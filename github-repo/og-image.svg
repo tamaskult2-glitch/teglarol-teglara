@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8DDD2"/>
+      <stop offset="100%" stop-color="#C9B8A8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Logo bal oldalon -->
+  <g transform="translate(80,165)">
+    <rect width="220" height="220" rx="44" fill="#CE2939"/>
+    <rect y="0" width="220" height="73" rx="44" fill="#CE2939"/>
+    <rect y="73" width="220" height="74" fill="#FFFFFF"/>
+    <rect y="147" width="220" height="73" fill="#477050"/>
+    <rect width="220" height="220" rx="44" fill="rgba(90,70,60,0.55)"/>
+    <!-- Tisza hullám -->
+    <path d="M22 110 Q 55 66, 88 110 T 154 110 T 198 110"
+      stroke="white" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <!-- Parlament -->
+    <g stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" fill="none">
+      <rect x="81" y="55" width="58" height="22" rx="1"/>
+      <path d="M99 55 Q110 35 121 55"/>
+      <line x1="110" y1="35" x2="110" y2="28"/>
+      <line x1="106" y1="30" x2="114" y2="30"/>
+    </g>
+    <!-- Lánchíd -->
+    <g stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" fill="none">
+      <line x1="26" y1="154" x2="88" y2="154"/>
+      <line x1="44" y1="154" x2="44" y2="134"/>
+      <line x1="70" y1="154" x2="70" y2="134"/>
+      <path d="M44 134 Q57 124 70 134"/>
+    </g>
+  </g>
+
+  <!-- Jobb oldal: szöveg -->
+  <text x="360" y="280" font-family="Georgia,serif" font-size="78" font-weight="bold" fill="#1A1918">„Tégláról-téglára"</text>
+  <text x="360" y="360" font-family="Georgia,serif" font-size="58" fill="#4A4947">mérő</text>
+  <text x="362" y="430" font-family="Arial,sans-serif" font-size="30" fill="#6B6A68">Független TISZA ígéretkövető · teglarol-teglara.hu</text>
+
+  <!-- Tisza hullám dekoráció -->
+  <path d="M0,560 Q100,530 200,560 Q300,590 400,560 Q500,530 600,560 Q700,590 800,560 Q900,530 1000,560 Q1100,590 1200,560"
+    fill="none" stroke="#4A9ECC" stroke-width="8" stroke-linecap="round" opacity="0.4"/>
+  <path d="M0,580 Q100,555 200,580 Q300,605 400,580 Q500,555 600,580 Q700,605 800,580 Q900,555 1000,580 Q1100,605 1200,580"
+    fill="none" stroke="#4A9ECC" stroke-width="5" stroke-linecap="round" opacity="0.25"/>
+</svg>
