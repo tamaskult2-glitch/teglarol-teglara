@@ -1645,7 +1645,828 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 
 <script>
 
-const excelData = [{"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Új alkotmánytervezet kidolgozása", "FiDeSZ állapot": "Alaptörvény XII. módosítása 2024", "Volt előrelépést jelentő bejelentés?": "igen – szükséges az Alaptörvény módosítása", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "azonnali"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "A rendeleti kormányzás megszüntetése", "FiDeSZ állapot": "rendkívüli jogrendben él az ország 2020 óta", "Volt előrelépést jelentő bejelentés?": "igen – rendkívüli jogrend megszüntetése első lépés", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "azonnali"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Miniszterelnöki mandátum két ciklusra korlátozása", "FiDeSZ állapot": "nincs korlátozás", "Volt előrelépést jelentő bejelentés?": "igen – Alaptörvény módosítás bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "azonnali"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Igazságszolgáltatás függetlenségének megerősítése", "FiDeSZ állapot": "politikailag kontrollált", "Volt előrelépést jelentő bejelentés?": "igen – EU feltétel vállalva; Kármán András pénzügy-, Orbán Anita külügyminiszter bejelentve (ápr.20)", "Változás": "bejelentve", "Frissítés": "2026-04-20", "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/", "Prioritás": "azonnali"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Új médiatörvény megalkotása", "FiDeSZ állapot": "közmédia propagandaeszköz", "Volt előrelépést jelentő bejelentés?": "igen – MTVA hírszolgáltatás azonnali felfüggesztése megerősítve (ápr.14)", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/", "Prioritás": "azonnali"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Pártfinanszírozás és választási törvény átalakítása", "FiDeSZ állapot": "Fidesz-érdekek szerint gerrymandering", "Volt előrelépést jelentő bejelentés?": "igen – Tisza–Fidesz–MiHazánk konstruktív alakuló ülés-előkészítő tárgyalások ápr.17 és ápr.21-én, konszenzus a Szent Korona-eskü kérdésében", "Változás": "bejelentve", "Frissítés": "2026-04-21", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Csatlakozás az Európai Ügyészséghez", "FiDeSZ állapot": "nem csatlakozott", "Volt előrelépést jelentő bejelentés?": "igen – első intézkedésként bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/", "Prioritás": "azonnali"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Magyarország visszalépése a Nemzetközi Büntetőbíróságba", "FiDeSZ állapot": "Magyarország 2025 tavaszán kilépett az ICC-ből", "Volt előrelépést jelentő bejelentés?": "nem – kilépés megtörtént, visszalépés szükséges", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://telex.hu/belfold/2026/04/13/parlamenti-valasztas-tisza-magyar-peter-gyozelem-fidesz-orban-viktor-ketharmad", "Prioritás": "rovid"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Szuverenitásvédelmi Hivatal megszüntetése", "FiDeSZ állapot": "2024 óta működik", "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter azonnali megszüntetését jelentette be", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "azonnali"}, {"Kategória": "Államszerkezet és jogállam", "TiSZa ígéret": "Nemzeti Vagyonvisszaszerzési és Védelmi Hivatal létrehozása", "FiDeSZ állapot": "nincs ilyen hivatal", "Volt előrelépést jelentő bejelentés?": "igen – első intézkedések között bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "azonnali"}, {"Kategória": "Biztonságpolitika", "TiSZa ígéret": "Nem küldenek magyar katonát az orosz–ukrán háborúba", "FiDeSZ állapot": "nem küldtek", "Volt előrelépést jelentő bejelentés?": "igen – Ruszin-Szendi Romulusz honvédelmi miniszternek jelölve (ápr.20), NATO-elkötelezettség megerősítve", "Változás": "bejelentve", "Frissítés": "2026-04-21", "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/", "Prioritás": "azonnali"}, {"Kategória": "Biztonságpolitika", "TiSZa ígéret": "Nem állítják vissza a sorkötelezettséget", "FiDeSZ állapot": "Medgyessy-kormány 2004-ben szüntette meg; Fidesz nem hozta vissza, de önkéntes Zrínyi-program van", "Volt előrelépést jelentő bejelentés?": "igen – megerősítve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "rovid"}, {"Kategória": "Biztonságpolitika", "TiSZa ígéret": "Védelmi kiadások GDP 5%-ára növelése 2035-ig", "FiDeSZ állapot": "2%-os NATO cél elérve 2024", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Biztonságpolitika", "TiSZa ígéret": "Déli határkerítés megtartása", "FiDeSZ állapot": "megtartják", "Volt előrelépést jelentő bejelentés?": "igen – megerősítve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592", "Prioritás": "azonnali"}, {"Kategória": "Biztonságpolitika", "TiSZa ígéret": "Nem engednek be Európán kívüli vendégmunkásokat", "FiDeSZ állapot": "jelenleg engednek", "Volt előrelépést jelentő bejelentés?": "igen – 2026. jún. 1-től tiltás bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok", "Prioritás": "rovid"}, {"Kategória": "Biztonságpolitika", "TiSZa ígéret": "EU-s migrációs kvóták elutasítása", "FiDeSZ állapot": "Fidesz következetesen elutasítja 2015 óta; EUB-perben is veszített, 200M EUR bírság", "Volt előrelépést jelentő bejelentés?": "igen – politika megerősítve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592", "Prioritás": "rovid"}, {"Kategória": "Biztonságpolitika", "TiSZa ígéret": "Embercsempészek nem kerülhetnek szabadon", "FiDeSZ állapot": "szigorú börtönbüntetés (3-8 év), a valóságban sok ítélet felfüggesztett vagy alacsony", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Külpolitika", "TiSZa ígéret": "EU- és NATO-orientált külpolitika", "FiDeSZ állapot": "keleti orientáció volt", "Volt előrelépést jelentő bejelentés?": "igen – első útja Varsóba, Bécsbe, Brüsszelbe", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592", "Prioritás": "azonnali"}, {"Kategória": "Külpolitika", "TiSZa ígéret": "V4-ek együttműködésének felélesztése", "FiDeSZ állapot": "meglazult 2022 után", "Volt előrelépést jelentő bejelentés?": "igen – V4 megújítás ígérete a sajtótájékoztatón", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592", "Prioritás": "rovid"}, {"Kategória": "Külpolitika", "TiSZa ígéret": "Ukrajna EU-csatlakozásáról népszavazás később", "FiDeSZ állapot": "Fidesz blokkolta Ukrajna EU-tárgyalásait, majd 2023-ban visszavonult; elvileg nem ellenzi, de vétóval fenyeget", "Volt előrelépést jelentő bejelentés?": "igen – megerősítve (háborúban álló ország most nem csatlakozhat)", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/", "Prioritás": "hosszu"}, {"Kategória": "Külpolitika", "TiSZa ígéret": "Kettős állampolgárság és külhoni magyarok választójoga marad", "FiDeSZ állapot": "Fidesz vezette be 2011-ben, 1,2M határon túli szavazó; Tisza megtartja", "Volt előrelépést jelentő bejelentés?": "igen – megerősítve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://index.hu/belfold/2026/04/12/magyar-peter-tisza-part-valasztas-2026-portre-miniszterelnok-szavazas/", "Prioritás": "rovid"}, {"Kategória": "Külpolitika", "TiSZa ígéret": "\"Vár a hazád\" program – 200 000 magyar hazacsábítása", "FiDeSZ állapot": "volt hasonló program", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Egészségügy", "TiSZa ígéret": "Vidéki kórházak megtartása", "FiDeSZ állapot": "ÁEEK centralizálta 2012-ben, majd átszervezés 2022-ben; vidéki kórházak megmaradtak de alulfinanszírozottak", "Volt előrelépést jelentő bejelentés?": "igen – Hegedűs Zsolt egészségügyi miniszternek jelölve (ápr.20); – vidéki kórházfejlesztés bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-21", "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon", "Prioritás": "rovid"}, {"Kategória": "Egészségügy", "TiSZa ígéret": "Régiónként egy szuperkórház fejlesztése", "FiDeSZ állapot": "Semmelweis-terv keretében részleges kórházfejlesztések indultak, de egységes szuperkórház-program nincs", "Volt előrelépést jelentő bejelentés?": "igen – regionális kórházi központok ígérve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon", "Prioritás": "rovid"}, {"Kategória": "Egészségügy", "TiSZa ígéret": "Évi 500 milliárd Ft pluszforrás az egészségügynek", "FiDeSZ állapot": "alulfinanszírozott", "Volt előrelépést jelentő bejelentés?": "igen – bejelentve az első intézkedések között", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "rovid"}, {"Kategória": "Egészségügy", "TiSZa ígéret": "Várólisták csökkentése és szűrőprogramok fejlesztése", "FiDeSZ állapot": "hosszú várólisták", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Egészségügy", "TiSZa ígéret": "Várható élettartam 80 évre növelése 2035-re", "FiDeSZ állapot": "76,5 év jelenleg", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Egészségügy", "TiSZa ígéret": "Egészségügyi kiadások GDP-arányának 7%-ra emelése 2030-ra", "FiDeSZ állapot": "~4,5% GDP körül", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "13. havi nyugdíj megtartása", "FiDeSZ állapot": "Fidesz visszaállította 2022-ben (2010-ben megszüntette Bajnai-kormány), megtartják", "Volt előrelépést jelentő bejelentés?": "igen – megerősítve + 14. havi és SZÉP-kártya ígérve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok", "Prioritás": "azonnali"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "Létminimum alatti nyugdíj megszüntetése", "FiDeSZ állapot": "800 ezer nyugdíjas él létminimum alatt", "Volt előrelépést jelentő bejelentés?": "igen – minimálnyugdíj 120 ezer Ft-ra emelése bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok", "Prioritás": "rovid"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "Háromgyermekes anyák és egyedülállók SZJA-mentessége", "FiDeSZ állapot": "4+ gyermekes anyák 2020-tól SZJA-mentes; 3 gyermekes anyák 2025. okt. 1-től; egyedülállókra külön mentesség nincs", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "Családtámogatások bővítése", "FiDeSZ állapot": "meglévő rendszer", "Volt előrelépést jelentő bejelentés?": "igen – duplázás bejelentve (csalpáti pótlék, gyes, gyet)", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok", "Prioritás": "rovid"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "Idősgondozás országos megerősítése", "FiDeSZ állapot": "otthonápolási díj létezik (2023-ban emelték), de szociális otthonokban 50 000 fős várólisták vannak", "Volt előrelépést jelentő bejelentés?": "igen – otthonápolási díj 50%-os emelése bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok", "Prioritás": "rovid"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "Népességfogyás megállítása 2035-ig", "FiDeSZ állapot": "évi 40-50 ezer fős fogyás", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "10 milliós népességcél 2050-re", "FiDeSZ állapot": "9,5 millió alatt", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "Családon belüli erőszak büntetésének szigorítása", "FiDeSZ állapot": "gyenge védelem", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Családpolitika", "TiSZa ígéret": "Gyermekek büntetőjogi védelmének bővítése", "FiDeSZ állapot": "visszaélések fedezve", "Volt előrelépést jelentő bejelentés?": "igen – Brunszvik Teréz program + kártérítés áldozatoknak", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok", "Prioritás": "azonnali"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Uniós források felszabadítása", "FiDeSZ állapot": "8000 Mrd Ft befagyasztva", "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter: máj.15-20 között Brüsszelbe megy aláírni a politikai megállapodást az EU-s forrásokról (ápr.20)", "Változás": "bejelentve", "Frissítés": "2026-04-20", "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/", "Prioritás": "azonnali"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Euró bevezetésének előkészítése", "FiDeSZ állapot": "aktívan ellenzi, Orbán: \"nem az unió menetrendje szerint\" – nincs csatlakozási terv", "Volt előrelépést jelentő bejelentés?": "igen – komolyan gondolják az euró bevezetését", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter", "Prioritás": "rovid"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Új növekedési modell kialakítása", "FiDeSZ állapot": "stagnáló gazdaság 2022 óta", "Volt előrelépést jelentő bejelentés?": "igen – Ganz Ábrahám program bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter", "Prioritás": "rovid"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Élelmiszeráfa csökkentése – zöldség és gyümölcs 5%", "FiDeSZ állapot": "27% áfa", "Volt előrelépést jelentő bejelentés?": "igen – 27%-ról 5%-ra csökkentés megerősítve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter", "Prioritás": "rovid"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Alapvető egészséges élelmiszerek áfájának csökkentése", "FiDeSZ állapot": "magas áfa", "Volt előrelépést jelentő bejelentés?": "igen – gyógyszerek 0%, élelmiszerek 5% bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok", "Prioritás": "rovid"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Fiatal gazdák támogatása és oligarchák földpiaci előnyeinek megszüntetése", "FiDeSZ állapot": "állami földek 94%-a bérletben ment Fidesz-közeli személyekhez; fiatal gazdák program létezik, de politikailag torzított", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Vállalkozásindítás egyszerűsítése", "FiDeSZ állapot": "bonyolult adminisztráció", "Volt előrelépést jelentő bejelentés?": "igen – KKV-fókusz, Ganz program keretében", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter", "Prioritás": "rovid"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "KKV-adminisztráció csökkentése", "FiDeSZ állapot": "Eonline, e-Cégkapu bevezetések ellenére a KKV adminisztrációs teher EU-átlag felett; 2023 OECD-mérés alapján", "Volt előrelépést jelentő bejelentés?": "igen – KKV-program bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter", "Prioritás": "rovid"}, {"Kategória": "Egyéb", "TiSZa ígéret": "\"Magyarok Hangja\" nemzeti konzultáció elindítása", "FiDeSZ állapot": "nincs valódi konzultáció", "Volt előrelépést jelentő bejelentés?": "igen – Nemzet Hangja konzultáció már zajlott", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://index.hu/belfold/2026/04/12/magyar-peter-tisza-part-valasztas-2026-portre-miniszterelnok-szavazas/", "Prioritás": "rovid"}, {"Kategória": "Egyéb", "TiSZa ígéret": "Társadalmi szerződés készítése a konzultáció alapján", "FiDeSZ állapot": "nincs", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Egyéb", "TiSZa ígéret": "MikulásGyár pótlása – új adventi jótékonysági program", "FiDeSZ állapot": "Magyar Péter alapította a MikulásGyárat, majd a Fidesz-közeli szervezetek átvették; civilek bojkottálták", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Egyéb", "TiSZa ígéret": "Gyermekvédelmi rendszer megerősítése", "FiDeSZ állapot": "visszaélések nem vizsgálva; bicskei ig. ma szabadult", "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette: gyermekvédelem felsőkorlát nélküli büdzsé + Brunszvik Teréz Program (ápr.20)", "Változás": "bejelentve", "Frissítés": "2026-04-20", "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok", "Prioritás": "azonnali"}, {"Kategória": "Egyéb", "TiSZa ígéret": "106 alapszervezet kiépítése országosan", "FiDeSZ állapot": "nincs helyi jelenlét", "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette a helyi jelenlét folytatását", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "rovid"}, {"Kategória": "Oktatás", "TiSZa ígéret": "Pedagógusbérek rendezése", "FiDeSZ állapot": "2023-24-ben lépcsős béremelés volt (+32% 3 lépcsőben), de uniós átlag ~60%-án maradtak", "Volt előrelépést jelentő bejelentés?": "igen – oktatási miniszter bejelentése pénteken (ápr.24) várható; Rubovszky Rita esélyesként említett; 15 gimnázium igazgatójával egyeztetett Magyar Péter", "Változás": "bejelentve", "Frissítés": "2026-04-24", "Forrás link": "https://telex.hu/belfold/2026/04/23/magyar-peter-oktatasi-miniszter-tisza-kormany-bejelentes", "Prioritás": "rovid"}, {"Kategória": "Oktatás", "TiSZa ígéret": "Tanárhiány csökkentése", "FiDeSZ állapot": "súlyos tanárhiány", "Volt előrelépést jelentő bejelentés?": "igen – ösztöndíjprogramok és béremelés bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "rovid"}, {"Kategória": "Oktatás", "TiSZa ígéret": "Modern tananyagfejlesztés", "FiDeSZ állapot": "elavult tananyag", "Volt előrelépést jelentő bejelentés?": "igen – Klebelsberg Központ átalakítása bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "rovid"}, {"Kategória": "Oktatás", "TiSZa ígéret": "Iskolai autonómia növelése", "FiDeSZ állapot": "2012-ben Klebelsberg Központ vette át az iskolákat; igazgatók elveszítették döntéshozó jogköröket", "Volt előrelépést jelentő bejelentés?": "igen – igazgatói jogosítványok visszaadása bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276", "Prioritás": "rovid"}, {"Kategória": "Korrupcióellenes intézkedések", "TiSZa ígéret": "Közbeszerzési rendszer átalakítása", "FiDeSZ állapot": "átláthatatlan rendszer", "Volt előrelépést jelentő bejelentés?": "igen – Vagyonvisszaszerzési Hivatal önálló szervként megerősítve, akár nyomozati jogkörrel (ápr.20)", "Változás": "bejelentve", "Frissítés": "2026-04-20", "Forrás link": "https://tudas.hu/amit-tudni-lehet-magyar-peter-szavaibol-mi-varhato-az-orszagban/", "Prioritás": "azonnali"}, {"Kategória": "Korrupcióellenes intézkedések", "TiSZa ígéret": "Átláthatósági szabályok szigorítása", "FiDeSZ állapot": "gyenge átláthatóság", "Volt előrelépést jelentő bejelentés?": "igen – EU feltételek vállalva, korrupcióellenes lépések", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/", "Prioritás": "azonnali"}, {"Kategória": "Közigazgatás", "TiSZa ígéret": "Állami bürokrácia csökkentése", "FiDeSZ állapot": "terjedelmes bürokratikus rendszer", "Volt előrelépést jelentő bejelentés?": "igen – 16 minisztériumos struktúra bejelentve (ápr.20), minden szakterületnek saját tárca", "Változás": "bejelentve", "Frissítés": "2026-04-20", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Közigazgatás", "TiSZa ígéret": "Digitális ügyintézés bővítése", "FiDeSZ állapot": "részleges digitalizáció", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Energia és környezet", "TiSZa ígéret": "Energiafüggetlenség növelése", "FiDeSZ állapot": "orosz energiafüggőség", "Volt előrelépést jelentő bejelentés?": "igen – Barátság kőolajvezeték újraindul ápr. végén; Mol-lal megállapodás védett benzinárról", "Változás": "folyamatban", "Frissítés": "2026-04-24", "Forrás link": "https://www.portfolio.hu/gazdasag/20260423/bejelentette-a-mol-itt-az-elso-orosz-olajszallitmany-a-baratsag-vezetekrol-832374", "Prioritás": "rovid"}, {"Kategória": "Energia és környezet", "TiSZa ígéret": "Megújulók arányának emelése", "FiDeSZ állapot": "2023-ra 17% megújuló, napelemek robbanásszerű elterjedése; de szél- és vízenergia-stop van", "Volt előrelépést jelentő bejelentés?": "igen – energiahatékonysági programok ígérve", "Változás": "bejelentve", "Frissítés": "2026-04-19", "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon", "Prioritás": "hosszu"}, {"Kategória": "Energia és környezet", "TiSZa ígéret": "Környezetvédelmi szabályok szigorítása", "FiDeSZ állapot": "akkugyárak kontroll nélkül", "Volt előrelépést jelentő bejelentés?": "igen – akkugyárak felülvizsgálata bejelentve", "Változás": "bejelentve", "Frissítés": "2026-02-07", "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter", "Prioritás": "hosszu"}, {"Kategória": "Közlekedés", "TiSZa ígéret": "Vidéki közlekedési hálózat fejlesztése", "FiDeSZ állapot": "leromlott vidéki közlekedés", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Közlekedés", "TiSZa ígéret": "Vasúti modernizáció", "FiDeSZ állapot": "vonatok átlagkora 40-50 év", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-19", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "hosszu"}, {"Kategória": "Lakhatás", "TiSZa ígéret": "Bérlakásprogram előkészítése", "FiDeSZ állapot": "az önkormányzati bérlakásállomány 90%-ot csökkent 1990 óta; CSOK lakástámogatás létezik, de bérlakásprogram nincs", "Volt előrelépést jelentő bejelentés?": "igen – bérlakásprogram bejelentve", "Változás": "bejelentve", "Frissítés": "2026-02-07", "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter", "Prioritás": "rovid"}, {"Kategória": "Közigazgatás", "TiSZa ígéret": "Vármegye elnevezés és főispáni pozíció megszüntetése", "FiDeSZ állapot": "2022-ben visszaállított vármegyék és főispánok", "Volt előrelépést jelentő bejelentés?": "igen – bejelentve az első intézkedések között", "Változás": "bejelentve", "Frissítés": "2026-04-21", "Forrás link": "https://index.hu/belfold/2026/02/09/magyar-peter-tisza-part-valasztasi-program-igazsagszolgaltatas-birosag-ugyeszseg-vegrehajtas-kozjegyzo/", "Prioritás": "azonnali"}, {"Kategória": "Közigazgatás", "TiSZa ígéret": "Önkormányzatok elvett hatásköreinek visszaadása", "FiDeSZ állapot": "2010 után centralizált önkormányzati rendszer", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://infostart.hu/belfold/2026/02/07/a-tisza-part-bemutatta-240-oldalas-programjat", "Prioritás": "rovid"}, {"Kategória": "Közigazgatás", "TiSZa ígéret": "Budapest-törvény – kormány és főváros partneri együttműködése", "FiDeSZ állapot": "konfliktus a főváros és a kormány között", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://infostart.hu/belfold/2026/02/07/a-tisza-part-bemutatta-240-oldalas-programjat", "Prioritás": "rovid"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Vagyonadó – évi 1% az 1 milliárd Ft feletti vagyonokra", "FiDeSZ állapot": "nincs vagyonadó", "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette: vagyonadó biztosan lesz", "Változás": "bejelentve", "Frissítés": "2026-04-21", "Forrás link": "https://www.portfolio.hu/gazdasag/20260420/magyar-peter-bejelentette-a-tisza-kormany-elso-minisztereit-831698", "Prioritás": "rovid"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Rezsicsökkentés megtartása és kiterjesztése vállalkozásokra", "FiDeSZ állapot": "csak lakossági rezsivédelem", "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter: védett ár és jövedéki adó meghosszabbítása ápr.30-ig", "Változás": "bejelentve", "Frissítés": "2026-04-21", "Forrás link": "https://index.hu/belfold/2026/04/17/orszaggyules-parlament-valasztas2026-fidesz-kdnp-tisza-part-mi-hazank-mozgalom-magyar-peter/", "Prioritás": "azonnali"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Paks II. felülvizsgálata", "FiDeSZ állapot": "orosz–magyar szerződés, 12,5 Mrd EUR hitel", "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette: minden szerződést átvizsgálnak, a projektet túlárazottnak tartja, de minden csatornát nyitva hagy; végleges döntés még nem született", "Változás": "folyamatban", "Frissítés": "2026-04-24", "Forrás link": "https://telex.hu/gazdasag/2026/04/21/paks-ii-magyar-peter-atomenergia-roszatom-orban-viktor", "Prioritás": "rovid"}, {"Kategória": "Gazdaság", "TiSZa ígéret": "Iskolakezdési támogatás – 100 000 Ft rászoruló családoknak", "FiDeSZ állapot": "nincs ilyen célzott támogatás", "Volt előrelépést jelentő bejelentés?": "igen – 2026 augusztustól bejelentve", "Változás": "bejelentve", "Frissítés": "2026-04-21", "Forrás link": "https://magyartisza.hu/", "Prioritás": "rovid"}, {"Kategória": "Oktatás", "TiSZa ígéret": "Állami tankönyvmonopólium megszüntetése", "FiDeSZ állapot": "kizárólagos állami tankönyv 2013 óta", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026", "Prioritás": "rovid"}, {"Kategória": "Oktatás", "TiSZa ígéret": "Tankötelezettség visszaemelése 18 évre", "FiDeSZ állapot": "2012 óta 16 év", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026", "Prioritás": "rovid"}, {"Kategória": "Oktatás", "TiSZa ígéret": "Alapítványi egyetemek visszaállamosítása", "FiDeSZ állapot": "11 egyetem alapítványi formában 2021-től", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026", "Prioritás": "rovid"}, {"Kategória": "Energia és környezet", "TiSZa ígéret": "Évente 100 000 lakás energetikai korszerűsítése", "FiDeSZ állapot": "lassú és bürokratikus felújítási program", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://magyartisza.hu/hirek/ujsag/bemutatta-mukodo-es-emberseges-magyarorszag-programjat-a-tisza", "Prioritás": "hosszu"}, {"Kategória": "Energia és környezet", "TiSZa ígéret": "Akkugyárak szigorúbb környezeti ellenőrzése", "FiDeSZ állapot": "Samsung SDI, CATL engedélyezés gyorsan ment", "Volt előrelépést jelentő bejelentés?": "nem – csak korábbi programígéret, konkrét intézkedés még nincs", "Változás": "ígéret", "Frissítés": "2026-04-24", "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf", "Prioritás": "rovid"}, {"Kategória": "Közlekedés", "TiSZa ígéret": "Ferihegyi reptér fejlesztése", "FiDeSZ állapot": "eladták, majd visszavásárolták a repteret", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026", "Prioritás": "hosszu"}, {"Kategória": "Közlekedés", "TiSZa ígéret": "HÉV-infrastruktúra fejlesztése", "FiDeSZ állapot": "elavult HÉV-vonalak", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026", "Prioritás": "hosszu"}, {"Kategória": "Lakhatás", "TiSZa ígéret": "Szociális bérlakások építése – 10 000 egység/év", "FiDeSZ állapot": "szinte nincs állami bérlakásépítés", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://avaloper.hu/tisza-part-valasztasi-programja-2026/", "Prioritás": "rovid"}, {"Kategória": "Korrupcióellenes intézkedések", "TiSZa ígéret": "20 évre visszamenőleg vagyonosodási vizsgálat politikusokon", "FiDeSZ állapot": "nincs átfogó vagyonosodási vizsgálat", "Volt előrelépést jelentő bejelentés?": "igen – Vagyonvisszaszerzési Hivatal nyomozati jogkörrel megerősítve", "Változás": "bejelentve", "Frissítés": "2026-04-21", "Forrás link": "https://444.hu/2026/04/20/magyar-peter-bejelentett-7-minisztert-a-heten-jonnek-ujabb-nevek", "Prioritás": "azonnali"}, {"Kategória": "Digitalizáció", "TiSZa ígéret": "Személyes AI-asszisztens minden állampolgárnak", "FiDeSZ állapot": "nincs ilyen szolgáltatás", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://index.hu/belfold/2026/02/07/magyar-peter-tisza-part-program-valasztasok-2026/", "Prioritás": "hosszu"}, {"Kategória": "Digitalizáció", "TiSZa ígéret": "Papírmentes, mobilbarát állami ügyintézés", "FiDeSZ állapot": "részleges e-ügyintézés, sok papír alapú folyamat", "Volt előrelépést jelentő bejelentés?": "nem", "Változás": "ígéret", "Frissítés": "2026-04-21", "Forrás link": "https://index.hu/belfold/2026/02/07/magyar-peter-tisza-part-program-valasztasok-2026/", "Prioritás": "rovid"}];
+const excelData = [
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Új alkotmánytervezet kidolgozása",
+  "FiDeSZ állapot": "Alaptörvény XII. módosítása 2024",
+  "Volt előrelépést jelentő bejelentés?": "igen – szükséges az Alaptörvény módosítása",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "A rendeleti kormányzás megszüntetése",
+  "FiDeSZ állapot": "rendkívüli jogrendben él az ország 2020 óta",
+  "Volt előrelépést jelentő bejelentés?": "igen – rendkívüli jogrend megszüntetése első lépés",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Miniszterelnöki mandátum két ciklusra korlátozása",
+  "FiDeSZ állapot": "nincs korlátozás",
+  "Volt előrelépést jelentő bejelentés?": "igen – Alaptörvény módosítás bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Igazságszolgáltatás függetlenségének megerősítése",
+  "FiDeSZ állapot": "politikailag kontrollált",
+  "Volt előrelépést jelentő bejelentés?": "igen – EU feltétel vállalva; Kármán András pénzügy-, Orbán Anita külügyminiszter bejelentve (ápr.20)",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-20",
+  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Új médiatörvény megalkotása",
+  "FiDeSZ állapot": "közmédia propagandaeszköz",
+  "Volt előrelépést jelentő bejelentés?": "igen – MTVA hírszolgáltatás azonnali felfüggesztése megerősítve (ápr.14)",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Pártfinanszírozás és választási törvény átalakítása",
+  "FiDeSZ állapot": "Fidesz-érdekek szerint gerrymandering",
+  "Volt előrelépést jelentő bejelentés?": "igen – Tisza–Fidesz–MiHazánk konstruktív alakuló ülés-előkészítő tárgyalások ápr.17 és ápr.21-én, konszenzus a Szent Korona-eskü kérdésében",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Csatlakozás az Európai Ügyészséghez",
+  "FiDeSZ állapot": "nem csatlakozott",
+  "Volt előrelépést jelentő bejelentés?": "igen – első intézkedésként bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Magyarország visszalépése a Nemzetközi Büntetőbíróságba",
+  "FiDeSZ állapot": "Magyarország 2025 tavaszán kilépett az ICC-ből",
+  "Volt előrelépést jelentő bejelentés?": "nem – kilépés megtörtént, visszalépés szükséges",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://telex.hu/belfold/2026/04/13/parlamenti-valasztas-tisza-magyar-peter-gyozelem-fidesz-orban-viktor-ketharmad",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Szuverenitásvédelmi Hivatal megszüntetése",
+  "FiDeSZ állapot": "2024 óta működik",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter azonnali megszüntetését jelentette be",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Államszerkezet és jogállam",
+  "TiSZa ígéret": "Nemzeti Vagyonvisszaszerzési és Védelmi Hivatal létrehozása",
+  "FiDeSZ állapot": "nincs ilyen hivatal",
+  "Volt előrelépést jelentő bejelentés?": "igen – első intézkedések között bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Biztonságpolitika",
+  "TiSZa ígéret": "Nem küldenek magyar katonát az orosz–ukrán háborúba",
+  "FiDeSZ állapot": "nem küldtek",
+  "Volt előrelépést jelentő bejelentés?": "igen – Ruszin-Szendi Romulusz honvédelmi miniszternek jelölve (ápr.20), NATO-elkötelezettség megerősítve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Biztonságpolitika",
+  "TiSZa ígéret": "Nem állítják vissza a sorkötelezettséget",
+  "FiDeSZ állapot": "Medgyessy-kormány 2004-ben szüntette meg; Fidesz nem hozta vissza, de önkéntes Zrínyi-program van",
+  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Biztonságpolitika",
+  "TiSZa ígéret": "Védelmi kiadások GDP 5%-ára növelése 2035-ig",
+  "FiDeSZ állapot": "2%-os NATO cél elérve 2024",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Biztonságpolitika",
+  "TiSZa ígéret": "Déli határkerítés megtartása",
+  "FiDeSZ állapot": "megtartják",
+  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Biztonságpolitika",
+  "TiSZa ígéret": "Nem engednek be Európán kívüli vendégmunkásokat",
+  "FiDeSZ állapot": "jelenleg engednek",
+  "Volt előrelépést jelentő bejelentés?": "igen – 2026. jún. 1-től tiltás bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Biztonságpolitika",
+  "TiSZa ígéret": "EU-s migrációs kvóták elutasítása",
+  "FiDeSZ állapot": "Fidesz következetesen elutasítja 2015 óta; EUB-perben is veszített, 200M EUR bírság",
+  "Volt előrelépést jelentő bejelentés?": "igen – politika megerősítve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Biztonságpolitika",
+  "TiSZa ígéret": "Embercsempészek nem kerülhetnek szabadon",
+  "FiDeSZ állapot": "szigorú börtönbüntetés (3-8 év), a valóságban sok ítélet felfüggesztett vagy alacsony",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Külpolitika",
+  "TiSZa ígéret": "EU- és NATO-orientált külpolitika",
+  "FiDeSZ állapot": "keleti orientáció volt",
+  "Volt előrelépést jelentő bejelentés?": "igen – első útja Varsóba, Bécsbe, Brüsszelbe",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Külpolitika",
+  "TiSZa ígéret": "V4-ek együttműködésének felélesztése",
+  "FiDeSZ állapot": "meglazult 2022 után",
+  "Volt előrelépést jelentő bejelentés?": "igen – V4 megújítás ígérete a sajtótájékoztatón",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Külpolitika",
+  "TiSZa ígéret": "Ukrajna EU-csatlakozásáról népszavazás később",
+  "FiDeSZ állapot": "Fidesz blokkolta Ukrajna EU-tárgyalásait, majd 2023-ban visszavonult; elvileg nem ellenzi, de vétóval fenyeget",
+  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve (háborúban álló ország most nem csatlakozhat)",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Külpolitika",
+  "TiSZa ígéret": "Kettős állampolgárság és külhoni magyarok választójoga marad",
+  "FiDeSZ állapot": "Fidesz vezette be 2011-ben, 1,2M határon túli szavazó; Tisza megtartja",
+  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://index.hu/belfold/2026/04/12/magyar-peter-tisza-part-valasztas-2026-portre-miniszterelnok-szavazas/",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Külpolitika",
+  "TiSZa ígéret": "\"Vár a hazád\" program – 200 000 magyar hazacsábítása",
+  "FiDeSZ állapot": "volt hasonló program",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Egészségügy",
+  "TiSZa ígéret": "Vidéki kórházak megtartása",
+  "FiDeSZ állapot": "ÁEEK centralizálta 2012-ben, majd átszervezés 2022-ben; vidéki kórházak megmaradtak de alulfinanszírozottak",
+  "Volt előrelépést jelentő bejelentés?": "igen – Hegedűs Zsolt egészségügyi miniszternek jelölve (ápr.20); – vidéki kórházfejlesztés bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Egészségügy",
+  "TiSZa ígéret": "Régiónként egy szuperkórház fejlesztése",
+  "FiDeSZ állapot": "Semmelweis-terv keretében részleges kórházfejlesztések indultak, de egységes szuperkórház-program nincs",
+  "Volt előrelépést jelentő bejelentés?": "igen – regionális kórházi központok ígérve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Egészségügy",
+  "TiSZa ígéret": "Évi 500 milliárd Ft pluszforrás az egészségügynek",
+  "FiDeSZ állapot": "alulfinanszírozott",
+  "Volt előrelépést jelentő bejelentés?": "igen – bejelentve az első intézkedések között",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Egészségügy",
+  "TiSZa ígéret": "Várólisták csökkentése és szűrőprogramok fejlesztése",
+  "FiDeSZ állapot": "hosszú várólisták",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Egészségügy",
+  "TiSZa ígéret": "Várható élettartam 80 évre növelése 2035-re",
+  "FiDeSZ állapot": "76,5 év jelenleg",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Egészségügy",
+  "TiSZa ígéret": "Egészségügyi kiadások GDP-arányának 7%-ra emelése 2030-ra",
+  "FiDeSZ állapot": "~4,5% GDP körül",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "13. havi nyugdíj megtartása",
+  "FiDeSZ állapot": "Fidesz visszaállította 2022-ben (2010-ben megszüntette Bajnai-kormány), megtartják",
+  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve + 14. havi és SZÉP-kártya ígérve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "Létminimum alatti nyugdíj megszüntetése",
+  "FiDeSZ állapot": "800 ezer nyugdíjas él létminimum alatt",
+  "Volt előrelépést jelentő bejelentés?": "igen – minimálnyugdíj 120 ezer Ft-ra emelése bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "Háromgyermekes anyák és egyedülállók SZJA-mentessége",
+  "FiDeSZ állapot": "4+ gyermekes anyák 2020-tól SZJA-mentes; 3 gyermekes anyák 2025. okt. 1-től; egyedülállókra külön mentesség nincs",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "Családtámogatások bővítése",
+  "FiDeSZ állapot": "meglévő rendszer",
+  "Volt előrelépést jelentő bejelentés?": "igen – duplázás bejelentve (csalpáti pótlék, gyes, gyet)",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "Idősgondozás országos megerősítése",
+  "FiDeSZ állapot": "otthonápolási díj létezik (2023-ban emelték), de szociális otthonokban 50 000 fős várólisták vannak",
+  "Volt előrelépést jelentő bejelentés?": "igen – otthonápolási díj 50%-os emelése bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "Népességfogyás megállítása 2035-ig",
+  "FiDeSZ állapot": "évi 40-50 ezer fős fogyás",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "10 milliós népességcél 2050-re",
+  "FiDeSZ állapot": "9,5 millió alatt",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "Családon belüli erőszak büntetésének szigorítása",
+  "FiDeSZ állapot": "gyenge védelem",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Családpolitika",
+  "TiSZa ígéret": "Gyermekek büntetőjogi védelmének bővítése",
+  "FiDeSZ állapot": "visszaélések fedezve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Brunszvik Teréz program + kártérítés áldozatoknak",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Uniós források felszabadítása",
+  "FiDeSZ állapot": "8000 Mrd Ft befagyasztva",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter: máj.15-20 között Brüsszelbe megy aláírni a politikai megállapodást az EU-s forrásokról (ápr.20)",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-20",
+  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Euró bevezetésének előkészítése",
+  "FiDeSZ állapot": "aktívan ellenzi, Orbán: \"nem az unió menetrendje szerint\" – nincs csatlakozási terv",
+  "Volt előrelépést jelentő bejelentés?": "igen – komolyan gondolják az euró bevezetését",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Új növekedési modell kialakítása",
+  "FiDeSZ állapot": "stagnáló gazdaság 2022 óta",
+  "Volt előrelépést jelentő bejelentés?": "igen – Ganz Ábrahám program bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Élelmiszeráfa csökkentése – zöldség és gyümölcs 5%",
+  "FiDeSZ állapot": "27% áfa",
+  "Volt előrelépést jelentő bejelentés?": "igen – 27%-ról 5%-ra csökkentés megerősítve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Alapvető egészséges élelmiszerek áfájának csökkentése",
+  "FiDeSZ állapot": "magas áfa",
+  "Volt előrelépést jelentő bejelentés?": "igen – gyógyszerek 0%, élelmiszerek 5% bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Fiatal gazdák támogatása és oligarchák földpiaci előnyeinek megszüntetése",
+  "FiDeSZ állapot": "állami földek 94%-a bérletben ment Fidesz-közeli személyekhez; fiatal gazdák program létezik, de politikailag torzított",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Vállalkozásindítás egyszerűsítése",
+  "FiDeSZ állapot": "bonyolult adminisztráció",
+  "Volt előrelépést jelentő bejelentés?": "igen – KKV-fókusz, Ganz program keretében",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "KKV-adminisztráció csökkentése",
+  "FiDeSZ állapot": "Eonline, e-Cégkapu bevezetések ellenére a KKV adminisztrációs teher EU-átlag felett; 2023 OECD-mérés alapján",
+  "Volt előrelépést jelentő bejelentés?": "igen – KKV-program bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Egyéb",
+  "TiSZa ígéret": "\"Magyarok Hangja\" nemzeti konzultáció elindítása",
+  "FiDeSZ állapot": "nincs valódi konzultáció",
+  "Volt előrelépést jelentő bejelentés?": "igen – Nemzet Hangja konzultáció már zajlott",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://index.hu/belfold/2026/04/12/magyar-peter-tisza-part-valasztas-2026-portre-miniszterelnok-szavazas/",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Egyéb",
+  "TiSZa ígéret": "Társadalmi szerződés készítése a konzultáció alapján",
+  "FiDeSZ állapot": "nincs",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Egyéb",
+  "TiSZa ígéret": "MikulásGyár pótlása – új adventi jótékonysági program",
+  "FiDeSZ állapot": "Magyar Péter alapította a MikulásGyárat, majd a Fidesz-közeli szervezetek átvették; civilek bojkottálták",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Egyéb",
+  "TiSZa ígéret": "Gyermekvédelmi rendszer megerősítése",
+  "FiDeSZ állapot": "visszaélések nem vizsgálva; bicskei ig. ma szabadult",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette: gyermekvédelem felsőkorlát nélküli büdzsé + Brunszvik Teréz Program (ápr.20)",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-20",
+  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Egyéb",
+  "TiSZa ígéret": "106 alapszervezet kiépítése országosan",
+  "FiDeSZ állapot": "nincs helyi jelenlét",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette a helyi jelenlét folytatását",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Oktatás",
+  "TiSZa ígéret": "Pedagógusbérek rendezése",
+  "FiDeSZ állapot": "2023-24-ben lépcsős béremelés volt (+32% 3 lépcsőben), de uniós átlag ~60%-án maradtak",
+  "Volt előrelépést jelentő bejelentés?": "igen – Rubovszky Rita oktatási miniszternek jelölve (Ciszterci Főhatóság), béremelés megerősítve (ápr.20)",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-20",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Oktatás",
+  "TiSZa ígéret": "Tanárhiány csökkentése",
+  "FiDeSZ állapot": "súlyos tanárhiány",
+  "Volt előrelépést jelentő bejelentés?": "igen – ösztöndíjprogramok és béremelés bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Oktatás",
+  "TiSZa ígéret": "Modern tananyagfejlesztés",
+  "FiDeSZ állapot": "elavult tananyag",
+  "Volt előrelépést jelentő bejelentés?": "igen – Klebelsberg Központ átalakítása bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Oktatás",
+  "TiSZa ígéret": "Iskolai autonómia növelése",
+  "FiDeSZ állapot": "2012-ben Klebelsberg Központ vette át az iskolákat; igazgatók elveszítették döntéshozó jogköröket",
+  "Volt előrelépést jelentő bejelentés?": "igen – igazgatói jogosítványok visszaadása bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Korrupcióellenes intézkedések",
+  "TiSZa ígéret": "Közbeszerzési rendszer átalakítása",
+  "FiDeSZ állapot": "átláthatatlan rendszer",
+  "Volt előrelépést jelentő bejelentés?": "igen – Vagyonvisszaszerzési Hivatal önálló szervként megerősítve, akár nyomozati jogkörrel (ápr.20)",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-20",
+  "Forrás link": "https://tudas.hu/amit-tudni-lehet-magyar-peter-szavaibol-mi-varhato-az-orszagban/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Korrupcióellenes intézkedések",
+  "TiSZa ígéret": "Átláthatósági szabályok szigorítása",
+  "FiDeSZ állapot": "gyenge átláthatóság",
+  "Volt előrelépést jelentő bejelentés?": "igen – EU feltételek vállalva, korrupcióellenes lépések",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Közigazgatás",
+  "TiSZa ígéret": "Állami bürokrácia csökkentése",
+  "FiDeSZ állapot": "terjedelmes bürokratikus rendszer",
+  "Volt előrelépést jelentő bejelentés?": "igen – 16 minisztériumos struktúra bejelentve (ápr.20), minden szakterületnek saját tárca",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-20",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Közigazgatás",
+  "TiSZa ígéret": "Digitális ügyintézés bővítése",
+  "FiDeSZ állapot": "részleges digitalizáció",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Energia és környezet",
+  "TiSZa ígéret": "Energiafüggetlenség növelése",
+  "FiDeSZ állapot": "orosz energiafüggőség",
+  "Volt előrelépést jelentő bejelentés?": "igen – Barátság kőolajvezeték újraindul ápr. végén; Mol-lal megállapodás védett benzinárról",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Energia és környezet",
+  "TiSZa ígéret": "Megújulók arányának emelése",
+  "FiDeSZ állapot": "2023-ra 17% megújuló, napelemek robbanásszerű elterjedése; de szél- és vízenergia-stop van",
+  "Volt előrelépést jelentő bejelentés?": "igen – energiahatékonysági programok ígérve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Energia és környezet",
+  "TiSZa ígéret": "Környezetvédelmi szabályok szigorítása",
+  "FiDeSZ állapot": "akkugyárak kontroll nélkül",
+  "Volt előrelépést jelentő bejelentés?": "igen – akkugyárak felülvizsgálata bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-02-07",
+  "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Közlekedés",
+  "TiSZa ígéret": "Vidéki közlekedési hálózat fejlesztése",
+  "FiDeSZ állapot": "leromlott vidéki közlekedés",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Közlekedés",
+  "TiSZa ígéret": "Vasúti modernizáció",
+  "FiDeSZ állapot": "vonatok átlagkora 40-50 év",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-19",
+  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Lakhatás",
+  "TiSZa ígéret": "Bérlakásprogram előkészítése",
+  "FiDeSZ állapot": "az önkormányzati bérlakásállomány 90%-ot csökkent 1990 óta; CSOK lakástámogatás létezik, de bérlakásprogram nincs",
+  "Volt előrelépést jelentő bejelentés?": "igen – bérlakásprogram bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-02-07",
+  "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Közigazgatás",
+  "TiSZa ígéret": "Vármegye elnevezés és főispáni pozíció megszüntetése",
+  "FiDeSZ állapot": "2022-ben visszaállított vármegyék és főispánok",
+  "Volt előrelépést jelentő bejelentés?": "igen – bejelentve az első intézkedések között",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://index.hu/belfold/2026/02/09/magyar-peter-tisza-part-valasztasi-program-igazsagszolgaltatas-birosag-ugyeszseg-vegrehajtas-kozjegyzo/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Közigazgatás",
+  "TiSZa ígéret": "Önkormányzatok elvett hatásköreinek visszaadása",
+  "FiDeSZ állapot": "2010 után centralizált önkormányzati rendszer",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://infostart.hu/belfold/2026/02/07/a-tisza-part-bemutatta-240-oldalas-programjat",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Közigazgatás",
+  "TiSZa ígéret": "Budapest-törvény – kormány és főváros partneri együttműködése",
+  "FiDeSZ állapot": "konfliktus a főváros és a kormány között",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://infostart.hu/belfold/2026/02/07/a-tisza-part-bemutatta-240-oldalas-programjat",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Vagyonadó – évi 1% az 1 milliárd Ft feletti vagyonokra",
+  "FiDeSZ állapot": "nincs vagyonadó",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette: vagyonadó biztosan lesz",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260420/magyar-peter-bejelentette-a-tisza-kormany-elso-minisztereit-831698",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Rezsicsökkentés megtartása és kiterjesztése vállalkozásokra",
+  "FiDeSZ állapot": "csak lakossági rezsivédelem",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter: védett ár és jövedéki adó meghosszabbítása ápr.30-ig",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://index.hu/belfold/2026/04/17/orszaggyules-parlament-valasztas2026-fidesz-kdnp-tisza-part-mi-hazank-mozgalom-magyar-peter/",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Paks II. felülvizsgálata",
+  "FiDeSZ állapot": "orosz–magyar szerződés, 12,5 Mrd EUR hitel",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Gazdaság",
+  "TiSZa ígéret": "Iskolakezdési támogatás – 100 000 Ft rászoruló családoknak",
+  "FiDeSZ állapot": "nincs ilyen célzott támogatás",
+  "Volt előrelépést jelentő bejelentés?": "igen – 2026 augusztustól bejelentve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://magyartisza.hu/",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Oktatás",
+  "TiSZa ígéret": "Állami tankönyvmonopólium megszüntetése",
+  "FiDeSZ állapot": "kizárólagos állami tankönyv 2013 óta",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Oktatás",
+  "TiSZa ígéret": "Tankötelezettség visszaemelése 18 évre",
+  "FiDeSZ állapot": "2012 óta 16 év",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Oktatás",
+  "TiSZa ígéret": "Alapítványi egyetemek visszaállamosítása",
+  "FiDeSZ állapot": "11 egyetem alapítványi formában 2021-től",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Energia és környezet",
+  "TiSZa ígéret": "Évente 100 000 lakás energetikai korszerűsítése",
+  "FiDeSZ állapot": "lassú és bürokratikus felújítási program",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://magyartisza.hu/hirek/ujsag/bemutatta-mukodo-es-emberseges-magyarorszag-programjat-a-tisza",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Energia és környezet",
+  "TiSZa ígéret": "Akkugyárak szigorúbb környezeti ellenőrzése",
+  "FiDeSZ állapot": "Samsung SDI, CATL engedélyezés gyorsan ment",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://avaloper.hu/tisza-part-valasztasi-programja-2026/",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Közlekedés",
+  "TiSZa ígéret": "Ferihegyi reptér fejlesztése",
+  "FiDeSZ állapot": "eladták, majd visszavásárolták a repteret",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Közlekedés",
+  "TiSZa ígéret": "HÉV-infrastruktúra fejlesztése",
+  "FiDeSZ állapot": "elavult HÉV-vonalak",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Lakhatás",
+  "TiSZa ígéret": "Szociális bérlakások építése – 10 000 egység/év",
+  "FiDeSZ állapot": "szinte nincs állami bérlakásépítés",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://avaloper.hu/tisza-part-valasztasi-programja-2026/",
+  "Prioritás": "rovid"
+ },
+ {
+  "Kategória": "Korrupcióellenes intézkedések",
+  "TiSZa ígéret": "20 évre visszamenőleg vagyonosodási vizsgálat politikusokon",
+  "FiDeSZ állapot": "nincs átfogó vagyonosodási vizsgálat",
+  "Volt előrelépést jelentő bejelentés?": "igen – Vagyonvisszaszerzési Hivatal nyomozati jogkörrel megerősítve",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://444.hu/2026/04/20/magyar-peter-bejelentett-7-minisztert-a-heten-jonnek-ujabb-nevek",
+  "Prioritás": "azonnali"
+ },
+ {
+  "Kategória": "Digitalizáció",
+  "TiSZa ígéret": "Személyes AI-asszisztens minden állampolgárnak",
+  "FiDeSZ állapot": "nincs ilyen szolgáltatás",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://index.hu/belfold/2026/02/07/magyar-peter-tisza-part-program-valasztasok-2026/",
+  "Prioritás": "hosszu"
+ },
+ {
+  "Kategória": "Digitalizáció",
+  "TiSZa ígéret": "Papírmentes, mobilbarát állami ügyintézés",
+  "FiDeSZ állapot": "részleges e-ügyintézés, sok papír alapú folyamat",
+  "Volt előrelépést jelentő bejelentés?": "nem",
+  "Változás": "ígéret",
+  "Frissítés": "2026-04-21",
+  "Forrás link": "https://index.hu/belfold/2026/02/07/magyar-peter-tisza-part-program-valasztasok-2026/",
+  "Prioritás": "rovid"
+ }
+];
 
 // Napja helper - globális
 function _dAgo(ds) {
@@ -2675,62 +3496,37 @@ document.getElementById("bugSubmit").addEventListener("click", () => {
 
 // Nézetszámláló – Netlify Function alapú, közös számláló
 (function() {
+  const BASE_TOTAL = 320;
+  const today = new Date().toISOString().slice(0,10);
+  const month = today.slice(0,7);
   function fmt(n) {
     if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
     if (n >= 1000) return (n/1000).toFixed(1)+'k';
     return String(n);
   }
-  function animateCount(el, target, duration=600) {
-    if (!el) return;
-    const start = parseInt(el.textContent.replace(/[^0-9]/g,'')) || 0;
-    const diff = target - start;
-    if (diff <= 0) { el.textContent = fmt(target); return; }
-    const startTime = performance.now();
-    function step(now) {
-      const p = Math.min((now - startTime) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      el.textContent = fmt(Math.round(start + diff * ease));
-      if (p < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
+  function updateUI(d) {
+    const el = (id) => document.getElementById(id);
+    if (el("statsToday")) el("statsToday").textContent = fmt(d.today);
+    if (el("statsMonth")) el("statsMonth").textContent = fmt(d.month);
+    if (el("statsTotal")) el("statsTotal").textContent = fmt(d.total);
+    if (el("statsHeaderNum")) el("statsHeaderNum").textContent = fmt(d.total);
   }
-  function updateUI(data) {
-    animateCount(document.getElementById("statsToday"), data.today);
-    animateCount(document.getElementById("statsMonth"), data.month);
-    animateCount(document.getElementById("statsTotal"), data.total);
-    animateCount(document.getElementById("statsHeaderNum"), data.total);
-  }
-  // Azonnal mutatunk valamit LocalStorage-ból (optimista UI)
   try {
-    const cached = JSON.parse(localStorage.getItem("igmero_cache") || "{}");
-    if (cached.total) updateUI(cached);
+    const dv = parseInt(localStorage.getItem("igmero_day_"+today)||"0") + 1;
+    const mv = parseInt(localStorage.getItem("igmero_month_"+month)||"0") + 1;
+    const av = Math.max(parseInt(localStorage.getItem("igmero_total")||"0"), BASE_TOTAL) + 1;
+    localStorage.setItem("igmero_day_"+today, dv);
+    localStorage.setItem("igmero_month_"+month, mv);
+    localStorage.setItem("igmero_total", av);
+    localStorage.setItem("igmero_cache", JSON.stringify({today:dv, month:mv, total:av}));
+    updateUI({today:dv, month:mv, total:av});
   } catch(e) {}
-  // POST: növeli a számlálót és visszaadja az új értéket
-  fetch("/api/counter", { method: "POST" })
-    .then(r => r.json())
-    .then(data => {
-      updateUI(data);
-      try { localStorage.setItem("igmero_cache", JSON.stringify(data)); } catch(e) {}
-    })
-    .catch(() => {
-      // Fallback: localStorage
-      try {
-        const today = new Date().toISOString().slice(0,10);
-        const month = today.slice(0,7);
-        const d = parseInt(localStorage.getItem("igmero_day_"+today)||"0") + 1;
-        const m = parseInt(localStorage.getItem("igmero_month_"+month)||"0") + 1;
-        const a = Math.max(parseInt(localStorage.getItem("igmero_total")||"0"), 320) + 1;
-        localStorage.setItem("igmero_day_"+today, d);
-        localStorage.setItem("igmero_month_"+month, m);
-        localStorage.setItem("igmero_total", a);
-        updateUI({ today: d, month: m, total: a });
-      } catch(e) {}
-    });
-  // Stats modal open
-  window.openStatsModal = function() {
-    document.getElementById("statsOverlay").classList.add("active");
-  };
 })();
+// Stats modal open
+window.openStatsModal = function() {
+  document.getElementById("statsOverlay").classList.add("active");
+};
+
 // ── Csengő gomb JS ──
 (function() {
   const bell = document.getElementById('bellBtn');
