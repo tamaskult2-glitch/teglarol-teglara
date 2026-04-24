@@ -503,10 +503,10 @@
     "Kategória": "Oktatás",
     "TiSZa ígéret": "Pedagógusbérek rendezése",
     "FiDeSZ állapot": "2023-24-ben lépcsős béremelés volt (+32% 3 lépcsőben), de uniós átlag ~60%-án maradtak",
-    "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter bejelentette, hogy ápr.24-én (pénteken) nyilvánosságra hozza az oktatási miniszter nevét; Rubovszky Rita a Ciszterci Iskolai Főhatóság igazgatója a legvalószínűbb jelölt",
+    "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter ápr.24-én 14 órakor bejelenti az oktatási miniszter személyét; a délelőtti bejelentésben már Vitézy Dávid közlekedési és Kátai-Németh Vilmos szociális miniszter is megerősítve",
     "Változás": "bejelentve",
     "Frissítés": "2026-04-24",
-    "Forrás link": "https://telex.hu/belfold/2026/04/23/magyar-peter-oktatasi-miniszter-tisza-kormany-bejelentes",
+    "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-kormany-miniszterek-bejelentes-oktatas-belugyminiszter/",
     "Prioritás": "rovid"
   },
   {
@@ -613,20 +613,20 @@
     "Kategória": "Közlekedés",
     "TiSZa ígéret": "Vidéki közlekedési hálózat fejlesztése",
     "FiDeSZ állapot": "leromlott vidéki közlekedés",
-    "Volt előrelépést jelentő bejelentés?": "nem",
-    "Változás": "ígéret",
-    "Frissítés": "2026-04-19",
-    "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+    "Volt előrelépést jelentő bejelentés?": "igen – Vitézy Dávid közlekedési miniszterként bejelentve (ápr.24); programjában szerepel vidéki utak felújítása, másod- és harmadrendű utak fejlesztése, vidéki közlekedés új szintre emelése",
+    "Változás": "bejelentve",
+    "Frissítés": "2026-04-24",
+    "Forrás link": "https://www.portfolio.hu/gazdasag/20260424/vitezy-david-bejelentette-mivel-kezdi-a-munkat-832694",
     "Prioritás": "hosszu"
   },
   {
     "Kategória": "Közlekedés",
     "TiSZa ígéret": "Vasúti modernizáció",
     "FiDeSZ állapot": "vonatok átlagkora 40-50 év",
-    "Volt előrelépést jelentő bejelentés?": "nem",
-    "Változás": "ígéret",
-    "Frissítés": "2026-04-19",
-    "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+    "Volt előrelépést jelentő bejelentés?": "igen – Vitézy Dávid közlekedési és beruházási miniszternek jelölve (ápr.24), fő feladata a MÁV talpraállítása és átfogó vasút-fejlesztési program uniós forrásokból",
+    "Változás": "bejelentve",
+    "Frissítés": "2026-04-24",
+    "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-kormany-miniszterek-bejelentes-oktatas-belugyminiszter/",
     "Prioritás": "hosszu"
   },
   {
@@ -773,10 +773,10 @@
     "Kategória": "Közlekedés",
     "TiSZa ígéret": "HÉV-infrastruktúra fejlesztése",
     "FiDeSZ állapot": "elavult HÉV-vonalak",
-    "Volt előrelépést jelentő bejelentés?": "nem",
-    "Változás": "ígéret",
-    "Frissítés": "2026-04-21",
-    "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
+    "Volt előrelépést jelentő bejelentés?": "igen – Vitézy Dávid közlekedési miniszterként bejelentve (ápr.24); programjában explicit szerepel átfogó vasút- és HÉV-fejlesztési program uniós forrásokból",
+    "Változás": "bejelentve",
+    "Frissítés": "2026-04-24",
+    "Forrás link": "https://telex.hu/belfold/2026/04/24/vitezy-david-kozlekedesi-miniszter-tisza-part",
     "Prioritás": "hosszu"
   },
   {
