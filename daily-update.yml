@@ -1,0 +1,66 @@
+name: Napi automatikus frissítés
+
+on:
+  schedule:
+    # Minden nap reggel 7:00 UTC (9:00 Magyarország)
+    - cron: '0 7 * * *'
+  # Kézi futtatás lehetősége
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write  # Szükséges a repo írásához
+
+    steps:
+      - name: 📥 Repo letöltése
+        uses: actions/checkout@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+      - name: 🐍 Python beállítása
+        uses: actions/setup-python@v5
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Függőségek telepítése
+        run: pip install anthropic
+
+      - name: 🤖 Claude frissítő futtatása
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/update.py
+
+      - name: 📊 Változások ellenőrzése
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Nincs változás"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Változás detektálva:"
+            git diff --stat
+          fi
+
+      - name: 💾 Commit és push (ha változott)
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "Tégláról-téglára Bot"
+          git config user.email "bot@teglarol-teglara.hu"
+          git add data.json index.html
+          git add sitemap.xml 2>/dev/null || true
+          git commit -m "🤖 Automatikus frissítés $(date '+%Y-%m-%d')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ✅ Összefoglaló
+        run: |
+          echo "Frissítés befejezve: $(date)"
+          echo "Changed: ${{ steps.check_changes.outputs.changed }}"
