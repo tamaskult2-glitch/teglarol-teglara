@@ -906,9 +906,9 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  <header class="modern-header" style="position:relative;">
 
  <span class="version-badge">
- Ver. 1.4
+ <span id="headerVerNum">Ver. 1.5</span>
  <span class="ver-divider"></span>
- <span class="ver-date">Updated: 2026.04.21</span>
+ <span class="ver-date" id="headerVerDate">Updated: 2026.04.24</span>
  </span>
  <div class="header-inner">
  <div class="header-left-col" style="display:flex;flex-direction:column;align-items:center;gap:0;">
@@ -1040,6 +1040,9 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  <p style="text-align:center;margin:16px 0 8px;font-size:14px;font-weight:600;color:var(--text-secondary);">
   🧱 Segíts hogy minél többen számon kérhessék az ígéreteket!
  </p>
+ <p style="text-align:center;margin:4px 0 12px;font-size:13px;color:var(--text-secondary);">
+  📲 Oszd meg, ha tetszik!
+ </p>
  <div class="share-row">
   <a class="share-btn fb" id="shareFacebook" href="#" onclick="return false;">
    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
@@ -1101,7 +1104,16 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
   <option value="__all__">Összes kategória</option>
  </select>
 
- <!-- IDŐSOR DIAGRAM – középre igazítva -->
+ <!-- KERESŐSÁV - fő tartalomban -->
+ <div id="mainSearchWrap" style="margin-bottom:20px;">
+  <div style="position:relative;">
+   <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#999;pointer-events:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+   <input id="mainSearch" type="text" placeholder="Keresés az ígéretek között… (pl. egészségügy, KATA, lakhatás)" autocomplete="off"
+    style="width:100%;box-sizing:border-box;padding:14px 16px 14px 42px;border-radius:16px;border:1.5px solid var(--border-subtle);background:var(--bg-card);color:var(--text-main);font-size:15px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;box-shadow:var(--shadow-soft);">
+  </div>
+ </div>
+
+<!-- IDŐSOR DIAGRAM – középre igazítva -->
  <div style="margin-bottom:24px;">
  <div class="card" id="timelineCard" style="width:100%;">
 
@@ -1473,52 +1485,38 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
    </blockquote>
   </div>
 
-  <!-- INTERAKTÍV TÚRA -->
+  <!-- INTERAKTÍV TÚRA - 3 lépés -->
   <div class="tour-wrap" id="tourWrap">
-   <p class="tour-intro">👋 <strong>Első látogatás?</strong> Gyors bemutató — 4 lépés, ~30 másodperc.</p>
+   <p class="tour-intro">👋 <strong>Első látogatás?</strong> 3 lépés, ~20 másodperc.</p>
    <div class="tour-steps" id="tourSteps">
+
     <div class="tour-step active" data-step="0">
-     <span class="tour-step-icon">🗂️</span>
+     <span class="tour-step-icon" style="font-size:36px;">🧱</span>
      <div class="tour-step-body">
-      <div class="tour-step-title">Témák menü — bal oldal</div>
-      <div class="tour-step-desc">Szűrj kategóriára (pl. Egészségügy, Gazdaság) vagy prioritásra (🔴 Azonnali). Desktopon mindig látható, mobilon a ☰ Témák gombbal nyílik.</div>
+      <div class="tour-step-title">Minden kártya = egy ígéret</div>
+      <div class="tour-step-desc">📣 Bejelentve &nbsp;·&nbsp; ✅ Teljesítve &nbsp;·&nbsp; ❌ Csak ígéret<br>Kattints bármelyikre a részletekért és forrásért.</div>
      </div>
     </div>
+
     <div class="tour-step" data-step="1">
-     <span class="tour-step-icon">🧱</span>
+     <span class="tour-step-icon" style="font-size:36px;">🗂️</span>
      <div class="tour-step-body">
-      <div class="tour-step-title">Csempék — az ígéretek</div>
-      <div class="tour-step-desc">Minden csempe egy TISZA ígéret. A badge mutatja: 📣 Bejelentve / ✅ Teljesítve / ❌ Csak ígéret. Kattints a csempére a részletekért és forrásért.</div>
+      <div class="tour-step-title">Szűrj témára vagy prioritásra</div>
+      <div class="tour-step-desc">Bal menü: válassz kategóriát (Egészségügy, Gazdaság…) vagy 🔴 Azonnali / 🟡 Rövid táv. Kereső is van fent.</div>
      </div>
     </div>
+
     <div class="tour-step" data-step="2">
-     <span class="tour-step-icon">💰</span>
+     <span class="tour-step-icon" style="font-size:36px;">💰</span>
      <div class="tour-step-body">
-      <div class="tour-step-title">Kalkulátor — neked mennyit jelent?</div>
-      <div class="tour-step-desc">A bal menüben a 💰 Mennyi az annyi? gombra kattintva kiszámolod, mennyivel változik a nettó fizetésed az ígéretek szerint.</div>
+      <div class="tour-step-title">Számold ki neked mennyit jelent</div>
+      <div class="tour-step-desc">💰 Mennyi az annyi? kalkulátor — add meg a fizetésed, látod a különbséget áradás előtt és után.</div>
      </div>
     </div>
-    <div class="tour-step" data-step="3">
-     <span class="tour-step-icon">📈</span>
-     <div class="tour-step-body">
-      <div class="tour-step-title">Idősor — mi mikor történt</div>
-      <div class="tour-step-desc">A főoldal tetején lévő diagram mutatja, mikor volt előrelépés a választás óta. Az egyes pontokra kattintva látod a részleteket.</div>
-     </div>
-    </div>
-    <div class="tour-step" data-step="4">
-     <span class="tour-step-icon" style="display:flex;align-items:center;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#e8405a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-     </span>
-     <div class="tour-step-body">
-      <div class="tour-step-title">Hiba bejelentés — segíts jobbá tenni</div>
-      <div class="tour-step-desc">Ha hibás adatot, elavult információt vagy pontatlanságot találsz, kattints a jobb oldali <strong>⚠ figyelmeztető háromszög</strong> ikonra és küldj visszajelzést. Minden bejelentés segít!</div>
-     </div>
-    </div>
+
    </div>
    <div class="tour-progress" id="tourProgress">
     <div class="tour-dot active"></div>
-    <div class="tour-dot"></div>
-    <div class="tour-dot"></div>
     <div class="tour-dot"></div>
     <div class="tour-dot"></div>
    </div>
@@ -1565,7 +1563,7 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#7ED957"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 1.5 <span class="story-tl-date">2026.04.21</span></div>
+      <div class="story-tl-ver">Ver. 1.5 <span class="story-tl-date">2026.04.24</span></div>
       <div class="story-tl-desc">18 új ígéret hozzáadva (Digitalizáció, Lakhatás, Gazdaság stb.), kalkulátor multi-select, mérföldkő idővonal, Netlify közös számláló, favicon logo. Átnevezés: „Tégláról-téglára” mérő. Prioritás rendszer (🔴🟡🟢), státusz pontosítás (📣 Bejelentve / ✅ Teljesítve), Netlify Forms hiba bejelentő, látogatószámláló a főcsempén, KT pill vízszintes.</div>
      </div>
     </div>
@@ -2470,6 +2468,24 @@ const excelData = [
  }
 ];
 
+// Napja helper - globális
+function _dAgo(ds) {
+  if (!ds) return '';
+  const d = Math.floor((new Date() - new Date(ds)) / 86400000);
+  return d === 0 ? '<span style="color:#e8405a;font-weight:700;">Ma</span>' : d === 1 ? '1 napja' : d + '\u00a0napja';
+}
+
+function getStatus(valtozas) {
+  switch((valtozas||'').toLowerCase()) {
+    case 'kész': case 'teljesítve':
+      return { cls:'badge-done', label:'✅ Teljesítve' };
+    case 'bejelentve': case 'folyamatban':
+      return { cls:'badge-yes', label:'📣 Bejelentve' };
+    default:
+      return { cls:'badge-no', label:'❌ Csak ígéret' };
+  }
+}
+
 const iconMap = {
  "Államszerkezet és jogállam": "🏛️",
  "Biztonságpolitika": "🛡️",
@@ -2676,19 +2692,22 @@ function renderDashboard(data) {
 
  const bodyHTML = `
  <div class="card-body" style="display:flex;flex-direction:column;height:100%;">
-  <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
    <div class="priority-badge ${priCls}">${priLabel}</div>
-   ${item["Frissítés"] === new Date().toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma frissült</span>' : ''}
+   <span class="badge ${st.cls}">${st.label}</span>
+   ${item["Frissítés"] === new Date().toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma</span>' : ''}
   </div>
-  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;">${title}</h3>
-  <div style="flex:1;">
-   ${item["FiDeSZ állapot"] ? `<p style="margin:0 0 6px;font-size:15px;"><strong>„áradás" előtt:</strong> ${item["FiDeSZ állapot"]}</p>` : ""}
-   <p style="margin:0 0 6px;font-size:15px;"><strong>Előrelépés:</strong> ${item["Volt előrelépést jelentő bejelentés?"] || "-"}</p>
-   <p style="margin:0 0 8px;font-size:15px;"><strong>Frissítve:</strong> ${item["Frissítés"] ? (() => { const d=Math.floor((new Date()-new Date(item["Frissítés"]))/86400000); return d===0?'<span style="color:#e8405a;font-weight:700;">Ma</span>':d===1?'1 napja':d+'\u00a0napja'; })() : "-"} &nbsp; <span class="badge ${st.cls}">${st.label}</span></p>
+  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
+  <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+   ${item["FiDeSZ állapot"] ? `<div style="font-size:13px;color:var(--text-secondary);padding:6px 10px;background:var(--bg-main);border-radius:8px;line-height:1.4;"><span style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;">Előtte:</span> ${item["FiDeSZ állapot"]}</div>` : ""}
+   <div style="font-size:14px;color:var(--text-main);line-height:1.5;"><span style="font-weight:700;">Előrelépés:</span> ${item["Volt előrelépést jelentő bejelentés?"] || "–"}</div>
   </div>
-  <div style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border-subtle);">
-   ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" class="source-link" style="font-size:14px;color:#c0183a;text-decoration:none;display:block;margin-bottom:6px;font-weight:600;">🔗 Forrás →</a>` : ""}
-   <span style="font-size:14px;color:#666;font-weight:500;">👆 Kattints a részletekért</span>
+  <div style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+   <span style="font-size:13px;color:var(--text-secondary);">${_dAgo(item["Frissítés"])}</span>
+   <div style="display:flex;align-items:center;gap:10px;">
+    ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">🔗 Forrás</a>` : ""}
+    <span style="font-size:13px;color:#888;">👆 Részletek</span>
+   </div>
   </div>
  </div>
  `;
@@ -2697,68 +2716,74 @@ function renderDashboard(data) {
  card.classList.add('card-split');
  card.innerHTML = bodyHTML + `<div class="card-viz">${vizHTML}</div>`;
  } else {
- card.innerHTML = `
- <div style="display:flex;flex-direction:column;height:100%;gap:0;">
-  <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+  card.innerHTML = `
+ <div style="display:flex;flex-direction:column;height:100%;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
    <div class="priority-badge ${priCls}">${priLabel}</div>
-   ${item["Frissítés"] === new Date().toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma frissült</span>' : ''}
+   <span class="badge ${st.cls}">${st.label}</span>
+   ${item["Frissítés"] === new Date().toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma</span>' : ''}
   </div>
-  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;">${title}</h3>
-  <div style="flex:1;">
-   ${item["FiDeSZ állapot"] ? `<p style="margin:0 0 6px;font-size:15px;"><strong>„áradás" előtt:</strong> ${item["FiDeSZ állapot"]}</p>` : ""}
-   <p style="margin:0 0 6px;font-size:15px;"><strong>Előrelépés:</strong> ${item["Volt előrelépést jelentő bejelentés?"] || "-"}</p>
-   <p style="margin:0 0 8px;font-size:15px;"><strong>Frissítve:</strong> ${item["Frissítés"] ? (() => { const d=Math.floor((new Date()-new Date(item["Frissítés"]))/86400000); return d===0?'<span style="color:#e8405a;font-weight:700;">Ma</span>':d===1?'1 napja':d+'\u00a0napja'; })() : "-"} &nbsp; <span class="badge ${st.cls}">${st.label}</span></p>
+  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
+  <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+   ${item["FiDeSZ állapot"] ? `<div style="font-size:13px;color:var(--text-secondary);padding:6px 10px;background:var(--bg-main);border-radius:8px;line-height:1.4;"><span style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;">Előtte:</span> ${item["FiDeSZ állapot"]}</div>` : ""}
+   <div style="font-size:14px;color:var(--text-main);line-height:1.5;"><span style="font-weight:700;">Előrelépés:</span> ${item["Volt előrelépést jelentő bejelentés?"] || "–"}</div>
   </div>
-  <div style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border-subtle);">
-   ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" class="source-link" style="font-size:14px;color:#c0183a;text-decoration:none;display:block;margin-bottom:6px;font-weight:600;">🔗 Forrás →</a>` : ""}
-   <span style="font-size:14px;color:#666;font-weight:500;">👆 Kattints a részletekért</span>
+  <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+   <span style="font-size:13px;color:var(--text-secondary);">${_dAgo(item["Frissítés"])}</span>
+   <div style="display:flex;align-items:center;gap:10px;">
+    ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">🔗 Forrás</a>` : ""}
+    <span style="font-size:13px;color:#888;">👆 Részletek</span>
+   </div>
   </div>
  </div>
  `;
- }
- card.addEventListener("click", () => openModal(item));
- cardsGrid.appendChild(card);
+ } // end else (no vizHTML)
+
+ card.addEventListener('click', (e) => {
+  if (e.target.tagName === 'A') return;
+  openModal(item);
  });
+ cardsGrid.appendChild(card);
+ }); // end grouped[cat].forEach
 
  container.appendChild(section);
- });
+ }); // end categories.forEach
 
  updateStats(data);
  drawChart(data);
-}
-
-function getStatus(value) {
- if (value === "kész" || value === "teljesítve") {
- return { key: "kesz", cls: "badge-kesz", label: "✅ Teljesítve", color: "#7ED957" };
+ // Hash alapján ugrás kategóriára
+ if (location.hash) {
+  setTimeout(() => {
+   const el = document.getElementById(location.hash.slice(1));
+   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 400);
  }
- if (value === "bejelentve" || value === "folyamatban") {
- return { key: "bejelentve", cls: "badge-folyamatban", label: "📣 Bejelentve", color: "#FF9933" };
- }
- return { key: "igeret", cls: "badge-igerete", label: "❌ Csak ígéret", color: "#FF6B6B" };
-}
+} // end renderDashboard
 
 function updateStats(data) {
- const total = data.length;
- const yes = data.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
- const done = data.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
- const no = data.filter(r => r["Változás"] === "ígéret").length;
- document.getElementById("tlTotal").textContent = total;
- document.getElementById("tlYes").textContent = yes;
- document.getElementById("tlDone").textContent = done;
- document.getElementById("tlNo").textContent = no;
- // Progress bar: bejelentve + teljesítve / összes
- const pb = document.getElementById("tlProgressBar");
- if (pb && total > 0) pb.style.width = Math.round((yes + done) / total * 100) + "%";
- // Nap számláló
- const electionDate = new Date("2026-04-12");
- const days = Math.floor((new Date() - electionDate) / 86400000);
- const dc = document.getElementById("tlDayCount");
- if (dc) dc.textContent = days + " nap";
- // Keep hidden counters for backwards compat
- if (document.getElementById("totalCount")) document.getElementById("totalCount").textContent = `📊 Összes tégla: ${total}`;
- if (document.getElementById("yesCount")) document.getElementById("yesCount").textContent = `📣 Bejelentve: ${yes}`;
- if (document.getElementById("doneCount")) document.getElementById("doneCount").textContent = `✅ Kész: ${done}`;
- if (document.getElementById("noCount")) document.getElementById("noCount").textContent = `❌ Csak ígéret: ${no}`;
+  const total = data.length;
+  const yes  = data.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
+  const done = data.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+  const no   = data.filter(r => r["Változás"] === "ígéret").length;
+  const el = (id) => document.getElementById(id);
+  if (el("tlTotal")) el("tlTotal").textContent = total;
+  if (el("tlYes"))   el("tlYes").textContent   = yes;
+  if (el("tlDone"))  el("tlDone").textContent   = done;
+  if (el("tlNo"))    el("tlNo").textContent     = no;
+  // Progress bar
+  const pb = el("tlProgressBar");
+  if (pb && total > 0) pb.style.width = Math.round((yes + done) / total * 100) + "%";
+  // Nap számláló
+  const days = Math.floor((new Date() - new Date("2026-04-12")) / 86400000);
+  const dc = el("tlDayCount");
+  if (dc) dc.textContent = days + " nap";
+  // "Ma" felirat dinamikus
+  const todayEl = el("todayMilestone");
+  if (todayEl) {
+    const now = new Date();
+    const months = ["jan.","feb.","már.","ápr.","máj.","jún.","júl.","aug.","szep.","okt.","nov.","dec."];
+    todayEl.textContent = now.getFullYear() + ". " + months[now.getMonth()] + " " + now.getDate() + ". — Ma";
+  }
 }
 
 function drawChart(data) {
@@ -2822,7 +2847,6 @@ document.getElementById("categoryFilter").addEventListener("change", function() 
  const match = val === "__all__" || sec.getAttribute("data-cat") === val;
  sec.style.display = match ? "" : "none";
  });
- // Ha konkrét kategória, ugrás oda
  if (val !== "__all__") {
  const sec = document.querySelector(`.category-section[data-cat="${val}"]`);
  if (sec) setTimeout(() => window.scrollTo({ top: sec.offsetTop - 20, behavior: "smooth" }), 50);
@@ -3253,6 +3277,35 @@ const miniCharts = {
 };
 
 renderDashboard(excelData);
+
+// ── Verzió badge automatikus frissítése a story timeline alapján ──
+(function() {
+  // Legfrissebb ver a story-tl-ver elemekből
+  const verEls = document.querySelectorAll('.story-tl-ver');
+  if (!verEls.length) return;
+  // Az első (legfelső) = legfrissebb
+  const latestVerEl = verEls[0];
+  const verText = latestVerEl ? latestVerEl.childNodes[0].textContent.trim() : '';
+  const dateEl  = latestVerEl ? latestVerEl.querySelector('.story-tl-date') : null;
+  const dateText = dateEl ? dateEl.textContent.trim() : '';
+
+  const headerVer  = document.getElementById('headerVerNum');
+  const headerDate = document.getElementById('headerVerDate');
+  if (headerVer  && verText)  headerVer.textContent  = verText;
+  if (headerDate && dateText) headerDate.textContent = 'Updated: ' + dateText;
+})();
+
+// ── Főoldali keresősáv - szinkron a sidebar kereső ──
+const mainSearchEl = document.getElementById('mainSearch');
+if (mainSearchEl) {
+  mainSearchEl.addEventListener('input', function() {
+    const sidebarSearch = document.getElementById('sidebarSearch');
+    if (sidebarSearch) {
+      sidebarSearch.value = this.value;
+      sidebarSearch.dispatchEvent(new Event('input'));
+    }
+  });
+}
 
 // ── Keresősáv ──
 const _ss = document.getElementById('sidebarSearch'); if(_ss) _ss.addEventListener('input', function() {
@@ -3850,11 +3903,20 @@ document.getElementById("statsHeaderBtn").addEventListener("click", () => {
   // KOMBINÁCIÓ: selectedTypes alapján számol
   // ════════════════════════════════════════════
   function calcCombined(selectedTypes, brutto, nyugdij) {
-    // Alap típusok (egymást kizárják)
-    const baseTypes = ['nyugdijas','kata','minber','gyermektelen','1gyerek','2gyerek','3gyerek'];
-    const primaryType = baseTypes.find(t => selectedTypes.has(t)) || 'gyermektelen';
+    // Alap jövedelem típus
+    const alapTypes = ['nyugdijas','kata','minber','gyermektelen'];
+    const alapType  = alapTypes.find(t => selectedTypes.has(t)) || 'gyermektelen';
 
-    // Additív típusok (hozzáadódnak az alaphoz)
+    // Gyerek szám (ha van, ez az elsődleges számítási alap ha nincs kata/minber/nyugdijas)
+    const gyerekType = ['1gyerek','2gyerek','3gyerek'].find(t => selectedTypes.has(t));
+
+    // Ha van gyerek és nincs kata/minber/nyugdijas → gyerek az alap
+    // Ha van gyerek ÉS van kata/minber → kombináljuk
+    const hasSpecialAlap = ['kata','minber','nyugdijas'].some(t => selectedTypes.has(t));
+    const primaryType = (gyerekType && !hasSpecialAlap) ? gyerekType : alapType;
+    const hasNonDefaultAlap = gyerekType && hasSpecialAlap;
+
+    // Additív élethelyzetek
     const addOnTypes = ['25alatt','elsohazas','fogyatekos'].filter(t => selectedTypes.has(t));
 
     // Alap számítás
@@ -3864,36 +3926,44 @@ document.getElementById("statsHeaderBtn").addEventListener("click", () => {
     let itemsBefore = [...base.itemsBefore];
     let itemsAfter  = [...base.itemsAfter];
 
-    // Additív kedvezmények: csak a DELTA-t adjuk hozzá az alaphoz
-    // (nem az egész számítást, csak a plusz kedvezményt)
+    // Ha KATA/Minimálbér + gyerek kombináció: a gyerek CSK-t adjuk hozzá
+    if (hasNonDefaultAlap && gyerekType) {
+      const alapCalc  = calcType(alapType, brutto, nyugdij);
+      const gyerekCalc = calcType(gyerekType, brutto, nyugdij);
+      const refCalc   = calcType('gyermektelen', brutto, nyugdij);
+      // Gyerek delta = gyerek számítás - gyermektelen számítás
+      const cskDeltaBefore = gyerekCalc.nettoBefore - refCalc.nettoBefore;
+      const cskDeltaAfter  = gyerekCalc.nettoAfter  - refCalc.nettoAfter;
+      // Alapra (KATA/Minber) rátesszük a CSK deltát
+      nettoBefore = alapCalc.nettoBefore + cskDeltaBefore;
+      nettoAfter  = alapCalc.nettoAfter  + cskDeltaAfter;
+      itemsBefore = [...alapCalc.itemsBefore,
+        ...gyerekCalc.itemsBefore.filter(i => i.tipus === 'pos' && !i.nev.includes('Bruttó') && !i.nev.includes('TB') && !i.nev.includes('SZJA'))
+      ];
+      itemsAfter = [...alapCalc.itemsAfter,
+        ...gyerekCalc.itemsAfter.filter(i => i.tipus === 'pos' && !i.nev.includes('Bruttó') && !i.nev.includes('TB') && !i.nev.includes('SZJA') && !i.nev.includes('adójóváírás'))
+      ];
+    }
+
+    // Additív élethelyzetek: csak a DELTA-t adjuk hozzá
+    const SKIP_ITEMS = ['Bruttó fizetés','TB járulék (18,5%)','SZJA (15%)','SZJA fizetendő',
+                        'Bruttó minimálbér (2026)','Havi bevétel'];
     addOnTypes.forEach(addType => {
-      const addBase    = calcType('gyermektelen', brutto, nyugdij); // referencia
-      const addCalc    = calcType(addType, brutto, nyugdij);
-      const deltaBefore = addCalc.nettoBefore - addBase.nettoBefore;
-      const deltaAfter  = addCalc.nettoAfter  - addBase.nettoAfter;
+      const refCalc  = calcType('gyermektelen', brutto, nyugdij);
+      const addCalc  = calcType(addType, brutto, nyugdij);
+      const deltaBefore = addCalc.nettoBefore - refCalc.nettoBefore;
+      const deltaAfter  = addCalc.nettoAfter  - refCalc.nettoAfter;
 
       nettoBefore += deltaBefore;
       nettoAfter  += deltaAfter;
 
-      // Csak az extra kedvezmény tételeket adjuk hozzá (nem az alapbért, TB-t stb.)
-      const extraBefore = addCalc.itemsBefore.filter(i =>
-        !['Bruttó fizetés','TB járulék (18,5%)','SZJA (15%)','SZJA fizetendő'].includes(i.nev)
-      );
-      const extraAfter = addCalc.itemsAfter.filter(i =>
-        !['Bruttó fizetés','TB járulék (18,5%)','SZJA fizetendő','SZJA adójóváírás (TISZA)'].includes(i.nev)
-      );
-
-      itemsBefore.push(...extraBefore);
-      itemsAfter.push(...extraAfter);
-
-      // Ha az "áradás után" jóváírás még nem szerepel és van delta, adjuk hozzá
-      if (deltaAfter !== deltaBefore && deltaAfter > 0 && addType !== '25alatt') {
-        const alreadyHasJov = itemsAfter.some(i => i.nev === 'SZJA adójóváírás (TISZA)');
-        if (!alreadyHasJov) {
-          const jovairas = tiszaAdojovairas(brutto);
-          if (jovairas > 0) itemsAfter.push({ nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' });
-        }
-      }
+      itemsBefore.push(...addCalc.itemsBefore.filter(i =>
+        !SKIP_ITEMS.some(s => i.nev.includes(s.split(' ')[0])) && i.tipus === 'pos'
+      ));
+      itemsAfter.push(...addCalc.itemsAfter.filter(i =>
+        !SKIP_ITEMS.some(s => i.nev.includes(s.split(' ')[0])) && i.tipus === 'pos'
+        && !itemsAfter.some(e => e.nev === i.nev)
+      ));
     });
 
     return {
@@ -3912,84 +3982,154 @@ document.getElementById("statsHeaderBtn").addEventListener("click", () => {
     return { netto: r.nettoAfter, kedvezmenyek: r.itemsAfter };
   }
 
-  // Multi-select tabs - egyszerre több kategória
+
+  // ═══════════════════════════════════════════════════
+  // KOMBINÁCIÓ LOGIKA
+  // ═══════════════════════════════════════════════════
+  //
+  // ALAP JÖVEDELEM (kötelező 1, egymást kizárják):
+  //   gyermektelen | minber | kata | nyugdijas
+  //
+  // GYEREK SZÁM (opcionális, egymást kizárják, nyugdíjassal NEM):
+  //   1gyerek | 2gyerek | 3gyerek
+  //   (gyermektelen helyettesíti ha nincs gyerek)
+  //
+  // ÉLETHELYZET (szabadon kombinálható, nyugdíjassal NEM):
+  //   25alatt | elsohazas | fogyatekos
+  //
+  // MINIMÁLBÉRES + gyerek: ✅
+  // KATA + gyerek: ✅
+  // KATA + elsohazas: ✅
+  // nyugdijas + fogyatekos: ✅
+  // nyugdijas + gyerek: ❌
+  // nyugdijas + 25alatt: ❌
+  // kata + minber: ❌
+
+  const ALAP_TYPES   = ['gyermektelen','minber','kata','nyugdijas'];
+  const GYEREK_TYPES = ['1gyerek','2gyerek','3gyerek'];
+  const ADDON_TYPES  = ['25alatt','elsohazas','fogyatekos'];
+  // Ezek Nyugdíjassal NEM kombinálhatók
+  const NO_WITH_NYUGDIJAS = [...GYEREK_TYPES, ...ADDON_TYPES.filter(t => t !== 'fogyatekos')];
+
   let selectedTypes = new Set(['gyermektelen']);
-  
-  // Kizáró csoportok - ezekből csak egyet lehet egyszerre
-  const exclusiveGroups = [
-    ['gyermektelen', '1gyerek', '2gyerek', '3gyerek'],  // gyerek szám
-    ['nyugdijas'],  // nyugdíjas kizárja a többit bizonyos értelemben
-    ['minber'],     // minimálbér önálló
-    ['kata'],       // KATA önálló
-  ];
 
   function updateTabInputs() {
     const hasNyugdijas = selectedTypes.has('nyugdijas');
-    const hasKata = selectedTypes.has('kata');
-    const hasMinber = selectedTypes.has('minber');
-    const needsBrutto = !hasNyugdijas && !hasKata && !hasMinber;
-    document.getElementById('calcBruttoWrap').style.display = needsBrutto ? '' : 'none';
+    const hasKata      = selectedTypes.has('kata');
+    const hasMinber    = selectedTypes.has('minber');
+    const needsBrutto  = !hasNyugdijas && !hasKata && !hasMinber;
+    document.getElementById('calcBruttoWrap').style.display  = needsBrutto ? '' : 'none';
     document.getElementById('calcNyugdijWrap').style.display = hasNyugdijas ? '' : 'none';
-    document.getElementById('calcKataWrap').style.display = hasKata ? '' : 'none';
+    document.getElementById('calcKataWrap').style.display    = hasKata ? '' : 'none';
     const label = document.querySelector('#calcBruttoWrap label');
-    if (label) label.textContent = selectedTypes.has('fogyatekos') ? 'Bruttó havi fizetés VAGY ellátás összege (Ft)' : 'Bruttó havi fizetés (Ft)';
+    if (label) label.textContent = selectedTypes.has('fogyatekos')
+      ? 'Bruttó havi fizetés VAGY ellátás összege (Ft)'
+      : 'Bruttó havi fizetés (Ft)';
     document.getElementById('calcResults').classList.remove('visible');
+
+    // Tiltott tabokat szürkítjük ha Nyugdíjas van kijelölve
+    document.querySelectorAll('.calc-tab').forEach(t => {
+      const ty = t.dataset.type;
+      const blocked = hasNyugdijas && NO_WITH_NYUGDIJAS.includes(ty);
+      t.style.opacity = blocked ? '0.35' : '';
+      t.style.pointerEvents = blocked ? 'none' : '';
+      t.title = blocked ? 'Nyugdíjassal nem kombinálható' : '';
+    });
   }
 
-  // Tab switching - multi-select
+  // Tab kattintás kezelő
   document.querySelectorAll('.calc-tab').forEach(tab => {
-    // Init: első tab active
     if (tab.dataset.type === 'gyermektelen') tab.classList.add('active', 'selected');
-    
+
     tab.addEventListener('click', () => {
       const type = tab.dataset.type;
-      const isExclusive = ['nyugdijas','kata','minber'].includes(type);
-      const isChildGroup = ['gyermektelen','1gyerek','2gyerek','3gyerek'].includes(type);
+      const isAlap   = ALAP_TYPES.includes(type);
+      const isGyerek = GYEREK_TYPES.includes(type);
+      const isAddon  = ADDON_TYPES.includes(type);
+      const hasNyugdijas = selectedTypes.has('nyugdijas');
 
-      if (isExclusive) {
-        // Exkluzív tab: kikapcsol mindent, csak ez marad
-        selectedTypes.clear();
-        selectedTypes.add(type);
-      } else if (isChildGroup) {
-        // Gyerek csoport: egymást kizárják
-        ['gyermektelen','1gyerek','2gyerek','3gyerek'].forEach(t => selectedTypes.delete(t));
-        // Töröljük az exkluzívokat is
-        ['nyugdijas','kata','minber'].forEach(t => selectedTypes.delete(t));
-        selectedTypes.add(type);
-      } else {
-        // Normál toggle: ha már van, kivesszük; ha nincs, hozzáadjuk
-        ['nyugdijas','kata','minber'].forEach(t => selectedTypes.delete(t));
-        if (selectedTypes.has(type)) {
-          selectedTypes.delete(type);
-          // Ha minden törlődött, alapértelmezett
-          if (selectedTypes.size === 0) selectedTypes.add('gyermektelen');
+      // Blokkolt kombináció: Nyugdíjas + nem-kompatibilis
+      if (hasNyugdijas && NO_WITH_NYUGDIJAS.includes(type)) return;
+
+      if (isAlap) {
+        const prevAlap = ALAP_TYPES.find(t => selectedTypes.has(t));
+
+        // Ha gyermektelen-re kattintunk → töröljük a gyerek típusokat
+        if (type === 'gyermektelen') {
+          selectedTypes.clear();
+          selectedTypes.add('gyermektelen');
+          // Addon-ok megmaradnak
+          ADDON_TYPES.forEach(a => { /* már törölve a clear-rel */ });
+          // Visszatesszük az addon-okat
+          const prevAddons = [...selectedTypes].filter(t => ADDON_TYPES.includes(t));
+          // (clear már mindent törölt, szóval az addon-okat mentjük előtte)
+          // Újra: mentsük az addon-okat clear előtt
+        }
+
+        if (type === 'gyermektelen') {
+          // Mentsük az addon-okat
+          const savedAddons = ADDON_TYPES.filter(t => selectedTypes.has(t));
+          selectedTypes.clear();
+          selectedTypes.add('gyermektelen');
+          savedAddons.forEach(a => selectedTypes.add(a));
         } else {
+          // Egyéb alap váltás (minber, kata, nyugdijas)
+          if (prevAlap === type) return;
+          const savedGyerek = GYEREK_TYPES.find(t => selectedTypes.has(t));
+          const savedAddons = ADDON_TYPES.filter(t => selectedTypes.has(t));
+          selectedTypes.clear();
           selectedTypes.add(type);
-          // Gyerek kategóriák közül csak egy maradhat
-          if (!isChildGroup) {
-            ['gyermektelen','1gyerek','2gyerek','3gyerek'].forEach(t => {
-              if (t !== type) selectedTypes.delete(t);
-            });
+          if (type !== 'nyugdijas') {
+            if (savedGyerek) selectedTypes.add(savedGyerek);
+            savedAddons.forEach(a => selectedTypes.add(a));
           }
         }
+
+      } else if (isGyerek) {
+        // Gyerek: egymást kizárják, gyermektelen-t is törli
+        // Ha ugyanaz van klikkelve → töröljük, visszaáll gyermektelen
+        if (selectedTypes.has(type)) {
+          selectedTypes.delete(type);
+          // Ha nincs más alap, visszatesszük gyermektelent
+          if (!ALAP_TYPES.some(t => selectedTypes.has(t)) &&
+              !GYEREK_TYPES.some(t => selectedTypes.has(t))) {
+            selectedTypes.add('gyermektelen');
+          }
+        } else {
+          // Töröljük a többi gyerek-típust ÉS a gyermektelen-t
+          GYEREK_TYPES.forEach(t => selectedTypes.delete(t));
+          selectedTypes.delete('gyermektelen');
+          selectedTypes.add(type);
+        }
+
+      } else if (isAddon) {
+        // Addon: toggle, de Nyugdíjassal nem kombinálható (már szűrt fent)
+        if (selectedTypes.has(type)) {
+          selectedTypes.delete(type);
+        } else {
+          selectedTypes.add(type);
+        }
+        // Biztosítsuk hogy van alapjövedelem (gyerek is alapként funkcionál)
+        const hasAnyBase = ALAP_TYPES.some(t => selectedTypes.has(t)) ||
+                           GYEREK_TYPES.some(t => selectedTypes.has(t));
+        if (!hasAnyBase) selectedTypes.add('gyermektelen');
       }
 
       // UI frissítés
       document.querySelectorAll('.calc-tab').forEach(t => {
         t.classList.remove('active', 'selected');
-        if (selectedTypes.has(t.dataset.type)) {
-          t.classList.add('active', 'selected');
-        }
+        if (selectedTypes.has(t.dataset.type)) t.classList.add('active', 'selected');
       });
-      // Utolsó kijelölt legyen "primary active"
-      const lastTab = [...document.querySelectorAll('.calc-tab')].filter(t => selectedTypes.has(t.dataset.type)).pop();
+      const lastTab = [...document.querySelectorAll('.calc-tab')]
+        .filter(t => selectedTypes.has(t.dataset.type)).pop();
       if (lastTab) lastTab.classList.add('active');
 
       updateTabInputs();
     });
   });
-  
+
   updateTabInputs();
+
 
   // Enter billentyű a beviteli mezőkön
   ['calcBrutto', 'calcNyugdij', 'calcKataBev'].forEach(id => {
@@ -4076,7 +4216,29 @@ document.getElementById("statsHeaderBtn").addEventListener("click", () => {
 })();
 
 // Storyboard modal
-function openStory() { document.getElementById("storyOverlay").classList.add("active"); }
+function openStory() {
+  document.getElementById("storyOverlay").classList.add("active");
+  try {
+    const total     = excelData.length;
+    const announced = excelData.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
+    const done      = excelData.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+    const pct       = total > 0 ? Math.round((announced + done) / total * 100) : 0;
+    const sa = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    sa('statPromises', total);
+    sa('statAnnounced', announced + done);
+    sa('statProgressPct', pct + '%');
+    const pb = document.getElementById('statProgress');
+    if (pb) setTimeout(() => pb.style.width = pct + '%', 50);
+    try {
+      const cached = JSON.parse(localStorage.getItem('igmero_cache') || '{}');
+      if (cached.total) sa('statVisitors', cached.total.toLocaleString('hu-HU'));
+    } catch(e) {}
+    fetch('/.netlify/forms/ertesito-feliratkozas/submissions/?per_page=1')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && d.count !== undefined) sa('statSubscribers', d.count); })
+      .catch(() => {});
+  } catch(e) {}
+}
 function closeStory() { document.getElementById("storyOverlay").classList.remove("active"); }
 document.getElementById("storyBtn").addEventListener("click", openStory);
 document.getElementById("storyModalClose").addEventListener("click", closeStory);
@@ -4095,6 +4257,15 @@ if (!localStorage.getItem("ttm_visited")) {
   let current = 0;
   const steps = document.querySelectorAll(".tour-step");
   const dots = document.querySelectorAll(".tour-dot");
+// Auto-open névjegy első látogatóknál
+  if (!localStorage.getItem('ttm_visited_v2')) {
+    setTimeout(() => {
+      const so = document.getElementById('storyOverlay');
+      if (so) { so.classList.add('active'); if(typeof openStory==='function') openStory(); }
+    }, 800);
+    localStorage.setItem('ttm_visited_v2', '1');
+  }
+
   const prev = document.getElementById("tourPrev");
   const next = document.getElementById("tourNext");
   const total = steps.length;
