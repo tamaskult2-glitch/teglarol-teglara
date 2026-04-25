@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <clipPath id="roundClip">
+      <rect width="512" height="512" rx="115" ry="115"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#roundClip)">
+    <!-- Magyar trikolór -->
+    <rect x="0" y="0"   width="512" height="171" fill="#CE2939"/>
+    <rect x="0" y="171" width="512" height="170" fill="#FFFFFF"/>
+    <rect x="0" y="341" width="512" height="171" fill="#477050"/>
+    <!-- Áttetsző sötét tónus -->
+    <rect width="512" height="512" fill="rgba(60,45,35,0.58)"/>
+    <!-- Tisza hullám -->
+    <path d="M51 256 Q128 154 205 256 T358 256 T461 256"
+      fill="none" stroke="white" stroke-width="13" stroke-linecap="round"
+      filter="url(#glow)"/>
+    <!-- Parlament -->
+    <g stroke="rgba(255,255,255,0.68)" stroke-width="4" stroke-linecap="round" fill="none">
+      <rect x="189" y="128" width="133" height="51" rx="2"/>
+      <path d="M230 128 Q256 82 282 128"/>
+      <path d="M199 128 Q210 108 221 128"/>
+      <path d="M291 128 Q302 108 313 128"/>
+      <line x1="256" y1="82" x2="256" y2="67"/>
+      <line x1="249" y1="72" x2="263" y2="72"/>
+      <rect x="210" y="146" width="13" height="18" rx="2"/>
+      <rect x="249" y="146" width="15" height="18" rx="2"/>
+      <rect x="289" y="146" width="13" height="18" rx="2"/>
+    </g>
+    <!-- Lánchíd -->
+    <g stroke="rgba(255,255,255,0.58)" stroke-width="4" stroke-linecap="round" fill="none">
+      <line x1="61" y1="358" x2="205" y2="358"/>
+      <line x1="102" y1="358" x2="102" y2="312"/>
+      <line x1="164" y1="358" x2="164" y2="312"/>
+      <line x1="95"  y1="315" x2="109" y2="315"/>
+      <line x1="157" y1="315" x2="171" y2="315"/>
+      <path d="M102 312 Q133 292 164 312"/>
+      <path d="M61 358 Q82 338 102 328"/>
+      <path d="M164 328 Q184 338 205 358"/>
+    </g>
+    <!-- Hősök tere -->
+    <g stroke="rgba(255,255,255,0.52)" stroke-width="4" stroke-linecap="round" fill="none">
+      <line x1="379" y1="390" x2="379" y2="307"/>
+      <line x1="369" y1="307" x2="389" y2="307"/>
+      <line x1="367" y1="390" x2="391" y2="390"/>
+      <path d="M379 307 Q358 287 348 300"/>
+      <path d="M379 307 Q400 287 410 300"/>
+      <path d="M375 307 Q379 295 383 307"/>
+    </g>
+    <!-- Duna -->
+    <path d="M41 404 Q154 387 256 404 Q358 421 471 404"
+      fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+    <path d="M41 421 Q154 406 256 421 Q358 436 471 421"
+      fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2.5"/>
+  </g>
+</svg>
