@@ -70,26 +70,24 @@ def ask_claude(data):
     pending.sort(key=lambda x: priority_order.get(x.get("Prioritás","hosszu"), 2))
     pending = pending[:15]
 
-    items_short = [{"i": d["TiSZa ígéret"][:60], "s": d["Változás"], "k": d["Kategória"]} for d in pending]
+    # Max 10 legfontosabb ígéret
+    priority_order = {"azonnali": 0, "rovid": 1, "hosszu": 2}
+    pending.sort(key=lambda x: priority_order.get(x.get("Prioritás","hosszu"), 2))
+    pending = pending[:10]
 
-    prompt = f"""Magyar politikai frissítő. Dátum: {TODAY}.
+    items_short = [{"i": d["TiSZa ígéret"][:50], "s": d["Változás"]} for d in pending]
 
-TISZA Párt ígéretek aktuális státusza (amit tudsz a képzési adataidból és általános tudásodból):
+    prompt = f"""Dátum: {TODAY}. TISZA ígéretek státusza:
 {json.dumps(items_short, ensure_ascii=False)}
-
-Ha bármelyik ígéretnél BIZTOS hogy változás történt (bejelentve/teljesítve), jelezd.
-Ha nem tudod biztosan, NE változtasd.
-
-Válasz CSAK JSON tömb:
-[{{"TiSZa ígéret": "...", "Változás": "bejelentve", "Volt előrelépést jelentő bejelentés?": "igen - rövid leírás"}}]
-Ha nincs biztos változás: []"""
+Csak ha BIZTOS változás van, válaszolj JSON-nel: [{{"TiSZa ígéret":"...","Változás":"bejelentve"}}]
+Ha nincs: []"""
 
     import time
     for attempt in range(3):
         try:
             message = client.messages.create(
-               model="claude-sonnet-4-6" → model="claude-haiku-4-5-20251001"
-                max_tokens=4000 → max_tokens=1000
+                model="claude-haiku-4-5-20251001",
+                max_tokens=500,
                 messages=[{"role": "user", "content": prompt}]
             )
             break
