@@ -70,19 +70,20 @@ def ask_claude(data):
     pending.sort(key=lambda x: priority_order.get(x.get("Prioritás","hosszu"), 2))
     pending = pending[:10]
 
-    items_short = [{"i": d["TiSZa ígéret"][:50], "s": d["Változás"]} for d in pending]
+    items_short = [{"i": d["TiSZa ígéret"][:40], "s": d["Változás"]} for d in pending]
 
-    prompt = f"""Dátum: {TODAY}. TISZA ígéretek státusza:
-{json.dumps(items_short, ensure_ascii=False)}
-Csak ha BIZTOS változás van, válaszolj JSON-nel: [{{"TiSZa ígéret":"...","Változás":"bejelentve"}}]
-Ha nincs: []"""
+    prompt = f"""Dátum: {TODAY}. Magyar politika.
+Ezek TISZA ígéretek: {json.dumps(items_short, ensure_ascii=False, separators=(',',':'))}
+Csak ha BIZTOS státuszváltozás van, add vissza JSON-ben: [{{"TiSZa ígéret":"...","Változás":"bejelentve"}}]
+Ha nincs biztos változás: []
+NE magyarázz, CSAK JSON!"""
 
     import time
     for attempt in range(3):
         try:
             message = client.messages.create(
                 model="claude-haiku-4-5-20251001",
-                max_tokens=500,
+                max_tokens=200,
                 messages=[{"role": "user", "content": prompt}]
             )
             break
@@ -101,6 +102,12 @@ Ha nincs: []"""
     for block in message.content:
         if block.type == "text":
             full_text += block.text
+
+    # Token használat naplózása
+    usage = message.usage
+    print(f"Token használat: input={usage.input_tokens}, output={usage.output_tokens}")
+    cost = (usage.input_tokens / 1_000_000 * 0.80) + (usage.output_tokens / 1_000_000 * 4.00)
+    print(f"Becsült költség: ${cost:.4f}")
 
     print(f"Claude válasz ({len(full_text)} karakter)")
 
