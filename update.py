@@ -64,13 +64,8 @@ def ask_claude(data):
     """Claude API frissítő — Haiku modellel, web search nélkül"""
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
-    # Max 15 legfontosabb ígéret
-    pending = [d for d in data if d["Változás"] not in ("kész", "teljesítve")]
-    priority_order = {"azonnali": 0, "rovid": 1, "hosszu": 2}
-    pending.sort(key=lambda x: priority_order.get(x.get("Prioritás","hosszu"), 2))
-    pending = pending[:15]
-
     # Max 10 legfontosabb ígéret
+    pending = [d for d in data if d["Változás"] not in ("kész", "teljesítve")]
     priority_order = {"azonnali": 0, "rovid": 1, "hosszu": 2}
     pending.sort(key=lambda x: priority_order.get(x.get("Prioritás","hosszu"), 2))
     pending = pending[:10]
