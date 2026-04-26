@@ -57,8 +57,11 @@ def build_html(data):
         f'Updated: {TODAY.replace("-", ".")}',
         html
     )
+    # Ha nincs dátum (üres), adjuk hozzá
+    if f'Updated: {TODAY.replace("-", ".")}' not in html:
+        html = html.replace('Updated: ', f'Updated: {TODAY.replace("-", ".")}')
     OUTPUT_FILE.write_text(html, encoding="utf-8")
-    print(f"✓ index.html létrehozva ({len(html):,} byte)")
+    print(f"✓ index.html létrehozva ({len(html):,} byte), dátum: {TODAY}")
 
 def ask_claude(data):
     """Claude API frissítő — Haiku modellel, web search nélkül"""
