@@ -906,6 +906,7 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
 .calc-disclaimer { font-size:13px; color:var(--text-secondary); opacity:0.7; margin-top:12px; font-style:italic; }
 body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 </style>
+<script data-goatcounter="https://teglarol-teglara.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div id="stickyCatHeader"></div>
@@ -3911,33 +3912,38 @@ document.getElementById("bugSubmit").addEventListener("click", () => {
     });
 });
 
-// Nézetszámláló – Netlify Function alapú, közös számláló
+// Nézetszámláló – GoatCounter alapú valódi közös számláló
 (function() {
   const BASE_TOTAL = 320;
-  const today = new Date().toISOString().slice(0,10);
-  const month = today.slice(0,7);
   function fmt(n) {
     if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
     if (n >= 1000) return (n/1000).toFixed(1)+'k';
     return String(n);
   }
-  function updateUI(d) {
+  function updateUI(total) {
     const el = (id) => document.getElementById(id);
-    if (el("statsToday")) el("statsToday").textContent = fmt(d.today);
-    if (el("statsMonth")) el("statsMonth").textContent = fmt(d.month);
-    if (el("statsTotal")) el("statsTotal").textContent = fmt(d.total);
-    if (el("statsHeaderNum")) el("statsHeaderNum").textContent = fmt(d.total);
+    if (el("statsHeaderNum")) el("statsHeaderNum").textContent = fmt(total);
+    if (el("statsTotal")) el("statsTotal").textContent = fmt(total);
   }
-  try {
-    const dv = parseInt(localStorage.getItem("igmero_day_"+today)||"0") + 1;
-    const mv = parseInt(localStorage.getItem("igmero_month_"+month)||"0") + 1;
-    const av = Math.max(parseInt(localStorage.getItem("igmero_total")||"0"), BASE_TOTAL) + 1;
-    localStorage.setItem("igmero_day_"+today, dv);
-    localStorage.setItem("igmero_month_"+month, mv);
-    localStorage.setItem("igmero_total", av);
-    localStorage.setItem("igmero_cache", JSON.stringify({today:dv, month:mv, total:av}));
-    updateUI({today:dv, month:mv, total:av});
-  } catch(e) {}
+
+  // GoatCounter API - valódi látogatószám lekérés
+  fetch('https://teglarol-teglara.goatcounter.com/counter//.json')
+    .then(r => r.json())
+    .then(d => {
+      const total = Math.max(d.count || 0, BASE_TOTAL);
+      updateUI(total);
+      // Cache localStorage-ba
+      try { localStorage.setItem('igmero_total', total); } catch(e) {}
+    })
+    .catch(() => {
+      // Fallback: localStorage cache
+      try {
+        const cached = parseInt(localStorage.getItem('igmero_total') || '0');
+        updateUI(Math.max(cached, BASE_TOTAL));
+      } catch(e) {
+        updateUI(BASE_TOTAL);
+      }
+    });
 })();
 // Stats modal open
 window.openStatsModal = function() {
