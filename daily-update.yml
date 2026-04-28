@@ -1,11 +1,10 @@
 name: Napi automatikus frissítés
 
 on:
-  schedule:
-    # Naponta 2x: reggel 7:00 és délután 15:00 (Magyarország = UTC+2 nyáron)
-    # 5:00 UTC = 7:00 MO, 13:00 UTC = 15:00 MO
-    - cron: '0 5 * * *'
-    - cron: '0 13 * * *'
+  # Automatikus futás KIKAPCSOLVA - csak kézi
+  # schedule:
+  #   - cron: '0 5 * * *'
+  #   - cron: '0 13 * * *'
   workflow_dispatch:
 
 jobs:
