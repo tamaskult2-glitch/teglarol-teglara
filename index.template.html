@@ -1874,8 +1874,9 @@ scrollBtn.addEventListener("click", () => {
 
 // Scroll-next: ugrik egy kártyasor magasságnyit lefelé
 scrollNextBtn.addEventListener("click", () => {
-  const stickyH = (document.getElementById('stickyCatHeader')?.offsetHeight || 0) + 8;
-  const offset = 8 + stickyH;
+  // Mindig fix offset = 60 (sticky header magasság + buffer)
+  // Így az első kategóriánál is ugyanúgy működik mint a többinél
+  const offset = 60;
 
   const allTargets = [];
 
@@ -3058,13 +3059,41 @@ function scrollToWithOffset(el, offset) {
   var tgl = document.getElementById('sidebarToggle');
   if (!tgl) return;
 
+  // 3 jobb felső gomb scroll után átkerül jobb oldalra a hamburger fölé
+  var topBtns = [
+    document.getElementById('searchBtn'),   // legfelső új pozícióban
+    document.getElementById('darkToggle'),
+    document.getElementById('bugBtn')
+  ].filter(Boolean);
+
+  var wasScrolled = false;
+
   function update() {
     var scrolled = window.scrollY > 300;
     var mobile = window.innerWidth < 900;
-    if (!mobile) { tgl.style.display = 'none'; return; }
-    if (scrolled) {
+
+    if (!mobile) {
+      tgl.style.display = 'none';
+      if (wasScrolled) {
+        topBtns.forEach(function(b) { b.style.cssText = ''; });
+        wasScrolled = false;
+      }
+      return;
+    }
+
+    if (scrolled && !wasScrolled) {
+      wasScrolled = true;
       tgl.style.cssText = 'display:flex !important;position:fixed !important;bottom:144px !important;right:16px !important;top:auto !important;left:auto !important;width:44px !important;height:44px !important;padding:0 !important;border-radius:50% !important;z-index:130 !important;border:1px solid rgba(0,0,0,0.12) !important;background:rgba(255,255,255,0.95) !important;box-shadow:0 2px 12px rgba(0,0,0,0.15) !important;cursor:pointer !important;align-items:center !important;justify-content:center !important;';
-    } else {
+      // search legfelső (312), dark (256), bug (200)
+      var positions = [312, 256, 200];
+      topBtns.forEach(function(btn, i) {
+        btn.style.cssText = 'display:flex !important;position:fixed !important;top:auto !important;left:auto !important;bottom:' + positions[i] + 'px !important;right:16px !important;width:44px !important;height:44px !important;border-radius:50% !important;z-index:130 !important;background:rgba(255,255,255,0.95) !important;backdrop-filter:blur(8px) !important;border:1px solid rgba(0,0,0,0.1) !important;box-shadow:0 2px 12px rgba(0,0,0,0.12) !important;cursor:pointer !important;align-items:center !important;justify-content:center !important;font-size:20px !important;';
+      });
+    } else if (!scrolled && wasScrolled) {
+      wasScrolled = false;
+      tgl.style.cssText = 'display:flex;position:fixed;top:15px;left:15px;width:44px;height:44px;padding:0;border-radius:50%;z-index:130;border:none;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.25);cursor:pointer;align-items:center;justify-content:center;';
+      topBtns.forEach(function(b) { b.style.cssText = ''; });
+    } else if (!scrolled && !wasScrolled) {
       tgl.style.cssText = 'display:flex;position:fixed;top:15px;left:15px;width:44px;height:44px;padding:0;border-radius:50%;z-index:130;border:none;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.25);cursor:pointer;align-items:center;justify-content:center;';
     }
   }
