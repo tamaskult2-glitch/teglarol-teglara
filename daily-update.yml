@@ -1,10 +1,9 @@
 name: Napi automatikus frissítés
 
 on:
-  # Automatikus futás KIKAPCSOLVA - csak kézi
-  # schedule:
-  #   - cron: '0 5 * * *'
-  #   - cron: '0 13 * * *'
+  schedule:
+    # Naponta 1x: reggel 7:00 (UTC+2 = 5:00 UTC)
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 jobs:
