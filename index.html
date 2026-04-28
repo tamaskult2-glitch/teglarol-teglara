@@ -1016,13 +1016,13 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  <span class="version-badge">
  <span id="headerVerNum">Ver. 1.5</span>
  <span class="ver-divider"></span>
- <span class="ver-date" id="headerVerDate">Updated: 2026.04.27</span>
+ <span class="ver-date" id="headerVerDate">Updated: 2026.04.28</span>
  </span>
  <div class="header-inner">
  <div class="header-left-col" style="display:flex;flex-direction:column;align-items:center;gap:0;">
  <div class="logo-future" style="position:relative;">
-  <!-- Látogató számláló – piros sáv bal felső -->
-  <button id="statsHeaderBtn" style="position:absolute;top:8px;left:8px;z-index:20;background:rgba(0,0,0,0.25);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:4px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;">
+  <!-- Látogató számláló – illeszkedik a logo bal felső sarkához -->
+  <button id="statsHeaderBtn" style="position:absolute;top:0;left:0;z-index:20;background:rgba(0,0,0,0.32);backdrop-filter:blur(6px);border:none;border-radius:40px 0 14px 0;padding:10px 12px 8px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;">
    <span style="font-size:14px;">👁️</span>
    <span id="statsHeaderNum" style="font-size:11px;font-weight:700;color:#fff;">–</span>
    <span style="font-size:8px;color:rgba(255,255,255,0.75);">látogató</span>
@@ -1219,13 +1219,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  </select>
 
  <!-- KERESŐSÁV - fő tartalomban -->
- <div id="mainSearchWrap" style="margin-bottom:20px;">
-  <div style="position:relative;">
-   <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#999;pointer-events:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-   <input id="mainSearch" type="search" aria-label="Keresés az ígéretek között" placeholder="Keresés az ígéretek között… (pl. egészségügy, KATA, lakhatás)" autocomplete="off"
-    style="width:100%;box-sizing:border-box;padding:14px 16px 14px 42px;border-radius:16px;border:1.5px solid var(--border-subtle);background:var(--bg-card);color:var(--text-main);font-size:15px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;box-shadow:var(--shadow-soft);">
-  </div>
- </div>
 
 
 <!-- IDŐSOR DIAGRAM – középre igazítva -->
@@ -3912,38 +3905,48 @@ document.getElementById("bugSubmit").addEventListener("click", () => {
     });
 });
 
-// Nézetszámláló – GoatCounter alapú valódi közös számláló
+// Nézetszámláló – GoatCounter API, valódi közös adatok, localStorage nélkül
 (function() {
-  const BASE_TOTAL = 320;
+  const BASE = 340;
+  const GC = 'https://teglarol-teglara.goatcounter.com';
+
   function fmt(n) {
+    if (!n || isNaN(n)) return '–';
     if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
     if (n >= 1000) return (n/1000).toFixed(1)+'k';
     return String(n);
   }
-  function updateUI(total) {
-    const el = (id) => document.getElementById(id);
-    if (el("statsHeaderNum")) el("statsHeaderNum").textContent = fmt(total);
-    if (el("statsTotal")) el("statsTotal").textContent = fmt(total);
+
+  function set(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
   }
 
-  // GoatCounter API - valódi látogatószám lekérés
-  fetch('https://teglarol-teglara.goatcounter.com/counter//.json')
-    .then(r => r.json())
-    .then(d => {
-      const total = Math.max(d.count || 0, BASE_TOTAL);
-      updateUI(total);
-      // Cache localStorage-ba
-      try { localStorage.setItem('igmero_total', total); } catch(e) {}
-    })
-    .catch(() => {
-      // Fallback: localStorage cache
-      try {
-        const cached = parseInt(localStorage.getItem('igmero_total') || '0');
-        updateUI(Math.max(cached, BASE_TOTAL));
-      } catch(e) {
-        updateUI(BASE_TOTAL);
-      }
-    });
+  // Mai dátum és hónap
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10); // 2026-04-28
+  const monthStart = todayStr.slice(0,7) + '-01';  // 2026-04-01
+
+  // 3 párhuzamos API hívás
+  Promise.all([
+    // Összes látogató
+    fetch(GC + '/counter/TOTAL.json').then(r => r.json()).catch(() => ({count: BASE})),
+    // Mai látogatók
+    fetch(GC + '/counter/TOTAL.json?start=' + todayStr + '&end=' + todayStr).then(r => r.json()).catch(() => ({count: 0})),
+    // Havi látogatók
+    fetch(GC + '/counter/TOTAL.json?start=' + monthStart + '&end=' + todayStr).then(r => r.json()).catch(() => ({count: 0}))
+  ]).then(([total, today, month]) => {
+    const t = Math.max(total.count || 0, BASE);
+    const d = today.count || 0;
+    const m = month.count || 0;
+    set('statsTotal',     fmt(t));
+    set('statsHeaderNum', fmt(t));
+    set('statsToday',     fmt(d));
+    set('statsMonth',     fmt(m));
+  }).catch(() => {
+    set('statsTotal',     fmt(BASE));
+    set('statsHeaderNum', fmt(BASE));
+  });
 })();
 // Stats modal open
 window.openStatsModal = function() {
