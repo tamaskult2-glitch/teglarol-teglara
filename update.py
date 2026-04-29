@@ -34,7 +34,6 @@ def build_html(data):
     template = TEMPLATE_FILE.read_text(encoding="utf-8")
     data_js = json.dumps(data, ensure_ascii=False)
     html = template.replace("excelData = __DATA_PLACEHOLDER__;", f"excelData = {data_js};")
-    html = re.sub(r'Updated: \d{4}\.\d{2}\.\d{2}', f'Updated: {TODAY.replace("-", ".")}', html)
     OUTPUT_FILE.write_text(html, encoding="utf-8")
     print(f"index.html: {len(html):,} byte, datum: {TODAY}")
 
