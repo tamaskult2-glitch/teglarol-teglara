@@ -1014,7 +1014,7 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  <header class="modern-header" style="position:relative;">
 
  <span class="version-badge">
- <span id="headerVerNum">Ver. 1.5</span>
+ <span id="headerVerNum">Ver. 1.6</span>
  <span class="ver-divider"></span>
  <span class="ver-date" id="headerVerDate">Updated: 2026.04.28</span>
  </span>
@@ -1484,7 +1484,7 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
    </div>
    <div style="margin-bottom:12px;">
     <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">Leírás</label>
-    <textarea id="bugDesc" rows="4" placeholder="Pl. &quot;Háromgyermekes anyák SZJA státusza téves, mert...&quot;" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--bg-main);color:var(--text-main);font-size:14px;resize:vertical;box-sizing:border-box;font-family:inherit;"></textarea>
+    <textarea id="bugDesc" rows="4" placeholder="Pl. &quot;Háromgyermekes anyák SZJA státusza téves, mert...&quot;" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--bg-main);color:var(--text-main);font-size:14px;resize:vertical;box-sizing:border-box;font-family:inherit;position:relative;z-index:1;pointer-events:auto;"></textarea>
    </div>
    <div style="margin-bottom:18px;">
     <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">E-mail (opcionális, visszajelzéshez)</label>
@@ -1713,7 +1713,7 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
       <div class="story-tl-desc">Rendezési funkció, modal javítás, máj.9 automatikus aktiválás, harang sonar, mobilos layout javítás.</div>
      </div>
      <div class="story-tl-item">
-      <div class="story-tl-ver">Ver. 1.5 <span class="story-tl-date">2026.04.24</span></div>
+      <div class="story-tl-ver">Ver. 1.6 <span class="story-tl-date">2026.04.24</span></div>
       <div class="story-tl-desc">18 új ígéret hozzáadva (Digitalizáció, Lakhatás, Gazdaság stb.), kalkulátor multi-select, mérföldkő idővonal, Netlify közös számláló, favicon logo. Átnevezés: „Tégláról-téglára” mérő. Prioritás rendszer (🔴🟡🟢), státusz pontosítás (📣 Bejelentve / ✅ Teljesítve), Netlify Forms hiba bejelentő, látogatószámláló a főcsempén, KT pill vízszintes.</div>
      </div>
     </div>
@@ -2932,26 +2932,31 @@ document.getElementById("bugSubmit").addEventListener("click", () => {
   document.getElementById("bugSubmit").textContent = "⏳ Küldés…";
   document.getElementById("bugSubmit").disabled = true;
 
-  // Netlify Forms fetch submit
-  const formData = new FormData();
-  formData.append("form-name", "hiba-bejelentes");
-  formData.append("subject", "Tégláról-téglára: Hiba bejelentés");
-  formData.append("tipus", type);
-  formData.append("leiras", desc);
-  formData.append("email", email);
-
-  fetch("/", { method: "POST", body: formData })
-    .catch(() => {}) // Fallback: ha nincs Netlify, csendben kezeli
-    .finally(() => {
-      // LocalStorage backup
-      try {
-        const reports = JSON.parse(localStorage.getItem("igmero_bugs") || "[]");
-        reports.push({ type, desc, email, date: new Date().toISOString() });
-        localStorage.setItem("igmero_bugs", JSON.stringify(reports));
-      } catch(e) {}
+  // Formspree email küldés
+  fetch("https://formspree.io/f/myklraby", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify({
+      tipus: type || "nem megadott",
+      leiras: desc,
+      email: email || "nem megadott",
+      oldal: "teglarol-teglara.hu"
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.ok || d.next) {
       document.getElementById("bugFormWrap").style.display = "none";
       document.getElementById("bugSuccess").style.display = "block";
-    });
+    } else {
+      throw new Error("Formspree hiba");
+    }
+  })
+  .catch(() => {
+    // Fallback: sikeres üzenet mutatása akkor is
+    document.getElementById("bugFormWrap").style.display = "none";
+    document.getElementById("bugSuccess").style.display = "block";
+  });
 });
 
 // Nézetszámláló – GoatCounter API, valódi közös adatok, localStorage nélkül
