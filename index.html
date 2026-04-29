@@ -4307,23 +4307,27 @@ document.getElementById("statsHeaderBtn").addEventListener("click", () => {
 
     if (type === '25alatt') {
       const mentesHatar = 715765;
+      // Mentesség csak a határig, utána a fennmaradó bruttó után kell SZJA-t fizetni
       const mentesOsszeg = Math.round(Math.min(brutto, mentesHatar) * 0.15);
+      const hatarFeletti = Math.max(0, brutto - mentesHatar);
+      const hatarFelettiSzja = Math.round(hatarFeletti * 0.15);
       const szjaBefore = Math.max(0, szjaAlap - mentesOsszeg);
-      // TISZA: megtartja a mentességet, plusz adójóváírás ha mediánbér felett
-      const szjaAfter  = Math.max(0, szjaBefore - (brutto > mentesHatar ? jovairas : 0));
+      // TISZA: megtartja a mentességet, plusz adójóváírás a fennmaradó SZJA-ból
+      const szjaAfter  = Math.max(0, szjaBefore - jovairas);
       return {
         nettoBefore: brutto - tb - szjaBefore,
         nettoAfter:  brutto - tb - szjaAfter,
         itemsBefore: [
           { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
           { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'25 év alatti SZJA mentesség', osszeg: mentesOsszeg, tipus:'pos' },
-          ...(szjaBefore > 0 ? [{ nev:'SZJA fizetendő', osszeg: -szjaBefore, tipus:'neg' }] : []),
+          { nev:'25 év alatti SZJA mentesség (max. 715 765 Ft-ig)', osszeg: mentesOsszeg, tipus:'pos' },
+          ...(szjaBefore > 0 ? [{ nev:'SZJA fizetendő (határ feletti rész után)', osszeg: -szjaBefore, tipus:'neg' }] : []),
         ],
         itemsAfter: [
           { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
           { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
           { nev:'25 év alatti SZJA mentesség (megtartva)', osszeg: mentesOsszeg, tipus:'pos' },
+          ...(jovairas > 0 && szjaBefore > 0 ? [{ nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' }] : []),
           ...(szjaAfter > 0 ? [{ nev:'SZJA fizetendő', osszeg: -szjaAfter, tipus:'neg' }] : []),
         ],
       };

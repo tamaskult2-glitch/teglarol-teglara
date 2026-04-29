@@ -2,8 +2,8 @@ name: Napi automatikus frissítés
 
 on:
   schedule:
-    # Naponta 1x: reggel 7:00 (UTC+2 = 5:00 UTC)
-    - cron: '0 5 * * *'
+    # Minden nap reggel 7:00 UTC (9:00 Magyarország)
+    - cron: '0 7 * * *'
   workflow_dispatch:
 
 jobs:
@@ -45,7 +45,7 @@ jobs:
         run: |
           git config user.name "Tégláról-téglára Bot"
           git config user.email "bot@teglarol-teglara.hu"
-          git add data.json index.html
+          git add data.json index.html index.template.html
           git commit -m "🤖 Automatikus frissítés $(date '+%Y-%m-%d %H:%M')"
           git push
         env:
