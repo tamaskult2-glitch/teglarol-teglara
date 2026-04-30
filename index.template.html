@@ -913,7 +913,7 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 body.dark .card::before { background-image: url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.12)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.12)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); }
 body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg width='220' height='140' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='15' y='45' fill='rgba(192,24,58,0.10)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='15' y='100' fill='rgba(192,24,58,0.10)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); }
 </style>
-<script data-goatcounter="https://teglarol-teglara.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
 </head>
 <body>
 <div id="stickyCatHeader"></div>
@@ -1026,12 +1026,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <div class="header-inner">
  <div class="header-left-col" style="display:flex;flex-direction:column;align-items:center;gap:0;">
  <div class="logo-future" style="position:relative;">
-  <!-- Látogató számláló – illeszkedik a logo bal felső sarkához -->
-  <button id="statsHeaderBtn" style="position:absolute;top:0;left:0;z-index:20;background:rgba(0,0,0,0.32);backdrop-filter:blur(6px);border:none;border-radius:40px 0 14px 0;padding:10px 12px 8px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;">
-   <span style="font-size:14px;">👁️</span>
-   <span id="statsHeaderNum" style="font-size:11px;font-weight:700;color:#fff;">–</span>
-   <span style="font-size:8px;color:rgba(255,255,255,0.75);">látogató</span>
-  </button>
   <!-- Magyar trikolór sávok -->
   <div style="position:absolute;inset:0;border-radius:40px;overflow:hidden;">
   <div class="tricolor-bg">
@@ -1544,29 +1538,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 </div>
 
 <!-- NÉZETSZÁMLÁLÓ MODAL -->
-<div class="modal-overlay" id="statsOverlay">
- <div class="modal-box" style="max-width:360px;">
-  <button class="modal-close" id="statsModalClose">×</button>
-  <div style="font-size:28px;margin-bottom:10px;">📊</div>
-  <div class="modal-title" style="font-size:18px;">Látogatottság</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px;">
-   <div style="text-align:center;background:var(--bg-main);border-radius:12px;padding:16px 8px;">
-    <div style="font-size:26px;font-weight:800;color:var(--text-main);" id="statsToday">–</div>
-    <div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">👁️ Ma</div>
-   </div>
-   <div style="text-align:center;background:var(--bg-main);border-radius:12px;padding:16px 8px;">
-    <div style="font-size:26px;font-weight:800;color:var(--text-main);" id="statsMonth">–</div>
-    <div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">📅 Hónap</div>
-   </div>
-   <div style="text-align:center;background:var(--bg-main);border-radius:12px;padding:16px 8px;">
-    <div style="font-size:26px;font-weight:800;color:var(--text-main);" id="statsTotal">–</div>
-    <div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">🌐 Összes</div>
-   </div>
-  </div>
-  <div style="font-size:11px;color:var(--text-secondary);text-align:center;margin-top:16px;opacity:0.7;">Az adatok csak ezen az eszközön tárolódnak.<br>Megosztás után valós számok jelennek meg.</div>
- </div>
-</div>
-
 <div class="modal-overlay" id="disclaimerOverlay">
  <div class="modal-box" style="max-width:500px;">
   <button class="modal-close" id="disclaimerModalClose">×</button>
@@ -2964,54 +2935,6 @@ document.getElementById("bugSubmit").addEventListener("click", () => {
   });
 });
 
-// Nézetszámláló – GoatCounter API, valódi közös adatok, localStorage nélkül
-(function() {
-  const BASE = 340;
-  const GC = 'https://teglarol-teglara.goatcounter.com';
-
-  function fmt(n) {
-    if (!n || isNaN(n)) return '–';
-    if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
-    if (n >= 1000) return (n/1000).toFixed(1)+'k';
-    return String(n);
-  }
-
-  function set(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-  }
-
-  // Mai dátum és hónap
-  const now = new Date();
-  const todayStr = now.toISOString().slice(0,10); // 2026-04-28
-  const monthStart = todayStr.slice(0,7) + '-01';  // 2026-04-01
-
-  // 3 párhuzamos API hívás
-  Promise.all([
-    // Összes látogató
-    fetch(GC + '/counter/TOTAL.json').then(r => r.json()).catch(() => ({count: BASE})),
-    // Mai látogatók
-    fetch(GC + '/counter/TOTAL.json?start=' + todayStr + '&end=' + todayStr).then(r => r.json()).catch(() => ({count: 0})),
-    // Havi látogatók
-    fetch(GC + '/counter/TOTAL.json?start=' + monthStart + '&end=' + todayStr).then(r => r.json()).catch(() => ({count: 0}))
-  ]).then(([total, today, month]) => {
-    const t = Math.max(total.count || 0, BASE);
-    const d = today.count || 0;
-    const m = month.count || 0;
-    set('statsTotal',     fmt(t));
-    set('statsHeaderNum', fmt(t));
-    set('statsToday',     fmt(d));
-    set('statsMonth',     fmt(m));
-  }).catch(() => {
-    set('statsTotal',     fmt(BASE));
-    set('statsHeaderNum', fmt(BASE));
-  });
-})();
-// Stats modal open
-window.openStatsModal = function() {
-  document.getElementById("statsOverlay").classList.add("active");
-};
-
 // ── Scroll offset segédfüggvény (sticky fejléc miatt) ──
 function scrollToWithOffset(el, offset) {
   if (!el) return;
@@ -3229,17 +3152,6 @@ Számold ki te is: ${url}`;
     });
   });
 })();
-
-document.getElementById("statsModalClose").addEventListener("click", () => {
-  document.getElementById("statsOverlay").classList.remove("active");
-});
-document.getElementById("statsOverlay").addEventListener("click", (e) => {
-  if (e.target === document.getElementById("statsOverlay"))
-    document.getElementById("statsOverlay").classList.remove("active");
-});
-document.getElementById("statsHeaderBtn").addEventListener("click", () => {
-  document.getElementById("statsOverlay").classList.add("active");
-});
 
 // ========= KALKULÁTOR =========
 (function() {
