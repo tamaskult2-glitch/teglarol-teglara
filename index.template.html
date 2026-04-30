@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="hu">
 <head>
  <meta charset="UTF-8">
@@ -252,6 +251,8 @@ body.dark #stickyCatHeader {
 }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 .card { background:var(--bg-card); padding:22px; border-radius:14px; margin-bottom:16px; box-shadow:var(--shadow-soft); border:1px solid var(--border-subtle); transition:background 0.3s,transform 0.18s,box-shadow 0.18s; word-break:break-word; overflow-wrap:break-word; max-width:100%; box-sizing:border-box; overflow:hidden; display:block; position:relative; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background-image: url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.08)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.08)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); background-repeat: repeat; background-size: 200px 120px; pointer-events:none; z-index:0; opacity:1; }
+.card > * { position:relative; z-index:1; }
 .card h3 { font-size:17px; line-height:1.4; margin:0 0 10px; word-break:break-word; font-weight:700; }
 .card p { font-size:15px; line-height:1.6; margin:5px 0; word-break:break-word; }
 .card h3 { margin:0 0 10px; font-size:17px; color:var(--text-main); font-weight:700; letter-spacing:-0.2px; }
@@ -348,6 +349,8 @@ body.dark .mini-bar { background:rgba(192,202,245,0.08); }
 .modal-overlay.active { display:flex; }
 .modal-box { pointer-events:auto; }
 .modal-box { background:var(--bg-card); border-radius:20px; padding:36px; max-width:620px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.25); border:1px solid var(--border-subtle); position:relative; animation:modalIn 0.22s ease; }
+.modal-box::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background-image: url("data:image/svg+xml,%3Csvg width='220' height='140' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='15' y='45' fill='rgba(192,24,58,0.06)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='15' y='100' fill='rgba(192,24,58,0.06)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); background-repeat: repeat; background-size: 220px 140px; pointer-events:none; z-index:0; opacity:1; border-radius:20px; }
+.modal-box > * { position:relative; z-index:1; }
 @keyframes modalIn { from{transform:scale(0.94) translateY(12px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
 .modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:26px; cursor:pointer; color:var(--text-secondary); line-height:1; transition:color 0.2s; }
 .modal-close:hover { color:#e8405a; }
@@ -907,15 +910,17 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
 .calc-breakdown-val.neu { color:var(--text-secondary); }
 .calc-disclaimer { font-size:13px; color:var(--text-secondary); opacity:0.7; margin-top:12px; font-style:italic; }
 body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
+body.dark .card::before { background-image: url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.12)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.12)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); }
+body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg width='220' height='140' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='15' y='45' fill='rgba(192,24,58,0.10)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='15' y='100' fill='rgba(192,24,58,0.10)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); }
 </style>
-
 <script data-goatcounter="https://teglarol-teglara.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-
 </head>
 <body>
 <div id="stickyCatHeader"></div>
 <a href="#categorySections" class="skip-link" style="position:absolute;top:-40px;left:0;background:#e8405a;color:#fff;padding:8px 16px;border-radius:0 0 8px 0;font-weight:700;font-size:14px;z-index:9999;transition:top 0.2s;text-decoration:none;">Ugrás a tartalomhoz</a>
 <style>.skip-link:focus{top:0!important}</style>
+
+
 
 <button class="scroll-to-top" id="scrollToTop" aria-label="Ugrás az oldal tetejére">
   <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
@@ -930,13 +935,11 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 </button>
 
 <!-- KERESŐ GOMB -->
-
 <button class="search-btn" id="searchBtn" aria-label="Keresés">
   <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
 </button>
 
 <!-- fabToggle eltávolítva -->
-
 <button id="darkToggle" aria-label="Sötét/világos mód váltása" class="dark-icon-btn" aria-label="Téma váltás">
   <span id="darkToggleIcon">🌙</span>
 </button>
@@ -948,7 +951,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 </button>
 
 <!-- KERESŐ PANEL -->
-
 <div class="search-overlay" id="searchOverlay">
   <div class="search-box">
     <div class="search-input-wrap">
@@ -963,7 +965,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 </div>
 
 <!-- KT LOGO – jobb oldal széle, függőleges -->
-
 <div class="kt-logo">
   <svg class="kt-claude-icon" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Claude">
     <path d="M20.5 3C11 3 3 11 3 20.5S11 38 20.5 38 38 30 38 20.5 30 3 20.5 3z" fill="#D97757" opacity="0.9"/>
@@ -977,7 +978,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 </div>
 
 <!-- Sidebar overlay – mobil backdrop -->
-
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <nav class="sidebar" id="sidebar" role="navigation" aria-label="Kategóriák és szűrők">
@@ -1087,7 +1087,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  </div><!-- /logo-future -->
 
  <!-- Névjegy + Csengő egy sorban -->
-
  <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
   <button class="story-btn" id="storyBtn" aria-label="Névjegy és verziótörténet megnyitása" aria-label="Az oldal története">
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1129,7 +1128,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
   </g>
 
   <!-- Lebegő tégla 1 -->
-
   <g class="river-brick-1" style="transform-origin:0 95px;">
    <g transform="translate(60, 88) rotate(-4)">
     <rect width="32" height="14" rx="3" fill="#C0643A"/>
@@ -1139,7 +1137,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
   </g>
 
   <!-- Lebegő tégla 2 -->
-
   <g class="river-brick-2" style="transform-origin:0 102px;">
    <g transform="translate(240, 95) rotate(5)">
     <rect width="28" height="12" rx="3" fill="#B85830"/>
@@ -1149,7 +1146,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
   </g>
 
   <!-- Lebegő tégla 3 -->
-
   <g class="river-brick-3" style="transform-origin:0 90px;">
    <g transform="translate(420, 90) rotate(-7)">
     <rect width="34" height="15" rx="3" fill="#C85A30"/>
@@ -1169,7 +1165,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  </p>
 
  <!-- Megosztás gombok -->
-
  <p style="text-align:center;margin:16px 0 8px;font-size:14px;font-weight:600;color:var(--text-secondary);">
   🧱 Segíts hogy minél többen számon kérhessék az ígéreteket!
  </p>
@@ -1208,7 +1203,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  </div>
 
  <!-- Készítette + Felelősségkizáró – jobb alsó sarok, egy sorban -->
-
  <div style="position:absolute;bottom:14px;right:18px;display:flex;align-items:center;gap:8px;">
   <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.35);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.4);border-radius:999px;padding:5px 12px;font-size:11px;color:#555;">
    <span style="font-weight:500;color:#555;">Készítette</span>
@@ -1225,20 +1219,18 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  </header>
 
  <!-- Hidden category filter for JS -->
-
  <select id="categoryFilter" style="display:none;">
   <option value="__all__">Összes kategória</option>
  </select>
 
  <!-- KERESŐSÁV - fő tartalomban -->
 
-<!-- IDŐSOR DIAGRAM – középre igazítva -->
 
+<!-- IDŐSOR DIAGRAM – középre igazítva -->
  <div style="margin-bottom:24px;">
  <div class="card" id="timelineCard" style="width:100%;">
 
   <!-- Fejléc: összesítő számok -->
-
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
    <div>
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-secondary);margin-bottom:4px;">Az „áradás" óta</div>
@@ -1269,21 +1261,17 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
   </div>
 
   <!-- Progress bar -->
-
   <div style="height:8px;border-radius:99px;overflow:hidden;background:var(--border-subtle);margin-bottom:24px;">
    <div id="tlProgressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#FF9933,#FF6B6B);transition:width 0.6s ease;width:0%;"></div>
   </div>
 
   <!-- Mérföldkő idővonal -->
-
   <div style="position:relative;padding-left:24px;">
 
    <!-- Függőleges vonal -->
-
    <div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,#CE2939,var(--border-subtle));border-radius:2px;"></div>
 
    <!-- Mérföldkövek -->
-
    <div class="milestone" data-date="2026-04-12">
     <div class="milestone-dot" style="background:#CE2939;"></div>
     <div class="milestone-content">
@@ -1361,7 +1349,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
  </div>
 
  <!-- Státusz lista panel – alulról csúszik be -->
-
  <div class="status-panel-overlay" id="statusPanelOverlay">
   <div class="status-panel">
    <div class="status-panel-header">
@@ -1372,15 +1359,14 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
   </div>
  </div>
 
- <!-- ========= KALKULÁTOR SZEKCIÓ ========= -->
 
+ <!-- ========= KALKULÁTOR SZEKCIÓ ========= -->
  <div class="calc-section" id="calcSection" style="display:none;">
   <div class="calc-card">
    <div class="calc-title">💰 Mennyit jelent neked az „áradás"?</div>
    <div class="calc-subtitle">Add meg a bruttó havi fizetésedet, és kiszámítjuk a várható változást az „áradás" előtti és utáni időszakban.</div>
 
    <!-- Típus választó -->
-
    <div class="calc-tabs-hint">Több kategória is kijelölhető egyszerre (pl. 25 év alatti + 1 gyermekes)</div>
    <div class="calc-tabs">
     <button class="calc-tab active" data-type="gyermektelen">🙋 Gyermektelen</button>
@@ -1396,7 +1382,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
    </div>
 
    <!-- Input -->
-
    <div class="calc-input-row">
     <div class="calc-input-group" id="calcBruttoWrap">
      <label>Bruttó havi fizetés (Ft)</label>
@@ -1415,7 +1400,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
    </div>
 
    <!-- Eredmények -->
-
    <div class="calc-results" id="calcResults">
     <div class="calc-result-grid">
      <div class="calc-result-box before">
@@ -1443,26 +1427,22 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
     </div>
     <div class="calc-disclaimer">* Becslés a TISZA program és hatályos adójogszabályok alapján. Tényleges összeg egyéni körülményektől függően eltérhet. Nem minősül adótanácsadásnak.</div>
 
-```
-<!-- Megosztás gomb -->
-<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
- <button id="calcShareBtn" style="flex:1;min-width:140px;padding:12px 16px;border-radius:12px;background:linear-gradient(135deg,#e8405a,#c0183a);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-  Eredmény megosztása
- </button>
- <button id="calcCopyBtn" style="padding:12px 16px;border-radius:12px;background:var(--bg-main);color:var(--text-main);border:1.5px solid var(--border-subtle);font-size:14px;font-weight:600;cursor:pointer;">
-  📋 Link másolása
- </button>
-</div>
-<div id="calcShareMsg" style="display:none;margin-top:8px;font-size:13px;color:#5ab040;font-weight:600;text-align:center;">✓ Link a vágólapra másolva!</div>
-```
-
+    <!-- Megosztás gomb -->
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+     <button id="calcShareBtn" style="flex:1;min-width:140px;padding:12px 16px;border-radius:12px;background:linear-gradient(135deg,#e8405a,#c0183a);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Eredmény megosztása
+     </button>
+     <button id="calcCopyBtn" style="padding:12px 16px;border-radius:12px;background:var(--bg-main);color:var(--text-main);border:1.5px solid var(--border-subtle);font-size:14px;font-weight:600;cursor:pointer;">
+      📋 Link másolása
+     </button>
+    </div>
+    <div id="calcShareMsg" style="display:none;margin-top:8px;font-size:13px;color:#5ab040;font-weight:600;text-align:center;">✓ Link a vágólapra másolva!</div>
    </div>
   </div>
  </div>
 
  <!-- RENDEZÉS SÁV – közvetlenül a kártyák felett -->
-
  <div class="sort-bar" id="sortBar" style="margin:20px 0 12px;padding:8px 0;border-bottom:1px solid var(--border-subtle);">
   <span class="sort-label">Rendezés:</span>
   <button class="sort-btn active" data-sort="default">🗂️ Alapértelmezett</button>
@@ -1479,7 +1459,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 </div>
 
 <!-- HIBA BEJELENTŐ MODAL -->
-
 <div class="modal-overlay" id="bugOverlay" role="dialog" aria-modal="true" aria-label="Hiba bejelentés">
  <div class="modal-box" style="max-width:460px;">
   <button class="modal-close" id="bugModalClose">×</button>
@@ -1529,7 +1508,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 </div>
 
 <!-- ÉRTESÍTŐ FELIRATKOZÁS MODAL -->
-
 <div class="modal-overlay" id="subscribeOverlay" role="dialog" aria-modal="true" aria-label="Értesítés feliratkozás" style="display:none;align-items:center;justify-content:center;">
  <div class="modal-box" style="max-width:420px;width:100%;">
   <button id="subscribeClose" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);">×</button>
@@ -1566,7 +1544,6 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 </div>
 
 <!-- NÉZETSZÁMLÁLÓ MODAL -->
-
 <div class="modal-overlay" id="statsOverlay">
  <div class="modal-box" style="max-width:360px;">
   <button class="modal-close" id="statsModalClose">×</button>
@@ -1660,36 +1637,33 @@ body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
   </div>
 
   <!-- INTERAKTÍV TÚRA - 3 lépés -->
-
   <div class="tour-wrap" id="tourWrap">
    <p class="tour-intro">👋 <strong>Első látogatás?</strong> 3 lépés, ~20 másodperc.</p>
    <div class="tour-steps" id="tourSteps">
 
-```
-<div class="tour-step active" data-step="0">
- <span class="tour-step-icon" style="font-size:36px;">🧱</span>
- <div class="tour-step-body">
-  <div class="tour-step-title">Minden kártya = egy ígéret</div>
-  <div class="tour-step-desc">📣 Bejelentve &nbsp;·&nbsp; ✅ Teljesítve &nbsp;·&nbsp; ❌ Csak ígéret<br>Kattints bármelyikre a részletekért és forrásért.</div>
- </div>
-</div>
+    <div class="tour-step active" data-step="0">
+     <span class="tour-step-icon" style="font-size:36px;">🧱</span>
+     <div class="tour-step-body">
+      <div class="tour-step-title">Minden kártya = egy ígéret</div>
+      <div class="tour-step-desc">📣 Bejelentve &nbsp;·&nbsp; ✅ Teljesítve &nbsp;·&nbsp; ❌ Csak ígéret<br>Kattints bármelyikre a részletekért és forrásért.</div>
+     </div>
+    </div>
 
-<div class="tour-step" data-step="1">
- <span class="tour-step-icon" style="font-size:36px;">🗂️</span>
- <div class="tour-step-body">
-  <div class="tour-step-title">Szűrj témára vagy prioritásra</div>
-  <div class="tour-step-desc">Bal menü: válassz kategóriát (Egészségügy, Gazdaság…) vagy 🔴 Azonnali / 🟡 Rövid táv. Kereső is van fent.</div>
- </div>
-</div>
+    <div class="tour-step" data-step="1">
+     <span class="tour-step-icon" style="font-size:36px;">🗂️</span>
+     <div class="tour-step-body">
+      <div class="tour-step-title">Szűrj témára vagy prioritásra</div>
+      <div class="tour-step-desc">Bal menü: válassz kategóriát (Egészségügy, Gazdaság…) vagy 🔴 Azonnali / 🟡 Rövid táv. Kereső is van fent.</div>
+     </div>
+    </div>
 
-<div class="tour-step" data-step="2">
- <span class="tour-step-icon" style="font-size:36px;">💰</span>
- <div class="tour-step-body">
-  <div class="tour-step-title">Számold ki neked mennyit jelent</div>
-  <div class="tour-step-desc">💰 Mennyi az annyi? kalkulátor — add meg a fizetésed, látod a különbséget áradás előtt és után.</div>
- </div>
-</div>
-```
+    <div class="tour-step" data-step="2">
+     <span class="tour-step-icon" style="font-size:36px;">💰</span>
+     <div class="tour-step-body">
+      <div class="tour-step-title">Számold ki neked mennyit jelent</div>
+      <div class="tour-step-desc">💰 Mennyi az annyi? kalkulátor — add meg a fizetésed, látod a különbséget áradás előtt és után.</div>
+     </div>
+    </div>
 
    </div>
    <div class="tour-progress" id="tourProgress">
@@ -4066,6 +4040,5 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
 </script>
-
 </body>
 </html>
