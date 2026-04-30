@@ -869,6 +869,14 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
 .calc-tab.active { background:#e8405a; color:#fff; border-color:#e8405a; }
 .calc-tab.selected { background:rgba(232,64,90,0.12); border-color:#e8405a; color:#e8405a; font-weight:700; }
 .calc-tab.selected::after { content:" ✓"; font-size:11px; }
+.calc-age-btn {
+  padding:8px 12px; border-radius:8px; font-size:12px; font-weight:600;
+  border:1.5px solid var(--border-subtle); background:var(--bg-card);
+  color:var(--text-secondary); cursor:pointer; transition:all 0.18s;
+  flex:1; text-align:center;
+}
+.calc-age-btn.active { background:#e8405a; color:#fff; border-color:#e8405a; }
+.calc-age-btn:hover { border-color:#e8405a; }
 .calc-tabs-hint { font-size:12px; color:var(--text-secondary); margin-bottom:8px; }
 .calc-input-row { display:flex; gap:12px; align-items:flex-end; margin-bottom:16px; flex-wrap:wrap; }
 .calc-input-group { flex:1; min-width:160px; }
@@ -990,7 +998,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <div class="cat-item cat-priority" data-priority="hosszu" style="border-left:3px solid #1E8449;">🟢 Hosszú táv — ciklus vége+</div>
 
  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-secondary);padding:10px 4px 6px;margin-top:4px;">Kalkulátor</div>
- <div class="cat-item" data-calc="true" style="border-left:3px solid #e8405a;">💰 Mennyi az annyi?</div>
+ <div class="cat-item" data-calc="true" style="border-left:3px solid #FFA500; opacity:0.7;">🚧 Mennyi az annyi? (javítás alatt)</div>
 
  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-secondary);padding:10px 4px 6px;margin-top:4px;">Témakör szerint</div>
  <div class="cat-item cat-jog" data-cat="Államszerkezet és jogállam">🏛️ Államszerkezet és jogállam</div>
@@ -1091,17 +1099,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    </svg>
    <span>Névjegy</span>
   </button>
-
-  <div class="bell-wrap" id="bellWrap" style="position:relative;bottom:auto;left:auto;margin-top:0;">
-   <div class="bell-sonar bell-sonar-1"></div>
-   <div class="bell-sonar bell-sonar-2"></div>
-   <button class="bell-btn" id="bellBtn" aria-label="Értesítés feliratkozás" role="button">🔔</button>
-   <div class="bell-tooltip">
-    <strong>Értesítés feliratkozás</strong><br>
-    Küldünk emailt ha ígéret<br>teljesül vagy bejelentés jön.
-   </div>
-  </div>
- </div>
+ </div><!-- /Névjegy + Csengő flex -->
 
  </div><!-- /header-left-col -->
  <div class="header-text">
@@ -1357,22 +1355,43 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <!-- ========= KALKULÁTOR SZEKCIÓ ========= -->
  <div class="calc-section" id="calcSection" style="display:none;">
   <div class="calc-card">
+   <!-- JAVÍTÁS ALATT BANNER -->
+   <div style="background:linear-gradient(135deg,#FFA500,#FF8C00); color:#fff; padding:14px 20px; border-radius:12px; margin-bottom:20px; text-align:center; box-shadow:0 4px 12px rgba(255,165,0,0.3);">
+    <div style="font-size:20px; margin-bottom:6px;">🚧 KALKULÁTOR JAVÍTÁS ALATT 🚧</div>
+    <div style="font-size:13px; opacity:0.95;">A kalkulátor jelenleg pontatlan adatokat mutat. Dolgozunk a javításon, hogy a NAV szabályok szerint pontosan működjön (anyák SZJA mentessége, CSED/GYED stb.). Hamarosan visszatér!</div>
+   </div>
+   
    <div class="calc-title">💰 Mennyit jelent neked az „áradás"?</div>
    <div class="calc-subtitle">Add meg a bruttó havi fizetésedet, és kiszámítjuk a várható változást az „áradás" előtti és utáni időszakban.</div>
 
    <!-- Típus választó -->
-   <div class="calc-tabs-hint">Több kategória is kijelölhető egyszerre (pl. 25 év alatti + 1 gyermekes)</div>
+   <div class="calc-tabs-hint">Több kategória is kijelölhető egyszerre (pl. 25 év alatti + 2 gyermekes + Anya vagyok)</div>
    <div class="calc-tabs">
     <button class="calc-tab active" data-type="gyermektelen">🙋 Gyermektelen</button>
-    <button class="calc-tab" data-type="minber">💼 Minimálbéres</button>
-    <button class="calc-tab" data-type="kata">🏪 KATA vállalkozó</button>
     <button class="calc-tab" data-type="25alatt">👤 25 év alatti</button>
-    <button class="calc-tab" data-type="elsohazas">💍 Első házasok</button>
     <button class="calc-tab" data-type="1gyerek">👶 1 gyermekes</button>
     <button class="calc-tab" data-type="2gyerek">👶👶 2 gyermekes</button>
     <button class="calc-tab" data-type="3gyerek">👨‍👩‍👧 3+ gyermekes</button>
-    <button class="calc-tab" data-type="nyugdijas">🧓 Nyugdíjas</button>
+    <button class="calc-tab" data-type="anya">👩 Anya vagyok</button>
+    <button class="calc-tab" data-type="elsohazas">💍 Első házasok</button>
     <button class="calc-tab" data-type="fogyatekos">♿ Fogyatékossággal élő</button>
+    <button class="calc-tab" data-type="csed">🤱 CSED-en vagyok</button>
+    <button class="calc-tab" data-type="gyed">👶 GYED-en vagyok</button>
+    <button class="calc-tab" data-type="kata">🏪 KATA</button>
+    <button class="calc-tab" data-type="nyugdijas">🧓 Nyugdíjas</button>
+   </div>
+
+   <!-- Anya életkor választó (csak ha Anya tab aktív) -->
+   <div class="calc-anya-age" id="anyaAgeWrap" style="display:none; margin:16px 0; padding:12px; background:var(--bg-main); border-radius:10px;">
+    <label style="display:block; margin-bottom:8px; font-weight:600; font-size:13px;">Életkorod:</label>
+    <div style="display:flex; gap:8px;">
+     <button class="calc-age-btn active" data-age="30alatt">👩 30 év alatt</button>
+     <button class="calc-age-btn" data-age="40alatt">👩 30-39 év között</button>
+     <button class="calc-age-btn" data-age="40felett">👩‍🦳 40 év felett</button>
+    </div>
+    <div style="margin-top:8px; font-size:11px; color:var(--text-secondary);">
+     <strong>SZJA mentesség:</strong> 30 alatt + 1 gyerek VAGY 40 alatt + 2 gyerek VAGY 3+ gyerek = teljes SZJA mentesség!
+    </div>
    </div>
 
    <!-- Input -->
@@ -1380,6 +1399,14 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     <div class="calc-input-group" id="calcBruttoWrap">
      <label>Bruttó havi fizetés (Ft)</label>
      <input type="number" id="calcBrutto" placeholder="pl. 450000" min="0" step="10000">
+    </div>
+    <div class="calc-input-group" id="calcCsedGyedWrap" style="display:none;">
+     <label>Eredeti bruttó bér (CSED/GYED alapja, Ft)</label>
+     <input type="number" id="calcCsedGyedBrutto" placeholder="pl. 500000" min="0" step="10000">
+     <div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">
+      <strong>CSED:</strong> bruttó 100%, SZJA-mentes<br>
+      <strong>GYED:</strong> bruttó 70% (max 451 920 Ft), SZJA-mentes, 10% nyugdíjjárulék
+     </div>
     </div>
     <div class="calc-input-group" id="calcKataWrap" style="display:none;">
      <label>Havi bevétel (Ft) — KATA előtt</label>
@@ -1497,42 +1524,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <div style="font-size:40px;margin-bottom:12px;">✅</div>
    <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;">Köszönjük!</div>
    <div style="font-size:14px;color:var(--text-secondary);">A bejelentésed megkaptuk. Ha megadtál e-mail címet, visszajelzünk.</div>
-  </div>
- </div>
-</div>
-
-<!-- ÉRTESÍTŐ FELIRATKOZÁS MODAL -->
-<div class="modal-overlay" id="subscribeOverlay" role="dialog" aria-modal="true" aria-label="Értesítés feliratkozás" style="display:none;align-items:center;justify-content:center;">
- <div class="modal-box" style="max-width:420px;width:100%;">
-  <button id="subscribeClose" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);">×</button>
-  <div style="margin-bottom:10px;display:flex;justify-content:center;">
-   <svg viewBox="0 0 24 24" fill="none" stroke="#e8405a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-  </div>
-  <div class="modal-title" style="font-size:18px;margin-bottom:4px;">Értesítés feliratkozás</div>
-  <p style="font-size:14px;color:var(--text-secondary);text-align:center;margin-bottom:20px;">Értesítünk ha új ígéret teljesül vagy fontos bejelentés érkezik.</p>
-  <div id="subscribeFormWrap">
-   <form name="ertesito-feliratkozas" data-netlify="true" netlify-honeypot="bot-field" hidden>
-    <input name="email"/><input name="tipus"/>
-   </form>
-   <div style="margin-bottom:12px;">
-    <label style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Email cím</label>
-    <input type="email" id="subEmail" placeholder="pelda@gmail.com" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border-subtle);background:var(--bg-card);color:var(--text-main);font-size:15px;outline:none;">
-   </div>
-   <div style="margin-bottom:16px;">
-    <label style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">Értesítés típusa</label>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-     <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;"><input type="checkbox" id="subTeljesitett" checked style="width:18px;height:18px;accent-color:#e8405a;"> ✅ Ígéret teljesült</label>
-     <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;"><input type="checkbox" id="subBejelentett" checked style="width:18px;height:18px;accent-color:#e8405a;"> 📣 Új bejelentés</label>
-     <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;"><input type="checkbox" id="subHeti" style="width:18px;height:18px;accent-color:#e8405a;"> 📊 Heti összefoglaló</label>
-    </div>
-   </div>
-   <button id="subscribeBtn" style="width:100%;padding:14px;background:linear-gradient(135deg,#e8405a,#c0183a);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;">🔔 Feliratkozás</button>
-   <p style="font-size:12px;color:var(--text-secondary);text-align:center;margin-top:10px;">Spam nélkül. Bármikor leiratkozhatsz.</p>
-  </div>
-  <div id="subscribeSuccess" style="display:none;text-align:center;padding:20px 0;">
-   <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-   <div style="font-size:17px;font-weight:700;color:var(--text-main);margin-bottom:8px;">Sikeresen feliratkoztál!</div>
-   <p style="font-size:14px;color:var(--text-secondary);">Értesíteni fogunk ha fontos változás történik.</p>
   </div>
  </div>
 </div>
@@ -3046,44 +3037,6 @@ function scrollToWithOffset(el, offset) {
 })();
 
 // ── Csengő gomb JS ──
-(function() {
-  const bell = document.getElementById('bellBtn');
-  const wrap = document.getElementById('bellWrap');
-  const overlay = document.getElementById('subscribeOverlay');
-  if (!bell || !wrap) return;
-
-  // Mobilon: tap = tooltip toggle, dupla tap / 1.5s után = modal
-  let tapTimer = null;
-  bell.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (window.innerWidth < 900) {
-      // Mobilon: első kattintás tooltip, második modal
-      if (wrap.classList.contains('open')) {
-        wrap.classList.remove('open');
-        if (overlay) overlay.style.cssText = 'display:flex;align-items:center;justify-content:center;';
-      } else {
-        wrap.classList.add('open');
-        clearTimeout(tapTimer);
-        tapTimer = setTimeout(() => wrap.classList.remove('open'), 3000);
-      }
-    } else {
-      // Desktopon: kattintás = modal megnyit
-      if (overlay) overlay.style.cssText = 'display:flex;align-items:center;justify-content:center;';
-    }
-  });
-
-  // Tooltip "Feliratkozás" linkre kattintva modal nyíl
-  if (wrap) wrap.addEventListener('click', (e) => {
-    if (e.target !== bell && overlay) {
-      overlay.style.cssText = 'display:flex;align-items:center;justify-content:center;';
-      wrap.classList.remove('open');
-    }
-  });
-
-  // Kívülre kattintva tooltip bezárul
-  document.addEventListener('click', () => wrap.classList.remove('open'));
-})();
-
 // ── Kalkulátor megosztás gombok ──
 (function() {
   const shareBtn = document.getElementById('calcShareBtn');
@@ -3120,36 +3073,6 @@ Számold ki te is: ${url}`;
     } else {
       copyUrl();
     }
-  });
-})();
-
-// ── Subscribe modal JS ──
-(function() {
-  function sa(id) { return document.getElementById(id); }
-  const overlay = sa('subscribeOverlay');
-  const closeBtn = sa('subscribeClose');
-  const btn = sa('subscribeBtn');
-  if (closeBtn) closeBtn.addEventListener('click', () => { if(overlay) overlay.style.display='none'; });
-  if (overlay) overlay.addEventListener('click', (e) => { if(e.target===overlay) overlay.style.display='none'; });
-  if (btn) btn.addEventListener('click', () => {
-    const email = sa('subEmail') ? sa('subEmail').value.trim() : '';
-    if (!email || !email.includes('@')) {
-      if(sa('subEmail')) sa('subEmail').style.borderColor='#e8405a'; return;
-    }
-    const types = [];
-    if (sa('subTeljesitett') && sa('subTeljesitett').checked) types.push('teljesített');
-    if (sa('subBejelentett') && sa('subBejelentett').checked) types.push('bejelentett');
-    if (sa('subHeti') && sa('subHeti').checked) types.push('heti');
-    const fd = new FormData();
-    fd.append('form-name','ertesito-feliratkozas');
-    fd.append('email', email);
-    fd.append('tipus', types.join(', '));
-    fetch('/', { method:'POST', body:fd }).catch(()=>{}).finally(() => {
-      const fw = sa('subscribeFormWrap');
-      const fs = sa('subscribeSuccess');
-      if(fw) fw.style.display='none';
-      if(fs) fs.style.display='block';
-    });
   });
 })();
 
