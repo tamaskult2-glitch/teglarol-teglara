@@ -1,21 +1,9 @@
 #!/usr/bin/env python3
-"""
-Tégláról-téglára automatikus frissítő
-Naponta fut GitHub Actions-ből, Claude API-t hív, frissíti az adatokat.
-"""
-
-import json
-import os
-import re
-import sys
+"""Tégláról-téglára frissítő – optimalizált, alacsony API költség"""
+import os, re, json
 from datetime import date
 from pathlib import Path
-
-try:
-    import anthropic
-except ImportError:
-    print("anthropic csomag hiányzik: pip install anthropic")
-    sys.exit(1)
+import anthropic
 
 TODAY = date.today().isoformat()
 ROOT = Path(__file__).parent.parent
@@ -23,145 +11,125 @@ DATA_FILE = ROOT / "data.json"
 TEMPLATE_FILE = ROOT / "index.template.html"
 OUTPUT_FILE = ROOT / "index.html"
 
+
 def load_data():
-    with open(DATA_FILE, encoding="utf-8") as f:
-        return json.load(f)
+    if not DATA_FILE.exists():
+        html_file = ROOT / "index.html"
+        if html_file.exists():
+            content = html_file.read_text(encoding="utf-8")
+            match = re.search(r'excelData = (\[.*?\]);', content, re.DOTALL)
+            if match:
+                data = json.loads(match.group(1))
+                save_data(data)
+                return data
+        raise FileNotFoundError(f"Nem található: {DATA_FILE}")
+    return json.loads(DATA_FILE.read_text(encoding="utf-8"))
+
 
 def save_data(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    DATA_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
 
 def build_html(data):
-    """Beilleszti az adatokat a template-be és létrehozza az index.html-t"""
     template = TEMPLATE_FILE.read_text(encoding="utf-8")
     data_js = json.dumps(data, ensure_ascii=False)
-    html = template.replace("excelData = __DATA_PLACEHOLDER__;",
-                            f"excelData = {data_js};")
-    # Frissíti a dátumot a fejlécben
-    html = re.sub(
-        r'Updated: \d{4}\.\d{2}\.\d{2}',
-        f'Updated: {TODAY.replace("-", ".")}',
-        html
-    )
+    html = template.replace("excelData = __DATA_PLACEHOLDER__;", f"excelData = {data_js};")
     OUTPUT_FILE.write_text(html, encoding="utf-8")
-    print(f"✓ index.html létrehozva ({len(html):,} byte)")
+    print(f"index.html: {len(html):,} byte, datum: {TODAY}")
+
 
 def ask_claude(data):
-    """Claude API-t kér meg a frissítésre"""
+    """Optimalizalt API hivas: max 5 igeret, ultra-rovid prompt"""
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
-    # Csak azokat küldjük, ahol a Változás nem "kész"/"teljesítve"
-    pending = [d for d in data if d["Változás"] not in ("kész", "teljesítve")]
+    pending = [d for d in data
+               if d["Változás"] not in ("kész", "teljesítve")
+               and d.get("Prioritás") == "azonnali"]
+    pending = pending[:5]
 
-    prompt = f"""Te egy magyar politikai adatelemző vagy. A mai dátum: {TODAY}.
-
-Az alábbi lista a TISZA Párt (Magyar Péter) ígéreteit tartalmazza, amelyek még nem teljesültek.
-Keresd meg az interneten (web search eszközzel) a mai friss híreket, és frissítsd az adatokat.
-
-FONTOS SZABÁLYOK:
-1. Csak akkor változtasd meg a "Változás" mezőt, ha BIZTOS forrásod van rá
-2. "Változás" lehetséges értékei: "ígéret", "bejelentve", "folyamatban", "kész", "teljesítve"
-3. Ha frissítettél valamit, add meg a "Forrás link"-et
-4. A "Frissítés" mezőt állítsd "{TODAY}"-re ha változtattal
-5. Ha nincs új információ egy tételnél, NE változtasd meg
-6. Válaszolj CSAK valid JSON tömbként, semmi más szöveg
-
-Az ígéretek listája (JSON):
-{json.dumps(pending, ensure_ascii=False, indent=1)}
-
-Válaszolj egy JSON tömbként, ahol csak a MEGVÁLTOZOTT tételeket szerepelted.
-Minden megváltozott tételnél add meg a "TiSZa ígéret" mezőt azonosításhoz.
-Ha semmi nem változott, válaszolj üres tömbbel: []"""
-
-    print("Claude API hívás...")
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=4000,
-        tools=[{"type": "web_search_20250305", "name": "web_search"}],
-        messages=[{"role": "user", "content": prompt}]
-    )
-
-    # Összegyűjti a text válaszokat
-    full_text = ""
-    for block in message.content:
-        if block.type == "text":
-            full_text += block.text
-
-    print(f"Claude válasz ({len(full_text)} karakter)")
-
-    # JSON kinyerése
-    json_match = re.search(r'\[.*\]', full_text, re.DOTALL)
-    if not json_match:
-        print("Nem találtam JSON választ, nincs változás")
+    if not pending:
+        print("Nincs azonnali frissitendo igeret.")
         return []
+
+    items = "\n".join([f"{i+1}. {d['TiSZa ígéret'][:50]} [{d['Változás']}]"
+                       for i, d in enumerate(pending)])
+
+    prompt = f"""Datum: {TODAY}. TISZA Part igeretek:
+{items}
+
+Ha BIZTOS statuszvaltozas van, valaszolj: [{{"n":1,"s":"bejelentve"}}]
+Ha nincs valtozas: []
+Csak JSON, semmi mas!"""
+
+    print(f"Prompt: {len(prompt)} kar, {len(pending)} igeret")
 
     try:
-        updates = json.loads(json_match.group())
-        print(f"✓ {len(updates)} frissítés érkezett")
-        return updates
-    except json.JSONDecodeError as e:
-        print(f"JSON parse hiba: {e}")
+        msg = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=150,
+            messages=[{"role": "user", "content": prompt}]
+        )
+    except Exception as e:
+        print(f"API hiba: {e}")
         return []
 
+    u = msg.usage
+    cost = (u.input_tokens / 1_000_000 * 0.80) + (u.output_tokens / 1_000_000 * 4.00)
+    print(f"Tokens: in={u.input_tokens}, out={u.output_tokens}, ~${cost:.4f}")
+
+    text = "".join(b.text for b in msg.content if b.type == "text").strip()
+    if text.startswith("```"):
+        text = re.sub(r'^```\w*\n?', '', text)
+        text = re.sub(r'\n?```$', '', text)
+
+    try:
+        updates = json.loads(text)
+    except Exception:
+        print(f"Nem JSON valasz: {text[:200]}")
+        return []
+
+    result = []
+    for u in updates:
+        if 'n' in u and 's' in u:
+            idx = u['n'] - 1
+            if 0 <= idx < len(pending):
+                result.append({"TiSZa ígéret": pending[idx]['TiSZa ígéret'], "Változás": u['s']})
+    return result
+
+
 def apply_updates(data, updates):
-    """Alkalmazza a Claude által visszaadott frissítéseket"""
     if not updates:
-        print("Nincs frissítés")
-        return data, 0
-
-    updated_count = 0
-    for update in updates:
-        igeret_name = update.get("TiSZa ígéret", "")
-        for item in data:
-            if item["TiSZa ígéret"] == igeret_name:
-                changed = False
-                for key, value in update.items():
-                    if key != "TiSZa ígéret" and item.get(key) != value:
-                        print(f"  [{igeret_name[:40]}] {key}: {item.get(key)} → {value}")
-                        item[key] = value
-                        changed = True
-                if changed:
-                    item["Frissítés"] = TODAY
-                    updated_count += 1
+        return 0
+    count = 0
+    for upd in updates:
+        for d in data:
+            if d['TiSZa ígéret'] == upd['TiSZa ígéret']:
+                if d.get('Változás') != upd.get('Változás'):
+                    d['Változás'] = upd['Változás']
+                    d['Frissítés'] = TODAY
+                    count += 1
+                    print(f"  Valtozas: {d['TiSZa ígéret'][:50]}")
                 break
+    return count
 
-    print(f"✓ {updated_count} ígéret frissítve")
-    return data, updated_count
-
-def update_sitemap():
-    """Frissíti a sitemap.xml dátumát"""
-    sitemap = ROOT / "sitemap.xml"
-    if sitemap.exists():
-        content = sitemap.read_text()
-        content = re.sub(r'<lastmod>.*?</lastmod>', f'<lastmod>{TODAY}</lastmod>', content)
-        sitemap.write_text(content)
-        print("✓ sitemap.xml frissítve")
 
 def main():
-    print(f"=== Tégláról-téglára frissítő | {TODAY} ===\n")
-
-    # Adatok betöltése
+    print(f"=== Teglarol-teglara | {TODAY} ===")
     data = load_data()
-    print(f"Betöltve: {len(data)} ígéret\n")
+    print(f"Adat: {len(data)} igeret")
 
-    # Claude API frissítés (csak ha van API key)
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if api_key:
-        updates = ask_claude(data)
-        data, count = apply_updates(data, updates)
-        if count > 0:
-            save_data(data)
-            print(f"\n✓ data.json mentve ({count} változás)")
-        else:
-            print("\nNincs változás a data.json-ban")
+    updates = ask_claude(data)
+    changed = apply_updates(data, updates)
+
+    if changed > 0:
+        save_data(data)
+        print(f"{changed} valtozas mentve")
     else:
-        print("ANTHROPIC_API_KEY nincs beállítva, kihagyva")
+        print("Nincs uj valtozas")
 
-    # HTML újragenerálás (mindig)
     build_html(data)
-    update_sitemap()
+    print("=== Kesz ===")
 
-    print(f"\n=== Kész ===")
 
 if __name__ == "__main__":
     main()
