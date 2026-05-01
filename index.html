@@ -998,7 +998,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <div class="cat-item cat-priority" data-priority="hosszu" style="border-left:3px solid #1E8449;">🟢 Hosszú táv — ciklus vége+</div>
 
  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-secondary);padding:10px 4px 6px;margin-top:4px;">Kalkulátor</div>
- <div class="cat-item" data-calc="true" style="border-left:3px solid #FFA500; opacity:0.7;">🚧 Mennyi az annyi? (javítás alatt)</div>
+ <div class="cat-item" data-calc="true" style="border-left:3px solid #e8405a;">💰 Mennyi az annyi?</div>
 
  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-secondary);padding:10px 4px 6px;margin-top:4px;">Témakör szerint</div>
  <div class="cat-item cat-jog" data-cat="Államszerkezet és jogállam">🏛️ Államszerkezet és jogállam</div>
@@ -1355,12 +1355,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <!-- ========= KALKULÁTOR SZEKCIÓ ========= -->
  <div class="calc-section" id="calcSection" style="display:none;">
   <div class="calc-card">
-   <!-- JAVÍTÁS ALATT BANNER -->
-   <div style="background:linear-gradient(135deg,#FFA500,#FF8C00); color:#fff; padding:14px 20px; border-radius:12px; margin-bottom:20px; text-align:center; box-shadow:0 4px 12px rgba(255,165,0,0.3);">
-    <div style="font-size:20px; margin-bottom:6px;">🚧 KALKULÁTOR JAVÍTÁS ALATT 🚧</div>
-    <div style="font-size:13px; opacity:0.95;">A kalkulátor jelenleg pontatlan adatokat mutat. Dolgozunk a javításon, hogy a NAV szabályok szerint pontosan működjön (anyák SZJA mentessége, CSED/GYED stb.). Hamarosan visszatér!</div>
-   </div>
-   
    <div class="calc-title">💰 Mennyit jelent neked az „áradás"?</div>
    <div class="calc-subtitle">Add meg a bruttó havi fizetésedet, és kiszámítjuk a várható változást az „áradás" előtti és utáni időszakban.</div>
 
@@ -2242,6 +2236,29 @@ document.querySelectorAll(".cat-item").forEach(item => {
  item.addEventListener("click", () => {
  const cat = item.getAttribute("data-cat");
  const pri = item.getAttribute("data-priority");
+ const isCalc = item.getAttribute("data-calc") === "true";
+ 
+ // KALKULÁTOR MEGNYITÁSA
+ if (isCalc) {
+  // Töröljük a kategória szűrőket
+  document.querySelectorAll(".cat-item").forEach(c => c.classList.remove("priority-filter-active"));
+  document.querySelectorAll(".category-section").forEach(s => s.style.display = "none");
+  
+  // Kalkulátor panel megjelenítése
+  const calcSection = document.getElementById("calcSection");
+  if (calcSection) {
+   calcSection.style.display = "block";
+   setTimeout(() => scrollToWithOffset(calcSection, 80), 100);
+  }
+  
+  if (window.innerWidth < 900) closeSidebar();
+  return;
+ }
+ 
+ // Kalkulátor elrejtése ha másra kattintunk
+ const calcSection = document.getElementById("calcSection");
+ if (calcSection) calcSection.style.display = "none";
+ 
  document.querySelectorAll(".tl-leg-item").forEach(c => c.classList.remove("active"));
  document.getElementById("statusPanelOverlay").classList.remove("active");
  document.querySelectorAll(".cat-item").forEach(c => c.classList.remove("priority-filter-active"));
@@ -4030,591 +4047,540 @@ Számold ki te is: ${url}`;
 
 // ========= KALKULÁTOR =========
 (function() {
-  // 2026-os valós adatok (NAV, MÁK, TISZA program)
-  const MEDIANBÉR = 625000;    // KSH 2024 mediánbér
-  const MINBÉR = 322800;       // minimálbér 2026
-  const GYES_NETTO = 25650;    // GYES nettó 2026
-
-  // TISZA adójóváírás sávok
-  function tiszaAdojovairas(brutto) {
-    if (brutto <= MINBÉR)    return Math.round(brutto * 0.06);
-    if (brutto <= 420000)    return 15000;
-    if (brutto <= 500000)    return 10000;
-    if (brutto <= MEDIANBÉR) return 5000;
-    return 0;
-  }
-
-  function fmt(n) {
-    return Math.abs(Math.round(n)).toLocaleString('hu-HU') + ' Ft';
-  }
-
-  // ════════════════════════════════════════════════════════
-  // ÚJ EGYSÉGES SZÁMÍTÁSI RENDSZER
-  // Minden típus önállóan számolja az ELŐTT és UTÁN értéket
-  // A kombináció: alaptípus + additív kedvezmények összeadva
-  // ════════════════════════════════════════════════════════
-
-  // Adja vissza: { nettoBefore, nettoAfter, itemsBefore, itemsAfter }
-  function calcType(type, brutto, nyugdij) {
-
-    // ── NYUGDÍJAS ──
-    if (type === 'nyugdijas') {
-      const ny = nyugdij;
-      const tip = Math.round(ny / 12);
-      const minNy = Math.max(ny, 120000);
-      const tipAfter = Math.round(minNy / 12);
-      const szep = Math.round(200000 / 12);
-      return {
-        nettoBefore: ny + tip,
-        nettoAfter:  minNy + tipAfter + szep,
-        itemsBefore: [
-          { nev:'Havi nyugdíj', osszeg: ny, tipus:'neu' },
-          { nev:'13. havi nyugdíj (÷12)', osszeg: tip, tipus:'pos' },
-        ],
-        itemsAfter: [
-          { nev:'Havi nyugdíj (min. 120 000 Ft)', osszeg: minNy, tipus:'pos' },
-          { nev:'13. havi nyugdíj (÷12)', osszeg: tipAfter, tipus:'pos' },
-          { nev:'Nyugdíjas SZÉP-kártya (÷12)', osszeg: szep, tipus:'pos' },
-        ],
-      };
-    }
-
-    // ── KATA ──
-    if (type === 'kata') {
-      const bev = parseInt(document.getElementById('calcKataBev')?.value) || brutto;
-      const bevAfter = Math.min(bev, 1500000);
-      return {
-        nettoBefore: Math.max(0, bev - 40000),
-        nettoAfter:  Math.max(0, bevAfter - 50000),
-        itemsBefore: [
-          { nev:'Havi bevétel', osszeg: bev, tipus:'neu' },
-          { nev:'Mini-KATA adó (jelenlegi)', osszeg: -40000, tipus:'neg' },
-          { nev:'Éves limit: 2M Ft/év (!)', osszeg: 0, tipus:'neg' },
-        ],
-        itemsAfter: [
-          { nev:'Havi bevétel (max 1,5M Ft)', osszeg: bevAfter, tipus:'neu' },
-          { nev:'KATA adó (visszaállított)', osszeg: -50000, tipus:'neg' },
-          { nev:'Éves limit: 18M Ft (TISZA)', osszeg: 0, tipus:'pos' },
-        ],
-      };
-    }
-
-    // ── MINIMÁLBÉRES ──
-    if (type === 'minber') {
-      const tb = Math.round(MINBÉR * 0.185);
-      const szjaBefore = Math.round(MINBÉR * 0.15);
-      const jovairas   = Math.round(MINBÉR * 0.06);
-      const szjaAfter  = Math.max(0, szjaBefore - jovairas);
-      return {
-        nettoBefore: MINBÉR - tb - szjaBefore,
-        nettoAfter:  MINBÉR - tb - szjaAfter,
-        itemsBefore: [
-          { nev:'Bruttó minimálbér (2026)', osszeg: MINBÉR, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA (15%)', osszeg: -szjaBefore, tipus:'neg' },
-        ],
-        itemsAfter: [
-          { nev:'Bruttó minimálbér (2026)', osszeg: MINBÉR, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' },
-          { nev:'SZJA fizetendő (9% eff.)', osszeg: -szjaAfter, tipus:'neg' },
-        ],
-      };
-    }
-
-    // ── BÉRES TÍPUSOK (alap SZJA számítás) ──
-    const tb = Math.round(brutto * 0.185);
-    const szjaAlap = Math.round(brutto * 0.15);
-    const jovairas = tiszaAdojovairas(brutto);
-
-    if (type === 'gyermektelen') {
-      const szjaAfter = Math.max(0, szjaAlap - jovairas);
-      return {
-        nettoBefore: brutto - tb - szjaAlap,
-        nettoAfter:  brutto - tb - szjaAfter,
-        itemsBefore: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA (15%)', osszeg: -szjaAlap, tipus:'neg' },
-        ],
-        itemsAfter: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          ...(jovairas > 0 ? [{ nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' }] : []),
-          { nev:'SZJA fizetendő', osszeg: -szjaAfter, tipus: szjaAfter > 0 ? 'neg' : 'neu' },
-        ],
-      };
-    }
-
-    if (type === '25alatt') {
-      const mentesHatar = 715765;
-      // Mentesség csak a határig, utána a fennmaradó bruttó után kell SZJA-t fizetni
-      const mentesOsszeg = Math.round(Math.min(brutto, mentesHatar) * 0.15);
-      const hatarFeletti = Math.max(0, brutto - mentesHatar);
-      const hatarFelettiSzja = Math.round(hatarFeletti * 0.15);
-      const szjaBefore = Math.max(0, szjaAlap - mentesOsszeg);
-      // TISZA: megtartja a mentességet, plusz adójóváírás a fennmaradó SZJA-ból
-      const szjaAfter  = Math.max(0, szjaBefore - jovairas);
-      return {
-        nettoBefore: brutto - tb - szjaBefore,
-        nettoAfter:  brutto - tb - szjaAfter,
-        itemsBefore: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'25 év alatti SZJA mentesség (max. 715 765 Ft-ig)', osszeg: mentesOsszeg, tipus:'pos' },
-          ...(szjaBefore > 0 ? [{ nev:'SZJA fizetendő (határ feletti rész után)', osszeg: -szjaBefore, tipus:'neg' }] : []),
-        ],
-        itemsAfter: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'25 év alatti SZJA mentesség (megtartva)', osszeg: mentesOsszeg, tipus:'pos' },
-          ...(jovairas > 0 && szjaBefore > 0 ? [{ nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' }] : []),
-          ...(szjaAfter > 0 ? [{ nev:'SZJA fizetendő', osszeg: -szjaAfter, tipus:'neg' }] : []),
-        ],
-      };
-    }
-
-    if (type === 'elsohazas') {
-      const kedv = 5000;
-      const szjaBefore = Math.max(0, szjaAlap - kedv);
-      const szjaAfter  = Math.max(0, szjaAlap - jovairas - kedv);
-      return {
-        nettoBefore: brutto - tb - szjaBefore,
-        nettoAfter:  brutto - tb - szjaAfter,
-        itemsBefore: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA (15%)', osszeg: -szjaAlap, tipus:'neg' },
-          { nev:'Első házasok kedvezménye', osszeg: kedv, tipus:'pos' },
-        ],
-        itemsAfter: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          ...(jovairas > 0 ? [{ nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' }] : []),
-          { nev:'Első házasok kedvezménye (megtartva)', osszeg: kedv, tipus:'pos' },
-          { nev:'SZJA fizetendő', osszeg: -szjaAfter, tipus: szjaAfter > 0 ? 'neg' : 'neu' },
-        ],
-      };
-    }
-
-    if (type === 'fogyatekos') {
-      const szemelyiKedv = 16140;
-      const szjaBefore = Math.max(0, szjaAlap - szemelyiKedv);
-      const szjaAfter  = Math.max(0, szjaAlap - jovairas - szemelyiKedv);
-      return {
-        nettoBefore: brutto - tb - szjaBefore,
-        nettoAfter:  brutto - tb - szjaAfter,
-        itemsBefore: [
-          { nev:'Bruttó fizetés / ellátás', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA (15%)', osszeg: -szjaAlap, tipus:'neg' },
-          { nev:'Személyi kedvezmény (fogyatékosság)', osszeg: szemelyiKedv, tipus:'pos' },
-        ],
-        itemsAfter: [
-          { nev:'Bruttó fizetés / ellátás', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          ...(jovairas > 0 ? [{ nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' }] : []),
-          { nev:'Személyi kedvezmény (megtartva)', osszeg: szemelyiKedv, tipus:'pos' },
-          { nev:'SZJA fizetendő', osszeg: -szjaAfter, tipus: szjaAfter > 0 ? 'neg' : 'neu' },
-        ],
-      };
-    }
-
-    if (type === '1gyerek') {
-      const csk = 20000;
-      const szjaBefore = Math.max(0, szjaAlap - csk);
-      const szjaAfter  = Math.max(0, szjaAlap - jovairas - csk);
-      return {
-        nettoBefore: brutto - tb - szjaBefore,
-        nettoAfter:  brutto - tb - szjaAfter,
-        itemsBefore: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA (15%)', osszeg: -szjaAlap, tipus:'neg' },
-          { nev:'Családi adókedvezmény (1 gyermek)', osszeg: csk, tipus:'pos' },
-        ],
-        itemsAfter: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          ...(jovairas > 0 ? [{ nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' }] : []),
-          { nev:'Családi adókedvezmény (megtartva)', osszeg: csk, tipus:'pos' },
-          { nev:'SZJA fizetendő', osszeg: -szjaAfter, tipus: szjaAfter > 0 ? 'neg' : 'neu' },
-        ],
-      };
-    }
-
-    if (type === '2gyerek') {
-      const csk = 80000;
-      const gyesBefore = GYES_NETTO * 2;
-      const gyesAfter  = GYES_NETTO * 2 * 2; // duplázás
-      const szjaBefore = Math.max(0, szjaAlap - csk);
-      const szjaAfter  = Math.max(0, szjaAlap - jovairas - csk);
-      return {
-        nettoBefore: brutto - tb - szjaBefore + gyesBefore,
-        nettoAfter:  brutto - tb - szjaAfter  + gyesAfter,
-        itemsBefore: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA (15%)', osszeg: -szjaAlap, tipus:'neg' },
-          { nev:'Családi adókedvezmény (2×40 000)', osszeg: csk, tipus:'pos' },
-          { nev:'GYES (2 gyermek × 25 650 Ft)', osszeg: gyesBefore, tipus:'pos' },
-        ],
-        itemsAfter: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          ...(jovairas > 0 ? [{ nev:'SZJA adójóváírás (TISZA)', osszeg: jovairas, tipus:'pos' }] : []),
-          { nev:'Családi adókedvezmény (2×40 000)', osszeg: csk, tipus:'pos' },
-          { nev:'GYES duplázás (2 × 51 300 Ft)', osszeg: gyesAfter, tipus:'pos' },
-          { nev:'SZJA fizetendő', osszeg: -szjaAfter, tipus: szjaAfter > 0 ? 'neg' : 'neu' },
-        ],
-      };
-    }
-
-    if (type === '3gyerek') {
-      const csk = 198000;
-      const gyesAfter = GYES_NETTO * 2;
-      // SZJA mentesség 3+ gyermeknél (jelenlegi is van, TISZA megtartja+bővíti)
-      const szjaBefore = Math.max(0, szjaAlap - csk);
-      const szjaAfter  = 0; // 3+ gyermek: teljes SZJA mentesség
-      return {
-        nettoBefore: brutto - tb - szjaBefore + GYES_NETTO,
-        nettoAfter:  brutto - tb + gyesAfter,
-        itemsBefore: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA (15%)', osszeg: -szjaAlap, tipus:'neg' },
-          { nev:'Családi adókedvezmény (3×66 000)', osszeg: csk, tipus:'pos' },
-          { nev:'GYES/GYET (legkisebb után)', osszeg: GYES_NETTO, tipus:'pos' },
-        ],
-        itemsAfter: [
-          { nev:'Bruttó fizetés', osszeg: brutto, tipus:'neu' },
-          { nev:'TB járulék (18,5%)', osszeg: -tb, tipus:'neg' },
-          { nev:'SZJA mentesség (3+ gyermek, kiterjesztve)', osszeg: szjaAlap, tipus:'pos' },
-          { nev:'Családi adókedvezmény (3×66 000)', osszeg: csk, tipus:'neu' },
-          { nev:'GYES/GYET duplázás (51 300 Ft)', osszeg: gyesAfter, tipus:'pos' },
-        ],
-      };
-    }
-
-    return { nettoBefore: 0, nettoAfter: 0, itemsBefore: [], itemsAfter: [] };
-  }
-
-  // ════════════════════════════════════════════
-  // KOMBINÁCIÓ: selectedTypes alapján számol
-  // ════════════════════════════════════════════
-  function calcCombined(selectedTypes, brutto, nyugdij) {
-    // Alap jövedelem típus
-    const alapTypes = ['nyugdijas','kata','minber','gyermektelen'];
-    const alapType  = alapTypes.find(t => selectedTypes.has(t)) || 'gyermektelen';
-
-    // Gyerek szám (ha van, ez az elsődleges számítási alap ha nincs kata/minber/nyugdijas)
-    const gyerekType = ['1gyerek','2gyerek','3gyerek'].find(t => selectedTypes.has(t));
-
-    // Ha van gyerek és nincs kata/minber/nyugdijas → gyerek az alap
-    // Ha van gyerek ÉS van kata/minber → kombináljuk
-    const hasSpecialAlap = ['kata','minber','nyugdijas'].some(t => selectedTypes.has(t));
-    const primaryType = (gyerekType && !hasSpecialAlap) ? gyerekType : alapType;
-    const hasNonDefaultAlap = gyerekType && hasSpecialAlap;
-
-    // Additív élethelyzetek
-    const addOnTypes = ['25alatt','elsohazas','fogyatekos'].filter(t => selectedTypes.has(t));
-
-    // Alap számítás
-    const base = calcType(primaryType, brutto, nyugdij);
-    let nettoBefore = base.nettoBefore;
-    let nettoAfter  = base.nettoAfter;
-    let itemsBefore = [...base.itemsBefore];
-    let itemsAfter  = [...base.itemsAfter];
-
-    // Ha KATA/Minimálbér + gyerek kombináció: a gyerek CSK-t adjuk hozzá
-    if (hasNonDefaultAlap && gyerekType) {
-      const alapCalc  = calcType(alapType, brutto, nyugdij);
-      const gyerekCalc = calcType(gyerekType, brutto, nyugdij);
-      const refCalc   = calcType('gyermektelen', brutto, nyugdij);
-      // Gyerek delta = gyerek számítás - gyermektelen számítás
-      const cskDeltaBefore = gyerekCalc.nettoBefore - refCalc.nettoBefore;
-      const cskDeltaAfter  = gyerekCalc.nettoAfter  - refCalc.nettoAfter;
-      // Alapra (KATA/Minber) rátesszük a CSK deltát
-      nettoBefore = alapCalc.nettoBefore + cskDeltaBefore;
-      nettoAfter  = alapCalc.nettoAfter  + cskDeltaAfter;
-      itemsBefore = [...alapCalc.itemsBefore,
-        ...gyerekCalc.itemsBefore.filter(i => i.tipus === 'pos' && !i.nev.includes('Bruttó') && !i.nev.includes('TB') && !i.nev.includes('SZJA'))
-      ];
-      itemsAfter = [...alapCalc.itemsAfter,
-        ...gyerekCalc.itemsAfter.filter(i => i.tipus === 'pos' && !i.nev.includes('Bruttó') && !i.nev.includes('TB') && !i.nev.includes('SZJA') && !i.nev.includes('adójóváírás'))
-      ];
-    }
-
-    // Additív élethelyzetek: csak a DELTA-t adjuk hozzá
-    const SKIP_ITEMS = ['Bruttó fizetés','TB járulék (18,5%)','SZJA (15%)','SZJA fizetendő',
-                        'Bruttó minimálbér (2026)','Havi bevétel'];
-    addOnTypes.forEach(addType => {
-      const refCalc  = calcType('gyermektelen', brutto, nyugdij);
-      const addCalc  = calcType(addType, brutto, nyugdij);
-      const deltaBefore = addCalc.nettoBefore - refCalc.nettoBefore;
-      const deltaAfter  = addCalc.nettoAfter  - refCalc.nettoAfter;
-
-      nettoBefore += deltaBefore;
-      nettoAfter  += deltaAfter;
-
-      itemsBefore.push(...addCalc.itemsBefore.filter(i =>
-        !SKIP_ITEMS.some(s => i.nev.includes(s.split(' ')[0])) && i.tipus === 'pos'
-      ));
-      itemsAfter.push(...addCalc.itemsAfter.filter(i =>
-        !SKIP_ITEMS.some(s => i.nev.includes(s.split(' ')[0])) && i.tipus === 'pos'
-        && !itemsAfter.some(e => e.nev === i.nev)
-      ));
-    });
-
-    return {
-      before: { netto: nettoBefore, kedvezmenyek: itemsBefore },
-      after:  { netto: nettoAfter,  kedvezmenyek: itemsAfter  },
-    };
-  }
-
-  // Régi függvények megtartása visszafelé kompatibilitáshoz
-  function calcBefore(type, brutto, nyugdij) {
-    const r = calcType(type, brutto, nyugdij);
-    return { netto: r.nettoBefore, kedvezmenyek: r.itemsBefore };
-  }
-  function calcAfter(type, brutto, nyugdij) {
-    const r = calcType(type, brutto, nyugdij);
-    return { netto: r.nettoAfter, kedvezmenyek: r.itemsAfter };
-  }
-
-
-  // ═══════════════════════════════════════════════════
-  // KOMBINÁCIÓ LOGIKA
-  // ═══════════════════════════════════════════════════
-  //
-  // ALAP JÖVEDELEM (kötelező 1, egymást kizárják):
-  //   gyermektelen | minber | kata | nyugdijas
-  //
-  // GYEREK SZÁM (opcionális, egymást kizárják, nyugdíjassal NEM):
-  //   1gyerek | 2gyerek | 3gyerek
-  //   (gyermektelen helyettesíti ha nincs gyerek)
-  //
-  // ÉLETHELYZET (szabadon kombinálható, nyugdíjassal NEM):
-  //   25alatt | elsohazas | fogyatekos
-  //
-  // MINIMÁLBÉRES + gyerek: ✅
-  // KATA + gyerek: ✅
-  // KATA + elsohazas: ✅
-  // nyugdijas + fogyatekos: ✅
-  // nyugdijas + gyerek: ❌
-  // nyugdijas + 25alatt: ❌
-  // kata + minber: ❌
-
-  const ALAP_TYPES   = ['gyermektelen','minber','kata','nyugdijas'];
-  const GYEREK_TYPES = ['1gyerek','2gyerek','3gyerek'];
-  const ADDON_TYPES  = ['25alatt','elsohazas','fogyatekos'];
-  // Ezek Nyugdíjassal NEM kombinálhatók
-  const NO_WITH_NYUGDIJAS = [...GYEREK_TYPES, ...ADDON_TYPES.filter(t => t !== 'fogyatekos')];
-
-  window._calcSelectedTypes = window._calcSelectedTypes || new Set(['gyermektelen']);
-  let selectedTypes = window._calcSelectedTypes;
-
-  function updateTabInputs() {
-    const hasNyugdijas = selectedTypes.has('nyugdijas');
-    const hasKata      = selectedTypes.has('kata');
-    const hasMinber    = selectedTypes.has('minber');
-    const needsBrutto  = !hasNyugdijas && !hasKata && !hasMinber;
-    document.getElementById('calcBruttoWrap').style.display  = needsBrutto ? '' : 'none';
-    document.getElementById('calcNyugdijWrap').style.display = hasNyugdijas ? '' : 'none';
-    document.getElementById('calcKataWrap').style.display    = hasKata ? '' : 'none';
-    const label = document.querySelector('#calcBruttoWrap label');
-    if (label) label.textContent = selectedTypes.has('fogyatekos')
-      ? 'Bruttó havi fizetés VAGY ellátás összege (Ft)'
-      : 'Bruttó havi fizetés (Ft)';
-    document.getElementById('calcResults').classList.remove('visible');
-
-    // Tiltott tabokat szürkítjük ha Nyugdíjas van kijelölve
-    document.querySelectorAll('.calc-tab').forEach(t => {
-      const ty = t.dataset.type;
-      const blocked = hasNyugdijas && NO_WITH_NYUGDIJAS.includes(ty);
-      t.style.opacity = blocked ? '0.35' : '';
-      t.style.pointerEvents = blocked ? 'none' : '';
-      t.title = blocked ? 'Nyugdíjassal nem kombinálható' : '';
-    });
-  }
-
-  // Tab kattintás kezelő
+  'use strict';
+  
+  // === KONSTANSOK (2026) ===
+  const MINBER = 322800;
+  const MEDIANBER = 625000;
+  const TB_RATE = 0.185;
+  const SZJA_RATE = 0.15;
+  const HUSZONOT_HATAR = 715765;
+  const GYED_MAX = 451920; // minimálbér × 2 × 70%
+  
+  // === DOM ELEMEK ===
+  const bruttoInput = document.getElementById('calcBrutto');
+  const csedGyedInput = document.getElementById('calcCsedGyedBrutto');
+  const kataInput = document.getElementById('calcKataBev');
+  const nyugdijInput = document.getElementById('calcNyugdij');
+  const calcBtn = document.getElementById('calcBtn');
+  const resultsDiv = document.getElementById('calcResults');
+  
+  // Wrapper-ek
+  const bruttoWrap = document.getElementById('calcBruttoWrap');
+  const csedGyedWrap = document.getElementById('calcCsedGyedWrap');
+  const kataWrap = document.getElementById('calcKataWrap');
+  const nyugdijWrap = document.getElementById('calcNyugdijWrap');
+  const anyaAgeWrap = document.getElementById('anyaAgeWrap');
+  
+  // === STATE ===
+  let activeCategories = new Set(['gyermektelen']);
+  let anyaAge = '30alatt'; // default
+  
+  // === TAB KEZELÉS ===
   document.querySelectorAll('.calc-tab').forEach(tab => {
-    if (tab.dataset.type === 'gyermektelen') tab.classList.add('active', 'selected');
-
     tab.addEventListener('click', () => {
       const type = tab.dataset.type;
-      const isAlap   = ALAP_TYPES.includes(type);
-      const isGyerek = GYEREK_TYPES.includes(type);
-      const isAddon  = ADDON_TYPES.includes(type);
-      const hasNyugdijas = selectedTypes.has('nyugdijas');
-
-      // Blokkolt kombináció: Nyugdíjas + nem-kompatibilis
-      if (hasNyugdijas && NO_WITH_NYUGDIJAS.includes(type)) return;
-
-      if (isAlap) {
-        const prevAlap = ALAP_TYPES.find(t => selectedTypes.has(t));
-
-        // Ha gyermektelen-re kattintunk → töröljük a gyerek típusokat
-        if (type === 'gyermektelen') {
-          selectedTypes.clear();
-          selectedTypes.add('gyermektelen');
-          // Addon-ok megmaradnak
-          ADDON_TYPES.forEach(a => { /* már törölve a clear-rel */ });
-          // Visszatesszük az addon-okat
-          const prevAddons = [...selectedTypes].filter(t => ADDON_TYPES.includes(t));
-          // (clear már mindent törölt, szóval az addon-okat mentjük előtte)
-          // Újra: mentsük az addon-okat clear előtt
-        }
-
-        if (type === 'gyermektelen') {
-          // Mentsük az addon-okat
-          const savedAddons = ADDON_TYPES.filter(t => selectedTypes.has(t));
-          selectedTypes.clear();
-          selectedTypes.add('gyermektelen');
-          savedAddons.forEach(a => selectedTypes.add(a));
+      
+      // Exkluzív kategóriák
+      const exclusive = ['kata', 'nyugdijas', 'csed', 'gyed'];
+      
+      if (exclusive.includes(type)) {
+        // Töröl mindent, csak ez marad
+        activeCategories.clear();
+        document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+        activeCategories.add(type);
+        tab.classList.add('active');
+      } else {
+        // Multi-select
+        if (activeCategories.has(type)) {
+          activeCategories.delete(type);
+          tab.classList.remove('active');
         } else {
-          // Egyéb alap váltás (minber, kata, nyugdijas)
-          if (prevAlap === type) return;
-          const savedGyerek = GYEREK_TYPES.find(t => selectedTypes.has(t));
-          const savedAddons = ADDON_TYPES.filter(t => selectedTypes.has(t));
-          selectedTypes.clear();
-          selectedTypes.add(type);
-          if (type !== 'nyugdijas') {
-            if (savedGyerek) selectedTypes.add(savedGyerek);
-            savedAddons.forEach(a => selectedTypes.add(a));
-          }
+          // Töröljük az exkluzív kategóriákat ha vannak
+          exclusive.forEach(ex => {
+            activeCategories.delete(ex);
+            const exTab = document.querySelector(`[data-type="${ex}"]`);
+            if (exTab) exTab.classList.remove('active');
+          });
+          
+          activeCategories.add(type);
+          tab.classList.add('active');
         }
-
-      } else if (isGyerek) {
-        // Gyerek: egymást kizárják, gyermektelen-t is törli
-        // Ha ugyanaz van klikkelve → töröljük, visszaáll gyermektelen
-        if (selectedTypes.has(type)) {
-          selectedTypes.delete(type);
-          // Ha nincs más alap, visszatesszük gyermektelent
-          if (!ALAP_TYPES.some(t => selectedTypes.has(t)) &&
-              !GYEREK_TYPES.some(t => selectedTypes.has(t))) {
-            selectedTypes.add('gyermektelen');
-          }
-        } else {
-          // Töröljük a többi gyerek-típust ÉS a gyermektelen-t
-          GYEREK_TYPES.forEach(t => selectedTypes.delete(t));
-          selectedTypes.delete('gyermektelen');
-          selectedTypes.add(type);
+        
+        // Ha üres, vissza gyermektelen
+        if (activeCategories.size === 0) {
+          activeCategories.add('gyermektelen');
+          document.querySelector('[data-type="gyermektelen"]').classList.add('active');
         }
-
-      } else if (isAddon) {
-        // Addon: toggle, de Nyugdíjassal nem kombinálható (már szűrt fent)
-        if (selectedTypes.has(type)) {
-          selectedTypes.delete(type);
-        } else {
-          selectedTypes.add(type);
-        }
-        // Biztosítsuk hogy van alapjövedelem (gyerek is alapként funkcionál)
-        const hasAnyBase = ALAP_TYPES.some(t => selectedTypes.has(t)) ||
-                           GYEREK_TYPES.some(t => selectedTypes.has(t));
-        if (!hasAnyBase) selectedTypes.add('gyermektelen');
       }
-
-      // UI frissítés
-      document.querySelectorAll('.calc-tab').forEach(t => {
-        t.classList.remove('active', 'selected');
-        if (selectedTypes.has(t.dataset.type)) t.classList.add('active', 'selected');
+      
+      updateInputVisibility();
+    });
+  });
+  
+  // === ANYA ÉLETKOR GOMBOK ===
+  document.querySelectorAll('.calc-age-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      anyaAge = btn.dataset.age;
+      document.querySelectorAll('.calc-age-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+  
+  // === INPUT LÁTHATÓSÁG ===
+  function updateInputVisibility() {
+    const hasCsed = activeCategories.has('csed');
+    const hasGyed = activeCategories.has('gyed');
+    const hasKata = activeCategories.has('kata');
+    const hasNyugdij = activeCategories.has('nyugdijas');
+    const hasAnya = activeCategories.has('anya');
+    
+    if (bruttoWrap) bruttoWrap.style.display = (hasCsed || hasGyed || hasKata || hasNyugdij) ? 'none' : 'flex';
+    if (csedGyedWrap) csedGyedWrap.style.display = (hasCsed || hasGyed) ? 'flex' : 'none';
+    if (kataWrap) kataWrap.style.display = hasKata ? 'flex' : 'none';
+    if (nyugdijWrap) nyugdijWrap.style.display = hasNyugdij ? 'flex' : 'none';
+    if (anyaAgeWrap) anyaAgeWrap.style.display = hasAnya ? 'block' : 'none';
+  }
+  
+  // === SZÁMÍTÁS GOMB ===
+  if (calcBtn) {
+    calcBtn.addEventListener('click', calculate);
+  }
+  
+  // === FŐ SZÁMÍTÁS ===
+  function calculate() {
+    const cats = Array.from(activeCategories);
+    
+    // Kategóriák elemzése
+    const gyerekSzam = getGyerekszam(cats);
+    const is25Alatt = cats.includes('25alatt');
+    const isElsoHazas = cats.includes('elsohazas');
+    const isFogyatekos = cats.includes('fogyatekos');
+    const isAnya = cats.includes('anya');
+    const isKata = cats.includes('kata');
+    const isNyugdijas = cats.includes('nyugdijas');
+    const isCsed = cats.includes('csed');
+    const isGyed = cats.includes('gyed');
+    
+    // ANYA státusz
+    const anyaInfo = isAnya ? getAnyaInfo(anyaAge, gyerekSzam) : null;
+    
+    let resultBefore, resultAfter;
+    
+    if (isCsed) {
+      const brutto = parseFloat(csedGyedInput.value) || 0;
+      if (brutto <= 0) { alert('Add meg az eredeti bruttó béred!'); return; }
+      resultBefore = calcCsed(brutto);
+      resultAfter = calcCsed(brutto); // TISZA alatt változatlan
+    } 
+    else if (isGyed) {
+      const brutto = parseFloat(csedGyedInput.value) || 0;
+      if (brutto <= 0) { alert('Add meg az eredeti bruttó béred!'); return; }
+      resultBefore = calcGyed(brutto, gyerekSzam);
+      resultAfter = calcGyed(brutto, gyerekSzam); // TISZA alatt változatlan
+    }
+    else if (isKata) {
+      const bev = parseFloat(kataInput.value) || 0;
+      if (bev <= 0) { alert('Add meg a havi bevételed!'); return; }
+      resultBefore = calcKata(bev, gyerekSzam);
+      resultAfter = calcKata(bev, gyerekSzam); // TISZA alatt változatlan (egyelőre)
+    }
+    else if (isNyugdijas) {
+      const nyugdij = parseFloat(nyugdijInput.value) || 0;
+      if (nyugdij <= 0) { alert('Add meg a nyugdíj összegét!'); return; }
+      resultBefore = calcNyugdij(nyugdij, gyerekSzam);
+      resultAfter = calcNyugdij(nyugdij, gyerekSzam); // TISZA alatt változatlan (egyelőre)
+    }
+    else {
+      // NORMÁL MUNKABÉR
+      const brutto = parseFloat(bruttoInput.value) || 0;
+      if (brutto <= 0) { alert('Add meg a bruttó fizetésed!'); return; }
+      
+      const params = { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, anyaInfo };
+      resultBefore = calcBer(brutto, params, false);
+      resultAfter = calcBer(brutto, params, true);
+    }
+    
+    displayResults(resultBefore, resultAfter);
+  }
+  
+  // === GYEREKSZÁM ===
+  function getGyerekszam(cats) {
+    if (cats.includes('3gyerek')) return 3;
+    if (cats.includes('2gyerek')) return 2;
+    if (cats.includes('1gyerek')) return 1;
+    return 0;
+  }
+  
+  // === ANYA INFO ===
+  function getAnyaInfo(age, gyerekSzam) {
+    let eletkor = 45;
+    if (age === '30alatt') eletkor = 29;
+    else if (age === '40alatt') eletkor = 39;
+    
+    // SZJA mentesség ellenőrzés
+    let szjaMentes = false;
+    let mentessegOk = '';
+    
+    if (gyerekSzam >= 3) {
+      szjaMentes = true;
+      mentessegOk = `${gyerekSzam}+ gyerekes anya (élethosszig mentes)`;
+    } else if (eletkor < 30 && gyerekSzam >= 1) {
+      szjaMentes = true;
+      mentessegOk = '30 év alatti anya 1+ gyerekkel';
+    } else if (eletkor < 40 && gyerekSzam >= 2) {
+      szjaMentes = true;
+      mentessegOk = '40 év alatti anya 2+ gyerekkel';
+    }
+    
+    return { eletkor, szjaMentes, mentessegOk };
+  }
+  
+  // === CSED SZÁMÍTÁS ===
+  function calcCsed(bruttoAlap) {
+    const items = [
+      { nev: 'CSED alapja (bruttó bér 100%)', osszeg: bruttoAlap, tipus: 'neutral' },
+      { nev: 'SZJA (MENTES 2025.07.01-től!)', osszeg: 0, tipus: 'positive', megjegyzes: '+' + fmt(bruttoAlap * SZJA_RATE) },
+      { nev: 'TB járulék (MENTES)', osszeg: 0, tipus: 'positive', megjegyzes: '+' + fmt(bruttoAlap * TB_RATE) }
+    ];
+    
+    return {
+      netto: bruttoAlap,
+      items: items,
+      title: 'CSED (Csecsemőgondozási díj)'
+    };
+  }
+  
+  // === GYED SZÁMÍTÁS ===
+  function calcGyed(bruttoAlap, gyerekSzam) {
+    const gyedOsszeg = Math.min(bruttoAlap * 0.7, GYED_MAX);
+    const nyugdijJarulék = gyedOsszeg * 0.1;
+    
+    // Családi kedvezmény
+    let csaladiKedv = 0;
+    if (gyerekSzam === 1) csaladiKedv = 20000;
+    else if (gyerekSzam === 2) csaladiKedv = 80000;
+    else if (gyerekSzam >= 3) csaladiKedv = gyerekSzam * 66000;
+    
+    const nyugdijUtanKedv = Math.max(0, nyugdijJarulék - csaladiKedv);
+    const netto = gyedOsszeg - nyugdijUtanKedv;
+    
+    const items = [
+      { nev: 'GYED alapja (bruttó bér 70%, max 451 920 Ft)', osszeg: gyedOsszeg, tipus: 'neutral' },
+      { nev: 'SZJA (MENTES 2025.07.01-től!)', osszeg: 0, tipus: 'positive', megjegyzes: '+' + fmt(gyedOsszeg * SZJA_RATE) },
+      { nev: 'Nyugdíjjárulék (10%)', osszeg: -nyugdijJarulék, tipus: 'negative' }
+    ];
+    
+    if (csaladiKedv > 0) {
+      const kedvErvenyesult = Math.min(csaladiKedv, nyugdijJarulék);
+      items.push({ 
+        nev: `Családi kedvezmény (${gyerekSzam} gyerek)`, 
+        osszeg: kedvErvenyesult, 
+        tipus: 'positive' 
       });
-      const lastTab = [...document.querySelectorAll('.calc-tab')]
-        .filter(t => selectedTypes.has(t.dataset.type)).pop();
-      if (lastTab) lastTab.classList.add('active');
-
-      updateTabInputs();
-    });
-  });
-
-  updateTabInputs();
-
-
-  // Enter billentyű a beviteli mezőkön
-  ['calcBrutto', 'calcNyugdij', 'calcKataBev'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('keydown', e => {
-      if (e.key === 'Enter') document.getElementById('calcBtn').click();
-    });
-  });
-
-  document.getElementById('calcBtn').addEventListener('click', () => {
-    const hasNyugdijas = selectedTypes.has('nyugdijas');
-    const hasKata = selectedTypes.has('kata');
-    const hasMinber = selectedTypes.has('minber');
-    const brutto = parseInt(document.getElementById('calcBrutto').value) || 0;
-    const nyugdij = parseInt(document.getElementById('calcNyugdij').value) || 0;
-    const kataBev = parseInt(document.getElementById('calcKataBev')?.value) || 0;
-    if (!hasNyugdijas && !hasKata && !hasMinber && brutto < 10000) {
-      document.getElementById('calcBrutto').style.borderColor = '#e8405a';
-      return;
     }
-    if (hasNyugdijas && nyugdij < 1000) {
-      document.getElementById('calcNyugdij').style.borderColor = '#e8405a';
-      return;
+    
+    return {
+      netto: netto,
+      items: items,
+      title: 'GYED (Gyermekgondozási díj)'
+    };
+  }
+  
+  // === KATA SZÁMÍTÁS ===
+  function calcKata(bevétel, gyerekSzam) {
+    const kataAdo = 50000; // fix havi KATA adó
+    const netto = bevétel - kataAdo;
+    
+    const items = [
+      { nev: 'Havi bevétel', osszeg: bevétel, tipus: 'neutral' },
+      { nev: 'KATA adó (fix 50 000 Ft/hó)', osszeg: -kataAdo, tipus: 'negative' }
+    ];
+    
+    return {
+      netto: netto,
+      items: items,
+      title: 'KATA (Kisadózó vállalkozás)'
+    };
+  }
+  
+  // === NYUGDÍJ SZÁMÍTÁS ===
+  function calcNyugdij(nyugdij, gyerekSzam) {
+    const items = [
+      { nev: 'Nyugdíj összege', osszeg: nyugdij, tipus: 'neutral' },
+      { nev: 'SZJA (nincs nyugdíjból)', osszeg: 0, tipus: 'neutral' }
+    ];
+    
+    return {
+      netto: nyugdij,
+      items: items,
+      title: 'Nyugdíj'
+    };
+  }
+  
+  // === NORMÁL BÉR SZÁMÍTÁS ===
+  function calcBer(brutto, params, isTisza) {
+    const { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, anyaInfo } = params;
+    
+    // TB járulék (TISZA alatt 3+ gyereknél csökken)
+    let tbRate = TB_RATE;
+    if (isTisza && gyerekSzam >= 4) tbRate = 0.125; // -6%
+    else if (isTisza && gyerekSzam === 3) tbRate = 0.155; // -3%
+    
+    const tb = Math.round(brutto * tbRate);
+    const szjaAlap = brutto - tb;
+    
+    const items = [];
+    items.push({ nev: 'Bruttó fizetés', osszeg: brutto, tipus: 'neutral' });
+    items.push({ nev: `TB járulék (${(tbRate * 100).toFixed(1)}%)`, osszeg: -tb, tipus: 'negative' });
+    
+    // === SZJA MENTESSÉG ELLENŐRZÉS ===
+    let szja = 0;
+    let szjaMentessegMegtakaritás = 0;
+    
+    // 1. ANYÁK SZJA MENTESSÉGE (PRIORITÁS!)
+    if (anyaInfo && anyaInfo.szjaMentes) {
+      szja = 0;
+      szjaMentessegMegtakaritás = Math.round(szjaAlap * SZJA_RATE);
+      items.push({ 
+        nev: `SZJA mentesség: ${anyaInfo.mentessegOk}`, 
+        osszeg: szjaMentessegMegtakaritás, 
+        tipus: 'positive',
+        megjegyzes: '0% SZJA!'
+      });
     }
-    if (hasKata && kataBev < 10000) {
-      document.getElementById('calcKataBev').style.borderColor = '#e8405a';
-      return;
+    // 2. 25 ÉV ALATTIAK MENTESSÉGE
+    else if (is25Alatt) {
+      if (brutto <= HUSZONOT_HATAR) {
+        szja = 0;
+        szjaMentessegMegtakaritás = Math.round(szjaAlap * SZJA_RATE);
+        items.push({ 
+          nev: '25 év alatti SZJA mentesség (715 765 Ft-ig)', 
+          osszeg: szjaMentessegMegtakaritás, 
+          tipus: 'positive',
+          megjegyzes: '0% SZJA!'
+        });
+      } else {
+        // Csak a határ feletti rész után SZJA
+        const hatarFeletti = brutto - HUSZONOT_HATAR;
+        const mentesRész = HUSZONOT_HATAR - tb; // A tb-t már levontuk
+        const hatarFelettiBol = hatarFeletti;
+        
+        szjaMentessegMegtakaritás = Math.round(mentesRész * SZJA_RATE);
+        szja = Math.round(hatarFelettiBol * SZJA_RATE);
+        
+        items.push({ 
+          nev: `25 év alatti mentesség (715 765 Ft-ig)`, 
+          osszeg: szjaMentessegMegtakaritás, 
+          tipus: 'positive'
+        });
+        items.push({ 
+          nev: `SZJA (15%, határ feletti ${fmt(hatarFelettiBol)}-ból)`, 
+          osszeg: -szja, 
+          tipus: 'negative'
+        });
+      }
     }
-    document.getElementById('calcBrutto').style.borderColor = '';
-    document.getElementById('calcNyugdij').style.borderColor = '';
-    if (document.getElementById('calcKataBev')) document.getElementById('calcKataBev').style.borderColor = '';
-
-    // Kombinálja az összes kijelölt típus kedvezményeit
-    const combined = calcCombined(selectedTypes, brutto, nyugdij);
-    const totalBefore = combined.before;
-    const totalAfter  = combined.after;
-    const diff = totalAfter.netto - totalBefore.netto;
-
-    document.getElementById('resNettoBefore').textContent = Math.round(totalBefore.netto).toLocaleString('hu-HU') + ' Ft';
-    document.getElementById('resNettoAfter').textContent  = Math.round(totalAfter.netto).toLocaleString('hu-HU') + ' Ft';
-    const diffEl = document.getElementById('resDiff');
-    diffEl.textContent = (diff >= 0 ? '+' : '-') + fmt(diff) + ' / hó';
-    diffEl.className = 'calc-diff-amount' + (diff < 0 ? ' negative' : '');
-
-    // Kétoszlopos részletezés
-    const bd = document.getElementById('calcBreakdown');
-    const maxRows = Math.max(totalBefore.kedvezmenyek.length, totalAfter.kedvezmenyek.length);
-    let rows = '';
-    for (let i = 0; i < maxRows; i++) {
-      const b = totalBefore.kedvezmenyek[i];
-      const a = totalAfter.kedvezmenyek[i];
-      const bVal = b ? `<span class="calc-breakdown-val ${b.tipus}" style="font-size:15px;font-weight:600;">${b.osszeg >= 0 ? '+' : ''}${Math.round(b.osszeg).toLocaleString('hu-HU')} Ft<br><span style="font-size:13px;font-weight:400;color:var(--text-secondary);">${b.nev}</span></span>` : '<span></span>';
-      const aVal = a ? `<span class="calc-breakdown-val ${a.tipus}" style="font-size:15px;font-weight:600;">${a.osszeg >= 0 ? '+' : ''}${Math.round(a.osszeg).toLocaleString('hu-HU')} Ft<br><span style="font-size:13px;font-weight:400;color:var(--text-secondary);">${a.nev}</span></span>` : '<span></span>';
-      rows += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:8px 0;border-bottom:1px solid var(--border-subtle);">
-        <div style="padding-right:8px;border-right:1px solid var(--border-subtle);">${bVal}</div>
-        <div style="padding-left:8px;">${aVal}</div>
-      </div>`;
+    // 3. Nincs mentesség → normál SZJA
+    else {
+      szja = Math.round(szjaAlap * SZJA_RATE);
+      items.push({ nev: 'SZJA (15%)', osszeg: -szja, tipus: 'negative' });
     }
-    bd.innerHTML = rows;
-
-    document.getElementById('calcResults').classList.add('visible');
-    setTimeout(() => document.getElementById('calcResults').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-  });
-
-  // Sidebar trigger
-  const calcSideBtn = document.querySelector('[data-calc="true"]');
-  if (calcSideBtn) calcSideBtn.addEventListener('click', () => {
-    document.querySelectorAll('.category-section').forEach(s => s.style.display = 'none');
-    document.getElementById('calcSection').style.display = 'block';
-    document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('priority-filter-active'));
-    if (calcSideBtn) calcSideBtn.classList.add('priority-filter-active');
-    if (window.innerWidth < 900) closeSidebar();
-    setTimeout(() => {
-      document.getElementById('calcSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 200);
-  });
-
-  const origCatHandler = document.querySelectorAll('.cat-item:not([data-calc])');
-  origCatHandler.forEach(item => {
-    item.addEventListener('click', () => {
-      document.getElementById('calcSection').style.display = 'none';
-    });
-  });
+    
+    // === CSALÁDI KEDVEZMÉNY ===
+    let csaladiKedv = 0;
+    if (gyerekSzam === 1) csaladiKedv = 20000;
+    else if (gyerekSzam === 2) csaladiKedv = 80000;
+    else if (gyerekSzam >= 3) csaladiKedv = gyerekSzam * 66000;
+    
+    if (isElsoHazas) csaladiKedv += 5000;
+    if (isFogyatekos) csaladiKedv += Math.round(MINBER * 0.05);
+    
+    // Kedvezmény levonása: először SZJA-ból, maradék TB-ből
+    let szjaUtanKedv = szja;
+    let tbUtanKedv = tb;
+    
+    if (csaladiKedv > 0) {
+      const kedvSzjabol = Math.min(csaladiKedv, szja);
+      const kedvMaradek = csaladiKedv - kedvSzjabol;
+      
+      szjaUtanKedv = szja - kedvSzjabol;
+      
+      if (kedvSzjabol > 0) {
+        items.push({ 
+          nev: `Családi kedvezmény SZJA-ból (${gyerekSzam} gyerek)`, 
+          osszeg: kedvSzjabol, 
+          tipus: 'positive'
+        });
+      }
+      
+      if (kedvMaradek > 0) {
+        const kedvTbbol = Math.min(kedvMaradek, tb);
+        tbUtanKedv = tb - kedvTbbol;
+        
+        if (kedvTbbol > 0) {
+          items.push({ 
+            nev: 'Családi kedvezmény TB-ből (maradék)', 
+            osszeg: kedvTbbol, 
+            tipus: 'positive'
+          });
+        }
+      }
+    }
+    
+    // === TISZA ADÓJÓVÁÍRÁS ===
+    let jovairas = 0;
+    if (isTisza && brutto <= MEDIANBER) {
+      if (brutto <= MINBER) {
+        jovairas = Math.round(brutto * 0.06);
+      } else if (brutto <= 420000) {
+        jovairas = 15000;
+      } else if (brutto <= 500000) {
+        jovairas = 10000;
+      } else {
+        jovairas = 5000;
+      }
+      
+      // Adójóváírás először SZJA-ból
+      const jovairasSzjabol = Math.min(jovairas, szjaUtanKedv);
+      szjaUtanKedv = szjaUtanKedv - jovairasSzjabol;
+      
+      const jovairasMaradek = jovairas - jovairasSzjabol;
+      
+      if (jovairasSzjabol > 0) {
+        items.push({ 
+          nev: 'TISZA adójóváírás SZJA-ból', 
+          osszeg: jovairasSzjabol, 
+          tipus: 'tisza'
+        });
+      }
+      
+      // Maradék TB-ből
+      if (jovairasMaradek > 0) {
+        const jovairasTbbol = Math.min(jovairasMaradek, tbUtanKedv);
+        tbUtanKedv = tbUtanKedv - jovairasTbbol;
+        
+        if (jovairasTbbol > 0) {
+          items.push({ 
+            nev: 'TISZA adójóváírás TB-ből (maradék)', 
+            osszeg: jovairasTbbol, 
+            tipus: 'tisza'
+          });
+        }
+      }
+    }
+    
+    const netto = brutto - tbUtanKedv - szjaUtanKedv;
+    
+    return {
+      netto: netto,
+      items: items,
+      title: isTisza ? 'Munkabér (TISZA program)' : 'Munkabér (jelenlegi rendszer)'
+    };
+  }
+  
+  // === MEGJELENÍTÉS ===
+  function displayResults(resBefore, resAfter) {
+    const diff = resAfter.netto - resBefore.netto;
+    const diffPercent = resBefore.netto > 0 ? ((diff / resBefore.netto) * 100).toFixed(1) : 0;
+    
+    let html = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+      <!-- ELŐTT -->
+      <div style="background:var(--bg-card); border-radius:16px; padding:24px; border:2px solid var(--border-subtle);">
+        <div style="font-size:13px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+          "Áradás" előtt
+        </div>
+        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">
+          ${fmt(resBefore.netto)}
+        </div>
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+          nettó / hó
+        </div>
+        <div style="border-top:1px solid var(--border-subtle); padding-top:12px;">
+          ${resBefore.items.map(renderItem).join('')}
+        </div>
+      </div>
+      
+      <!-- UTÁN -->
+      <div style="background:linear-gradient(135deg, rgba(232,64,90,0.08), rgba(192,24,58,0.08)); border-radius:16px; padding:24px; border:2px solid #e8405a;">
+        <div style="font-size:13px; font-weight:700; color:#e8405a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+          "Áradás" után
+        </div>
+        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">
+          ${fmt(resAfter.netto)}
+        </div>
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+          nettó / hó
+        </div>
+        <div style="border-top:1px solid rgba(232,64,90,0.2); padding-top:12px;">
+          ${resAfter.items.map(renderItem).join('')}
+        </div>
+      </div>
+    </div>
+    
+    <!-- KÜLÖNBSÉG -->
+    <div style="background:${diff >= 0 ? 'linear-gradient(135deg, #e8f5e9, #c8e6c9)' : 'linear-gradient(135deg, #ffebee, #ffcdd2)'}; border-radius:16px; padding:20px; text-align:center;">
+      <div style="font-size:14px; font-weight:600; color:${diff >= 0 ? '#2e7d32' : '#c62828'}; margin-bottom:8px;">
+        Havi különbség
+      </div>
+      <div style="font-size:36px; font-weight:900; color:${diff >= 0 ? '#1b5e20' : '#b71c1c'}; margin-bottom:4px;">
+        ${diff >= 0 ? '+' : ''}${fmt(diff)}
+      </div>
+      <div style="font-size:13px; color:${diff >= 0 ? '#2e7d32' : '#c62828'};">
+        ${diff >= 0 ? '+' : ''}${diffPercent}% ${diff >= 0 ? 'növekedés' : 'csökkenés'}
+      </div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-top:8px;">
+        Évente: ${diff >= 0 ? '+' : ''}${fmt(diff * 12)}
+      </div>
+    </div>
+    `;
+    
+    if (resultsDiv) {
+      resultsDiv.innerHTML = html;
+      resultsDiv.style.display = 'block';
+      
+      // Scroll eredményhez
+      resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+  
+  // === ITEM RENDER ===
+  function renderItem(item) {
+    let color = 'var(--text-secondary)';
+    let sign = '';
+    
+    if (item.tipus === 'positive') {
+      color = '#2e7d32';
+      sign = '+';
+    } else if (item.tipus === 'negative') {
+      color = '#c62828';
+      sign = '';
+    } else if (item.tipus === 'tisza') {
+      color = '#e8405a';
+      sign = '+';
+    }
+    
+    const megjegyzes = item.megjegyzes ? ` <span style="font-size:11px; color:${color};">(${item.megjegyzes})</span>` : '';
+    
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:13px;">
+        <div style="color:var(--text-secondary);">${item.nev}${megjegyzes}</div>
+        <div style="font-weight:700; color:${color};">${sign}${fmt(Math.abs(item.osszeg))}</div>
+      </div>
+    `;
+  }
+  
+  // === FORMÁZÁS ===
+  function fmt(n) {
+    return Math.round(Math.abs(n)).toLocaleString('hu-HU') + ' Ft';
+  }
+  
+  // === INIT ===
+  updateInputVisibility();
+  
 })();
+
 
 // Storyboard modal
 function openStory() {
