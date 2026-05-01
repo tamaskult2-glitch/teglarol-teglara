@@ -4081,28 +4081,52 @@ Számold ki te is: ${url}`;
     tab.addEventListener('click', () => {
       const type = tab.dataset.type;
       
-      // Exkluzív kategóriák
+      // Exkluzív kategóriák (mindent törölnek)
       const exclusive = ['kata', 'nyugdijas', 'csed', 'gyed'];
       
+      // Gyerek kategóriák
+      const gyerekKategoria = ['1gyerek', '2gyerek', '3gyerek'];
+      
       if (exclusive.includes(type)) {
+        // EXKLUZÍV KATEGÓRIA (KATA, nyugdíjas, CSED, GYED)
         // Töröl mindent, csak ez marad
         activeCategories.clear();
         document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
         activeCategories.add(type);
         tab.classList.add('active');
       } else {
-        // Multi-select
+        // MULTI-SELECT KATEGÓRIA
+        
         if (activeCategories.has(type)) {
+          // Már aktív → kikapcsoljuk
           activeCategories.delete(type);
           tab.classList.remove('active');
         } else {
-          // Töröljük az exkluzív kategóriákat ha vannak
+          // Még nem aktív → bekapcsoljuk
+          
+          // 1. Töröljük az exkluzív kategóriákat ha vannak
           exclusive.forEach(ex => {
             activeCategories.delete(ex);
             const exTab = document.querySelector(`[data-type="${ex}"]`);
             if (exTab) exTab.classList.remove('active');
           });
           
+          // 2. GYERMEKTELEN ↔ GYEREKES kizárás
+          if (type === 'gyermektelen') {
+            // Gyermektelen → töröljük az összes gyerek kategóriát
+            gyerekKategoria.forEach(gk => {
+              activeCategories.delete(gk);
+              const gkTab = document.querySelector(`[data-type="${gk}"]`);
+              if (gkTab) gkTab.classList.remove('active');
+            });
+          } else if (gyerekKategoria.includes(type)) {
+            // Gyerekes → töröljük a gyermektelen-t
+            activeCategories.delete('gyermektelen');
+            const gyermektelenTab = document.querySelector('[data-type="gyermektelen"]');
+            if (gyermektelenTab) gyermektelenTab.classList.remove('active');
+          }
+          
+          // 3. Hozzáadjuk az új kategóriát
           activeCategories.add(type);
           tab.classList.add('active');
         }
@@ -4484,6 +4508,11 @@ Számold ki te is: ${url}`;
     const diff = resAfter.netto - resBefore.netto;
     const diffPercent = resBefore.netto > 0 ? ((diff / resBefore.netto) * 100).toFixed(1) : 0;
     
+    // TISZA tételek összesítése
+    const tiszaTobblet = resAfter.items
+      .filter(item => item.tipus === 'tisza')
+      .reduce((sum, item) => sum + item.osszeg, 0);
+    
     let html = `
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
       <!-- ELŐTT -->
@@ -4515,6 +4544,14 @@ Számold ki te is: ${url}`;
         </div>
         <div style="border-top:1px solid rgba(232,64,90,0.2); padding-top:12px;">
           ${resAfter.items.map(renderItem).join('')}
+          ${tiszaTobblet > 0 ? `
+          <div style="margin-top:12px; padding-top:12px; border-top:2px solid #e8405a;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:linear-gradient(135deg, rgba(232,64,90,0.15), rgba(232,64,90,0.08)); border-radius:10px; border:1.5px solid #e8405a;">
+              <div style="font-weight:800; color:#e8405a; font-size:14px;">🎁 TISZA TÖBBLET ÖSSZESEN</div>
+              <div style="font-weight:900; color:#e8405a; font-size:16px;">+${fmt(tiszaTobblet)}</div>
+            </div>
+          </div>
+          ` : ''}
         </div>
       </div>
     </div>
@@ -4549,6 +4586,9 @@ Számold ki te is: ${url}`;
   function renderItem(item) {
     let color = 'var(--text-secondary)';
     let sign = '';
+    let bgColor = 'transparent';
+    let fontWeight = '700';
+    let prefix = '';
     
     if (item.tipus === 'positive') {
       color = '#2e7d32';
@@ -4559,14 +4599,17 @@ Számold ki te is: ${url}`;
     } else if (item.tipus === 'tisza') {
       color = '#e8405a';
       sign = '+';
+      bgColor = 'rgba(232,64,90,0.08)';
+      fontWeight = '800';
+      prefix = '🎁 ';
     }
     
     const megjegyzes = item.megjegyzes ? ` <span style="font-size:11px; color:${color};">(${item.megjegyzes})</span>` : '';
     
     return `
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:13px;">
-        <div style="color:var(--text-secondary);">${item.nev}${megjegyzes}</div>
-        <div style="font-weight:700; color:${color};">${sign}${fmt(Math.abs(item.osszeg))}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; margin:2px 0; font-size:13px; background:${bgColor}; border-radius:8px;">
+        <div style="color:var(--text-secondary);">${prefix}${item.nev}${megjegyzes}</div>
+        <div style="font-weight:${fontWeight}; color:${color};">${sign}${fmt(Math.abs(item.osszeg))}</div>
       </div>
     `;
   }
