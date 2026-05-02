@@ -2330,7 +2330,9 @@ function updateStats(data) {
   if (todayEl) {
     const now = new Date();
     const months = ["jan.","feb.","már.","ápr.","máj.","jún.","júl.","aug.","szep.","okt.","nov.","dec."];
-    todayEl.textContent = now.getFullYear() + ". " + months[now.getMonth()] + " " + now.getDate() + ". — Ma";
+    const days = ["Vasárnap","Hétfő","Kedd","Szerda","Csütörtök","Péntek","Szombat"];
+    const dayName = days[now.getDay()];
+    todayEl.textContent = now.getFullYear() + ". " + months[now.getMonth()] + " " + now.getDate() + ". — " + dayName;
   }
 }
 
@@ -2971,11 +2973,13 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
       maj9ms.querySelector('.milestone-dot').style.boxShadow = '0 0 0 4px rgba(126,217,87,0.3)';
     }
 
-    // "Ma" felirat frissítése
+    // "Ma" felirat frissítése -> CSAK dátum + napnév
     const todayEl = document.getElementById('todayMilestone');
     if (todayEl) {
       const months = ['jan.','feb.','már.','ápr.','máj.','jún.','júl.','aug.','szep.','okt.','nov.','dec.'];
-      todayEl.textContent = today.getFullYear() + '. ' + months[today.getMonth()] + ' ' + today.getDate() + '. — Ma';
+      const days = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
+      const dayName = days[today.getDay()];
+      todayEl.textContent = today.getFullYear() + '. ' + months[today.getMonth()] + ' ' + today.getDate() + '. — ' + dayName;
     }
   } else {
     // Visszaszámlálás máj.9-ig
