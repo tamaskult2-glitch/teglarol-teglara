@@ -989,7 +989,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 </button>
 
 <!-- fabToggle eltávolítva -->
-<button id="darkToggle" aria-label="Sötét/világos mód váltása" class="dark-icon-btn" aria-label="Téma váltás">
+<button id="darkToggle" aria-label="Sötét/világos mód váltása" class="dark-icon-btn" style="top:66px;" title="Téma váltás">
   <span id="darkToggleIcon">🌙</span>
 </button>
 
@@ -1138,7 +1138,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  </div><!-- /inner clip wrapper -->
  </div><!-- /logo-future -->
 
- <!-- Névjegy + Csengő egy sorban -->
+ <!-- Névjegy + Dark toggle egy sorban -->
  <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
   <button class="story-btn" id="storyBtn" aria-label="Névjegy és verziótörténet megnyitása" aria-label="Az oldal története">
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1149,7 +1149,12 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    </svg>
    <span>Névjegy</span>
   </button>
- </div><!-- /Névjegy + Csengő flex -->
+  
+  <!-- Dark mode toggle -->
+  <button id="darkToggleHeader" class="story-btn" style="padding:8px 12px;" aria-label="Sötét/világos mód váltása" title="Téma váltás">
+   <span id="darkToggleIconHeader" style="font-size:18px;">🌙</span>
+  </button>
+ </div><!-- /Névjegy + Dark toggle -->
 
  </div><!-- /header-left-col -->
  <div class="header-text">
@@ -1940,12 +1945,30 @@ scrollNextBtn.addEventListener("click", () => {
   });
 })();
 
+// Dark mode toggle (jobb oldali fixed gomb)
 document.getElementById("darkToggle").addEventListener("click", () => {
  document.body.classList.toggle("dark");
  const isDark = document.body.classList.contains("dark");
  document.getElementById("darkToggleIcon").textContent = isDark ? "☀️" : "🌙";
+ // Header gomb is frissül
+ const headerIcon = document.getElementById("darkToggleIconHeader");
+ if (headerIcon) headerIcon.textContent = isDark ? "☀️" : "🌙";
  if (typeof excelData !== 'undefined' && excelData.length) drawChart(excelData);
 });
+
+// Dark mode toggle (header gomb - fő csempén)
+const darkToggleHeader = document.getElementById("darkToggleHeader");
+if (darkToggleHeader) {
+ darkToggleHeader.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  const isDark = document.body.classList.contains("dark");
+  document.getElementById("darkToggleIconHeader").textContent = isDark ? "☀️" : "🌙";
+  // Jobb oldali gomb is frissül
+  const rightIcon = document.getElementById("darkToggleIcon");
+  if (rightIcon) rightIcon.textContent = isDark ? "☀️" : "🌙";
+  if (typeof excelData !== 'undefined' && excelData.length) drawChart(excelData);
+ });
+}
 
 const sidebar = document.getElementById("sidebar");
 const sidebarOverlay = document.getElementById("sidebarOverlay");
@@ -2970,7 +2993,8 @@ document.getElementById("bugSubmit").addEventListener("click", () => {
   const formData = new FormData();
   formData.append("tipus", type || "nem megadott");
   formData.append("leiras", desc);
-  formData.append("email", email || "nem megadott");
+  // Ha nincs email, dummy címet küldünk hogy Formspree küldjön értesítést
+  formData.append("email", email || "noreply@teglarol-teglara.hu");
   formData.append("oldal", "teglarol-teglara.hu");
 
   fetch("https://formspree.io/f/myklraby", {
