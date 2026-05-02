@@ -1470,7 +1470,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <div class="milestone" data-date="2026-04-24">
     <div class="milestone-dot" style="background:#FF9933;border:2px solid #CE2939;"></div>
     <div class="milestone-content">
-     <div class="milestone-date" style="font-weight:700;color:var(--text-main);" id="todayMilestone">2026. ápr. 24. — Ma</div>
+     <div class="milestone-date">2026. ápr. 24. — Szerda</div>
      <div class="milestone-desc">📣 Vitézy Dávid közlekedési miniszter · Kátai-Németh Vilmos szociális miniszter (első vak miniszter Mo. történetében) · Lannert Judit oktatási miniszter · Magyar Péter–Fico telefonon · EU-zászló visszakerül a Parlamentre</div>
     </div>
    </div>
@@ -1483,18 +1483,10 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-05-09" style="opacity:0.55;">
-    <div class="milestone-dot" style="background:var(--border-subtle);border:2px dashed #888;"></div>
-    <div class="milestone-content">
-     <div class="milestone-date">2026. máj. 9. — Kormányalakítás (várható)</div>
-     <div class="milestone-desc">🏛️ Magyar Péter miniszterelnöki eskü · Kormány megalakulása · Azonnali intézkedések indulása</div>
-    </div>
-   </div>
-
    <div class="milestone" data-date="2026-05-15" style="opacity:0.45;">
     <div class="milestone-dot" style="background:var(--border-subtle);border:2px dashed #888;"></div>
     <div class="milestone-content">
-     <div class="milestone-date">2026. máj. 15–20. — Brüsszel (várható)</div>
+     <div class="milestone-date">🔮 2026. máj. 15–20. — Brüsszel (várható)</div>
      <div class="milestone-desc">🇪🇺 Magyar Péter aláírja az EU forrás politikai megállapodást · 8.000 Mrd Ft felszabadítása</div>
     </div>
    </div>
@@ -2022,19 +2014,46 @@ const ktLogo = document.querySelector(".kt-logo");
 // Show scroll-next on load if content below
 setTimeout(() => { if (document.body.scrollHeight > window.innerHeight + 100) document.getElementById("scrollNext").classList.add("visible"); }, 300);
 window.addEventListener("scroll", () => {
- const scrolled = window.scrollY > 200;  // 400 → 200 (gyorsabb trigger)
+ const scrolled = window.scrollY > 200;
  const atBottom = window.scrollY + window.innerHeight >= document.body.scrollHeight - 80;
+ 
+ // DEBUG
+ console.log("SCROLL EVENT! scrollY:", window.scrollY, "scrolled:", scrolled);
  
  // Scrolled class a body-ra
  document.body.classList.toggle("scrolled", scrolled);
  
- // DIREKT DOM manipuláció - dark toggle, bug button ÉS search button
+ // DIREKT DOM manipuláció - MINDEN gomb + TELJES CSS reset
  const darkToggle = document.getElementById("darkToggle");
  const bugBtn = document.getElementById("bugBtn");
  const searchBtn = document.getElementById("searchBtn");
- if (darkToggle) darkToggle.style.display = scrolled ? "none" : "flex";
- if (bugBtn) bugBtn.style.display = scrolled ? "none" : "flex";
- if (searchBtn) searchBtn.style.display = scrolled ? "none" : "flex";
+ const darkToggleHeader = document.getElementById("darkToggleHeader");
+ 
+ // Jobb oldali fix gombok
+ if (darkToggle) {
+   darkToggle.style.display = scrolled ? "none" : "flex";
+   darkToggle.style.opacity = scrolled ? "0" : "1";
+   darkToggle.style.visibility = scrolled ? "hidden" : "visible";
+   console.log("  darkToggle.style.display =", darkToggle.style.display);
+ }
+ if (bugBtn) {
+   bugBtn.style.display = scrolled ? "none" : "flex";
+   bugBtn.style.opacity = scrolled ? "0" : "1";
+   bugBtn.style.visibility = scrolled ? "hidden" : "visible";
+ }
+ if (searchBtn) {
+   searchBtn.style.display = scrolled ? "none" : "flex";
+   searchBtn.style.opacity = scrolled ? "0" : "1";
+   searchBtn.style.visibility = scrolled ? "hidden" : "visible";
+ }
+ 
+ // Header dark toggle (fő csempén) - TELJES CSS reset
+ if (darkToggleHeader) {
+   darkToggleHeader.style.display = scrolled ? "none" : "flex";
+   darkToggleHeader.style.opacity = scrolled ? "0" : "1";
+   darkToggleHeader.style.visibility = scrolled ? "hidden" : "visible";
+   console.log("  darkToggleHeader.style.display =", darkToggleHeader.style.display);
+ }
  
  scrollBtn.classList.toggle("visible", scrolled);
  scrollNextBtn.classList.toggle("visible", !atBottom);
@@ -2047,7 +2066,46 @@ window.addEventListener("scroll", () => {
  }
 }, { passive: true });
 scrollBtn.addEventListener("click", () => {
+ console.log("FEL GOMB KATTINTÁS! Scroll to top...");
  window.scrollTo({ top: 0, behavior: "smooth" });
+ 
+ // Gombok KÉNYSZERÍTETT megjelenítése 500ms után (smooth scroll végén)
+ setTimeout(() => {
+   console.log("500ms ELTELT! Gombok kényszerített megjelenítés...");
+   const darkToggle = document.getElementById("darkToggle");
+   const bugBtn = document.getElementById("bugBtn");
+   const searchBtn = document.getElementById("searchBtn");
+   const darkToggleHeader = document.getElementById("darkToggleHeader");
+   
+   if (darkToggle) {
+     darkToggle.style.display = "flex";
+     darkToggle.style.opacity = "1";
+     darkToggle.style.visibility = "visible";
+     console.log("  darkToggle.style.display =", darkToggle.style.display);
+   }
+   if (bugBtn) {
+     bugBtn.style.display = "flex";
+     bugBtn.style.opacity = "1";
+     bugBtn.style.visibility = "visible";
+   }
+   if (searchBtn) {
+     searchBtn.style.display = "flex";
+     searchBtn.style.opacity = "1";
+     searchBtn.style.visibility = "visible";
+   }
+   if (darkToggleHeader) {
+     darkToggleHeader.style.display = "flex";
+     darkToggleHeader.style.opacity = "1";
+     darkToggleHeader.style.visibility = "visible";
+     darkToggleHeader.style.transform = "none";
+     darkToggleHeader.style.height = "auto";
+     darkToggleHeader.style.width = "auto";
+     console.log("  darkToggleHeader TELJES RESET!");
+     console.log("    display =", darkToggleHeader.style.display);
+     console.log("    opacity =", darkToggleHeader.style.opacity);
+     console.log("    visibility =", darkToggleHeader.style.visibility);
+   }
+ }, 500);
 });
 
 // Scroll-next: ugrik egy kártyasor magasságnyit lefelé
@@ -2126,8 +2184,12 @@ document.getElementById("darkToggle").addEventListener("click", () => {
 
 // Dark mode toggle (header gomb - fő csempén)
 const darkToggleHeader = document.getElementById("darkToggleHeader");
+console.log("darkToggleHeader elem:", darkToggleHeader);
+console.log("darkToggleHeader style:", darkToggleHeader ? darkToggleHeader.style.cssText : "NINCS ELEM");
+
 if (darkToggleHeader) {
  darkToggleHeader.addEventListener("click", () => {
+  console.log("Header dark toggle kattintva!");
   document.body.classList.toggle("dark");
   const isDark = document.body.classList.contains("dark");
   document.getElementById("darkToggleIconHeader").textContent = isDark ? "☀️" : "🌙";
@@ -2347,16 +2409,8 @@ function updateStats(data) {
   const days = Math.floor((new Date() - new Date("2026-04-12")) / 86400000);
   const dc = el("tlDayCount");
   if (dc) dc.textContent = days + " nap";
-  // "Ma" felirat dinamikus
-  const todayEl = el("todayMilestone");
-  if (todayEl) {
-    const now = new Date();
-    const months = ["jan.","feb.","már.","ápr.","máj.","jún.","júl.","aug.","szep.","okt.","nov.","dec."];
-    // getDay: 0=Vasárnap, 1=Hétfő, 2=Kedd, 3=Szerda, 4=Csütörtök, 5=Péntek, 6=Szombat
-    const days = ["Vasárnap","Hétfő","Kedd","Szerda","Csütörtök","Péntek","Szombat"];
-    const dayName = days[now.getDay()];
-    todayEl.textContent = now.getFullYear() + ". " + months[now.getMonth()] + " " + now.getDate() + ". — " + dayName;
-  }
+  
+  // Timeline NINCS dinamikus "ma" frissítés - csak statikus dátumok
 }
 
 function drawChart(data) {
@@ -3947,15 +4001,7 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
       maj9ms.querySelector('.milestone-dot').style.boxShadow = '0 0 0 4px rgba(126,217,87,0.3)';
     }
 
-    // "Ma" felirat frissítése -> CSAK dátum + napnév
-    const todayEl = document.getElementById('todayMilestone');
-    if (todayEl) {
-      const months = ['jan.','feb.','már.','ápr.','máj.','jún.','júl.','aug.','szep.','okt.','nov.','dec.'];
-      // getDay: 0=Vasárnap, 1=Hétfő, 2=Kedd, 3=Szerda, 4=Csütörtök, 5=Péntek, 6=Szombat
-      const days = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
-      const dayName = days[today.getDay()];
-      todayEl.textContent = today.getFullYear() + '. ' + months[today.getMonth()] + ' ' + today.getDate() + '. — ' + dayName;
-    }
+    // Timeline NINCS dinamikus "ma" frissítés - csak statikus dátumok!
   } else {
     // Visszaszámlálás máj.9-ig
     const napok = Math.ceil((maj9 - today) / 86400000);
