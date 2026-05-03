@@ -4303,6 +4303,383 @@ currentNo   = excelData.filter(r => r["Változás"] === "ígéret").length;
 })();
 
 
+<!-- ========================================== -->
+<!-- 🗳️ SZAVAZÓ WIDGET - TOP 3 LEGFONTOSABB   -->
+<!-- ========================================== -->
+<style>
+.voting-widget {
+  max-width: 800px;
+  margin: 40px auto 40px auto;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.voting-widget h3 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.voting-subtitle {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.vote-counter {
+  background: var(--bg-main);
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.vote-item {
+  background: var(--bg-main);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.vote-item:hover {
+  border-color: var(--border-subtle);
+  transform: translateX(4px);
+}
+
+.vote-item.selected {
+  background: linear-gradient(90deg, rgba(255,153,51,0.12), rgba(255,153,51,0.06));
+  border-color: #FF9933;
+}
+
+.vote-checkbox {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 2px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+  transition: all 0.2s;
+  margin-top: 2px;
+}
+
+.vote-item.selected .vote-checkbox {
+  background: #FF9933;
+  border-color: #FF9933;
+  color: white;
+}
+
+.vote-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.vote-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.vote-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.vote-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.vote-bar {
+  height: 6px;
+  background: var(--border-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.vote-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF9933, #FF6B35);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 3px;
+}
+
+.vote-submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: #FF9933;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 20px;
+}
+
+.vote-submit-btn:hover:not(:disabled) {
+  background: #E88A2E;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255,153,51,0.35);
+}
+
+.vote-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.vote-success {
+  background: rgba(126, 217, 87, 0.12);
+  border: 2px solid rgba(126, 217, 87, 0.4);
+  padding: 18px;
+  border-radius: 12px;
+  margin-top: 20px;
+  text-align: center;
+  font-weight: 600;
+  color: #5ab040;
+  font-size: 15px;
+  display: none;
+}
+
+.vote-loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .voting-widget {
+    padding: 20px;
+    margin: 24px 12px;
+  }
+  .vote-title {
+    font-size: 14px;
+  }
+  .vote-stats {
+    font-size: 12px;
+    gap: 12px;
+  }
+}
+</style>
+
+<div class="voting-widget">
+  <h3>🗳️ Melyik ígéret a legfontosabb számodra?</h3>
+  <p class="voting-subtitle">Válaszd ki a TOP 3 legfontosabb ígéretet! A közösség szavazatai valós időben frissülnek.</p>
+  
+  <div class="vote-counter" id="voteCounter">
+    Kiválasztva: <span id="selectedCount" style="color:#FF9933;font-size:18px;">0</span>/3
+  </div>
+  
+  <div class="vote-loading" id="voteLoading">Szavazatok betöltése...</div>
+  <div id="voteList"></div>
+  
+  <button class="vote-submit-btn" id="voteSubmitBtn" disabled>
+    Szavazat leadása
+  </button>
+  
+  <div class="vote-success" id="voteSuccess">
+    ✅ Köszönjük a szavazatod! Az eredményeket valós időben frissítjük.
+  </div>
+</div>
+
+<script type="module">
+// ===== FIREBASE CONFIG - IDE ÍRD BE A SAJÁT ADATAIDAT! =====
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebasedatabase.app",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "YOUR_APP_ID"
+};
+
+// Firebase SDK import
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, onValue, runTransaction } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+// TOP ígéretek listája
+const topPromises = [
+  { id: 'eu-funds', title: 'Uniós források felszabadítása (8.000 Mrd Ft)', votes: 0 },
+  { id: 'health-budget', title: 'Egészségügy +500 milliárd Ft pluszforrás', votes: 0 },
+  { id: '13th-pension', title: '13. havi nyugdíj megtartása', votes: 0 },
+  { id: 'teacher-salaries', title: 'Pedagógusbérek rendezése', votes: 0 },
+  { id: 'corruption-eppo', title: 'Csatlakozás az Európai Ügyészséghez (EPPO)', votes: 0 },
+  { id: 'media-law', title: 'Új médiatörvény - közmédia függetlensége', votes: 0 },
+  { id: 'minimum-pension', title: 'Létminimum alatti nyugdíj megszüntetése (120k Ft)', votes: 0 },
+  { id: 'euro', title: 'Euró bevezetésének előkészítése', votes: 0 }
+];
+
+const voteList = document.getElementById('voteList');
+const voteLoading = document.getElementById('voteLoading');
+const selectedCountEl = document.getElementById('selectedCount');
+const submitBtn = document.getElementById('voteSubmitBtn');
+const successMsg = document.getElementById('voteSuccess');
+
+let selectedVotes = new Set();
+let totalVotes = 0;
+let firebaseInitialized = false;
+
+// Check if already voted
+function hasVoted() {
+  return localStorage.getItem('teglarol_voted') === 'true';
+}
+
+// Render votes
+function renderVotes(votes) {
+  voteLoading.style.display = 'none';
+  totalVotes = Object.values(votes).reduce((sum, v) => sum + (v || 0), 0);
+  
+  // Sort by votes DESC
+  const sorted = [...topPromises].map(p => ({
+    ...p,
+    votes: votes[p.id] || 0
+  })).sort((a, b) => b.votes - a.votes);
+  
+  voteList.innerHTML = sorted.map((promise, index) => {
+    const percent = totalVotes > 0 ? (promise.votes / totalVotes * 100).toFixed(1) : 0;
+    const isSelected = selectedVotes.has(promise.id);
+    
+    return `
+      <div class="vote-item ${isSelected ? 'selected' : ''}" data-id="${promise.id}">
+        <div class="vote-checkbox">${isSelected ? '✓' : ''}</div>
+        <div class="vote-content">
+          <div class="vote-title">${index + 1}. ${promise.title}</div>
+          <div class="vote-stats">
+            <div class="vote-count">👥 ${promise.votes.toLocaleString('hu-HU')} szavazat</div>
+            <div>${percent}%</div>
+          </div>
+          <div class="vote-bar">
+            <div class="vote-bar-fill" style="width: ${percent}%"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Click handlers
+  document.querySelectorAll('.vote-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (hasVoted()) return;
+      
+      const id = item.dataset.id;
+      
+      if (selectedVotes.has(id)) {
+        selectedVotes.delete(id);
+      } else {
+        if (selectedVotes.size < 3) {
+          selectedVotes.add(id);
+        }
+      }
+      
+      updateUI(votes);
+    });
+  });
+  
+  // Disable if already voted
+  if (hasVoted()) {
+    voteList.style.opacity = '0.6';
+    voteList.style.pointerEvents = 'none';
+    successMsg.style.display = 'block';
+  }
+}
+
+function updateUI(votes) {
+  selectedCountEl.textContent = selectedVotes.size;
+  submitBtn.disabled = selectedVotes.size !== 3 || hasVoted();
+  renderVotes(votes);
+}
+
+// Initialize Firebase
+try {
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  firebaseInitialized = true;
+  
+  // Listen to votes
+  const votesRef = ref(db, 'votes');
+  onValue(votesRef, (snapshot) => {
+    const votes = snapshot.val() || {};
+    updateUI(votes);
+  }, (error) => {
+    console.error('Firebase read error:', error);
+    voteLoading.textContent = 'Hiba a szavazatok betöltésénél. Frissítsd az oldalt!';
+  });
+  
+  // Submit handler
+  submitBtn.addEventListener('click', async () => {
+    if (selectedVotes.size !== 3 || hasVoted() || !firebaseInitialized) return;
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Küldés...';
+    
+    try {
+      // Atomic increment for each vote
+      for (const voteId of selectedVotes) {
+        const voteRef = ref(db, `votes/${voteId}`);
+        await runTransaction(voteRef, (current) => (current || 0) + 1);
+      }
+      
+      // Mark as voted
+      localStorage.setItem('teglarol_voted', 'true');
+      
+      // Show success
+      successMsg.style.display = 'block';
+      voteList.style.opacity = '0.6';
+      voteList.style.pointerEvents = 'none';
+      submitBtn.textContent = 'Szavazat leadva ✓';
+      
+      // Google Analytics (if available)
+      if (window.gtag) {
+        gtag('event', 'vote_submitted', {
+          votes: Array.from(selectedVotes).join(',')
+        });
+      }
+      
+    } catch (error) {
+      console.error('Vote submission error:', error);
+      alert('Hiba történt a szavazat leadásánál. Próbáld újra!');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Szavazat leadása';
+    }
+  });
+  
+} catch (error) {
+  console.error('Firebase initialization error:', error);
+  voteLoading.innerHTML = '⚠️ Firebase inicializálás sikertelen.<br>Kérlek add meg a Firebase config adatokat!';
+}
+</script>
+<!-- ========================================== -->
+
+
 </script>
 
 <script>
