@@ -1099,6 +1099,13 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;position:relative;z-index:2;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
 </button>
 
+<!-- LE NYÍL GOMB -->
+<button class="dark-icon-btn" id="scrollDownBtn" aria-label="Görgetés lefelé" style="top:170px;" title="Tovább lefelé">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;">
+    <polyline points="6 9 12 15 18 9"/>
+  </svg>
+</button>
+
 <!-- Tooltip (külön elem) -->
 <div class="bug-tooltip" style="position:fixed; top:118px; right:76px; z-index:95;">
  <strong>Találtál hibát?</strong><br>
@@ -1187,7 +1194,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <header class="modern-header" style="position:relative;">
 
  <span class="version-badge">
- <span id="headerVerNum">Ver. 1.6</span>
+ <span id="headerVerNum">Ver. 1.7</span>
  </span>
  <div class="header-inner">
  <div class="header-left-col" style="display:flex;flex-direction:column;align-items:center;gap:0;">
@@ -2005,7 +2012,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    </div>
    <div style="margin-bottom:12px;">
     <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">Leírás</label>
-    <textarea id="bugDesc" rows="4" placeholder="Pl. &quot;Háromgyermekes anyák SZJA státusza téves, mert...&quot;" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--bg-main);color:var(--text-main);font-size:14px;resize:vertical;box-sizing:border-box;font-family:inherit;position:relative;z-index:1;pointer-events:auto;"></textarea>
+    <textarea id="bugDesc" rows="4" placeholder="Pl. &quot;A szavazó widget nem tölt be&quot; vagy &quot;Háromgyermekes anyák SZJA státusza téves, mert...&quot;" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--bg-main);color:var(--text-main);font-size:14px;resize:vertical;box-sizing:border-box;font-family:inherit;position:relative;z-index:1;pointer-events:auto;"></textarea>
    </div>
    <div style="margin-bottom:18px;">
     <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">E-mail (opcionális, visszajelzéshez)</label>
@@ -2171,6 +2178,13 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#7ED957"></div>
      <div class="story-tl-content">
+      <div class="story-tl-ver">Ver. 1.7 <span class="story-tl-date">2026.05.03</span></div>
+      <div class="story-tl-desc">🗳️ Szavazó widget Firebase-zel: TOP 8 ígéret közösségi szavazás, real-time eredmények. Timeline duplikáció fix (máj.9), napnevek javítás, scroll gombok viselkedés debug. Névjegy auto-open visszaállítva első látogatáskor.</div>
+     </div>
+    </div>
+    <div class="story-tl-item">
+     <div class="story-tl-dot" style="background:#7ED957"></div>
+     <div class="story-tl-content">
       <div class="story-tl-ver">Ver. 1.6 <span class="story-tl-date">2026.04.25</span></div>
       <div class="story-tl-desc">Rendezési funkció, modal javítás, máj.9 automatikus aktiválás, harang sonar, mobilos layout javítás.</div>
      </div>
@@ -2229,9 +2243,14 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
      <div class="story-struct-desc">Valós idejű keresés az összes tégla között, kiemelés és kártyára ugrás.</div>
     </div>
     <div class="story-struct-item">
+     <div class="story-struct-icon">🗳️</div>
+     <div class="story-struct-label">Szavazó widget</div>
+     <div class="story-struct-desc">TOP 8 ígéret közösségi szavazás, Firebase real-time eredmények, anti-cheat védelemmel.</div>
+    </div>
+    <div class="story-struct-item">
      <div class="story-struct-icon">📋</div>
      <div class="story-struct-label">Tégla­kártyák</div>
-     <div class="story-struct-desc">64 tégla, mindegyikhez státusz, „áradás előtt" előzmény, forráslink és mini vizualizáció.</div>
+     <div class="story-struct-desc">95 tégla, mindegyikhez státusz, „áradás előtt" előzmény, forráslink és mini vizualizáció.</div>
     </div>
    </div>
   </div>
@@ -2325,6 +2344,7 @@ window.addEventListener("scroll", () => {
  const darkToggle = document.getElementById("darkToggle");
  const bugBtn = document.getElementById("bugBtn");
  const searchBtn = document.getElementById("searchBtn");
+ const scrollDownBtn = document.getElementById("scrollDownBtn");
  const darkToggleHeader = document.getElementById("darkToggleHeader");
  
  // Jobb oldali fix gombok
@@ -2338,6 +2358,11 @@ window.addEventListener("scroll", () => {
    bugBtn.style.display = scrolled ? "none" : "flex";
    bugBtn.style.opacity = scrolled ? "0" : "1";
    bugBtn.style.visibility = scrolled ? "hidden" : "visible";
+ }
+ if (scrollDownBtn) {
+   scrollDownBtn.style.display = scrolled ? "none" : "flex";
+   scrollDownBtn.style.opacity = scrolled ? "0" : "1";
+   scrollDownBtn.style.visibility = scrolled ? "hidden" : "visible";
  }
  if (searchBtn) {
    searchBtn.style.display = scrolled ? "none" : "flex";
@@ -2363,6 +2388,39 @@ window.addEventListener("scroll", () => {
  ktLogo.style.opacity = scrolled ? "0" : "1";
  }
 }, { passive: true });
+
+// LE NYÍL GOMB - 1. kattintás: Timeline, 2. kattintás: Szavazó
+let scrollDownClickCount = 0;
+const scrollDownBtn = document.getElementById("scrollDownBtn");
+if (scrollDownBtn) {
+  scrollDownBtn.addEventListener("click", () => {
+    scrollDownClickCount++;
+    
+    if (scrollDownClickCount === 1) {
+      // 1. kattintás: Timeline tetejére
+      const timeline = document.querySelector('.timeline-card');
+      if (timeline) {
+        window.scrollTo({ 
+          top: timeline.offsetTop - 80, 
+          behavior: "smooth" 
+        });
+      }
+    } else if (scrollDownClickCount === 2) {
+      // 2. kattintás: Szavazó widget tetejére
+      const votingWidget = document.querySelector('.voting-widget');
+      if (votingWidget) {
+        window.scrollTo({ 
+          top: votingWidget.offsetTop - 80, 
+          behavior: "smooth" 
+        });
+      }
+      // Reset counter
+      scrollDownClickCount = 0;
+    }
+  });
+}
+
+// FEL GOMB
 scrollBtn.addEventListener("click", () => {
  console.log("FEL GOMB KATTINTÁS! Scroll to top...");
  window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2373,6 +2431,7 @@ scrollBtn.addEventListener("click", () => {
    const darkToggle = document.getElementById("darkToggle");
    const bugBtn = document.getElementById("bugBtn");
    const searchBtn = document.getElementById("searchBtn");
+   const scrollDownBtn = document.getElementById("scrollDownBtn");
    const darkToggleHeader = document.getElementById("darkToggleHeader");
    
    if (darkToggle) {
@@ -2385,6 +2444,11 @@ scrollBtn.addEventListener("click", () => {
      bugBtn.style.display = "flex";
      bugBtn.style.opacity = "1";
      bugBtn.style.visibility = "visible";
+   }
+   if (scrollDownBtn) {
+     scrollDownBtn.style.display = "flex";
+     scrollDownBtn.style.opacity = "1";
+     scrollDownBtn.style.visibility = "visible";
    }
    if (searchBtn) {
      searchBtn.style.display = "flex";
@@ -2407,7 +2471,22 @@ scrollBtn.addEventListener("click", () => {
 });
 
 // Scroll-next: ugrik egy kártyasor magasságnyit lefelé
+let scrollNextClickCount = 0;
 scrollNextBtn.addEventListener("click", () => {
+  scrollNextClickCount++;
+  
+  // MÁSODIK KATTINTÁS → Szavazó widget tetejére
+  if (scrollNextClickCount === 2) {
+    const votingWidget = document.querySelector(".voting-widget");
+    if (votingWidget) {
+      const offset = 80; // Header + buffer
+      const targetY = votingWidget.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: targetY, behavior: "smooth" });
+      scrollNextClickCount = 0; // Reset
+      return;
+    }
+  }
+  
   // Mindig fix offset = 60 (sticky header magasság + buffer)
   // Így az első kategóriánál is ugyanúgy működik mint a többinél
   const offset = 60;
@@ -4434,24 +4513,19 @@ document.getElementById("storyOverlay").addEventListener("click", (e) => {
   if (e.target === document.getElementById("storyOverlay")) closeStory();
 });
 
-// Auto-open on first visit
-if (!localStorage.getItem("ttm_visited")) {
-  localStorage.setItem("ttm_visited", "1");
-  setTimeout(openStory, 800);
-}
-
 // Interaktív túra logika
 (function() {
   let current = 0;
   const steps = document.querySelectorAll(".tour-step");
   const dots = document.querySelectorAll(".tour-dot");
+
 // Auto-open névjegy első látogatóknál
-  if (!localStorage.getItem('ttm_visited_v2')) {
+  if (!localStorage.getItem('ttm_visited_v3')) {
     setTimeout(() => {
       const so = document.getElementById('storyOverlay');
       if (so) { so.classList.add('active'); if(typeof openStory==='function') openStory(); }
     }, 800);
-    localStorage.setItem('ttm_visited_v2', '1');
+    localStorage.setItem('ttm_visited_v3', '1');
   }
 
   const prev = document.getElementById("tourPrev");
