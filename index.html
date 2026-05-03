@@ -2642,16 +2642,7 @@ scrollNextBtn.addEventListener("click", () => {
   });
 })();
 
-// Dark mode toggle (jobb oldali fixed gomb)
-document.getElementById("darkToggle").addEventListener("click", () => {
- document.body.classList.toggle("dark");
- const isDark = document.body.classList.contains("dark");
- document.getElementById("darkToggleIcon").textContent = isDark ? "☀️" : "🌙";
- // Header gomb is frissül
- const headerIcon = document.getElementById("darkToggleIconHeader");
- if (headerIcon) headerIcon.textContent = isDark ? "☀️" : "🌙";
- if (typeof excelData !== 'undefined' && excelData.length) drawChart(excelData);
-});
+// Dark mode toggle (jobb oldali gomb TÖRÖLVE - csak header marad!)
 
 // Dark mode toggle (header gomb - fő csempén)
 const darkToggleHeader = document.getElementById("darkToggleHeader");
@@ -2664,9 +2655,7 @@ if (darkToggleHeader) {
   document.body.classList.toggle("dark");
   const isDark = document.body.classList.contains("dark");
   document.getElementById("darkToggleIconHeader").textContent = isDark ? "☀️" : "🌙";
-  // Jobb oldali gomb is frissül
-  const rightIcon = document.getElementById("darkToggleIcon");
-  if (rightIcon) rightIcon.textContent = isDark ? "☀️" : "🌙";
+  // Jobb oldali gomb már NINCS!
   if (typeof excelData !== 'undefined' && excelData.length) drawChart(excelData);
  });
 }
@@ -2687,8 +2676,7 @@ if (sidebarDarkToggle) {
     const headerIcon = document.getElementById("darkToggleIconHeader");
     if (headerIcon) headerIcon.textContent = isDark ? "☀️" : "🌙";
     
-    const rightIcon = document.getElementById("darkToggleIcon");
-    if (rightIcon) rightIcon.textContent = isDark ? "☀️" : "🌙";
+    // Jobb oldali icon már NINCS!
     
     if (typeof excelData !== 'undefined' && excelData.length) drawChart(excelData);
     
@@ -5559,15 +5547,18 @@ document.getElementById("storyOverlay").addEventListener("click", (e) => {
 });
 
 // SZAVAZÓ GOMB - Scroll a szavazó widget-hez
-document.getElementById("votingBtn").addEventListener("click", () => {
-  const votingWidget = document.querySelector('.voting-widget');
-  if (votingWidget) {
-    window.scrollTo({ 
-      top: votingWidget.offsetTop - 80, 
-      behavior: "smooth" 
-    });
-  }
-});
+const votingBtn = document.getElementById("votingBtn");
+if (votingBtn) {
+  votingBtn.addEventListener("click", () => {
+    const votingWidget = document.querySelector('.voting-widget');
+    if (votingWidget) {
+      window.scrollTo({ 
+        top: votingWidget.offsetTop - 80, 
+        behavior: "smooth" 
+      });
+    }
+  });
+}
 
 // Interaktív túra logika
 (function() {
