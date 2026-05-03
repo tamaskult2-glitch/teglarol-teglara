@@ -422,6 +422,22 @@ body.dark .cat-all { border-color:rgba(192,202,245,0.2); }
 .story-btn svg { width:22px; height:22px; }
 body.dark .story-btn { background:rgba(192,202,245,0.12); border-color:rgba(192,202,245,0.2); color:#C0CAF5; }
 
+/* SZAVAZÓ GOMB - Vibráló pulzáló animáció */
+@keyframes voting-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,153,51,0.7); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255,153,51,0); }
+}
+
+.voting-pulse {
+  animation: voting-pulse 2s ease-in-out infinite;
+}
+
+.voting-pulse:hover {
+  animation: none;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(255,153,51,0.5);
+}
+
 /* ---- STORYBOARD MODAL ---- */
 .story-modal-box { max-width:560px; padding:32px; }
 .tour-wrap { margin:0 -32px 24px; padding:0 32px 24px; border-bottom:1px solid var(--border-subtle); }
@@ -1086,12 +1102,10 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 </button>
 
 <!-- fabToggle eltávolítva -->
-<button id="darkToggle" aria-label="Sötét/világos mód váltása" class="dark-icon-btn" style="top:66px;" title="Téma váltás">
-  <span id="darkToggleIcon">🌙</span>
-</button>
+<!-- Dark toggle is eltávolítva - csak a header-ben marad -->
 
 <!-- HIBA BEJELENTŐ GOMB -->
-<button class="dark-icon-btn" id="bugBtn" aria-label="Hiba bejelentése" style="top:118px;" title="Hiba bejelentés">
+<button class="dark-icon-btn" id="bugBtn" aria-label="Hiba bejelentése" style="top:66px;" title="Hiba bejelentés">
   <!-- Sonar animáció -->
   <div class="bug-sonar bug-sonar-1"></div>
   <div class="bug-sonar bug-sonar-2"></div>
@@ -1100,7 +1114,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 </button>
 
 <!-- LE NYÍL GOMB -->
-<button class="dark-icon-btn" id="scrollDownBtn" aria-label="Görgetés lefelé" style="top:170px;" title="Tovább lefelé">
+<button class="dark-icon-btn" id="scrollDownBtn" aria-label="Görgetés lefelé" style="top:118px;" title="Tovább lefelé">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;">
     <polyline points="6 9 12 15 18 9"/>
   </svg>
@@ -1210,11 +1224,11 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   <div class="logo-tint"></div>
   <!-- Magyarország jellegzetességei SVG -->
   <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="fill:none;">
-    <!-- Tisza hullám – fő vonal -->
-    <path d="M20 100 Q 50 60, 80 100 T 140 100 T 180 100"
+    <!-- Tisza hullám – fő vonal (FELJEBB: y=100→80) -->
+    <path d="M20 80 Q 50 40, 80 80 T 140 80 T 180 80"
       stroke="white" stroke-width="5" stroke-linecap="round"
       filter="drop-shadow(0 0 10px rgba(255,255,255,0.7))"/>
-    <!-- Parlament -->
+    <!-- Parlament (változatlan, már felül van) -->
     <g stroke="rgba(255,255,255,0.65)" stroke-width="1.5" stroke-linecap="round">
       <rect x="74" y="50" width="52" height="20" rx="1"/>
       <path d="M90 50 Q100 32 110 50"/>
@@ -1226,34 +1240,34 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
       <rect x="97" y="57" width="6" height="7" rx="1"/>
       <rect x="113" y="57" width="5" height="7" rx="1"/>
     </g>
-    <!-- Lánchíd -->
+    <!-- Lánchíd (FELJEBB: y=140→120, y=122→102) -->
     <g stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round">
-      <line x1="24" y1="140" x2="80" y2="140"/>
-      <line x1="40" y1="140" x2="40" y2="122"/>
-      <line x1="64" y1="140" x2="64" y2="122"/>
-      <line x1="37" y1="123" x2="43" y2="123"/>
-      <line x1="61" y1="123" x2="67" y2="123"/>
-      <path d="M40 122 Q52 114 64 122"/>
-      <path d="M24 140 Q32 132 40 128"/>
-      <path d="M64 128 Q72 132 80 140"/>
+      <line x1="24" y1="120" x2="80" y2="120"/>
+      <line x1="40" y1="120" x2="40" y2="102"/>
+      <line x1="64" y1="120" x2="64" y2="102"/>
+      <line x1="37" y1="103" x2="43" y2="103"/>
+      <line x1="61" y1="103" x2="67" y2="103"/>
+      <path d="M40 102 Q52 94 64 102"/>
+      <path d="M24 120 Q32 112 40 108"/>
+      <path d="M64 108 Q72 112 80 120"/>
     </g>
-    <!-- Hősök tere -->
+    <!-- Hősök tere (FELJEBB: y=152→132, y=120→100) -->
     <g stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round">
-      <line x1="148" y1="152" x2="148" y2="120"/>
-      <line x1="144" y1="120" x2="152" y2="120"/>
-      <line x1="143" y1="152" x2="153" y2="152"/>
-      <path d="M148 120 Q140 112 136 117"/>
-      <path d="M148 120 Q156 112 160 117"/>
-      <path d="M146 120 Q148 115 150 120"/>
+      <line x1="148" y1="132" x2="148" y2="100"/>
+      <line x1="144" y1="100" x2="152" y2="100"/>
+      <line x1="143" y1="132" x2="153" y2="132"/>
+      <path d="M148 100 Q140 92 136 97"/>
+      <path d="M148 100 Q156 92 160 97"/>
+      <path d="M146 100 Q148 95 150 100"/>
     </g>
-    <!-- Duna -->
-    <path d="M16 158 Q60 151 100 158 Q140 165 184 158" stroke="rgba(255,255,255,0.28)" stroke-width="1.2" fill="none"/>
-    <path d="M16 165 Q60 159 100 165 Q140 171 184 165" stroke="rgba(255,255,255,0.16)" stroke-width="1" fill="none"/>
+    <!-- Duna (FELJEBB: y=158→138, y=165→145) -->
+    <path d="M16 138 Q60 131 100 138 Q140 145 184 138" stroke="rgba(255,255,255,0.28)" stroke-width="1.2" fill="none"/>
+    <path d="M16 145 Q60 139 100 145 Q140 151 184 145" stroke="rgba(255,255,255,0.16)" stroke-width="1" fill="none"/>
   </svg>
  </div><!-- /inner clip wrapper -->
  </div><!-- /logo-future -->
 
- <!-- Névjegy + Dark toggle egy sorban -->
+ <!-- Névjegy + Szavazó + Dark toggle egy sorban -->
  <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
   <button class="story-btn" id="storyBtn" aria-label="Névjegy és verziótörténet megnyitása" aria-label="Az oldal története">
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1265,11 +1279,17 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <span>Névjegy</span>
   </button>
   
+  <!-- SZAVAZÓ GOMB - ÚJ FUNKCIÓ! -->
+  <button id="votingBtn" class="story-btn voting-pulse" style="padding:10px 12px; flex-direction:row; gap:6px; background:linear-gradient(135deg,#FF9933,#FF6B35); color:white; border:none; position:relative;" aria-label="Szavazás" title="Új! Szavazz a legfontosabb ígéretekre!">
+   <span style="font-size:18px;">🗳️</span>
+   <span style="font-size:12px; font-weight:700;">ÚJ!</span>
+  </button>
+  
   <!-- Dark mode toggle -->
   <button id="darkToggleHeader" class="story-btn" style="padding:10px 12px; flex-direction:row; gap:0;" aria-label="Sötét/világos mód váltása" title="Téma váltás">
    <span id="darkToggleIconHeader" style="font-size:20px;">🌙</span>
   </button>
- </div><!-- /Névjegy + Dark toggle -->
+ </div><!-- /Névjegy + Szavazó + Dark toggle -->
 
  </div><!-- /header-left-col -->
  <div class="header-text">
@@ -1525,6 +1545,29 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    border-radius: 16px;
    padding: 28px;
    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+   position: relative;
+   overflow: hidden;
+ }
+
+ .voting-widget::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   background-image: url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.08)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.08)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E");
+   background-repeat: repeat;
+   background-size: 200px 120px;
+   pointer-events: none;
+   z-index: 0;
+   opacity: 1;
+   border-radius: 16px;
+ }
+
+ .voting-widget > * {
+   position: relative;
+   z-index: 1;
  }
  .voting-widget h3 {
    margin: 0 0 8px 0;
@@ -2340,21 +2383,18 @@ window.addEventListener("scroll", () => {
  // Scrolled class a body-ra
  document.body.classList.toggle("scrolled", scrolled);
  
- // DIREKT DOM manipuláció - MINDEN gomb + TELJES CSS reset
- const darkToggle = document.getElementById("darkToggle");
+ // DIREKT DOM manipuláció - gombok + TELJES CSS reset
  const bugBtn = document.getElementById("bugBtn");
  const searchBtn = document.getElementById("searchBtn");
  const scrollDownBtn = document.getElementById("scrollDownBtn");
  const darkToggleHeader = document.getElementById("darkToggleHeader");
  
- // Jobb oldali fix gombok
- if (darkToggle) {
-   darkToggle.style.display = scrolled ? "none" : "flex";
-   darkToggle.style.opacity = scrolled ? "0" : "1";
-   darkToggle.style.visibility = scrolled ? "hidden" : "visible";
-   console.log("  darkToggle.style.display =", darkToggle.style.display);
- }
+ // Jobb oldali fix gombok (darkToggle már nincs!)
  if (bugBtn) {
+   bugBtn.style.display = scrolled ? "none" : "flex";
+   bugBtn.style.opacity = scrolled ? "0" : "1";
+   bugBtn.style.visibility = scrolled ? "hidden" : "visible";
+ }
    bugBtn.style.display = scrolled ? "none" : "flex";
    bugBtn.style.opacity = scrolled ? "0" : "1";
    bugBtn.style.visibility = scrolled ? "hidden" : "visible";
@@ -2389,15 +2429,17 @@ window.addEventListener("scroll", () => {
  }
 }, { passive: true });
 
-// LE NYÍL GOMB - 1. kattintás: Timeline, 2. kattintás: Szavazó
+// LE NYÍL GOMB - Timeline → Szavazó → Rendezés → Lépkedés ígéretek között
 let scrollDownClickCount = 0;
+let currentCardIndex = -1;
 const scrollDownBtn = document.getElementById("scrollDownBtn");
+
 if (scrollDownBtn) {
   scrollDownBtn.addEventListener("click", () => {
     scrollDownClickCount++;
     
     if (scrollDownClickCount === 1) {
-      // 1. kattintás: Timeline tetejére
+      // 1. kattintás: Timeline
       const timeline = document.querySelector('.timeline-card');
       if (timeline) {
         window.scrollTo({ 
@@ -2405,8 +2447,10 @@ if (scrollDownBtn) {
           behavior: "smooth" 
         });
       }
+      currentCardIndex = -1; // Reset
+      
     } else if (scrollDownClickCount === 2) {
-      // 2. kattintás: Szavazó widget tetejére
+      // 2. kattintás: Szavazó widget
       const votingWidget = document.querySelector('.voting-widget');
       if (votingWidget) {
         window.scrollTo({ 
@@ -2414,8 +2458,65 @@ if (scrollDownBtn) {
           behavior: "smooth" 
         });
       }
-      // Reset counter
-      scrollDownClickCount = 0;
+      
+    } else if (scrollDownClickCount === 3) {
+      // 3. kattintás: Rendezés panel
+      const sortBar = document.getElementById('sortBar');
+      if (sortBar) {
+        window.scrollTo({ 
+          top: sortBar.offsetTop - 100, 
+          behavior: "smooth" 
+        });
+      }
+      currentCardIndex = -1; // Reset ígéret index
+      
+    } else {
+      // 4+ kattintás: Lépkedés ígéretek között
+      // Összes látható kártya (rendezés szerint)
+      const allCards = Array.from(document.querySelectorAll('.card.clickable'));
+      const visibleCards = allCards.filter(card => {
+        return card.offsetParent !== null && 
+               card.style.display !== 'none' &&
+               !card.closest('.category-section[style*="display: none"]');
+      });
+      
+      if (visibleCards.length === 0) {
+        // Nincs látható kártya → Reset
+        scrollDownClickCount = 0;
+        currentCardIndex = -1;
+        return;
+      }
+      
+      // Következő kártya
+      currentCardIndex++;
+      
+      if (currentCardIndex >= visibleCards.length) {
+        // Végeztünk az összes kártyával → Reset (Timeline)
+        scrollDownClickCount = 0;
+        currentCardIndex = -1;
+        const timeline = document.querySelector('.timeline-card');
+        if (timeline) {
+          window.scrollTo({ 
+            top: timeline.offsetTop - 80, 
+            behavior: "smooth" 
+          });
+        }
+      } else {
+        // Scroll a következő kártyára
+        const nextCard = visibleCards[currentCardIndex];
+        window.scrollTo({ 
+          top: nextCard.offsetTop - 120, 
+          behavior: "smooth" 
+        });
+        
+        // Highlight effekt (opcionális)
+        nextCard.style.outline = '3px solid #FF9933';
+        nextCard.style.outlineOffset = '4px';
+        setTimeout(() => {
+          nextCard.style.outline = '';
+          nextCard.style.outlineOffset = '';
+        }, 1500);
+      }
     }
   });
 }
@@ -2428,18 +2529,11 @@ scrollBtn.addEventListener("click", () => {
  // Gombok KÉNYSZERÍTETT megjelenítése 500ms után (smooth scroll végén)
  setTimeout(() => {
    console.log("500ms ELTELT! Gombok kényszerített megjelenítés...");
-   const darkToggle = document.getElementById("darkToggle");
    const bugBtn = document.getElementById("bugBtn");
    const searchBtn = document.getElementById("searchBtn");
    const scrollDownBtn = document.getElementById("scrollDownBtn");
    const darkToggleHeader = document.getElementById("darkToggleHeader");
    
-   if (darkToggle) {
-     darkToggle.style.display = "flex";
-     darkToggle.style.opacity = "1";
-     darkToggle.style.visibility = "visible";
-     console.log("  darkToggle.style.display =", darkToggle.style.display);
-   }
    if (bugBtn) {
      bugBtn.style.display = "flex";
      bugBtn.style.opacity = "1";
@@ -5462,6 +5556,17 @@ document.getElementById("storyBtn").addEventListener("click", openStory);
 document.getElementById("storyModalClose").addEventListener("click", closeStory);
 document.getElementById("storyOverlay").addEventListener("click", (e) => {
   if (e.target === document.getElementById("storyOverlay")) closeStory();
+});
+
+// SZAVAZÓ GOMB - Scroll a szavazó widget-hez
+document.getElementById("votingBtn").addEventListener("click", () => {
+  const votingWidget = document.querySelector('.voting-widget');
+  if (votingWidget) {
+    window.scrollTo({ 
+      top: votingWidget.offsetTop - 80, 
+      behavior: "smooth" 
+    });
+  }
 });
 
 // Interaktív túra logika
