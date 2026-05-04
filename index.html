@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
- <meta charset="UTF-8">
+ <meta charset="UTFigen – Ganz Ábrahám gazdaságfejlesztési terv: KKV-fókusz, exportfejlesztés, energiahatékonyság; Kapitány István gazdasági miniszter koordinál8">
  <title>Tégláról-téglára | teglarol-teglara.hu</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="Független nyomonkövetés: Magyar Péter és a TISZA Párt ígéreteinek teljesülése tégláról-téglára.">
@@ -249,13 +249,66 @@ body.dark #stickyCatHeader {
   #stickyCatHeader { left:var(--sidebar-width); }
 }
 
+
+/* Teljesített-0 placeholder */
+.done-placeholder {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:56px 24px; text-align:center;
+  background:var(--bg-card); border-radius:20px;
+  border:2px dashed var(--border-subtle);
+  margin:24px 0;
+  opacity:0.7;
+}
+.done-placeholder-icon {
+  font-size:56px; margin-bottom:16px;
+  filter:grayscale(1);
+  text-decoration:line-through;
+  position:relative;
+}
+.done-placeholder-icon::after {
+  content:'';
+  position:absolute; left:-8px; right:-8px; top:50%;
+  height:4px; background:var(--text-secondary); border-radius:2px;
+  transform:rotate(-8deg);
+  opacity:0.5;
+}
+.done-placeholder-title {
+  font-size:20px; font-weight:800; color:var(--text-main);
+  margin-bottom:8px;
+  text-decoration:line-through;
+  text-decoration-color:var(--text-secondary);
+  text-decoration-thickness:2px;
+}
+.done-placeholder-sub {
+  font-size:14px; color:var(--text-secondary); line-height:1.6; max-width:320px;
+}
+.done-placeholder-brick {
+  font-size:52px; margin-bottom:8px;
+  filter:grayscale(1) opacity(0.5);
+  position:relative; display:inline-block;
+}
+.done-placeholder-brick::after {
+  content:'';
+  position:absolute; left:-6px; right:-6px; top:50%;
+  height:3px; background:var(--text-secondary); border-radius:2px;
+  transform:rotate(-6deg); opacity:0.6;
+}
+.done-placeholder-count {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:52px; height:52px; border-radius:50%;
+  background:var(--border-subtle);
+  font-size:26px; font-weight:900; color:var(--text-secondary);
+  margin-bottom:14px;
+}
+
 .fresh-badge {
-  position:absolute; top:10px; right:10px;
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
   padding:3px 9px; border-radius:999px; font-size:11px; font-weight:800;
   background:#e8405a; color:#fff;
   animation:pulse 2s infinite;
   z-index:2;
   box-shadow:0 2px 6px rgba(232,64,90,0.4);
+  white-space:nowrap;
 }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 .card { background:var(--bg-card); padding:22px; border-radius:14px; margin-bottom:16px; box-shadow:var(--shadow-soft); border:1px solid var(--border-subtle); transition:background 0.3s,transform 0.18s,box-shadow 0.18s; word-break:break-word; overflow-wrap:break-word; max-width:100%; box-sizing:border-box; overflow:hidden; display:block; position:relative; }
@@ -380,22 +433,20 @@ body.dark .version-badge .ver-divider { background:rgba(255,255,255,0.2); }
 
 /* ---- SCROLL TO TOP ---- */
 .scroll-to-top { position:fixed; bottom:28px; right:16px; z-index:150; width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#e8405a,#c0183a); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(192,24,58,0.45); opacity:0; transform:translateY(16px) scale(0.8); transition:opacity 0.25s,transform 0.25s; pointer-events:none; }
+
+/* Kategóriánként visszaugró gomb (scroll-to-top felett) */
+.scroll-prev-cat { position:fixed; bottom:84px; right:16px; z-index:150; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); border:1.5px solid rgba(232,64,90,0.3); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.12); opacity:0; transform:translateY(16px) scale(0.8); transition:opacity 0.25s,transform 0.25s; pointer-events:none; }
+.scroll-prev-cat.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+.scroll-prev-cat:hover { background:#fff; box-shadow:0 8px 24px rgba(0,0,0,0.18); transform:translateY(-2px) scale(1.06); }
+.scroll-prev-cat svg { width:20px; height:20px; stroke:#e8405a; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+body.dark .scroll-prev-cat { background:rgba(36,40,59,0.95); border-color:rgba(232,64,90,0.4); }
+body.dark .scroll-prev-cat svg { stroke:#F7768E; }
+@media(max-width:600px) { .scroll-prev-cat { bottom:76px; right:16px; width:42px; height:42px; } }
 .scroll-to-top.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
 .scroll-to-top:hover { box-shadow:0 8px 24px rgba(192,24,58,0.6); transform:translateY(-2px) scale(1.06); }
 .scroll-to-top svg { width:20px; height:20px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
-.scroll-next { position:fixed; bottom:96px; right:16px; z-index:150; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); border:1.5px solid rgba(232,64,90,0.3); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.12); opacity:0; transform:translateY(16px) scale(0.8); transition:opacity 0.25s,transform 0.25s; pointer-events:none; }
-.scroll-next.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
-.scroll-next:hover { background:#fff; box-shadow:0 8px 24px rgba(0,0,0,0.18); transform:translateY(-2px) scale(1.06); }
-.scroll-next svg { width:20px; height:20px; stroke:#e8405a; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
-body.dark .scroll-next { background:rgba(36,40,59,0.95); border-color:rgba(232,64,90,0.4); }
-body.dark .scroll-next svg { stroke:#F7768E; }
-
-.skip-down-btn { position:fixed; bottom:86px; right:28px; z-index:150; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); border:1px solid rgba(0,0,0,0.1); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 12px rgba(0,0,0,0.12); opacity:0; transform:translateY(16px) scale(0.8); transition:opacity 0.25s,transform 0.25s; pointer-events:none; }
-.skip-down-btn.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
-.skip-down-btn:hover { box-shadow:0 4px 18px rgba(0,0,0,0.18); transform:translateY(-2px) scale(1.06); }
-.skip-down-btn svg { width:20px; height:20px; stroke:#e8405a; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
-body.dark .skip-down-btn { background:rgba(36,40,59,0.9); border-color:rgba(192,202,245,0.2); }
-
+body.dark body.dark 
+body.dark 
 /* ---- KT LOGO ---- */
 .kt-logo { display:none !important; } .kt-logo-DISABLED { position:fixed; top:15px; right:68px; z-index:100; display:flex; flex-direction:row; align-items:center; gap:5px; background:rgba(255,255,255,0.6); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.5); border-radius:999px; padding:7px 12px 7px 7px; color:#555; box-shadow:0 2px 10px rgba(0,0,0,0.08); pointer-events:none; transition:opacity 0.25s; }
 body.dark .kt-logo { display:none !important; } .kt-logo-DISABLED { background:rgba(36,40,59,0.8); color:#aaa; border-color:rgba(192,202,245,0.15); box-shadow:0 2px 10px rgba(0,0,0,0.4); }
@@ -802,11 +853,9 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
   .card-split { flex-direction:column; }
   .card-split .card-viz { flex:1; border-left:none; border-top:1px solid var(--border-subtle); padding-left:0; padding-top:16px; margin-top:10px; }
   .scroll-to-top { bottom:24px; right:16px; width:42px; height:42px; }
-  .scroll-next { bottom:76px; right:16px; width:42px; height:42px; }
-  .tisza-program-btn { display:none !important; }
+    .tisza-program-btn { display:none !important; }
   .kt-hide-mobile { display:none !important; }
-  .skip-down-btn { bottom:138px; }
-  .calc-result-grid { grid-template-columns:1fr; }
+    .calc-result-grid { grid-template-columns:1fr; }
 
   /* Mobilon kompaktabb elrendezés, logo érintetlen */
   .modern-header { padding:52px 16px 44px; }
@@ -1091,16 +1140,13 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 
 
 
-<button class="scroll-to-top" id="scrollToTop" aria-label="Ugrás az oldal tetejére">
+<!-- KATEGÓRIA VISSZA GOMB - scrollToTop felett -->
+<button class="scroll-prev-cat" id="scrollPrevCat" aria-label="Előző kategória tetejére" title="Előző kategória">
   <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
-<button class="scroll-next" id="scrollNext" aria-label="Következő csempe sor">
-  <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-</button>
-
-<button class="skip-down-btn" id="skipDownBtn" aria-label="Következő sor">
-  <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+<button class="scroll-to-top" id="scrollToTop" aria-label="Ugrás az oldal tetejére">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
 <!-- KERESŐ GOMB -->
@@ -1118,13 +1164,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   <div class="bug-sonar bug-sonar-2"></div>
   
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;position:relative;z-index:2;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-</button>
-
-<!-- LE NYÍL GOMB - Jobb oldalon, bug gomb alatt -->
-<button class="dark-icon-btn" id="scrollDownBtn" aria-label="Görgetés lefelé" style="top:118px;" title="Tovább lefelé">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;">
-    <polyline points="6 9 12 15 18 9"/>
-  </svg>
 </button>
 
 <!-- Tooltip (külön elem) -->
@@ -1485,7 +1524,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-04-20">
+   <div class="milestone" data-date="2026-04-30">
     <div class="milestone-dot" style="background:#FF9933;border:2px solid #CE2939;"></div>
     <div class="milestone-content">
      <div class="milestone-date" style="font-weight:700;color:var(--text-main);">2026. ápr. 20. — Hétfő</div>
@@ -1493,15 +1532,15 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-04-21">
+   <div class="milestone" data-date="2026-05-04">
     <div class="milestone-dot" style="background:#FF9933;"></div>
     <div class="milestone-content">
      <div class="milestone-date">2026. ápr. 21. — Kedd</div>
-     <div class="milestone-desc">🏛️ TISZA–Fidesz–MiHazánk alakuló ülés-előkészítő tárgyalások · Konstruktív hangnem, konszenzus a Szent Korona-eskü kérdésében</div>
+     <div class="milestone-desc">🏛️ TISZA–Fidesz–MiHazánk alakuló ülés-előkészítő tárgyalások · Konstruktív hangnem – rugalmas nyugdíjba vonulás tervben; konkrét jogszabályi lépés még nem bejelentett – 20 000 új nyugdíjasotthoni férőhely a tervben; konkrét lépés még nem bejelentett – digitális ügyintézés fejlesztése tervben; Digitális Minisztérium felállítása folyamatban – Digitális és Technológiai Minisztérium felállítása tervben; konkrét AI program még nem bejelentett – bérlakásprogram bejelentve; 10 000 szociális bérlakás tervben; konkrét kivitelezési lépés még nem – Vitézy Dávid közlekedési miniszter; Ferihegy fejlesztéséről konkrét lépés még nem bejelentett – akkugyárak felülvizsgálata és szigorúbb ellenőrzése bejelentve; CATL tárgyalás máj.4; konkrét szabályozás még nem – ezermilliárd Ft-os energiahatékonysági program ígérve; évi 100 000 lakás cél a programban de konkrét lépés még nem – az akadémiai szabadság visszaadása EU-s vállalás; visszaállamosítás konkrét lépése még nem bejelentett – felülvizsgálat bejelentve; részletek még nem ismertek; Kapitány István energetikai miniszter foglalkozik – Karácsony Gergely főpolgármesterrel kooperatív viszony; konkrét Budapest-törvény még nem bejelentett – Melléthei-Barna igazságügyi miniszter; konkrét hatáskör-visszaadási törvény még nem bejelentett – Vitézy Dávid közlekedési miniszter; konkrét vidéki fejlesztési terv még nem bejelentett – Digitális és Technológiai Minisztérium felállítása tervben; konkrét lépések még nem bejelentve – konkrét bejelentés még nem történt – Tisza program tartalmazza; konkrét lépés még nem bejelentett – oligarchák földterületeinek visszaszerzése tervben (Vagyonvisszaszerzési Hivatal); konkrét agrártámogatási lépés még nem bejelentett – konkrét törvényjavaslat még nem bejelentett – hosszú távú cél 2050-re – hosszú távú cél; azonnali demográfiai lépések a családtámogatásokon keresztül – konkrét lépés még nem bejelentett – hosszú távú cél; azonnali ütemezés nem ismert – hosszú távú cél; azonnali lépések nem bejelentettek – konkrét lépés még nem bejelentett; szűrőprogramok és várólisták csökkentése a 100 napos tervben – konkrét jogszabályi lépés még nem bejelentett; Magyar Péter M1-en hangsúlyozta: embercsempészeket nem enged ki (ápr.15) – konkrét ütemezés még nincs bejelentve; Ruszin-Szendi honvédelmi miniszter kijelölve, konszenzus a Szent Korona-eskü kérdésében</div>
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-04-24">
+   <div class="milestone" data-date="2026-04-29">
     <div class="milestone-dot" style="background:#FF9933;border:2px solid #CE2939;"></div>
     <div class="milestone-content">
      <div class="milestone-date">2026. ápr. 24. — Szerda</div>
@@ -2375,11 +2414,10 @@ const colorMap = {
 };
 
 const scrollBtn = document.getElementById("scrollToTop");
-const scrollNextBtn = document.getElementById("scrollNext");
+scrollBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+const prevCatBtn = document.getElementById("scrollPrevCat");
 const tiszaBtn = document.querySelector(".tisza-program-btn");
 const ktLogo = document.querySelector(".kt-logo");
-// Show scroll-next on load if content below
-setTimeout(() => { if (document.body.scrollHeight > window.innerHeight + 100) document.getElementById("scrollNext").classList.add("visible"); }, 300);
 window.addEventListener("scroll", () => {
  const scrolled = window.scrollY > 200;
  const atBottom = window.scrollY + window.innerHeight >= document.body.scrollHeight - 80;
@@ -2392,22 +2430,14 @@ window.addEventListener("scroll", () => {
  
  // DIREKT DOM manipuláció - gombok + TELJES CSS reset
  const bugBtn = document.getElementById("bugBtn");
- const searchBtn = document.getElementById("searchBtn");
- const scrollDownBtn = document.getElementById("scrollDownBtn");
- const darkToggleHeader = document.getElementById("darkToggleHeader");
+ const searchBtn = document.getElementById("searchBtn");const darkToggleHeader = document.getElementById("darkToggleHeader");
  
  // Jobb oldali fix gombok
  if (bugBtn) {
    bugBtn.style.display = scrolled ? "none" : "flex";
    bugBtn.style.opacity = scrolled ? "0" : "1";
    bugBtn.style.visibility = scrolled ? "hidden" : "visible";
- }
- if (scrollDownBtn) {
-   scrollDownBtn.style.display = scrolled ? "none" : "flex";
-   scrollDownBtn.style.opacity = scrolled ? "0" : "1";
-   scrollDownBtn.style.visibility = scrolled ? "hidden" : "visible";
- }
- if (searchBtn) {
+ }if (searchBtn) {
    searchBtn.style.display = scrolled ? "none" : "flex";
    searchBtn.style.opacity = scrolled ? "0" : "1";
    searchBtn.style.visibility = scrolled ? "hidden" : "visible";
@@ -2422,8 +2452,8 @@ window.addEventListener("scroll", () => {
  }
  
  scrollBtn.classList.toggle("visible", scrolled);
- scrollNextBtn.classList.toggle("visible", !atBottom);
- if (tiszaBtn) {
+ // Kategória vissza gomb: csak ha legörgettünk (mint a scrollToTop)
+ if (prevCatBtn) prevCatBtn.classList.toggle("visible", scrolled);if (tiszaBtn) {
  tiszaBtn.style.opacity = scrolled ? "0" : "1";
  tiszaBtn.style.pointerEvents = scrolled ? "none" : "auto";
  }
@@ -2432,189 +2462,43 @@ window.addEventListener("scroll", () => {
  }
 }, { passive: true });
 
-// LE NYÍL GOMB - Timeline → Szavazó → Rendezés → Lépkedés ígéretek között
-let scrollDownClickCount = 0;
-let currentCardIndex = -1;
-const scrollDownBtn = document.getElementById("scrollDownBtn");
+// KATEGÓRIA VISSZA GOMB – kategóriánként felfelé ugrik, legvégül az oldal tetejére
+if (prevCatBtn) {
+  prevCatBtn.addEventListener("click", () => {
+    // Összegyűjtjük az összes látható kategória-szekció és a főcsempe tetejét
+    const anchors = [];
 
-if (scrollDownBtn) {
-  scrollDownBtn.addEventListener("click", () => {
-    scrollDownClickCount++;
-    
-    if (scrollDownClickCount === 1) {
-      // 1. kattintás: Timeline
-      const timeline = document.querySelector('.timeline-card');
-      if (timeline) {
-        window.scrollTo({ 
-          top: timeline.offsetTop - 80, 
-          behavior: "smooth" 
-        });
+    // Főcsempe / oldal teteje (0)
+    anchors.push(0);
+
+    // Kategória szekciók teteje
+    document.querySelectorAll(".category-section").forEach(sec => {
+      if (sec.offsetParent !== null && sec.style.display !== "none") {
+        anchors.push(sec.getBoundingClientRect().top + window.scrollY);
       }
-      currentCardIndex = -1; // Reset
-      
-    } else if (scrollDownClickCount === 2) {
-      // 2. kattintás: Szavazó widget
-      const votingWidget = document.querySelector('.voting-widget');
-      if (votingWidget) {
-        window.scrollTo({ 
-          top: votingWidget.offsetTop - 80, 
-          behavior: "smooth" 
-        });
-      }
-      
-    } else if (scrollDownClickCount === 3) {
-      // 3. kattintás: Rendezés panel
-      const sortBar = document.getElementById('sortBar');
-      if (sortBar) {
-        window.scrollTo({ 
-          top: sortBar.offsetTop - 100, 
-          behavior: "smooth" 
-        });
-      }
-      currentCardIndex = -1; // Reset ígéret index
-      
+    });
+
+    // Rendezés sáv
+    const sb = document.getElementById("sortBar");
+    if (sb && sb.offsetParent) anchors.push(sb.getBoundingClientRect().top + window.scrollY);
+
+    anchors.sort((a, b) => a - b);
+
+    // Jelenlegi scroll pozíció (kis offset, hogy az épp látható szekció is "előző"-nek számítson)
+    const current = window.scrollY - 80;
+    // Az összes anchor közül az első, ami KISEBB a current-nél (visszafelé)
+    let prev = null;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] < current) { prev = anchors[i]; break; }
+    }
+
+    if (prev !== null) {
+      window.scrollTo({ top: Math.max(0, prev - 60), behavior: "smooth" });
     } else {
-      // 4+ kattintás: Lépkedés ígéretek között
-      // Összes látható kártya (rendezés szerint)
-      const allCards = Array.from(document.querySelectorAll('.card.clickable'));
-      const visibleCards = allCards.filter(card => {
-        return card.offsetParent !== null && 
-               card.style.display !== 'none' &&
-               !card.closest('.category-section[style*="display: none"]');
-      });
-      
-      if (visibleCards.length === 0) {
-        // Nincs látható kártya → Reset
-        scrollDownClickCount = 0;
-        currentCardIndex = -1;
-        return;
-      }
-      
-      // Következő kártya
-      currentCardIndex++;
-      
-      if (currentCardIndex >= visibleCards.length) {
-        // Végeztünk az összes kártyával → Reset (Timeline)
-        scrollDownClickCount = 0;
-        currentCardIndex = -1;
-        const timeline = document.querySelector('.timeline-card');
-        if (timeline) {
-          window.scrollTo({ 
-            top: timeline.offsetTop - 80, 
-            behavior: "smooth" 
-          });
-        }
-      } else {
-        // Scroll a következő kártyára
-        const nextCard = visibleCards[currentCardIndex];
-        window.scrollTo({ 
-          top: nextCard.offsetTop - 120, 
-          behavior: "smooth" 
-        });
-        
-        // Highlight effekt (opcionális)
-        nextCard.style.outline = '3px solid #FF9933';
-        nextCard.style.outlineOffset = '4px';
-        setTimeout(() => {
-          nextCard.style.outline = '';
-          nextCard.style.outlineOffset = '';
-        }, 1500);
-      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   });
 }
-
-// FEL GOMB
-scrollBtn.addEventListener("click", () => {
- console.log("FEL GOMB KATTINTÁS! Scroll to top...");
- window.scrollTo({ top: 0, behavior: "smooth" });
- 
- // Gombok KÉNYSZERÍTETT megjelenítése 500ms után (smooth scroll végén)
- setTimeout(() => {
-   console.log("500ms ELTELT! Gombok kényszerített megjelenítés...");
-   const bugBtn = document.getElementById("bugBtn");
-   const searchBtn = document.getElementById("searchBtn");
-   const scrollDownBtn = document.getElementById("scrollDownBtn");
-   const darkToggleHeader = document.getElementById("darkToggleHeader");
-   
-   if (bugBtn) {
-     bugBtn.style.display = "flex";
-     bugBtn.style.opacity = "1";
-     bugBtn.style.visibility = "visible";
-   }
-   if (scrollDownBtn) {
-     scrollDownBtn.style.display = "flex";
-     scrollDownBtn.style.opacity = "1";
-     scrollDownBtn.style.visibility = "visible";
-   }
-   if (searchBtn) {
-     searchBtn.style.display = "flex";
-     searchBtn.style.opacity = "1";
-     searchBtn.style.visibility = "visible";
-   }
-   if (darkToggleHeader) {
-     darkToggleHeader.style.display = "flex";
-     darkToggleHeader.style.opacity = "1";
-     darkToggleHeader.style.visibility = "visible";
-     darkToggleHeader.style.transform = "none";
-     darkToggleHeader.style.height = "auto";
-     darkToggleHeader.style.width = "auto";
-     console.log("  darkToggleHeader TELJES RESET!");
-     console.log("    display =", darkToggleHeader.style.display);
-     console.log("    opacity =", darkToggleHeader.style.opacity);
-     console.log("    visibility =", darkToggleHeader.style.visibility);
-   }
- }, 500);
-});
-
-// Scroll-next: ugrik egy kártyasor magasságnyit lefelé
-let scrollNextClickCount = 0;
-scrollNextBtn.addEventListener("click", () => {
-  scrollNextClickCount++;
-  
-  // MÁSODIK KATTINTÁS → Szavazó widget tetejére
-  if (scrollNextClickCount === 2) {
-    const votingWidget = document.querySelector(".voting-widget");
-    if (votingWidget) {
-      const offset = 80; // Header + buffer
-      const targetY = votingWidget.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top: targetY, behavior: "smooth" });
-      scrollNextClickCount = 0; // Reset
-      return;
-    }
-  }
-  
-  // Mindig fix offset = 60 (sticky header magasság + buffer)
-  // Így az első kategóriánál is ugyanúgy működik mint a többinél
-  const offset = 60;
-
-  const allTargets = [];
-
-  // Timeline kártya + rendezés sáv
-  const tl = document.getElementById("timelineCard");
-  if (tl && tl.offsetParent) allTargets.push(tl.getBoundingClientRect().top + window.scrollY);
-  const sb = document.getElementById("sortBar");
-  if (sb && sb.offsetParent) allTargets.push(sb.getBoundingClientRect().top + window.scrollY);
-
-  // Kártyák
-  document.querySelectorAll(".card.clickable").forEach(card => {
-    if (card.offsetParent && card.style.display !== "none") {
-      allTargets.push(card.getBoundingClientRect().top + window.scrollY);
-    }
-  });
-
-  allTargets.sort((a, b) => a - b);
-
-  const current = window.scrollY + offset + 10;
-  const next = allTargets.find(top => top > current);
-
-  if (next !== undefined) {
-    window.scrollTo({ top: next - offset, behavior: "smooth" });
-  } else {
-    window.scrollBy({ top: window.innerHeight * 0.8, behavior: "smooth" });
-  }
-});
-
 
 // Megosztás gombok
 (function() {
@@ -3018,20 +2902,56 @@ document.getElementById("statusDropdown").addEventListener("click", (e) => {
  jumpToItem(cat, title);
 });
 
-// Timeline legend kattintás → dropdown
+// Timeline legend kattintás → szűrés + scroll a sortBar-hoz
 document.querySelectorAll(".tl-leg-item").forEach(item => {
   item.addEventListener("click", () => {
     const status = item.getAttribute("data-status");
-    const dropdown = document.getElementById("statusDropdown");
-    const isActive = item.classList.contains("active");
 
+    // Active jelölés
     document.querySelectorAll(".tl-leg-item").forEach(i => i.classList.remove("active"));
-    document.getElementById("statusPanelOverlay").classList.remove("active");
+    item.classList.add("active");
 
-    if (!isActive) {
-      item.classList.add("active");
-      buildStatusDropdown(status);
+    // Panel bezárás ha nyitva volt
+    const overlay = document.getElementById("statusPanelOverlay");
+    if (overlay) overlay.classList.remove("active");
 
+    if (status === "__all__") {
+      // Összes tégla: alapértelmezett rendezés, minden kategória látható
+      renderDashboard(excelData);
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(".sort-btn[data-sort='default']").classList.add("active");
+      currentSort = "default";
+    } else if (status === "kész") {
+      // Teljesítve → "Teljesített előre" rendezés gomb aktiválása
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(".sort-btn[data-sort='done']").classList.add("active");
+      currentSort = "done";
+      const doneCount = excelData.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+      if (doneCount === 0) {
+        renderDonePlaceholder();
+      } else {
+        renderDashboard(getSortedData(excelData, "done"));
+      }
+    } else if (status === "bejelentve") {
+      // Bejelentve → "Bejelentve előre" rendezés
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(".sort-btn[data-sort='announced']").classList.add("active");
+      currentSort = "announced";
+      renderDashboard(getSortedData(excelData, "announced"));
+    } else if (status === "ígéret") {
+      // Csak ígéret → "Csak ígéret előre" rendezés
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(".sort-btn[data-sort='promise']").classList.add("active");
+      currentSort = "promise";
+      renderDashboard(getSortedData(excelData, "promise"));
+    }
+
+    // Scroll a sortBar-hoz
+    const sortBar = document.getElementById("sortBar");
+    if (sortBar) {
+      setTimeout(() => {
+        window.scrollTo({ top: sortBar.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
+      }, 80);
     }
   });
 });
@@ -3404,29 +3324,29 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Új alkotmánytervezet kidolgozása",
   "FiDeSZ állapot": "Alaptörvény XII. módosítása 2024",
-  "Volt előrelépést jelentő bejelentés?": "igen – szükséges az Alaptörvény módosítása",
+  "Volt előrelépést jelentő bejelentés?": "igen – Alaptörvény módosítás az első intézkedések között; mandátumkorlátozás, EP ügyészség, sorkötelezettség tiltása",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "A rendeleti kormányzás megszüntetése",
   "FiDeSZ állapot": "rendkívüli jogrendben él az ország 2020 óta",
-  "Volt előrelépést jelentő bejelentés?": "igen – rendkívüli jogrend megszüntetése első lépés",
+  "Volt előrelépést jelentő bejelentés?": "igen – rendkívüli jogrend megszüntetése bejelentve; éjszakai jogalkotás és oligarchák érdekében hozott törvények megszüntetése ígérve",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://444.hu/2026/04/20/magyar-peter-bejelentett-7-minisztert-a-heten-jonnek-ujabb-nevek",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Miniszterelnöki mandátum két ciklusra korlátozása",
   "FiDeSZ állapot": "nincs korlátozás",
-  "Volt előrelépést jelentő bejelentés?": "igen – Alaptörvény módosítás bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Alaptörvény módosítás: mandátumkorlátozás az első intézkedések között (2 ciklus max); Melléthei-Barna igazságügyi miniszter felel a jogállami reformokért",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
   "Prioritás": "azonnali"
  },
@@ -3434,90 +3354,90 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Igazságszolgáltatás függetlenségének megerősítése",
   "FiDeSZ állapot": "politikailag kontrollált",
-  "Volt előrelépést jelentő bejelentés?": "igen – EU feltétel vállalva; Kármán András pénzügy-, Orbán Anita külügyminiszter bejelentve (ápr.20)",
+  "Volt előrelépést jelentő bejelentés?": "igen – Melléthei-Barna Márton igazságügyi miniszter (ápr.30); igazságszolgáltatás függetlensége EU-s feltétel, jogszabályi keret kialakítása első feladat",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-20",
-  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Frissítés": "2026-04-29",
+  "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Új médiatörvény megalkotása",
   "FiDeSZ állapot": "közmédia propagandaeszköz",
-  "Volt előrelépést jelentő bejelentés?": "igen – MTVA hírszolgáltatás azonnali felfüggesztése megerősítve (ápr.14)",
+  "Volt előrelépést jelentő bejelentés?": "igen – MTVA hírszolgáltatás felfüggesztve; független közmédia feltételei megteremtendők; KESMA vizsgálat; propaganda-finanszírozás leállítása EU-s vállalás",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Pártfinanszírozás és választási törvény átalakítása",
   "FiDeSZ állapot": "Fidesz-érdekek szerint gerrymandering",
-  "Volt előrelépést jelentő bejelentés?": "igen – Tisza–Fidesz–MiHazánk konstruktív alakuló ülés-előkészítő tárgyalások ápr.17 és ápr.21-én, konszenzus a Szent Korona-eskü kérdésében",
+  "Volt előrelépést jelentő bejelentés?": "igen – alakuló ülés május 9. (megerősítve); 20 parlamenti bizottság, ellenzéknek 6; konstruktív tárgyalás mind 3 párttal (ápr.17-21)nszenzus a Szent Korona-eskü kérdésében",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-21",
-  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://index.hu/belfold/2026/04/21/orszaggyules-parlament-valasztas2026-tisza-part-fidesz-kdnp-mi-hazank-mozgalom-magyar-peter/",
   "Prioritás": "rovid"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Csatlakozás az Európai Ügyészséghez",
   "FiDeSZ állapot": "nem csatlakozott",
-  "Volt előrelépést jelentő bejelentés?": "igen – első intézkedésként bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – azonnali csatlakozás megerősítve (ápr.26, ápr.29 Brüsszelben is vállalva); Melléthei-Barna igazságügyi miniszter felel a jogszabályi keretért",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Frissítés": "2026-04-30",
+  "Forrás link": "https://index.hu/belfold/2026/04/29/magyar-peter-brusszel-orban-viktor-penzmosas-bank-nav-europai-unio/",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Magyarország visszalépése a Nemzetközi Büntetőbíróságba",
   "FiDeSZ állapot": "Magyarország 2025 tavaszán kilépett az ICC-ből",
-  "Volt előrelépést jelentő bejelentés?": "nem – kilépés megtörtént, visszalépés szükséges",
+  "Volt előrelépést jelentő bejelentés?": "nem – kilépés megtörtént; visszalépés tervezett de még nem bejelentett konkrét lépéssel; Netanjahu körözés ügyében Magyar: le kell tartóztatni ha Magyarországra jön (ápr.20)",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://telex.hu/belfold/2026/04/13/parlamenti-valasztas-tisza-magyar-peter-gyozelem-fidesz-orban-viktor-ketharmad",
+  "Frissítés": "2026-04-29",
+  "Forrás link": "https://444.hu/2026/04/20/magyar-peter-bejelentett-7-minisztert-a-heten-jonnek-ujabb-nevek",
   "Prioritás": "rovid"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Szuverenitásvédelmi Hivatal megszüntetése",
   "FiDeSZ állapot": "2024 óta működik",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter azonnali megszüntetését jelentette be",
+  "Volt előrelépést jelentő bejelentés?": "igen – azonnali megszüntetés bejelentve; portfolio.hu szerint zajlik a felszámolás",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Nemzeti Vagyonvisszaszerzési és Védelmi Hivatal létrehozása",
   "FiDeSZ állapot": "nincs ilyen hivatal",
-  "Volt előrelépést jelentő bejelentés?": "igen – első intézkedések között bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – önálló szerv, nyomozati jogkörrel (ápr.20 megerősítve); 20 évre visszamenőleg vagyonosodási vizsgálat; Melléthei-Barna igazságügyi miniszter felel",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Frissítés": "2026-04-30",
+  "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Biztonságpolitika",
   "TiSZa ígéret": "Nem küldenek magyar katonát az orosz–ukrán háborúba",
   "FiDeSZ állapot": "nem küldtek",
-  "Volt előrelépést jelentő bejelentés?": "igen – Ruszin-Szendi Romulusz honvédelmi miniszternek jelölve (ápr.20), NATO-elkötelezettség megerősítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Ruszin-Szendi Romulusz honvédelmi miniszter; ukrán háborúba nem küldenek katonát megerősítve (ápr.20), NATO-elkötelezettség megerősítve",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-21",
-  "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Biztonságpolitika",
   "TiSZa ígéret": "Nem állítják vissza a sorkötelezettséget",
   "FiDeSZ állapot": "Medgyessy-kormány 2004-ben szüntette meg; Fidesz nem hozta vissza, de önkéntes Zrínyi-program van",
-  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – sorkötelezettség visszaállítása kizárva; Alaptörvény módosítással rögzítendő",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
   "Prioritás": "rovid"
  },
  {
@@ -3526,7 +3446,7 @@ const excelData = [
   "FiDeSZ állapot": "2%-os NATO cél elérve 2024",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "hosszu"
  },
@@ -3534,30 +3454,30 @@ const excelData = [
   "Kategória": "Biztonságpolitika",
   "TiSZa ígéret": "Déli határkerítés megtartása",
   "FiDeSZ állapot": "megtartják",
-  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – határkerítés megtartva; Magyar Péter M1-en is megerősítette (ápr.15)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592",
+  "Frissítés": "2026-04-15",
+  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Biztonságpolitika",
   "TiSZa ígéret": "Nem engednek be Európán kívüli vendégmunkásokat",
   "FiDeSZ állapot": "jelenleg engednek",
-  "Volt előrelépést jelentő bejelentés?": "igen – 2026. jún. 1-től tiltás bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – 2026. jún. 1-től jogszabályban tiltják; Kapitány István gazdasági miniszter megerősítette (máj.4)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
   "Prioritás": "rovid"
  },
  {
   "Kategória": "Biztonságpolitika",
   "TiSZa ígéret": "EU-s migrációs kvóták elutasítása",
   "FiDeSZ állapot": "Fidesz következetesen elutasítja 2015 óta; EUB-perben is veszített, 200M EUR bírság",
-  "Volt előrelépést jelentő bejelentés?": "igen – politika megerősítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – EU migrációs kvóták elutasítása fenntartva; migráció miatt kirótt büntetés felfüggesztése kérve (ápr.20)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592",
+  "Frissítés": "2026-04-30",
+  "Forrás link": "https://444.hu/2026/04/20/magyar-peter-bejelentett-7-minisztert-a-heten-jonnek-ujabb-nevek",
   "Prioritás": "rovid"
  },
  {
@@ -3566,7 +3486,7 @@ const excelData = [
   "FiDeSZ állapot": "szigorú börtönbüntetés (3-8 év), a valóságban sok ítélet felfüggesztett vagy alacsony",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-04-15",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "rovid"
  },
@@ -3574,30 +3494,30 @@ const excelData = [
   "Kategória": "Külpolitika",
   "TiSZa ígéret": "EU- és NATO-orientált külpolitika",
   "FiDeSZ állapot": "keleti orientáció volt",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter–Fico telefonon (ápr.24); EU-zászló visszakerül a Parlamentre; Donald Tusk türelmet kért az EU-tól",
+  "Volt előrelépést jelentő bejelentés?": "igen – Von der Leyennel és Costa EU tanácselnökkel tárgyalt (ápr.29); Orbán Anita külügyminiszter; EU-NATO orientált irány megerősítveet kért az EU-tól",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-24",
-  "Forrás link": "https://www.portfolio.hu/gazdasag/20260424/valasztas-2026-ujabb-fontos-bejelentesekre-keszul-magyar-peter-832588",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://index.hu/belfold/2026/04/29/magyar-peter-brusszel-orban-viktor-penzmosas-bank-nav-europai-unio/",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Külpolitika",
   "TiSZa ígéret": "V4-ek együttműködésének felélesztése",
   "FiDeSZ állapot": "meglazult 2022 után",
-  "Volt előrelépést jelentő bejelentés?": "igen – V4 megújítás ígérete a sajtótájékoztatón",
+  "Volt előrelépést jelentő bejelentés?": "igen – V4 megújítás ígérve; első miniszterelnöki út Varsóba (bejelentve); Magyar Péter–Fico telefon (ápr.24)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://www.portfolio.hu/global/20260413/uj-idoszamitas-kezdodik-a-magyar-kulpolitikaban-eroteljes-valtozast-hozhat-a-tisza-kormany-829592",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
   "Prioritás": "rovid"
  },
  {
   "Kategória": "Külpolitika",
   "TiSZa ígéret": "Ukrajna EU-csatlakozásáról népszavazás később",
   "FiDeSZ állapot": "Fidesz blokkolta Ukrajna EU-tárgyalásait, majd 2023-ban visszavonult; elvileg nem ellenzi, de vétóval fenyeget",
-  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve (háborúban álló ország most nem csatlakozhat)",
+  "Volt előrelépést jelentő bejelentés?": "igen – kettős állampolgárság és külhoni magyarok támogatása fenntartva; Orbán Anita külügyminiszter; háborúban álló ország most nem csatlakozhat; Zelenszkijnek üzente: Barátság kőolajvezetéket nyissa meg (ápr.20)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
-  "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-tisza-part-valasztas2026-orszaggyulesi-valasztasok-sajtotajekoztato/",
+  "Frissítés": "2026-04-20",
+  "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
   "Prioritás": "hosszu"
  },
  {
@@ -3606,7 +3526,7 @@ const excelData = [
   "FiDeSZ állapot": "Fidesz vezette be 2011-ben, 1,2M határon túli szavazó; Tisza megtartja",
   "Volt előrelépést jelentő bejelentés?": "igen – megerősítve",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://index.hu/belfold/2026/04/12/magyar-peter-tisza-part-valasztas-2026-portre-miniszterelnok-szavazas/",
   "Prioritás": "rovid"
  },
@@ -3616,7 +3536,7 @@ const excelData = [
   "FiDeSZ állapot": "volt hasonló program",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "rovid"
  },
@@ -3624,9 +3544,9 @@ const excelData = [
   "Kategória": "Egészségügy",
   "TiSZa ígéret": "Vidéki kórházak megtartása",
   "FiDeSZ állapot": "ÁEEK centralizálta 2012-ben, majd átszervezés 2022-ben; vidéki kórházak megmaradtak de alulfinanszírozottak",
-  "Volt előrelépést jelentő bejelentés?": "igen – Hegedűs Zsolt egészségügyi miniszternek jelölve (ápr.20); – vidéki kórházfejlesztés bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Hegedűs Zsolt egészségügyi miniszter; 38 vidéki kórház megtartva; regionális csúcskórházak fejlesztése uniós forrásból20); – vidéki kórházfejlesztés bejelentve",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-04-30",
   "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon",
   "Prioritás": "rovid"
  },
@@ -3634,9 +3554,9 @@ const excelData = [
   "Kategória": "Egészségügy",
   "TiSZa ígéret": "Régiónként egy szuperkórház fejlesztése",
   "FiDeSZ állapot": "Semmelweis-terv keretében részleges kórházfejlesztések indultak, de egységes szuperkórház-program nincs",
-  "Volt előrelépést jelentő bejelentés?": "igen – regionális kórházi központok ígérve",
+  "Volt előrelépést jelentő bejelentés?": "igen – regionális csúcskórházak ígérve; Hegedűs Zsolt egészségügyi miniszter felel a fejlesztésért",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon",
   "Prioritás": "rovid"
  },
@@ -3644,9 +3564,9 @@ const excelData = [
   "Kategória": "Egészségügy",
   "TiSZa ígéret": "Évi 500 milliárd Ft pluszforrás az egészségügynek",
   "FiDeSZ állapot": "alulfinanszírozott",
-  "Volt előrelépést jelentő bejelentés?": "igen – bejelentve az első intézkedések között",
+  "Volt előrelépést jelentő bejelentés?": "igen – 500 mrd/év pluszforrás ígérve; Hegedűs Zsolt egészségügyi miniszter; EU-forrásokból is fejlesztenek",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
   "Prioritás": "rovid"
  },
@@ -3656,7 +3576,7 @@ const excelData = [
   "FiDeSZ állapot": "hosszú várólisták",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "rovid"
  },
@@ -3666,7 +3586,7 @@ const excelData = [
   "FiDeSZ állapot": "76,5 év jelenleg",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "hosszu"
  },
@@ -3676,7 +3596,7 @@ const excelData = [
   "FiDeSZ állapot": "~4,5% GDP körül",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "hosszu"
  },
@@ -3684,9 +3604,9 @@ const excelData = [
   "Kategória": "Családpolitika",
   "TiSZa ígéret": "13. havi nyugdíj megtartása",
   "FiDeSZ állapot": "Fidesz visszaállította 2022-ben (2010-ben megszüntette Bajnai-kormány), megtartják",
-  "Volt előrelépést jelentő bejelentés?": "igen – megerősítve + 14. havi és SZÉP-kártya ígérve",
+  "Volt előrelépést jelentő bejelentés?": "igen – 13. havi nyugdíj megtartva; 14. havi és SZÉP-kártya ígérve; minimálnyugdíj 120 eFt-ra emelése bejelentve",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
   "Prioritás": "azonnali"
  },
@@ -3694,9 +3614,9 @@ const excelData = [
   "Kategória": "Családpolitika",
   "TiSZa ígéret": "Létminimum alatti nyugdíj megszüntetése",
   "FiDeSZ állapot": "800 ezer nyugdíjas él létminimum alatt",
-  "Volt előrelépést jelentő bejelentés?": "igen – minimálnyugdíj 120 ezer Ft-ra emelése bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – minimálnyugdíj 120 eFt-ra emelése bejelentve; otthonápolási díj 50%-os emelése is",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-04-20",
   "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
   "Prioritás": "rovid"
  },
@@ -3706,7 +3626,7 @@ const excelData = [
   "FiDeSZ állapot": "4+ gyermekes anyák 2020-tól SZJA-mentes; 3 gyermekes anyák 2025. okt. 1-től; egyedülállókra külön mentesség nincs",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-04-30",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "rovid"
  },
@@ -3714,9 +3634,9 @@ const excelData = [
   "Kategória": "Családpolitika",
   "TiSZa ígéret": "Családtámogatások bővítése",
   "FiDeSZ állapot": "meglévő rendszer",
-  "Volt előrelépést jelentő bejelentés?": "igen – duplázás bejelentve (csalpáti pótlék, gyes, gyet)",
+  "Volt előrelépést jelentő bejelentés?": "igen – családi pótlék, gyes, gyet duplázás bejelentve; Kátai-Németh Vilmos szociális miniszter felel",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
   "Prioritás": "rovid"
  },
@@ -3724,9 +3644,9 @@ const excelData = [
   "Kategória": "Családpolitika",
   "TiSZa ígéret": "Idősgondozás országos megerősítése",
   "FiDeSZ állapot": "otthonápolási díj létezik (2023-ban emelték), de szociális otthonokban 50 000 fős várólisták vannak",
-  "Volt előrelépést jelentő bejelentés?": "igen – otthonápolási díj 50%-os emelése bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – otthonápolási díj 50%-os emelése bejelentve; 20 000 új nyugdíjasotthoni férőhely tervben",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
   "Prioritás": "rovid"
  },
@@ -3736,7 +3656,7 @@ const excelData = [
   "FiDeSZ állapot": "évi 40-50 ezer fős fogyás",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "hosszu"
  },
@@ -3746,7 +3666,7 @@ const excelData = [
   "FiDeSZ állapot": "9,5 millió alatt",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "hosszu"
  },
@@ -3756,7 +3676,7 @@ const excelData = [
   "FiDeSZ állapot": "gyenge védelem",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "rovid"
  },
@@ -3764,9 +3684,9 @@ const excelData = [
   "Kategória": "Családpolitika",
   "TiSZa ígéret": "Gyermekek büntetőjogi védelmének bővítése",
   "FiDeSZ állapot": "visszaélések fedezve",
-  "Volt előrelépést jelentő bejelentés?": "igen – Brunszvik Teréz program + kártérítés áldozatoknak",
+  "Volt előrelépést jelentő bejelentés?": "igen – Brunszvik Teréz program; gyermekvédelem költségvetése felülről nyitott (ápr.20); bicskei eset kapcsán megerősítve",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
   "Prioritás": "azonnali"
  },
@@ -3774,19 +3694,19 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Uniós források felszabadítása",
   "FiDeSZ állapot": "8000 Mrd Ft befagyasztva",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter: máj.15-20 között Brüsszelbe megy aláírni a politikai megállapodást az EU-s forrásokról (ápr.20)",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter ápr.29-én Brüsszelben tárgyalt Von der Leyennel; politikai megállapodás aláírása a máj.25-i héten várható",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-20",
-  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Frissítés": "2026-04-29",
+  "Forrás link": "https://telex.hu/kulfold/2026/04/29/eu-magyar-peter-ursula-von-der-leyen-tamogatas-befagyasztas-jogallamisag",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Euró bevezetésének előkészítése",
   "FiDeSZ állapot": "aktívan ellenzi, Orbán: \"nem az unió menetrendje szerint\" – nincs csatlakozási terv",
-  "Volt előrelépést jelentő bejelentés?": "igen – komolyan gondolják az euró bevezetését",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter megerősítette: euró bevezetés 2030-ra; Maastrichti kritériumok maradéktalan teljesítése cél",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
   "Prioritás": "rovid"
  },
@@ -3794,9 +3714,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Új növekedési modell kialakítása",
   "FiDeSZ állapot": "stagnáló gazdaság 2022 óta",
-  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András (pénzügyminiszter) ápr.27-én bejelentette: forint erősödik, állampapírhozamok csökkennek; piac pozitívan reagált",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter; KKV-fókuszú Ganz Ábrahám program; uniós forrásokból gazdaságindítás; reális, tartható költségvetés cél: forint erősödik, állampapírhozamok csökkennek; piac pozitívan reagált",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-27",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
   "Prioritás": "rovid"
  },
@@ -3804,9 +3724,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Élelmiszeráfa csökkentése – zöldség és gyümölcs 5%",
   "FiDeSZ állapot": "27% áfa",
-  "Volt előrelépést jelentő bejelentés?": "igen – 27%-ról 5%-ra csökkentés megerősítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – zöldség, gyümölcs áfa 27%-ról 5%-ra; gyógyszerek 0% ÁFA bejelentve; Kármán András pénzügyminiszter",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
   "Prioritás": "rovid"
  },
@@ -3814,9 +3734,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Alapvető egészséges élelmiszerek áfájának csökkentése",
   "FiDeSZ állapot": "magas áfa",
-  "Volt előrelépést jelentő bejelentés?": "igen – gyógyszerek 0%, élelmiszerek 5% bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – gyógyszerek 0%, alapélelmiszerek 5% ÁFA bejelentve; Kármán András pénzügyminiszter",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-04-29",
   "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
   "Prioritás": "rovid"
  },
@@ -3826,7 +3746,7 @@ const excelData = [
   "FiDeSZ állapot": "állami földek 94%-a bérletben ment Fidesz-közeli személyekhez; fiatal gazdák program létezik, de politikailag torzított",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-04-20",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
   "Prioritás": "hosszu"
  },
@@ -3834,9 +3754,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Vállalkozásindítás egyszerűsítése",
   "FiDeSZ állapot": "bonyolult adminisztráció",
-  "Volt előrelépést jelentő bejelentés?": "igen – KKV-fókusz, Ganz program keretében",
+  "Volt előrelépést jelentő bejelentés?": "igen – Ganz Ábrahám gazdaságfejlesztési program; KKV adminisztráció csökkentése; Kapitány István gazdasági miniszter",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
   "Prioritás": "rovid"
  },
@@ -3844,9 +3764,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "KKV-adminisztráció csökkentése",
   "FiDeSZ állapot": "Eonline, e-Cégkapu bevezetések ellenére a KKV adminisztrációs teher EU-átlag felett; 2023 OECD-mérés alapján",
-  "Volt előrelépést jelentő bejelentés?": "igen – KKV-program bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – KKV-program bejelentve; Kapitány István gazdasági miniszter; multiknak fizetett támogatások felülvizsgálata",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-19",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
   "Prioritás": "rovid"
  },
@@ -3854,7 +3774,7 @@ const excelData = [
   "Kategória": "Egyéb",
   "TiSZa ígéret": "\"Magyarok Hangja\" nemzeti konzultáció elindítása",
   "FiDeSZ állapot": "nincs valódi konzultáció",
-  "Volt előrelépést jelentő bejelentés?": "igen – Nemzet Hangja konzultáció már zajlott",
+  "Volt előrelépést jelentő bejelentés?": "igen – Nemzet Hangja konzultáció zajlott; 106 alapszervezet kiépítése folytatódik",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-19",
   "Forrás link": "https://index.hu/belfold/2026/04/12/magyar-peter-tisza-part-valasztas-2026-portre-miniszterelnok-szavazas/",
@@ -3884,9 +3804,9 @@ const excelData = [
   "Kategória": "Egyéb",
   "TiSZa ígéret": "Gyermekvédelmi rendszer megerősítése",
   "FiDeSZ állapot": "visszaélések nem vizsgálva; bicskei ig. ma szabadult",
-  "Volt előrelépést jelentő bejelentés?": "igen – Kátai-Németh Vilmos szociális és családügyi miniszternek jelölve (ápr.24); első vak miniszter Mo. történetében",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kátai-Németh Vilmos szociális és családügyi miniszter (ápr.24); gyermekvédelem költségvetése felülről nyitott; elmúlt 20 év visszásságainak kivizsgálásanek jelölve (ápr.24); első vak miniszter Mo. történetében",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-24",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-kormany-miniszterek-bejelentes-oktatas-belugyminiszter/",
   "Prioritás": "azonnali"
  },
@@ -3894,7 +3814,7 @@ const excelData = [
   "Kategória": "Egyéb",
   "TiSZa ígéret": "106 alapszervezet kiépítése országosan",
   "FiDeSZ állapot": "nincs helyi jelenlét",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette a helyi jelenlét folytatását",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette a helyi jelenlét folytatását; 106 alapszervezet az országos hálózat alapjaát",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-19",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
@@ -3904,7 +3824,7 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Pedagógusbérek rendezése",
   "FiDeSZ állapot": "2023-24-ben lépcsős béremelés volt (+32% 3 lépcsőben), de uniós átlag ~60%-án maradtak",
-  "Volt előrelépést jelentő bejelentés?": "igen – Lannert Judit gyermek- és oktatásügyi miniszternek jelölve (ápr.24); tankötelezettség 18 évre megerősítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Lannert Judit oktatásügyi miniszter (ápr.24); pedagógusbérek rendezése prioritás; tankötelezettség 18 évre, szabad tankönyvválasztás megerősítvelölve (ápr.24); tankötelezettség 18 évre megerősítve",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
   "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-part-lannert-judit-gyermek-es-oktatasugyi-miniszter/",
@@ -3914,7 +3834,7 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Tanárhiány csökkentése",
   "FiDeSZ állapot": "súlyos tanárhiány",
-  "Volt előrelépést jelentő bejelentés?": "igen – ösztöndíjprogramok és béremelés bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – ösztöndíjprogramok és béremelés; Lannert Judit oktatásügyi miniszter felel",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-19",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
@@ -3924,7 +3844,7 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Modern tananyagfejlesztés",
   "FiDeSZ állapot": "elavult tananyag",
-  "Volt előrelépést jelentő bejelentés?": "igen – Klebelsberg Központ átalakítása bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Klebelsberg Központ átalakítása bejelentve; szabad tankönyvválasztás visszaadása (Lannert, ápr.24)",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-19",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
@@ -3934,7 +3854,7 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Iskolai autonómia növelése",
   "FiDeSZ állapot": "2012-ben Klebelsberg Központ vette át az iskolákat; igazgatók elveszítették döntéshozó jogköröket",
-  "Volt előrelépést jelentő bejelentés?": "igen – igazgatói jogosítványok visszaadása bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – igazgatói jogosítványok visszaadása; Lannert Judit oktatásügyi miniszter megerősítette",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-19",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
@@ -3944,7 +3864,7 @@ const excelData = [
   "Kategória": "Korrupcióellenes intézkedések",
   "TiSZa ígéret": "Közbeszerzési rendszer átalakítása",
   "FiDeSZ állapot": "átláthatatlan rendszer",
-  "Volt előrelépést jelentő bejelentés?": "igen – Vagyonvisszaszerzési Hivatal önálló szervként megerősítve, akár nyomozati jogkörrel (ápr.20)",
+  "Volt előrelépést jelentő bejelentés?": "igen – Vagyonvisszaszerzési Hivatal önálló szerv, nyomozati jogkörrel (ápr.20); közbeszerzési és vagyonnyilatkozati szabályok megújítása EU-s vállalásítve, akár nyomozati jogkörrel (ápr.20)",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-20",
   "Forrás link": "https://tudas.hu/amit-tudni-lehet-magyar-peter-szavaibol-mi-varhato-az-orszagban/",
@@ -3954,7 +3874,7 @@ const excelData = [
   "Kategória": "Korrupcióellenes intézkedések",
   "TiSZa ígéret": "Átláthatósági szabályok szigorítása",
   "FiDeSZ állapot": "gyenge átláthatóság",
-  "Volt előrelépést jelentő bejelentés?": "igen – EU feltételek vállalva, korrupcióellenes lépések",
+  "Volt előrelépést jelentő bejelentés?": "igen – EU feltételek vállalva (ápr.29 Brüsszel); Integritás Hatóság jogköre bővül; Biró Ferenc elnökkel EU biztos egyeztetett",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-19",
   "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
@@ -3964,10 +3884,10 @@ const excelData = [
   "Kategória": "Közigazgatás",
   "TiSZa ígéret": "Állami bürokrácia csökkentése",
   "FiDeSZ állapot": "terjedelmes bürokratikus rendszer",
-  "Volt előrelépést jelentő bejelentés?": "igen – 16 minisztériumos struktúra bejelentve (ápr.20), minden szakterületnek saját tárca",
+  "Volt előrelépést jelentő bejelentés?": "igen – 16 minisztériumos struktúra bejelentve (ápr.20); teljes 16 fős kabinet kész (Pósfai belügy, Melléthei-Barna igazságügy, ápr.30)en szakterületnek saját tárca",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-20",
-  "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
+  "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
   "Prioritás": "rovid"
  },
  {
@@ -3984,17 +3904,17 @@ const excelData = [
   "Kategória": "Energia és környezet",
   "TiSZa ígéret": "Energiafüggetlenség növelése",
   "FiDeSZ állapot": "orosz energiafüggőség",
-  "Volt előrelépést jelentő bejelentés?": "igen – Barátság kőolajvezeték újraindul ápr. végén; Mol-lal megállapodás védett benzinárról",
+  "Volt előrelépést jelentő bejelentés?": "igen – Barátság kőolajvezeték újraindult; Hernádi Zsolt Oroszországba utazik tárgyalni; Adria vezetéken is érkezik olaj; Kapitány István energetikai miniszter megállapodás védett benzinárról",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-21",
-  "Forrás link": "https://index.hu/belfold/2026/04/15/magyar-peter-tisza-part-m1-kozmedia-mtva-valasztas2026-orszaggyulesi-valasztasok/",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://mti.hu/hirek/2026/04/17/valasztas-2026-magyar-peter-nagy-orszagos-rendezveny-lesz-az-uj-kormany",
   "Prioritás": "rovid"
  },
  {
   "Kategória": "Energia és környezet",
   "TiSZa ígéret": "Megújulók arányának emelése",
   "FiDeSZ állapot": "2023-ra 17% megújuló, napelemek robbanásszerű elterjedése; de szél- és vízenergia-stop van",
-  "Volt előrelépést jelentő bejelentés?": "igen – energiahatékonysági programok ígérve",
+  "Volt előrelépést jelentő bejelentés?": "igen – ezermilliárd Ft-os energiahatékonysági program ígérve; 100 000 lakás/év korszerűsítés tervben; Kapitány István energetikai miniszter",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-19",
   "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon",
@@ -4004,9 +3924,9 @@ const excelData = [
   "Kategória": "Energia és környezet",
   "TiSZa ígéret": "Környezetvédelmi szabályok szigorítása",
   "FiDeSZ állapot": "akkugyárak kontroll nélkül",
-  "Volt előrelépést jelentő bejelentés?": "igen – akkugyárak felülvizsgálata bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – akkugyárak szigorúbb környezeti ellenőrzése bejelentve; CATL képviselőkkel konstruktív egyeztetés (Tárkányi, Kapitány, máj.4)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-02-07",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
   "Prioritás": "hosszu"
  },
@@ -4024,19 +3944,19 @@ const excelData = [
   "Kategória": "Közlekedés",
   "TiSZa ígéret": "Vasúti modernizáció",
   "FiDeSZ állapot": "vonatok átlagkora 40-50 év",
-  "Volt előrelépést jelentő bejelentés?": "igen – Vitézy Dávid közlekedési és beruházási miniszternek jelölve (ápr.24)",
+  "Volt előrelépést jelentő bejelentés?": "igen – Vitézy Dávid közlekedési és beruházási miniszter (ápr.24); Budapest-Varsó gyorsvasút ígérve; HÉV fejlesztés is prioritáselölve (ápr.24)",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
-  "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-kormany-miniszterek-bejelentes-oktatas-belugyminiszter/",
+  "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
   "Prioritás": "hosszu"
  },
  {
   "Kategória": "Lakhatás",
   "TiSZa ígéret": "Bérlakásprogram előkészítése",
   "FiDeSZ állapot": "az önkormányzati bérlakásállomány 90%-ot csökkent 1990 óta; CSOK lakástámogatás létezik, de bérlakásprogram nincs",
-  "Volt előrelépést jelentő bejelentés?": "igen – bérlakásprogram bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – bérlakásprogram bejelentve; 10 000 szociális bérlakás tervben; uniós forrásokból is finanszíroznák",
   "Változás": "bejelentve",
-  "Frissítés": "2026-02-07",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
   "Prioritás": "rovid"
  },
@@ -4044,9 +3964,9 @@ const excelData = [
   "Kategória": "Közigazgatás",
   "TiSZa ígéret": "Vármegye elnevezés és főispáni pozíció megszüntetése",
   "FiDeSZ állapot": "2022-ben visszaállított vármegyék és főispánok",
-  "Volt előrelépést jelentő bejelentés?": "igen – bejelentve az első intézkedések között",
+  "Volt előrelépést jelentő bejelentés?": "igen – vármegye elnevezés és főispáni pozíció megszüntetése az első intézkedések között bejelentve (ápr.21)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://index.hu/belfold/2026/02/09/magyar-peter-tisza-part-valasztasi-program-igazsagszolgaltatas-birosag-ugyeszseg-vegrehajtas-kozjegyzo/",
   "Prioritás": "azonnali"
  },
@@ -4056,7 +3976,7 @@ const excelData = [
   "FiDeSZ állapot": "2010 után centralizált önkormányzati rendszer",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-04-29",
   "Forrás link": "https://infostart.hu/belfold/2026/02/07/a-tisza-part-bemutatta-240-oldalas-programjat",
   "Prioritás": "rovid"
  },
@@ -4066,7 +3986,7 @@ const excelData = [
   "FiDeSZ állapot": "konfliktus a főváros és a kormány között",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-04-29",
   "Forrás link": "https://infostart.hu/belfold/2026/02/07/a-tisza-part-bemutatta-240-oldalas-programjat",
   "Prioritás": "rovid"
  },
@@ -4074,7 +3994,7 @@ const excelData = [
   "Kategória": "Közigazgatás",
   "TiSZa ígéret": "Miniszterelnöki fizetés csökkentése 2,5 millió forintra",
   "FiDeSZ állapot": "miniszterelnöki fizetés magasabb (pontos adat nem publikus)",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter bejelentette a 2,5 milliós bért",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter 2,5 millió Ft/hó miniszterelnöki fizetést bejelentett; többi miniszter fizetése arányos",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-20",
   "Forrás link": "https://index.hu/belfold/2026/04/20/magyar-peter-tisza-part-kormany-miniszterek-miniszteriumok-orban-anita-karman-andras-kapitany-istvan-tisza-kormany-2026/",
@@ -4084,9 +4004,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Vagyonadó – évi 1% az 1 milliárd Ft feletti vagyonokra",
   "FiDeSZ állapot": "nincs vagyonadó",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette: vagyonadó biztosan lesz",
+  "Volt előrelépést jelentő bejelentés?": "igen – vagyonadó biztosan jön (ápr.21); 1 Mrd Ft felett évi 1%; részletek a büdzsé ismeretében; Kármán András pénzügyminiszter",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260420/magyar-peter-bejelentette-a-tisza-kormany-elso-minisztereit-831698",
   "Prioritás": "rovid"
  },
@@ -4094,9 +4014,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Rezsicsökkentés megtartása és kiterjesztése vállalkozásokra",
   "FiDeSZ állapot": "csak lakossági rezsivédelem",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter: védett ár és jövedéki adó meghosszabbítása ápr.30-ig",
+  "Volt előrelépést jelentő bejelentés?": "igen – védett ár és jövedéki adócsökkentés meghosszabbítása kérve máj.végéig; tűzifára és rendszerhasználati díjra is kiterjesztés ígérve (M1 ápr.15)ása ápr.30-ig",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://index.hu/belfold/2026/04/17/orszaggyules-parlament-valasztas2026-fidesz-kdnp-tisza-part-mi-hazank-mozgalom-magyar-peter/",
   "Prioritás": "azonnali"
  },
@@ -4106,7 +4026,7 @@ const excelData = [
   "FiDeSZ állapot": "orosz–magyar szerződés, 12,5 Mrd EUR hitel",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-04-24",
   "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
   "Prioritás": "rovid"
  },
@@ -4114,9 +4034,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Iskolakezdési támogatás – 100 000 Ft rászoruló családoknak",
   "FiDeSZ állapot": "nincs ilyen célzott támogatás",
-  "Volt előrelépést jelentő bejelentés?": "igen – 2026 augusztustól bejelentve",
+  "Volt előrelépést jelentő bejelentés?": "igen – 2026 augusztustól 100 eFt minden rászoruló családnak; Magyar Péter (ápr.27) és Tisza program is tartalmazza",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-05-04",
   "Forrás link": "https://magyartisza.hu/",
   "Prioritás": "rovid"
  },
@@ -4124,7 +4044,7 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Állami tankönyvmonopólium megszüntetése",
   "FiDeSZ állapot": "kizárólagos állami tankönyv 2013 óta",
-  "Volt előrelépést jelentő bejelentés?": "igen – Lannert Judit megerősítette: szabad tankönyvválasztás visszaáll (ápr.24)",
+  "Volt előrelépést jelentő bejelentés?": "igen – Lannert Judit: szabad tankönyvválasztás visszaadva (ápr.24); állami monopol megszűnik visszaáll (ápr.24)",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
   "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-part-lannert-judit-gyermek-es-oktatasugyi-miniszter/",
@@ -4134,7 +4054,7 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Tankötelezettség visszaemelése 18 évre",
   "FiDeSZ állapot": "2012 óta 16 év",
-  "Volt előrelépést jelentő bejelentés?": "igen – Lannert Judit oktatási miniszter megerősítette (ápr.24)",
+  "Volt előrelépést jelentő bejelentés?": "igen – Lannert Judit oktatásügyi miniszter megerősítette (ápr.24); tankötelezettség visszaemelése 18 évre4)",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
   "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-part-lannert-judit-gyermek-es-oktatasugyi-miniszter/",
@@ -4146,7 +4066,7 @@ const excelData = [
   "FiDeSZ állapot": "11 egyetem alapítványi formában 2021-től",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-04-30",
   "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
   "Prioritás": "rovid"
  },
@@ -4156,7 +4076,7 @@ const excelData = [
   "FiDeSZ állapot": "lassú és bürokratikus felújítási program",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-04-20",
   "Forrás link": "https://magyartisza.hu/hirek/ujsag/bemutatta-mukodo-es-emberseges-magyarorszag-programjat-a-tisza",
   "Prioritás": "hosszu"
  },
@@ -4166,7 +4086,7 @@ const excelData = [
   "FiDeSZ állapot": "Samsung SDI, CATL engedélyezés gyorsan ment",
   "Volt előrelépést jelentő bejelentés?": "nem",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-21",
+  "Frissítés": "2026-04-20",
   "Forrás link": "https://avaloper.hu/tisza-part-valasztasi-programja-2026/",
   "Prioritás": "rovid"
  },
@@ -4184,7 +4104,7 @@ const excelData = [
   "Kategória": "Közlekedés",
   "TiSZa ígéret": "HÉV-infrastruktúra fejlesztése",
   "FiDeSZ állapot": "elavult HÉV-vonalak",
-  "Volt előrelépést jelentő bejelentés?": "igen – Vitézy Dávid közlekedési miniszternek jelölve (ápr.24)",
+  "Volt előrelépést jelentő bejelentés?": "igen – Vitézy Dávid közlekedési és beruházási miniszter (ápr.24); HÉV infrastruktúra fejlesztése prioritás)",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
   "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-kormany-miniszterek-bejelentes-oktatas-belugyminiszter/",
@@ -4204,10 +4124,10 @@ const excelData = [
   "Kategória": "Korrupcióellenes intézkedések",
   "TiSZa ígéret": "20 évre visszamenőleg vagyonosodási vizsgálat politikusokon",
   "FiDeSZ állapot": "nincs átfogó vagyonosodási vizsgálat",
-  "Volt előrelépést jelentő bejelentés?": "igen – Vagyonvisszaszerzési Hivatal nyomozati jogkörrel megerősítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Vagyonvisszaszerzési Hivatal nyomozati jogkörrel (ápr.20-21); 20 évre visszamenőleg; Melléthei-Barna igazságügyi miniszter felelrősítve",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-21",
-  "Forrás link": "https://444.hu/2026/04/20/magyar-peter-bejelentett-7-minisztert-a-heten-jonnek-ujabb-nevek",
+  "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
   "Prioritás": "azonnali"
  },
  {
@@ -4234,7 +4154,7 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Euró bevezetés 2030-ra – Maastrichti kritériumok teljesítése",
   "FiDeSZ állapot": "Orbán-kormány elutasította az euró bevezetését",
-  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András megerősítette: euró bevezetés előkészítése az első prioritások között",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter: euró bevezetés 2030-ra; Maastrichti kritériumok teljesítése cél; 3% alatti hiány vállaltése az első prioritások között",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
   "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-elso-100-nap-ugynokaktak-ugyeszseg-kozmedia-kormany-tisza-part/",
@@ -4244,7 +4164,7 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Vendégmunkás-stop 2026. június 1-től",
   "FiDeSZ állapot": "tömeges vendégmunkás-foglalkoztatás engedélyezett",
-  "Volt előrelépést jelentő bejelentés?": "igen – bejelentve: 2026. június 1-től jogszabályban tiltják a harmadik országbeli vendégmunkások tömeges foglalkoztatását",
+  "Volt előrelépést jelentő bejelentés?": "igen – 2026. jún.1-től jogszabályban tiltják; Kapitány István gazdasági miniszter megerősítette (máj.4) a harmadik országbeli vendégmunkások tömeges foglalkoztatását",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
@@ -4254,17 +4174,17 @@ const excelData = [
   "Kategória": "Igazságszolgáltatás",
   "TiSZa ígéret": "Ügynökakták teljes megnyitása",
   "FiDeSZ állapot": "részlegesen elérhető akták, sok zárt",
-  "Volt előrelépést jelentő bejelentés?": "igen – az első 100 napos tervben szerepel az ügynökakták nyilvánosságra hozatala",
+  "Volt előrelépést jelentő bejelentés?": "igen – ügynökakták megnyitása a 100 napos tervben; kegyelmi ügy aktája is nyilvánossá válik (ápr.20); Melléthei-Barna igazságügyi miniszterlvánosságra hozatala",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
-  "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-elso-100-nap-ugynokaktak-ugyeszseg-kozmedia-kormany-tisza-part/",
+  "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Költségvetési hiány 3% alá szorítása 2030-ra",
   "FiDeSZ állapot": "2025-ben a hiány jóval 3% felett volt",
-  "Volt előrelépést jelentő bejelentés?": "igen – TISZA megerősítette: Maastrichti kritériumok maradéktalan teljesítése 2030-ig",
+  "Volt előrelépést jelentő bejelentés?": "igen – Maastrichti kritériumok maradéktalan teljesítése vállalva; 3% alatti hiány cél; Kármán András pénzügyminiszter; reális költségvetés készülalan teljesítése 2030-ig",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
   "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-elso-100-nap-ugynokaktak-ugyeszseg-kozmedia-kormany-tisza-part/",
@@ -4274,7 +4194,7 @@ const excelData = [
   "Kategória": "Szociálpolitika",
   "TiSZa ígéret": "Otthonápolási díj 50%-os emelése",
   "FiDeSZ állapot": "alacsony otthonápolási díj",
-  "Volt előrelépést jelentő bejelentés?": "igen – kampányígéret, megerősítve a 100 napos tervben",
+  "Volt előrelépést jelentő bejelentés?": "igen – otthonápolási díj 50%-os emelése megerősítve; Kátai-Németh Vilmos szociális miniszter felel",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-24",
   "Forrás link": "https://www.szon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
@@ -4314,9 +4234,9 @@ const excelData = [
   "Kategória": "Szociálpolitika",
   "TiSZa ígéret": "Iskolakezdési támogatás minden rászoruló családnak (100.000 Ft/gyerek)",
   "FiDeSZ állapot": "Évek óta nem volt iskolakezdési támogatás",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter bejelentette: 2026 augusztusától minden rászoruló család 100.000 Ft iskolakezdési támogatást kap (Balatonfüred, frakcióülés)",
+  "Volt előrelépést jelentő bejelentés?": "igen – 2026 augusztusától minden rászoruló család kap 100 eFt-ot (ápr.27 megerősítve); Kátai-Németh szociális miniszter rászoruló család 100.000 Ft iskolakezdési támogatást kap (Balatonfüred, frakcióülés)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-27",
+  "Frissítés": "2026-04-30",
   "Forrás link": "https://magyartisza.hu/",
   "Prioritás": "rovid"
  },
@@ -4324,27 +4244,27 @@ const excelData = [
   "Kategória": "Igazságszolgáltatás",
   "TiSZa ígéret": "Csatlakozás az Európai Ügyészséghez (EPPO)",
   "FiDeSZ állapot": "Magyarország kimaradt az EPPO-ból",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter megerősítette ápr.26-án: azonnali csatlakozás, az első 100 napos program része; a befagyasztott EU-pénzek felszabadításának feltétele",
+  "Volt előrelépést jelentő bejelentés?": "igen – azonnali csatlakozás megerősítve (ápr.26, ápr.29 Brüsszelben EU-s feltételként vállalva); Melléthei-Barna igazságügyi miniszter felel a jogszabályi keretértkozás, az első 100 napos program része; a befagyasztott EU-pénzek felszabadításának feltétele",
   "Változás": "bejelentve",
-  "Frissítés": "2026-04-27",
-  "Forrás link": "https://www.economx.hu/belfold/2026/04/26/magyar-peter-elszant-de-meg-honapokba-telhet-mire-teljesulhet-vallalas-europai-ugyeszseg/",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://index.hu/belfold/2026/04/29/magyar-peter-brusszel-orban-viktor-penzmosas-bank-nav-europai-unio/",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Miniszterelnöki mandátum 2 ciklusra (max 8 év) korlátozása",
   "FiDeSZ állapot": "Orbán Viktor 5 cikluson át (1998-2002, 2010-2026)",
-  "Volt előrelépést jelentő bejelentés?": "igen – TISZA programban szerepel; az alkotmányozási csomag része",
+  "Volt előrelépést jelentő bejelentés?": "igen – Alaptörvény módosítás: mandátumkorlátozás az első intézkedések között; Melléthei-Barna igazságügyi miniszter koordinálésze",
   "Változás": "ígéret",
-  "Frissítés": "2026-04-27",
-  "Forrás link": "https://www.economx.hu/belfold/2026/04/24/tisza-part-magyar-peter-igeretek-reformok-kormany-parlament-elszamoltatas/",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
   "Prioritás": "rovid"
  },
  {
   "Kategória": "Egészségügy",
   "TiSZa ígéret": "Vényköteles gyógyszerek áfája 0%-ra",
   "FiDeSZ állapot": "27% áfa a gyógyszerekre",
-  "Volt előrelépést jelentő bejelentés?": "igen – TISZA választási programban rögzítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – gyógyszerek 0% ÁFA a Tisza programban; Kármán András pénzügyminiszter megerősítette",
   "Változás": "ígéret",
   "Frissítés": "2026-04-27",
   "Forrás link": "https://telex.hu/gazdasag/2026/04/13/tisza-kormany-gazdasagpolitika-adozas-koltsegvetes",
@@ -4354,7 +4274,7 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Vagyonadó 1 milliárd Ft feletti magánvagyonra (1%)",
   "FiDeSZ állapot": "Nincs vagyonadó",
-  "Volt előrelépést jelentő bejelentés?": "igen – TISZA választási programban; pl. Mészáros Lőrinc esetén ~17,5 mrd Ft/év",
+  "Volt előrelépést jelentő bejelentés?": "igen – vagyonadó biztosan jön (ápr.21); 1 Mrd Ft felett évi 1%; Mészáros Lőrinc eset is szóba kerül; Kármán András pénzügyminiszterén ~17,5 mrd Ft/év",
   "Változás": "bejelentve",
   "Frissítés": "2026-04-27",
   "Forrás link": "https://telex.hu/gazdasag/2026/04/13/tisza-kormany-gazdasagpolitika-adozas-koltsegvetes",
@@ -4418,6 +4338,31 @@ function buildCalcShareUrl() {
 // ── Rendezés logika ──
 let currentSort = 'default';
 
+
+// Teljesített placeholder ha nincs egyetlen kész tégla sem
+function renderDonePlaceholder() {
+  const container = document.getElementById('categorySections');
+  container.innerHTML = '';
+  const ma = new Date();
+  const maj9 = new Date('2026-05-09');
+  let subText;
+  if (ma < maj9) {
+    const napok = Math.ceil((maj9 - ma) / 86400000);
+    subText = `A kormány még nem alakult meg.<br><strong>${napok} nap múlva</strong>, május 9-én kezdődik az ígéretek teljesítése – figyeld itt!`;
+  } else {
+    const eltelt = Math.floor((ma - maj9) / 86400000);
+    subText = `A kormány <strong>${eltelt} napja</strong> működik.<br>Az első teljesítések várhatók – figyeld itt!`;
+  }
+  container.innerHTML = `
+    <div class="done-placeholder">
+      <div class="done-placeholder-brick">🧱</div>
+      <div class="done-placeholder-count">0</div>
+      <div class="done-placeholder-title">Még nincs teljesített ígéret</div>
+      <div class="done-placeholder-sub">${subText}</div>
+    </div>
+  `;
+}
+
 function getSortedData(data, sort) {
   const clone = [...data];
   const statusOrder = { 'kész':0,'teljesítve':0,'bejelentve':1,'folyamatban':1,'ígéret':2 };
@@ -4444,20 +4389,20 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
     document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentSort = btn.dataset.sort;
+    // Ha "done" rendezés és nincs egyetlen teljesített tégla sem → placeholder
+    if (currentSort === 'done') {
+      const doneCount = excelData.filter(r => r['Változás'] === 'kész' || r['Változás'] === 'teljesítve').length;
+      if (doneCount === 0) {
+        renderDonePlaceholder();
+        return;
+      }
+    }
     const sorted = getSortedData(excelData, currentSort);
     // Apply current search filter too
     const searchVal = document.getElementById('sidebarSearch')?.value || '';
     renderDashboard(sorted);
     if (searchVal) {
       document.getElementById('sidebarSearch').dispatchEvent(new Event('input'));
-    }
-    
-    // RESET le nyíl lépkedés index (hogy első ígéretre ugorjon!)
-    if (typeof currentCardIndex !== 'undefined') {
-      currentCardIndex = -1;
-    }
-    if (typeof scrollDownClickCount !== 'undefined') {
-      scrollDownClickCount = 3; // Következő kattintás = első ígéret
     }
   });
 });

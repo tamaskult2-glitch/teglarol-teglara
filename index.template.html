@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
- <meta charset="UTF-8">
+ <meta charset="UTFigen – Ganz Ábrahám gazdaságfejlesztési terv: KKV-fókusz, exportfejlesztés, energiahatékonyság; Kapitány István gazdasági miniszter koordinál8">
  <title>Tégláról-téglára | teglarol-teglara.hu</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="Független nyomonkövetés: Magyar Péter és a TISZA Párt ígéreteinek teljesülése tégláról-téglára.">
@@ -249,13 +249,66 @@ body.dark #stickyCatHeader {
   #stickyCatHeader { left:var(--sidebar-width); }
 }
 
+
+/* Teljesített-0 placeholder */
+.done-placeholder {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:56px 24px; text-align:center;
+  background:var(--bg-card); border-radius:20px;
+  border:2px dashed var(--border-subtle);
+  margin:24px 0;
+  opacity:0.7;
+}
+.done-placeholder-icon {
+  font-size:56px; margin-bottom:16px;
+  filter:grayscale(1);
+  text-decoration:line-through;
+  position:relative;
+}
+.done-placeholder-icon::after {
+  content:'';
+  position:absolute; left:-8px; right:-8px; top:50%;
+  height:4px; background:var(--text-secondary); border-radius:2px;
+  transform:rotate(-8deg);
+  opacity:0.5;
+}
+.done-placeholder-title {
+  font-size:20px; font-weight:800; color:var(--text-main);
+  margin-bottom:8px;
+  text-decoration:line-through;
+  text-decoration-color:var(--text-secondary);
+  text-decoration-thickness:2px;
+}
+.done-placeholder-sub {
+  font-size:14px; color:var(--text-secondary); line-height:1.6; max-width:320px;
+}
+.done-placeholder-brick {
+  font-size:52px; margin-bottom:8px;
+  filter:grayscale(1) opacity(0.5);
+  position:relative; display:inline-block;
+}
+.done-placeholder-brick::after {
+  content:'';
+  position:absolute; left:-6px; right:-6px; top:50%;
+  height:3px; background:var(--text-secondary); border-radius:2px;
+  transform:rotate(-6deg); opacity:0.6;
+}
+.done-placeholder-count {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:52px; height:52px; border-radius:50%;
+  background:var(--border-subtle);
+  font-size:26px; font-weight:900; color:var(--text-secondary);
+  margin-bottom:14px;
+}
+
 .fresh-badge {
-  position:absolute; top:10px; right:10px;
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
   padding:3px 9px; border-radius:999px; font-size:11px; font-weight:800;
   background:#e8405a; color:#fff;
   animation:pulse 2s infinite;
   z-index:2;
   box-shadow:0 2px 6px rgba(232,64,90,0.4);
+  white-space:nowrap;
 }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 .card { background:var(--bg-card); padding:22px; border-radius:14px; margin-bottom:16px; box-shadow:var(--shadow-soft); border:1px solid var(--border-subtle); transition:background 0.3s,transform 0.18s,box-shadow 0.18s; word-break:break-word; overflow-wrap:break-word; max-width:100%; box-sizing:border-box; overflow:hidden; display:block; position:relative; }
@@ -380,22 +433,20 @@ body.dark .version-badge .ver-divider { background:rgba(255,255,255,0.2); }
 
 /* ---- SCROLL TO TOP ---- */
 .scroll-to-top { position:fixed; bottom:28px; right:16px; z-index:150; width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#e8405a,#c0183a); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(192,24,58,0.45); opacity:0; transform:translateY(16px) scale(0.8); transition:opacity 0.25s,transform 0.25s; pointer-events:none; }
+
+/* Kategóriánként visszaugró gomb (scroll-to-top felett) */
+.scroll-prev-cat { position:fixed; bottom:84px; right:16px; z-index:150; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); border:1.5px solid rgba(232,64,90,0.3); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.12); opacity:0; transform:translateY(16px) scale(0.8); transition:opacity 0.25s,transform 0.25s; pointer-events:none; }
+.scroll-prev-cat.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+.scroll-prev-cat:hover { background:#fff; box-shadow:0 8px 24px rgba(0,0,0,0.18); transform:translateY(-2px) scale(1.06); }
+.scroll-prev-cat svg { width:20px; height:20px; stroke:#e8405a; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+body.dark .scroll-prev-cat { background:rgba(36,40,59,0.95); border-color:rgba(232,64,90,0.4); }
+body.dark .scroll-prev-cat svg { stroke:#F7768E; }
+@media(max-width:600px) { .scroll-prev-cat { bottom:76px; right:16px; width:42px; height:42px; } }
 .scroll-to-top.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
 .scroll-to-top:hover { box-shadow:0 8px 24px rgba(192,24,58,0.6); transform:translateY(-2px) scale(1.06); }
 .scroll-to-top svg { width:20px; height:20px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
-.scroll-next { position:fixed; bottom:96px; right:16px; z-index:150; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); border:1.5px solid rgba(232,64,90,0.3); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.12); opacity:0; transform:translateY(16px) scale(0.8); transition:opacity 0.25s,transform 0.25s; pointer-events:none; }
-.scroll-next.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
-.scroll-next:hover { background:#fff; box-shadow:0 8px 24px rgba(0,0,0,0.18); transform:translateY(-2px) scale(1.06); }
-.scroll-next svg { width:20px; height:20px; stroke:#e8405a; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
-body.dark .scroll-next { background:rgba(36,40,59,0.95); border-color:rgba(232,64,90,0.4); }
-body.dark .scroll-next svg { stroke:#F7768E; }
-
-.skip-down-btn { position:fixed; bottom:86px; right:28px; z-index:150; width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); border:1px solid rgba(0,0,0,0.1); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 12px rgba(0,0,0,0.12); opacity:0; transform:translateY(16px) scale(0.8); transition:opacity 0.25s,transform 0.25s; pointer-events:none; }
-.skip-down-btn.visible { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
-.skip-down-btn:hover { box-shadow:0 4px 18px rgba(0,0,0,0.18); transform:translateY(-2px) scale(1.06); }
-.skip-down-btn svg { width:20px; height:20px; stroke:#e8405a; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
-body.dark .skip-down-btn { background:rgba(36,40,59,0.9); border-color:rgba(192,202,245,0.2); }
-
+body.dark body.dark 
+body.dark 
 /* ---- KT LOGO ---- */
 .kt-logo { display:none !important; } .kt-logo-DISABLED { position:fixed; top:15px; right:68px; z-index:100; display:flex; flex-direction:row; align-items:center; gap:5px; background:rgba(255,255,255,0.6); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.5); border-radius:999px; padding:7px 12px 7px 7px; color:#555; box-shadow:0 2px 10px rgba(0,0,0,0.08); pointer-events:none; transition:opacity 0.25s; }
 body.dark .kt-logo { display:none !important; } .kt-logo-DISABLED { background:rgba(36,40,59,0.8); color:#aaa; border-color:rgba(192,202,245,0.15); box-shadow:0 2px 10px rgba(0,0,0,0.4); }
@@ -802,11 +853,9 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
   .card-split { flex-direction:column; }
   .card-split .card-viz { flex:1; border-left:none; border-top:1px solid var(--border-subtle); padding-left:0; padding-top:16px; margin-top:10px; }
   .scroll-to-top { bottom:24px; right:16px; width:42px; height:42px; }
-  .scroll-next { bottom:76px; right:16px; width:42px; height:42px; }
-  .tisza-program-btn { display:none !important; }
+    .tisza-program-btn { display:none !important; }
   .kt-hide-mobile { display:none !important; }
-  .skip-down-btn { bottom:138px; }
-  .calc-result-grid { grid-template-columns:1fr; }
+    .calc-result-grid { grid-template-columns:1fr; }
 
   /* Mobilon kompaktabb elrendezés, logo érintetlen */
   .modern-header { padding:52px 16px 44px; }
@@ -1091,16 +1140,13 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 
 
 
-<button class="scroll-to-top" id="scrollToTop" aria-label="Ugrás az oldal tetejére">
+<!-- KATEGÓRIA VISSZA GOMB - scrollToTop felett -->
+<button class="scroll-prev-cat" id="scrollPrevCat" aria-label="Előző kategória tetejére" title="Előző kategória">
   <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
-<button class="scroll-next" id="scrollNext" aria-label="Következő csempe sor">
-  <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-</button>
-
-<button class="skip-down-btn" id="skipDownBtn" aria-label="Következő sor">
-  <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+<button class="scroll-to-top" id="scrollToTop" aria-label="Ugrás az oldal tetejére">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
 <!-- KERESŐ GOMB -->
@@ -1118,13 +1164,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   <div class="bug-sonar bug-sonar-2"></div>
   
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;position:relative;z-index:2;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-</button>
-
-<!-- LE NYÍL GOMB - Jobb oldalon, bug gomb alatt -->
-<button class="dark-icon-btn" id="scrollDownBtn" aria-label="Görgetés lefelé" style="top:118px;" title="Tovább lefelé">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;">
-    <polyline points="6 9 12 15 18 9"/>
-  </svg>
 </button>
 
 <!-- Tooltip (külön elem) -->
@@ -1485,7 +1524,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-04-20">
+   <div class="milestone" data-date="2026-04-30">
     <div class="milestone-dot" style="background:#FF9933;border:2px solid #CE2939;"></div>
     <div class="milestone-content">
      <div class="milestone-date" style="font-weight:700;color:var(--text-main);">2026. ápr. 20. — Hétfő</div>
@@ -1493,15 +1532,15 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-04-21">
+   <div class="milestone" data-date="2026-05-04">
     <div class="milestone-dot" style="background:#FF9933;"></div>
     <div class="milestone-content">
      <div class="milestone-date">2026. ápr. 21. — Kedd</div>
-     <div class="milestone-desc">🏛️ TISZA–Fidesz–MiHazánk alakuló ülés-előkészítő tárgyalások · Konstruktív hangnem, konszenzus a Szent Korona-eskü kérdésében</div>
+     <div class="milestone-desc">🏛️ TISZA–Fidesz–MiHazánk alakuló ülés-előkészítő tárgyalások · Konstruktív hangnem – rugalmas nyugdíjba vonulás tervben; konkrét jogszabályi lépés még nem bejelentett – 20 000 új nyugdíjasotthoni férőhely a tervben; konkrét lépés még nem bejelentett – digitális ügyintézés fejlesztése tervben; Digitális Minisztérium felállítása folyamatban – Digitális és Technológiai Minisztérium felállítása tervben; konkrét AI program még nem bejelentett – bérlakásprogram bejelentve; 10 000 szociális bérlakás tervben; konkrét kivitelezési lépés még nem – Vitézy Dávid közlekedési miniszter; Ferihegy fejlesztéséről konkrét lépés még nem bejelentett – akkugyárak felülvizsgálata és szigorúbb ellenőrzése bejelentve; CATL tárgyalás máj.4; konkrét szabályozás még nem – ezermilliárd Ft-os energiahatékonysági program ígérve; évi 100 000 lakás cél a programban de konkrét lépés még nem – az akadémiai szabadság visszaadása EU-s vállalás; visszaállamosítás konkrét lépése még nem bejelentett – felülvizsgálat bejelentve; részletek még nem ismertek; Kapitány István energetikai miniszter foglalkozik – Karácsony Gergely főpolgármesterrel kooperatív viszony; konkrét Budapest-törvény még nem bejelentett – Melléthei-Barna igazságügyi miniszter; konkrét hatáskör-visszaadási törvény még nem bejelentett – Vitézy Dávid közlekedési miniszter; konkrét vidéki fejlesztési terv még nem bejelentett – Digitális és Technológiai Minisztérium felállítása tervben; konkrét lépések még nem bejelentve – konkrét bejelentés még nem történt – Tisza program tartalmazza; konkrét lépés még nem bejelentett – oligarchák földterületeinek visszaszerzése tervben (Vagyonvisszaszerzési Hivatal); konkrét agrártámogatási lépés még nem bejelentett – konkrét törvényjavaslat még nem bejelentett – hosszú távú cél 2050-re – hosszú távú cél; azonnali demográfiai lépések a családtámogatásokon keresztül – konkrét lépés még nem bejelentett – hosszú távú cél; azonnali ütemezés nem ismert – hosszú távú cél; azonnali lépések nem bejelentettek – konkrét lépés még nem bejelentett; szűrőprogramok és várólisták csökkentése a 100 napos tervben – konkrét jogszabályi lépés még nem bejelentett; Magyar Péter M1-en hangsúlyozta: embercsempészeket nem enged ki (ápr.15) – konkrét ütemezés még nincs bejelentve; Ruszin-Szendi honvédelmi miniszter kijelölve, konszenzus a Szent Korona-eskü kérdésében</div>
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-04-24">
+   <div class="milestone" data-date="2026-04-29">
     <div class="milestone-dot" style="background:#FF9933;border:2px solid #CE2939;"></div>
     <div class="milestone-content">
      <div class="milestone-date">2026. ápr. 24. — Szerda</div>
@@ -2375,11 +2414,10 @@ const colorMap = {
 };
 
 const scrollBtn = document.getElementById("scrollToTop");
-const scrollNextBtn = document.getElementById("scrollNext");
+scrollBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+const prevCatBtn = document.getElementById("scrollPrevCat");
 const tiszaBtn = document.querySelector(".tisza-program-btn");
 const ktLogo = document.querySelector(".kt-logo");
-// Show scroll-next on load if content below
-setTimeout(() => { if (document.body.scrollHeight > window.innerHeight + 100) document.getElementById("scrollNext").classList.add("visible"); }, 300);
 window.addEventListener("scroll", () => {
  const scrolled = window.scrollY > 200;
  const atBottom = window.scrollY + window.innerHeight >= document.body.scrollHeight - 80;
@@ -2392,22 +2430,14 @@ window.addEventListener("scroll", () => {
  
  // DIREKT DOM manipuláció - gombok + TELJES CSS reset
  const bugBtn = document.getElementById("bugBtn");
- const searchBtn = document.getElementById("searchBtn");
- const scrollDownBtn = document.getElementById("scrollDownBtn");
- const darkToggleHeader = document.getElementById("darkToggleHeader");
+ const searchBtn = document.getElementById("searchBtn");const darkToggleHeader = document.getElementById("darkToggleHeader");
  
  // Jobb oldali fix gombok
  if (bugBtn) {
    bugBtn.style.display = scrolled ? "none" : "flex";
    bugBtn.style.opacity = scrolled ? "0" : "1";
    bugBtn.style.visibility = scrolled ? "hidden" : "visible";
- }
- if (scrollDownBtn) {
-   scrollDownBtn.style.display = scrolled ? "none" : "flex";
-   scrollDownBtn.style.opacity = scrolled ? "0" : "1";
-   scrollDownBtn.style.visibility = scrolled ? "hidden" : "visible";
- }
- if (searchBtn) {
+ }if (searchBtn) {
    searchBtn.style.display = scrolled ? "none" : "flex";
    searchBtn.style.opacity = scrolled ? "0" : "1";
    searchBtn.style.visibility = scrolled ? "hidden" : "visible";
@@ -2422,8 +2452,8 @@ window.addEventListener("scroll", () => {
  }
  
  scrollBtn.classList.toggle("visible", scrolled);
- scrollNextBtn.classList.toggle("visible", !atBottom);
- if (tiszaBtn) {
+ // Kategória vissza gomb: csak ha legörgettünk (mint a scrollToTop)
+ if (prevCatBtn) prevCatBtn.classList.toggle("visible", scrolled);if (tiszaBtn) {
  tiszaBtn.style.opacity = scrolled ? "0" : "1";
  tiszaBtn.style.pointerEvents = scrolled ? "none" : "auto";
  }
@@ -2432,189 +2462,43 @@ window.addEventListener("scroll", () => {
  }
 }, { passive: true });
 
-// LE NYÍL GOMB - Timeline → Szavazó → Rendezés → Lépkedés ígéretek között
-let scrollDownClickCount = 0;
-let currentCardIndex = -1;
-const scrollDownBtn = document.getElementById("scrollDownBtn");
+// KATEGÓRIA VISSZA GOMB – kategóriánként felfelé ugrik, legvégül az oldal tetejére
+if (prevCatBtn) {
+  prevCatBtn.addEventListener("click", () => {
+    // Összegyűjtjük az összes látható kategória-szekció és a főcsempe tetejét
+    const anchors = [];
 
-if (scrollDownBtn) {
-  scrollDownBtn.addEventListener("click", () => {
-    scrollDownClickCount++;
-    
-    if (scrollDownClickCount === 1) {
-      // 1. kattintás: Timeline
-      const timeline = document.querySelector('.timeline-card');
-      if (timeline) {
-        window.scrollTo({ 
-          top: timeline.offsetTop - 80, 
-          behavior: "smooth" 
-        });
+    // Főcsempe / oldal teteje (0)
+    anchors.push(0);
+
+    // Kategória szekciók teteje
+    document.querySelectorAll(".category-section").forEach(sec => {
+      if (sec.offsetParent !== null && sec.style.display !== "none") {
+        anchors.push(sec.getBoundingClientRect().top + window.scrollY);
       }
-      currentCardIndex = -1; // Reset
-      
-    } else if (scrollDownClickCount === 2) {
-      // 2. kattintás: Szavazó widget
-      const votingWidget = document.querySelector('.voting-widget');
-      if (votingWidget) {
-        window.scrollTo({ 
-          top: votingWidget.offsetTop - 80, 
-          behavior: "smooth" 
-        });
-      }
-      
-    } else if (scrollDownClickCount === 3) {
-      // 3. kattintás: Rendezés panel
-      const sortBar = document.getElementById('sortBar');
-      if (sortBar) {
-        window.scrollTo({ 
-          top: sortBar.offsetTop - 100, 
-          behavior: "smooth" 
-        });
-      }
-      currentCardIndex = -1; // Reset ígéret index
-      
+    });
+
+    // Rendezés sáv
+    const sb = document.getElementById("sortBar");
+    if (sb && sb.offsetParent) anchors.push(sb.getBoundingClientRect().top + window.scrollY);
+
+    anchors.sort((a, b) => a - b);
+
+    // Jelenlegi scroll pozíció (kis offset, hogy az épp látható szekció is "előző"-nek számítson)
+    const current = window.scrollY - 80;
+    // Az összes anchor közül az első, ami KISEBB a current-nél (visszafelé)
+    let prev = null;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] < current) { prev = anchors[i]; break; }
+    }
+
+    if (prev !== null) {
+      window.scrollTo({ top: Math.max(0, prev - 60), behavior: "smooth" });
     } else {
-      // 4+ kattintás: Lépkedés ígéretek között
-      // Összes látható kártya (rendezés szerint)
-      const allCards = Array.from(document.querySelectorAll('.card.clickable'));
-      const visibleCards = allCards.filter(card => {
-        return card.offsetParent !== null && 
-               card.style.display !== 'none' &&
-               !card.closest('.category-section[style*="display: none"]');
-      });
-      
-      if (visibleCards.length === 0) {
-        // Nincs látható kártya → Reset
-        scrollDownClickCount = 0;
-        currentCardIndex = -1;
-        return;
-      }
-      
-      // Következő kártya
-      currentCardIndex++;
-      
-      if (currentCardIndex >= visibleCards.length) {
-        // Végeztünk az összes kártyával → Reset (Timeline)
-        scrollDownClickCount = 0;
-        currentCardIndex = -1;
-        const timeline = document.querySelector('.timeline-card');
-        if (timeline) {
-          window.scrollTo({ 
-            top: timeline.offsetTop - 80, 
-            behavior: "smooth" 
-          });
-        }
-      } else {
-        // Scroll a következő kártyára
-        const nextCard = visibleCards[currentCardIndex];
-        window.scrollTo({ 
-          top: nextCard.offsetTop - 120, 
-          behavior: "smooth" 
-        });
-        
-        // Highlight effekt (opcionális)
-        nextCard.style.outline = '3px solid #FF9933';
-        nextCard.style.outlineOffset = '4px';
-        setTimeout(() => {
-          nextCard.style.outline = '';
-          nextCard.style.outlineOffset = '';
-        }, 1500);
-      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   });
 }
-
-// FEL GOMB
-scrollBtn.addEventListener("click", () => {
- console.log("FEL GOMB KATTINTÁS! Scroll to top...");
- window.scrollTo({ top: 0, behavior: "smooth" });
- 
- // Gombok KÉNYSZERÍTETT megjelenítése 500ms után (smooth scroll végén)
- setTimeout(() => {
-   console.log("500ms ELTELT! Gombok kényszerített megjelenítés...");
-   const bugBtn = document.getElementById("bugBtn");
-   const searchBtn = document.getElementById("searchBtn");
-   const scrollDownBtn = document.getElementById("scrollDownBtn");
-   const darkToggleHeader = document.getElementById("darkToggleHeader");
-   
-   if (bugBtn) {
-     bugBtn.style.display = "flex";
-     bugBtn.style.opacity = "1";
-     bugBtn.style.visibility = "visible";
-   }
-   if (scrollDownBtn) {
-     scrollDownBtn.style.display = "flex";
-     scrollDownBtn.style.opacity = "1";
-     scrollDownBtn.style.visibility = "visible";
-   }
-   if (searchBtn) {
-     searchBtn.style.display = "flex";
-     searchBtn.style.opacity = "1";
-     searchBtn.style.visibility = "visible";
-   }
-   if (darkToggleHeader) {
-     darkToggleHeader.style.display = "flex";
-     darkToggleHeader.style.opacity = "1";
-     darkToggleHeader.style.visibility = "visible";
-     darkToggleHeader.style.transform = "none";
-     darkToggleHeader.style.height = "auto";
-     darkToggleHeader.style.width = "auto";
-     console.log("  darkToggleHeader TELJES RESET!");
-     console.log("    display =", darkToggleHeader.style.display);
-     console.log("    opacity =", darkToggleHeader.style.opacity);
-     console.log("    visibility =", darkToggleHeader.style.visibility);
-   }
- }, 500);
-});
-
-// Scroll-next: ugrik egy kártyasor magasságnyit lefelé
-let scrollNextClickCount = 0;
-scrollNextBtn.addEventListener("click", () => {
-  scrollNextClickCount++;
-  
-  // MÁSODIK KATTINTÁS → Szavazó widget tetejére
-  if (scrollNextClickCount === 2) {
-    const votingWidget = document.querySelector(".voting-widget");
-    if (votingWidget) {
-      const offset = 80; // Header + buffer
-      const targetY = votingWidget.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top: targetY, behavior: "smooth" });
-      scrollNextClickCount = 0; // Reset
-      return;
-    }
-  }
-  
-  // Mindig fix offset = 60 (sticky header magasság + buffer)
-  // Így az első kategóriánál is ugyanúgy működik mint a többinél
-  const offset = 60;
-
-  const allTargets = [];
-
-  // Timeline kártya + rendezés sáv
-  const tl = document.getElementById("timelineCard");
-  if (tl && tl.offsetParent) allTargets.push(tl.getBoundingClientRect().top + window.scrollY);
-  const sb = document.getElementById("sortBar");
-  if (sb && sb.offsetParent) allTargets.push(sb.getBoundingClientRect().top + window.scrollY);
-
-  // Kártyák
-  document.querySelectorAll(".card.clickable").forEach(card => {
-    if (card.offsetParent && card.style.display !== "none") {
-      allTargets.push(card.getBoundingClientRect().top + window.scrollY);
-    }
-  });
-
-  allTargets.sort((a, b) => a - b);
-
-  const current = window.scrollY + offset + 10;
-  const next = allTargets.find(top => top > current);
-
-  if (next !== undefined) {
-    window.scrollTo({ top: next - offset, behavior: "smooth" });
-  } else {
-    window.scrollBy({ top: window.innerHeight * 0.8, behavior: "smooth" });
-  }
-});
-
 
 // Megosztás gombok
 (function() {
@@ -3018,20 +2902,56 @@ document.getElementById("statusDropdown").addEventListener("click", (e) => {
  jumpToItem(cat, title);
 });
 
-// Timeline legend kattintás → dropdown
+// Timeline legend kattintás → szűrés + scroll a sortBar-hoz
 document.querySelectorAll(".tl-leg-item").forEach(item => {
   item.addEventListener("click", () => {
     const status = item.getAttribute("data-status");
-    const dropdown = document.getElementById("statusDropdown");
-    const isActive = item.classList.contains("active");
 
+    // Active jelölés
     document.querySelectorAll(".tl-leg-item").forEach(i => i.classList.remove("active"));
-    document.getElementById("statusPanelOverlay").classList.remove("active");
+    item.classList.add("active");
 
-    if (!isActive) {
-      item.classList.add("active");
-      buildStatusDropdown(status);
+    // Panel bezárás ha nyitva volt
+    const overlay = document.getElementById("statusPanelOverlay");
+    if (overlay) overlay.classList.remove("active");
 
+    if (status === "__all__") {
+      // Összes tégla: alapértelmezett rendezés, minden kategória látható
+      renderDashboard(excelData);
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(".sort-btn[data-sort='default']").classList.add("active");
+      currentSort = "default";
+    } else if (status === "kész") {
+      // Teljesítve → "Teljesített előre" rendezés gomb aktiválása
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(".sort-btn[data-sort='done']").classList.add("active");
+      currentSort = "done";
+      const doneCount = excelData.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+      if (doneCount === 0) {
+        renderDonePlaceholder();
+      } else {
+        renderDashboard(getSortedData(excelData, "done"));
+      }
+    } else if (status === "bejelentve") {
+      // Bejelentve → "Bejelentve előre" rendezés
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(".sort-btn[data-sort='announced']").classList.add("active");
+      currentSort = "announced";
+      renderDashboard(getSortedData(excelData, "announced"));
+    } else if (status === "ígéret") {
+      // Csak ígéret → "Csak ígéret előre" rendezés
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(".sort-btn[data-sort='promise']").classList.add("active");
+      currentSort = "promise";
+      renderDashboard(getSortedData(excelData, "promise"));
+    }
+
+    // Scroll a sortBar-hoz
+    const sortBar = document.getElementById("sortBar");
+    if (sortBar) {
+      setTimeout(() => {
+        window.scrollTo({ top: sortBar.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
+      }, 80);
     }
   });
 });
@@ -3457,6 +3377,31 @@ function buildCalcShareUrl() {
 // ── Rendezés logika ──
 let currentSort = 'default';
 
+
+// Teljesített placeholder ha nincs egyetlen kész tégla sem
+function renderDonePlaceholder() {
+  const container = document.getElementById('categorySections');
+  container.innerHTML = '';
+  const ma = new Date();
+  const maj9 = new Date('2026-05-09');
+  let subText;
+  if (ma < maj9) {
+    const napok = Math.ceil((maj9 - ma) / 86400000);
+    subText = `A kormány még nem alakult meg.<br><strong>${napok} nap múlva</strong>, május 9-én kezdődik az ígéretek teljesítése – figyeld itt!`;
+  } else {
+    const eltelt = Math.floor((ma - maj9) / 86400000);
+    subText = `A kormány <strong>${eltelt} napja</strong> működik.<br>Az első teljesítések várhatók – figyeld itt!`;
+  }
+  container.innerHTML = `
+    <div class="done-placeholder">
+      <div class="done-placeholder-brick">🧱</div>
+      <div class="done-placeholder-count">0</div>
+      <div class="done-placeholder-title">Még nincs teljesített ígéret</div>
+      <div class="done-placeholder-sub">${subText}</div>
+    </div>
+  `;
+}
+
 function getSortedData(data, sort) {
   const clone = [...data];
   const statusOrder = { 'kész':0,'teljesítve':0,'bejelentve':1,'folyamatban':1,'ígéret':2 };
@@ -3483,20 +3428,20 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
     document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentSort = btn.dataset.sort;
+    // Ha "done" rendezés és nincs egyetlen teljesített tégla sem → placeholder
+    if (currentSort === 'done') {
+      const doneCount = excelData.filter(r => r['Változás'] === 'kész' || r['Változás'] === 'teljesítve').length;
+      if (doneCount === 0) {
+        renderDonePlaceholder();
+        return;
+      }
+    }
     const sorted = getSortedData(excelData, currentSort);
     // Apply current search filter too
     const searchVal = document.getElementById('sidebarSearch')?.value || '';
     renderDashboard(sorted);
     if (searchVal) {
       document.getElementById('sidebarSearch').dispatchEvent(new Event('input'));
-    }
-    
-    // RESET le nyíl lépkedés index (hogy első ígéretre ugorjon!)
-    if (typeof currentCardIndex !== 'undefined') {
-      currentCardIndex = -1;
-    }
-    if (typeof scrollDownClickCount !== 'undefined') {
-      scrollDownClickCount = 3; // Következő kattintás = első ígéret
     }
   });
 });
