@@ -577,11 +577,16 @@ body.dark .dark-icon-btn { background:rgba(36,40,59,0.9); border-color:rgba(192,
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   width:44px; height:44px; border-radius:999px;
   border:2px solid #FFA500; opacity:0;
-  animation:bugSonar 2.5s ease-out infinite;
+  animation:none; /* Fix: alapból NE pulzáljon */
   pointer-events:none; z-index:1;
 }
 .bug-sonar-1 { animation-delay:0s; }
 .bug-sonar-2 { animation-delay:1.25s; }
+
+/* Sonar csak hover-re aktiválódik */
+#bugBtn:hover .bug-sonar {
+  animation:bugSonar 2.5s ease-out infinite;
+}
 
 @keyframes bugSonar {
   0% { opacity:0.7; transform:translate(-50%,-50%) scale(0.8); }
@@ -995,11 +1000,14 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
 .calc-tabs-hint { font-size:12px; color:var(--text-secondary); margin-bottom:8px; }
 .calc-input-row { display:flex; gap:12px; align-items:flex-end; margin-bottom:16px; flex-wrap:wrap; }
 .calc-input-group { flex:1; min-width:160px; }
-.calc-input-group label { font-size:15px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px; }
+.calc-input-group label { font-size:15px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px; position:relative; z-index:2; }
 .calc-input-group input {
   width:100%; padding:12px 14px; border-radius:12px;
   border:1.5px solid var(--border-subtle); background:var(--bg-main);
   color:var(--text-main); font-size:16px; font-weight:600; box-sizing:border-box;
+  position:relative; z-index:2; /* Fix: card::before overlay felett legyen */
+  pointer-events:auto !important; /* Fix: desktop klikkelhető legyen */
+  -webkit-user-select:text; user-select:text;
 }
 .calc-input-group input:focus { outline:none; border-color:#e8405a; }
 
