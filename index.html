@@ -5296,26 +5296,26 @@ Számold ki te is: ${url}`;
     if (isCsed) {
       const brutto = parseFloat(csedGyedInput.value) || 0;
       if (brutto <= 0) { alert('Add meg az eredeti bruttó béred!'); return; }
-      resultBefore = calcCsed(brutto);
-      resultAfter = calcCsed(brutto); // TISZA alatt változatlan
+      resultBefore = calcCsed(brutto, false);
+      resultAfter = calcCsed(brutto, true);
     } 
     else if (isGyed) {
       const brutto = parseFloat(csedGyedInput.value) || 0;
       if (brutto <= 0) { alert('Add meg az eredeti bruttó béred!'); return; }
-      resultBefore = calcGyed(brutto, gyerekSzam);
-      resultAfter = calcGyed(brutto, gyerekSzam); // TISZA alatt változatlan
+      resultBefore = calcGyed(brutto, gyerekSzam, false);
+      resultAfter = calcGyed(brutto, gyerekSzam, true);
     }
     else if (isKata) {
       const bev = parseFloat(kataInput.value) || 0;
       if (bev <= 0) { alert('Add meg a havi bevételed!'); return; }
-      resultBefore = calcKata(bev, gyerekSzam);
-      resultAfter = calcKata(bev, gyerekSzam); // TISZA alatt változatlan (egyelőre)
+      resultBefore = calcKata(bev, gyerekSzam, false);
+      resultAfter = calcKata(bev, gyerekSzam, true);
     }
     else if (isNyugdijas) {
       const nyugdij = parseFloat(nyugdijInput.value) || 0;
       if (nyugdij <= 0) { alert('Add meg a nyugdíj összegét!'); return; }
-      resultBefore = calcNyugdij(nyugdij, gyerekSzam);
-      resultAfter = calcNyugdij(nyugdij, gyerekSzam); // TISZA alatt változatlan (egyelőre)
+      resultBefore = calcNyugdij(nyugdij, gyerekSzam, false);
+      resultAfter = calcNyugdij(nyugdij, gyerekSzam, true);
     }
     else {
       // NORMÁL MUNKABÉR
@@ -5363,22 +5363,30 @@ Számold ki te is: ${url}`;
   }
   
   // === CSED SZÁMÍTÁS ===
-  function calcCsed(bruttoAlap) {
+  function calcCsed(bruttoAlap, isTisza) {
     const items = [
       { nev: 'CSED alapja (bruttó bér 100%)', osszeg: bruttoAlap, tipus: 'neutral' },
       { nev: 'SZJA (MENTES 2025.07.01-től!)', osszeg: 0, tipus: 'positive', megjegyzes: '+' + fmt(bruttoAlap * SZJA_RATE) },
       { nev: 'TB járulék (MENTES)', osszeg: 0, tipus: 'positive', megjegyzes: '+' + fmt(bruttoAlap * TB_RATE) }
     ];
-    
+    let extra = 0;
+    if (isTisza) {
+      // Dupla anyasági támogatás: jelenlegi összeg ~82 500 Ft (egyszeri, havi vetítve 1 évre: 6 875 Ft)
+      // GYES dupla: 28 500 → 57 000 (+28 500) ha CSED után GYES-re megy
+      // Újszülött kelengye: 50 000 Ft egyszeri
+      const kelengye = Math.round(50000 / 12); // havi vetítve
+      items.push({ nev: '+ Újszülött kelengye (50 000 Ft egyszeri)', osszeg: kelengye, tipus: 'tisza', megjegyzes: 'havi vetítve 1 évre' });
+      extra += kelengye;
+    }
     return {
-      netto: bruttoAlap,
+      netto: bruttoAlap + extra,
       items: items,
-      title: 'CSED (Csecsemőgondozási díj)'
+      title: isTisza ? 'CSED (TISZA program)' : 'CSED (Csecsemőgondozási díj)'
     };
   }
   
   // === GYED SZÁMÍTÁS ===
-  function calcGyed(bruttoAlap, gyerekSzam) {
+  function calcGyed(bruttoAlap, gyerekSzam, isTisza) {
     const gyedOsszeg = Math.min(bruttoAlap * 0.7, GYED_MAX);
     const nyugdijJarulék = gyedOsszeg * 0.1;
     
@@ -5406,15 +5414,27 @@ Számold ki te is: ${url}`;
       });
     }
     
+    let extra = 0;
+    if (isTisza) {
+      // Dupla GYED: +ugyanannyi a jelenlegi GYED összeg
+      items.push({ nev: '+ Dupla GYED (TISZA ígéret)', osszeg: gyedOsszeg, tipus: 'tisza', megjegyzes: 'teljes összeg duplázva' });
+      extra += gyedOsszeg;
+      // Dupla családi pótlék
+      if (gyerekSzam > 0) {
+        const potlek = gyerekSzam === 1 ? 25900 : gyerekSzam === 2 ? 32600 : 43700;
+        items.push({ nev: `+ Dupla családi pótlék (${gyerekSzam} gyerek)`, osszeg: potlek, tipus: 'tisza', megjegyzes: 'külön juttatás' });
+        extra += potlek;
+      }
+    }
     return {
-      netto: netto,
+      netto: netto + extra,
       items: items,
-      title: 'GYED (Gyermekgondozási díj)'
+      title: isTisza ? 'GYED (TISZA program)' : 'GYED (Gyermekgondozási díj)'
     };
   }
   
   // === KATA SZÁMÍTÁS ===
-  function calcKata(bevétel, gyerekSzam) {
+  function calcKata(bevétel, gyerekSzam, isTisza) {
     const kataAdo = 50000; // fix havi KATA adó
     const netto = bevétel - kataAdo;
     
@@ -5423,24 +5443,59 @@ Számold ki te is: ${url}`;
       { nev: 'KATA adó (fix 50 000 Ft/hó)', osszeg: -kataAdo, tipus: 'negative' }
     ];
     
+    let extra = 0;
+    if (isTisza) {
+      // Tisza: KATA visszahozatal + kedvezőbb feltételek (részletek még nem véglegesek)
+      // Adminisztrációs teher csökkentése (nem számszerűsíthető)
+      // ÁFA csökkentés élelmiszereken (ha vállalkozói tevékenység kapcsolódik)
+      items.push({ nev: 'Kedvező KATA feltételek (TISZA ígéret)', osszeg: 0, tipus: 'tisza', megjegyzes: 'részletek még nem véglegesek' });
+    }
     return {
-      netto: netto,
+      netto: netto + extra,
       items: items,
-      title: 'KATA (Kisadózó vállalkozás)'
+      title: isTisza ? 'KATA (TISZA program)' : 'KATA (Kisadózó vállalkozás)'
     };
   }
   
   // === NYUGDÍJ SZÁMÍTÁS ===
-  function calcNyugdij(nyugdij, gyerekSzam) {
+  function calcNyugdij(nyugdij, gyerekSzam, isTisza) {
     const items = [
       { nev: 'Nyugdíj összege', osszeg: nyugdij, tipus: 'neutral' },
       { nev: 'SZJA (nincs nyugdíjból)', osszeg: 0, tipus: 'neutral' }
     ];
-    
+
+    let extra = 0;
+
+    if (isTisza) {
+      // 1. Minimálnyugdíj kiegészítés 120 000 Ft-ra
+      if (nyugdij < 120000) {
+        const kieg = 120000 - nyugdij;
+        items.push({ nev: 'Minimálnyugdíj kiegészítés 120 000 Ft-ra', osszeg: kieg, tipus: 'tisza', megjegyzes: 'TISZA ígéret' });
+        extra += kieg;
+      }
+
+      // 2. SZÉP-kártya (havi vetítve)
+      const szep = nyugdij <= 250000 ? 16667 : nyugdij <= 500000 ? 8333 : 0;
+      if (szep > 0) {
+        items.push({ nev: `+ SZÉP-kártya (${nyugdij <= 250000 ? '200 000' : '100 000'} Ft/év)`, osszeg: szep, tipus: 'tisza', megjegyzes: 'havi vetítve' });
+        extra += szep;
+      }
+
+      // 3. 14. havi nyugdíj (havi vetítve: 1/12)
+      items.push({ nev: '+ 14. havi nyugdíj', osszeg: Math.round(nyugdij / 12), tipus: 'tisza', megjegyzes: 'havi vetítve' });
+      extra += Math.round(nyugdij / 12);
+
+      // 4. Időskorúak járadéka duplázás (ha nagyon alacsony, < 57 000)
+      if (nyugdij < 57000) {
+        items.push({ nev: 'Időskorúak járadéka duplázás', osszeg: nyugdij, tipus: 'tisza', megjegyzes: 'TISZA ígéret' });
+        extra += nyugdij;
+      }
+    }
+
     return {
-      netto: nyugdij,
+      netto: nyugdij + extra,
       items: items,
-      title: 'Nyugdíj'
+      title: isTisza ? 'Nyugdíj (TISZA program)' : 'Nyugdíj'
     };
   }
   
