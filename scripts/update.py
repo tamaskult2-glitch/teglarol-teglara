@@ -48,42 +48,36 @@ def build_html(data):
 
 
 def ask_claude_batch(client, batch):
-    """Egy batch téglára kér frissítést web search-csel"""
+    """Egy batch téglára kér frissítést – web search csak ha régi adat"""
+    from datetime import datetime, timedelta
+
+    # Web search csak ha van 7 napnál régebben frissített tégla a batch-ben
+    stale = [d for d in batch
+             if d.get("Frissítés", "2000-01-01") < (date.today() - timedelta(days=7)).isoformat()]
+    use_web = len(stale) > 0
 
     items_text = "\n".join(
         f"{i+1}. [{d['Változás']}] {d['TiSZa ígéret'][:60]}"
-        f" | Utolsó: {d.get('Frissítés','?')} | {d.get('Volt előrelépést jelentő bejelentés?','')[:80]}"
+        f" | Utolsó: {d.get('Frissítés','?')}"
         for i, d in enumerate(batch)
     )
 
-    prompt = f"""Mai dátum: {TODAY}. Magyar politika, Tisza Párt kormány ígéretei.
-
-Vizsgáld meg az alábbi ígéreteket web search segítségével és keresd a mai vagy tegnapi friss híreket:
+    prompt = f"""Mai dátum: {TODAY}. Tisza Párt kormány ígéretek Magyarország.
+{"Keresd meg a legfrissebb híreket az alábbi ígéretekhez:" if use_web else "Tudásod alapján van-e friss fejlemény ("+TODAY+") az alábbi ígéreteknél?"}
 
 {items_text}
 
-FELADAT: Minden ígérethez keresd meg a legfrissebb hírt (ha van {TODAY} vagy közeli dátumú).
+Válaszolj CSAK JSON-ban:
+[{{"n":1,"elore":"új előrelépés max 120 kar","datum":"{TODAY}","forras":"url","valtozas":"bejelentve|kész|igéret"}}]
+Ha nincs változás: []"""
 
-Válaszolj CSAK JSON tömbben, minden frissítendő ígérethez egy objektum:
-[
-  {{
-    "n": <sorszám 1-től>,
-    "elore": "<új előrelépés szöveg max 120 kar, magyar nyelven>",
-    "datum": "{TODAY}",
-    "forras": "<url>",
-    "valtozas": "<csak ha státusz változott: bejelentve|kész|igéret>"
-  }}
-]
-
-Ha nincs friss hír egy ígéretnél, ne szerepeljen a válaszban.
-Ha semmiben nincs változás: []
-CSAK JSON, semmi más!"""
+    tools = [{"type": "web_search_20250305", "name": "web_search"}] if use_web else []
 
     try:
         msg = client.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=800,
-            tools=[{"type": "web_search_20250305", "name": "web_search"}],
+            max_tokens=400,
+            tools=tools if tools else anthropic.NOT_GIVEN,
             messages=[{"role": "user", "content": prompt}],
         )
     except Exception as e:
@@ -163,6 +157,61 @@ def apply_updates(data, batch, updates):
     return count
 
 
+def get_subscribers():
+    """Feliratkozók beolvasása subscribers.json-ból"""
+    subs_file = ROOT / "subscribers.json"
+    if not subs_file.exists():
+        print("  subscribers.json nem található")
+        return []
+    try:
+        data = json.loads(subs_file.read_text(encoding="utf-8"))
+        emails = data.get("emails", [])
+        print(f"  Feliratkozók: {len(emails)} db")
+        return emails
+    except Exception as e:
+        print(f"  subscribers.json hiba: {e}")
+        return []
+
+
+def send_notifications(changed_count):
+    """EmailJS REST API-n keresztül értesíti a feliratkozókat"""
+    import urllib.request
+    emails = get_subscribers()
+    if not emails:
+        return
+
+    service_id = "service_x5huqxn"
+    template_id = "template_pfrf10g"
+    public_key  = "0k7yH8d4u-BjgACd1"
+
+    sent = 0
+    for email in emails:
+        payload = json.dumps({
+            "service_id": service_id,
+            "template_id": template_id,
+            "user_id": public_key,
+            "template_params": {
+                "email": email,
+                "name": "Feliratkozó",
+                "db": str(changed_count)
+            }
+        }).encode()
+        try:
+            req = urllib.request.Request(
+                "https://api.emailjs.com/api/v1.0/email/send",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req) as r:
+                if r.status == 200:
+                    sent += 1
+        except Exception as e:
+            print(f"  EmailJS hiba ({email[:20]}): {e}")
+
+    print(f"  Értesítő elküldve: {sent}/{len(emails)} feliratkozónak")
+
+
 def main():
     print(f"=== Teglarol-teglara | {TODAY} ===")
     data = load_data()
@@ -198,6 +247,7 @@ def main():
     if total_changed > 0:
         save_data(data)
         print(f"\n{total_changed} valtozas mentve → data.json")
+        send_notifications(total_changed)
     else:
         print("\nNincs uj valtozas")
 
