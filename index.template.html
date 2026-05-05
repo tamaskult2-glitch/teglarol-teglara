@@ -2540,7 +2540,7 @@ if (prevCatBtn) {
 
   const fb = document.getElementById('shareFacebook');
   if (fb) fb.addEventListener('click', () => {
-    window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '_blank', 'width=600,height=400');
+    window.open('https://www.facebook.com/sharer/sharer.php?u=' + url + '&quote=' + encodeURIComponent('Számon kérem az ígéreteket! 🧱 Nézd meg te is:'), '_blank', 'width=600,height=400');
   });
 
   const tw = document.getElementById('shareTwitter');
