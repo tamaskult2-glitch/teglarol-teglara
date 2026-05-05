@@ -2058,7 +2058,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
      </div>
      <div id="calcBreakdown"></div>
     </div>
-    <div class="calc-disclaimer">* Becslés a TISZA program és hatályos adójogszabályok alapján. Tényleges összeg egyéni körülményektől függően eltérhet. Nem minősül adótanácsadásnak.</div>
+    <div class="calc-disclaimer">⚠️ Az <strong>„áradás után"</strong> oszlop a TISZA Párt <strong>ígéretei alapján</strong> számolt becslés — nem a valóság! Az ígéretek törvényi részletei, pontos összegei még változhatnak. Nem minősül adótanácsadásnak.</div>
 
     <!-- Megosztás gomb -->
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -4564,6 +4564,70 @@ Számold ki te is: ${url}`;
       }
     }
     
+    // === TISZA EXTRA JUTTATÁSOK ===
+    if (isTisza) {
+
+      // 1. Dupla családi pótlék (ha van gyerek)
+      if (gyerekSzam > 0) {
+        const potlekPlusz = gyerekSzam === 1 ? 25900 : gyerekSzam === 2 ? 32600 : 43700;
+        items.push({
+          nev: `+ Dupla családi pótlék (${gyerekSzam} gyerek)`,
+          osszeg: potlekPlusz,
+          tipus: 'tisza',
+          megjegyzes: 'külön juttatás'
+        });
+      }
+
+      // 2. GYES duplázás (ha CSED/GYED paraméter nincs, de gyes van)
+      if (params.isGyes && gyerekSzam > 0) {
+        const gyesJelenlegi = 28500; // ~min.bér 70%-a / 12 hó alapján
+        items.push({
+          nev: '+ Dupla GYES (TISZA ígéret)',
+          osszeg: gyesJelenlegi,
+          tipus: 'tisza',
+          megjegyzes: 'külön juttatás'
+        });
+      }
+
+      // 3. Minimálbér SZJA csökkentés: 15% → 8% (mediánbér alatt)
+      if (brutto <= MEDIANBER && !anyaInfo?.szjaMentes && !params.is25Alatt) {
+        const szjaKedvezmeny = Math.round(szjaAlap * (0.15 - 0.08));
+        if (szjaKedvezmeny > 0) {
+          items.push({
+            nev: 'SZJA csökkentés 15%→8% (mediánbér alatt)',
+            osszeg: szjaKedvezmeny,
+            tipus: 'tisza',
+            megjegyzes: 'TISZA ígéret'
+          });
+        }
+      }
+
+      // 4. Újszülött kelengye (egyszeri, havi vetítve: ~4 167 Ft/hó ha az első évben)
+      // Tájékoztató jelleggel nem adjuk hozzá a havi nettóhoz - csak megjegyezzük
+
+      // 5. Nyugdíjas SZÉP-kártya
+      if (params.isNyugdijas) {
+        const szepKartya = brutto <= 250000 ? 16667 : brutto <= 500000 ? 8333 : 0; // évi 200/100e Ft / 12
+        if (szepKartya > 0) {
+          items.push({
+            nev: `+ SZÉP-kártya juttatás (${brutto <= 250000 ? '200 000' : '100 000'} Ft/év)`,
+            osszeg: szepKartya,
+            tipus: 'tisza',
+            megjegyzes: 'havi vetítve'
+          });
+        }
+        // Minimálnyugdíj: ha 120 eFt alatt
+        if (brutto < 120000) {
+          items.push({
+            nev: '+ Minimálnyugdíj kiegészítés 120 000 Ft-ra',
+            osszeg: 120000 - brutto,
+            tipus: 'tisza',
+            megjegyzes: 'TISZA ígéret'
+          });
+        }
+      }
+    }
+
     // === TISZA ADÓJÓVÁÍRÁS ===
     let jovairas = 0;
     if (isTisza && brutto <= MEDIANBER) {
@@ -4606,7 +4670,17 @@ Számold ki te is: ${url}`;
       }
     }
     
-    const netto = brutto - tbUtanKedv - szjaUtanKedv;
+    // TISZA extra tételek összesítése a nettóba
+    const tiszaExtra = isTisza ? items
+      .filter(i => i.tipus === 'tisza' && !i.nev.includes('adójóváírás'))
+      .reduce((s, i) => s + i.osszeg, 0) : 0;
+
+    // SZJA csökkentés (mediánbér alatt) külön vonjuk le
+    const tiszaSzjaKedv = isTisza && brutto <= MEDIANBER && !anyaInfo?.szjaMentes && !params.is25Alatt
+      ? Math.round(szjaAlap * (0.15 - 0.08)) : 0;
+    if (tiszaSzjaKedv > 0) szjaUtanKedv = Math.max(0, szjaUtanKedv - tiszaSzjaKedv);
+
+    const netto = brutto - tbUtanKedv - szjaUtanKedv + tiszaExtra;
     
     return {
       netto: netto,
