@@ -500,7 +500,8 @@ body.dark .story-btn { background:rgba(192,202,245,0.12); border-color:rgba(192,
 }
 
 /* ---- STORYBOARD MODAL ---- */
-.story-modal-box { max-width:560px; padding:32px; }
+.story-modal-box { max-width:560px; padding:32px; background:#EDE6DC; }
+body.dark .story-modal-box { background:var(--bg-card); }
 .tour-wrap { margin:0 -32px 24px; padding:0 32px 24px; border-bottom:1px solid var(--border-subtle); }
 .tour-intro { font-size:14px; color:var(--text-secondary); margin-bottom:14px; line-height:1.6; }
 .tour-steps { display:flex; flex-direction:column; gap:0; }
@@ -2196,7 +2197,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 </div>
 
 <div class="modal-overlay" id="storyOverlay" role="dialog" aria-modal="true" aria-label="Névjegy">
- <div class="modal-box story-modal-box" id="storyModalBox" style="background:#EDE6DC;">
+ <div class="modal-box story-modal-box" id="storyModalBox">
   <button class="modal-close" id="storyModalClose">×</button>
 
   <div class="story-header">
@@ -2280,11 +2281,11 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
      <div style="font-size:24px;font-weight:800;color:#FF9933;" id="statAnnounced">–</div>
      <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Bejelentve</div>
     </div>
-    <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
+    <div id="statVisitorBox" style="display:none;background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
      <div style="font-size:24px;font-weight:800;color:#4A9ECC;" id="statVisitors">–</div>
      <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Látogató (összes)</div>
     </div>
-    <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
+    <div id="statSubscriberBox" style="display:none;background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
      <div style="font-size:24px;font-weight:800;color:#7ED957;" id="statSubscribers">–</div>
      <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Feliratkozó</div>
     </div>
@@ -5863,9 +5864,16 @@ function openStory() {
       const cached = JSON.parse(localStorage.getItem('igmero_cache') || '{}');
       if (cached.total) sa('statVisitors', cached.total.toLocaleString('hu-HU'));
     } catch(e) {}
-    fetch('/.netlify/forms/ertesito-feliratkozas/submissions/?per_page=1')
+    // Feliratkozók száma: subscribers.json-ból
+    fetch('https://raw.githubusercontent.com/tamaskult2-glitch/teglarol-teglara/main/subscribers.json')
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d && d.count !== undefined) sa('statSubscribers', d.count); })
+      .then(d => {
+        if (d && d.emails && d.emails.length > 0) {
+          const sBox = document.getElementById('statSubscriberBox');
+          if(sBox) sBox.style.display='block';
+          document.getElementById('statSubscribers').textContent = d.emails.length;
+        }
+      })
       .catch(() => {});
   } catch(e) {}
 }
