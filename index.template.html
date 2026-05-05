@@ -138,6 +138,16 @@ body.dark .logo-future .logo-tint { background:rgba(30,35,60,0.55); }
 .river-brick-3 { animation:floatBrick3 20s linear infinite 12s; }
 .header-text h1 { margin:0 0 8px; font-size:32px; font-weight:700; color:var(--text-main); letter-spacing:-0.5px; }
 .share-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; justify-content:center; align-items:center; margin-top:16px; max-width:320px; margin-left:auto; margin-right:auto; }
+
+/* Feliratkozó szekció */
+.subscribe-section { margin:20px 0 8px; padding:16px 20px; background:rgba(232,64,90,0.07); border-radius:16px; border:1px solid rgba(232,64,90,0.2); }
+.subscribe-row { display:flex; gap:8px; margin-top:10px; }
+.subscribe-row input { flex:1; padding:10px 14px; border-radius:10px; border:1.5px solid var(--border-subtle); background:var(--bg-main); color:var(--text-main); font-size:14px; box-sizing:border-box; }
+.subscribe-row input:focus { outline:none; border-color:#e8405a; }
+.subscribe-row button { padding:10px 16px; background:linear-gradient(135deg,#e8405a,#c0183a); color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.subscribe-row button:disabled { opacity:0.6; cursor:default; }
+body.dark .subscribe-section { background:rgba(232,64,90,0.1); border-color:rgba(232,64,90,0.25); }
+
 .share-btn { display:flex; align-items:center; justify-content:center; gap:6px; padding:10px 14px; border-radius:14px; border:none; cursor:pointer; font-size:13px; font-weight:600; text-decoration:none; transition:transform 0.15s, opacity 0.15s; white-space:nowrap; width:100%; }
 .share-btn:hover { transform:translateY(-2px); opacity:0.9; }
 .share-btn.fb { background:#1877F2; color:#fff; }
@@ -1133,6 +1143,8 @@ body.dark .card::before { background-image: url("data:image/svg+xml,%3Csvg width
 body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg width='220' height='140' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='15' y='45' fill='rgba(192,24,58,0.10)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='15' y='100' fill='rgba(192,24,58,0.10)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); }
 </style>
 
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init("0k7yH8d4u-BjgACd1");</script>
 </head>
 <body>
 <div id="stickyCatHeader"></div>
@@ -1401,6 +1413,17 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <span style="font-size:13px;opacity:0.85;">→</span>
   </button>
  </p>
+
+<!-- FELIRATKOZÓ SZEKCIÓ -->
+ <div class="subscribe-section">
+  <div style="font-size:14px;font-weight:700;color:var(--text-main);">🔔 Értesítést kérek frissítésekről</div>
+  <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Ha új tégla kerül fel vagy státusz változik, e-mailben értesítünk.</div>
+  <div class="subscribe-row">
+   <input type="email" id="subEmail" placeholder="email@cím.hu" />
+   <button id="subBtn">Feliratkozás</button>
+  </div>
+  <div id="subMsg" style="display:none;font-size:13px;margin-top:8px;color:#2da44e;font-weight:600;"></div>
+ </div>
 
  <!-- Megosztás gombok -->
  <p style="text-align:center;margin:16px 0 8px;font-size:14px;font-weight:600;color:var(--text-secondary);">
@@ -3803,6 +3826,75 @@ document.getElementById("bugOverlay").addEventListener("click", (e) => {
   if (e.target === document.getElementById("bugOverlay"))
     document.getElementById("bugOverlay").classList.remove("active");
 });
+
+// ── Feliratkozó – GitHub API mentés ──
+const GITHUB_REPO = 'tamaskult2-glitch/teglarol-teglara';
+const SUBS_FILE   = 'subscribers.json';
+
+async function loadSubscribers() {
+  try {
+    const r = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${SUBS_FILE}`);
+    if (!r.ok) return { emails: [], sha: null };
+    const d = await r.json();
+    const decoded = JSON.parse(atob(d.content.replace(/\n/g,'')));
+    return { emails: decoded.emails || [], sha: d.sha };
+  } catch { return { emails: [], sha: null }; }
+}
+
+async function saveSubscriber(email) {
+  // Formspree POST - e-mail értesítőt küld az adminnak
+  const r = await fetch('https://formspree.io/f/xzdogedd', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      email: email,
+      _subject: '🔔 Új feliratkozó – teglarol-teglara.hu',
+      uzenet: 'Ezt a címet add hozzá a subscribers.json fájlhoz a GitHub repóban!'
+    })
+  });
+  if (!r.ok) throw new Error('Formspree hiba');
+  return true;
+}
+
+document.getElementById('subBtn').addEventListener('click', async function() {
+  const email = document.getElementById('subEmail').value.trim();
+  const msg   = document.getElementById('subMsg');
+  if (!email || !email.includes('@')) {
+    document.getElementById('subEmail').style.borderColor = '#e8405a';
+    return;
+  }
+  document.getElementById('subEmail').style.borderColor = '';
+
+  // Dupla feliratkozás check localStorage-ból
+  const local = JSON.parse(localStorage.getItem('ttm_subs') || '[]');
+  if (local.includes(email)) {
+    msg.style.color = '#888';
+    msg.textContent = 'Már fel vagy iratkozva!';
+    msg.style.display = 'block';
+    return;
+  }
+
+  this.disabled = true;
+  this.textContent = '⏳…';
+
+  try {
+    await saveSubscriber(email);
+    local.push(email);
+    localStorage.setItem('ttm_subs', JSON.stringify(local));
+    msg.style.color = '#2da44e';
+    msg.textContent = '✅ Feliratkoztál! Frissítésekről értesítünk.';
+    msg.style.display = 'block';
+    document.getElementById('subEmail').value = '';
+    this.textContent = '✅ Feliratkozva';
+  } catch {
+    msg.style.color = '#e8405a';
+    msg.textContent = '❌ Hiba. Próbáld újra!';
+    msg.style.display = 'block';
+    this.disabled = false;
+    this.textContent = 'Feliratkozás';
+  }
+});
+
 document.getElementById("bugSubmit").addEventListener("click", () => {
   const type = document.getElementById("bugType").value;
   const desc = document.getElementById("bugDesc").value.trim();
