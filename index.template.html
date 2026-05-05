@@ -1407,7 +1407,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 
  <!-- MAI FRISSÍTÉSEK FELHÍVÓ -->
  <p id="todayUpdateWrap" style="text-align:center;margin-top:8px;display:none;">
-  <button onclick="activateNewestSort()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#e8405a,#c0183a);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,64,90,0.4);transition:transform 0.15s;">
+  <button onclick="document.querySelector('.cat-item[data-calc]').click()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#e8405a,#c0183a);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,64,90,0.4);transition:transform 0.15s;">
    <span style="font-size:16px;">🔴</span>
    <span id="todayUpdateMsg">Ma X tégla frissült – nézd meg!</span>
    <span style="font-size:13px;opacity:0.85;">→</span>
@@ -1415,6 +1415,24 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  </p>
 
 <!-- FELIRATKOZÓ SZEKCIÓ -->
+ <!-- KALKULÁTOR CTA -->
+ <div style="text-align:center; margin:12px 0 4px;">
+  <button id="calcCtaBtn" onclick="
+    const calcBtn = document.querySelector('.cat-item[data-cat=kalkulátor], [data-cat=kalkulator]');
+    if(calcBtn) { calcBtn.click(); }
+    else {
+      const calcSection = document.getElementById('calcSection');
+      if(calcSection) {
+        calcSection.style.display='block';
+        setTimeout(() => window.scrollTo({top: calcSection.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}), 80);
+      }
+    }
+  " style="display:inline-flex;align-items:center;gap:10px;background:var(--bg-card);color:var(--text-main);border:1.5px solid var(--border-subtle);border-radius:999px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-soft);transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+   💰 Mennyit jelent neked az „áradás"?
+   <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:#e8405a;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+ </div>
+
  <div class="subscribe-section">
   <div style="font-size:14px;font-weight:700;color:var(--text-main);">🔔 Értesítést kérek frissítésekről</div>
   <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Ha új tégla kerül fel vagy státusz változik, e-mailben értesítünk.</div>
@@ -2543,7 +2561,7 @@ if (prevCatBtn) {
 
   const cp = document.getElementById('shareCopy');
   if (cp) cp.addEventListener('click', () => {
-    navigator.clipboard.writeText(window.location.href).then(() => {
+    navigator.clipboard.writeText('https://teglarol-teglara.hu').then(() => {
       const lbl = document.getElementById('copyLabel');
       if (lbl) { lbl.textContent = '✓ Másolva!'; setTimeout(() => lbl.textContent = 'Link másolás', 2000); }
     });
