@@ -979,8 +979,8 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
 }
 
 /* ========= KALKULÁTOR ========= */
-.calc-section { margin-bottom: 40px; }
-.calc-card { background:var(--bg-card); border-radius:20px; padding:24px; box-shadow:var(--shadow-soft); overflow:hidden; box-sizing:border-box; }
+.calc-section { margin-bottom: 40px; position:relative; isolation:isolate; }
+.calc-card { background:var(--bg-card); border-radius:20px; padding:24px; box-shadow:var(--shadow-soft); overflow:hidden; box-sizing:border-box; position:relative; isolation:isolate; }
 .calc-title { font-size:20px; font-weight:800; color:var(--text-main); margin-bottom:4px; }
 .calc-subtitle { font-size:13px; color:var(--text-secondary); margin-bottom:20px; }
 .calc-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
@@ -1054,9 +1054,10 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
   width:100%; padding:12px 14px; border-radius:12px;
   border:1.5px solid var(--border-subtle); background:var(--bg-main);
   color:var(--text-main); font-size:16px; font-weight:600; box-sizing:border-box;
-  position:relative; z-index:2; /* Fix: card::before overlay felett legyen */
-  pointer-events:auto !important; /* Fix: desktop klikkelhető legyen */
+  position:relative; z-index:5;
+  pointer-events:auto !important;
   -webkit-user-select:text; user-select:text;
+  cursor:text;
 }
 .calc-input-group input:focus { outline:none; border-color:#e8405a; }
 
@@ -1390,6 +1391,15 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <span style="font-size:11px;font-weight:800;color:#c0183a;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">🧪 Teszt verzió</span>
    <span id="tesztMsg">🧱 Az első tégla lerakva — de az építkezés május 9-én kezdődik igazán.</span>
   </span>
+ </p>
+
+ <!-- MAI FRISSÍTÉSEK FELHÍVÓ -->
+ <p id="todayUpdateWrap" style="text-align:center;margin-top:8px;display:none;">
+  <button onclick="activateNewestSort()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#e8405a,#c0183a);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,64,90,0.4);transition:transform 0.15s;">
+   <span style="font-size:16px;">🔴</span>
+   <span id="todayUpdateMsg">Ma X tégla frissült – nézd meg!</span>
+   <span style="font-size:13px;opacity:0.85;">→</span>
+  </button>
  </p>
 
  <!-- Megosztás gombok -->
@@ -2618,9 +2628,116 @@ sidebarOverlay.addEventListener("click", closeSidebar);
  document.getElementById("daysSince").textContent = "Az \"áradás\" óta eltelt napok: " + diff;
 })();
 
+
+// ── Kártyaépítő segédfüggvény ──
+function buildCard(item) {
+ const card = document.createElement("div");
+ card.className = "card clickable";
+ const st = getStatus(item["Változás"]);
+ const title = item["TiSZa ígéret"] || "Nincs cím";
+ const vizHTML = getMiniCharts()[title] ? getMiniCharts()[title]() : "";
+ const pri = item["Prioritás"] || "rovid";
+ const priLabel = pri === "azonnali" ? "🔴 Azonnali" : pri === "hosszu" ? "🟢 Hosszú táv" : "🟡 Rövid táv";
+ const priCls = `priority-${pri}`;
+ card.dataset.priority = pri;
+ const today = new Date().toISOString().slice(0,10);
+ const freshBadge = item["Frissítés"] === today ? '<span class="fresh-badge">● Ma</span>' : '';
+
+ const bodyHTML = `
+ <div class="card-body" style="display:flex;flex-direction:column;height:100%;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+   <div class="priority-badge ${priCls}">${priLabel}</div>
+   <span class="badge ${st.cls}">${st.label}</span>
+   ${freshBadge}
+  </div>
+  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
+  <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+   ${item["FiDeSZ állapot"] ? `<div style="font-size:13px;color:var(--text-secondary);padding:6px 10px;background:var(--bg-main);border-radius:8px;line-height:1.4;"><span style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;">Előtte:</span> ${item["FiDeSZ állapot"]}</div>` : ""}
+   <div style="font-size:14px;color:var(--text-main);line-height:1.5;"><span style="font-weight:700;">Előrelépés:</span> ${item["Volt előrelépést jelentő bejelentés?"] || "–"}</div>
+  </div>
+  <div style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+   <span style="font-size:13px;color:var(--text-secondary);">${_dAgo(item["Frissítés"])}</span>
+   <div style="display:flex;align-items:center;gap:10px;">
+    ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">🔗 Forrás</a>` : ""}
+    <span style="font-size:13px;color:#888;">👆 Részletek</span>
+   </div>
+  </div>
+ </div>
+ `;
+
+ if (vizHTML) {
+  card.classList.add('card-split');
+  card.innerHTML = bodyHTML + `<div class="card-viz">${vizHTML}</div>`;
+ } else {
+  card.innerHTML = bodyHTML;
+ }
+
+ card.addEventListener('click', (e) => {
+  if (e.target.tagName === 'A') return;
+  openModal(item);
+ });
+ return card;
+}
+
 function renderDashboard(data) {
  const container = document.getElementById("categorySections");
  container.innerHTML = "";
+
+ // Legfrissebb módban: flat lista, nem kategóriánként csoportosítva
+ if (typeof currentSort !== 'undefined' && currentSort === 'newest') {
+   const today = new Date().toISOString().slice(0,10);
+   const todayItems = data.filter(r => r['Frissítés'] === today);
+   const restItems  = data.filter(r => r['Frissítés'] !== today);
+
+   // Ha vannak mai téglák → "Ma frissült" szekció élre
+   if (todayItems.length > 0) {
+     const todaySec = document.createElement('div');
+     todaySec.className = 'category-section';
+     todaySec.style.background = 'linear-gradient(135deg,rgba(232,64,90,0.12),rgba(192,24,58,0.06))';
+     todaySec.style.border = '2px solid rgba(232,64,90,0.3)';
+     const todayTitle = document.createElement('div');
+     todayTitle.className = 'category-title';
+     todayTitle.innerHTML = '🔴 Ma frissült – ' + todayItems.length + ' tégla';
+     todaySec.appendChild(todayTitle);
+     const todayGrid = document.createElement('div');
+     todayGrid.className = 'cards-grid';
+     todaySec.appendChild(todayGrid);
+     todayItems.forEach(item => todayGrid.appendChild(buildCard(item)));
+     container.appendChild(todaySec);
+   }
+
+   // Többi dátum csoportonként
+   const dateGroups = {};
+   restItems.forEach(r => {
+     const d = r['Frissítés'] || '?';
+     if (!dateGroups[d]) dateGroups[d] = [];
+     dateGroups[d].push(r);
+   });
+   Object.keys(dateGroups).sort((a,b) => b.localeCompare(a)).forEach(d => {
+     const sec = document.createElement('div');
+     sec.className = 'category-section';
+     sec.style.background = 'var(--bg-card)';
+     const secTitle = document.createElement('div');
+     secTitle.className = 'category-title';
+     secTitle.innerHTML = '📅 ' + d + ' – ' + dateGroups[d].length + ' tégla';
+     sec.appendChild(secTitle);
+     const grid = document.createElement('div');
+     grid.className = 'cards-grid';
+     sec.appendChild(grid);
+     dateGroups[d].forEach(item => grid.appendChild(buildCard(item)));
+     container.appendChild(sec);
+   });
+   // categoryFilter frissítése newest módban is
+   const filterN = document.getElementById("categoryFilter");
+   if (filterN) {
+     const allCats = [...new Set(data.map(r => r["Kategória"]))];
+     filterN.innerHTML = `<option value="__all__">Összes kategória</option>`;
+     allCats.forEach(cat => { const o = document.createElement("option"); o.value = cat; o.textContent = cat; filterN.appendChild(o); });
+   }
+   updateStats(data);
+   drawChart(data);
+   return;
+ }
 
  const categories = [...new Set(data.map(r => r["Kategória"]))];
 
@@ -2972,6 +3089,10 @@ document.querySelectorAll(".cat-item").forEach(item => {
   const calcSection = document.getElementById("calcSection");
   if (calcSection) {
    calcSection.style.display = "block";
+   // Force-enable inputs desktopont
+   calcSection.querySelectorAll('input').forEach(inp => {
+     inp.style.cssText += ';position:relative!important;z-index:10!important;pointer-events:auto!important;-webkit-user-select:text!important;user-select:text!important;';
+   });
    setTimeout(() => scrollToWithOffset(calcSection, 80), 100);
   }
   
@@ -3321,6 +3442,7 @@ function getMiniCharts() {
 
 const excelData = __DATA_PLACEHOLDER__;
 
+let currentSort = 'default';
 renderDashboard(excelData);
 
 // ── Kalkulátor megosztás ──
@@ -3375,7 +3497,6 @@ function buildCalcShareUrl() {
 })();
 
 // ── Rendezés logika ──
-let currentSort = 'default';
 
 
 // Teljesített placeholder ha nincs egyetlen kész tégla sem
@@ -3471,6 +3592,29 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
     const napok = Math.ceil((maj9 - today) / 86400000);
     if (tesztMsg) tesztMsg.innerHTML =
       '🧱 Az első tégla lerakva — <strong>' + napok + ' nap</strong> múlva kezdődik az építkezés igazán (máj. 9.)';
+  }
+})();
+
+// ── Legfrissebb rendezés aktiválása ──
+function activateNewestSort() {
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector('.sort-btn[data-sort="newest"]');
+  if (btn) btn.classList.add('active');
+  currentSort = 'newest';
+  renderDashboard(getSortedData(excelData, 'newest'));
+  const sortBar = document.getElementById('sortBar');
+  if (sortBar) setTimeout(() => window.scrollTo({ top: sortBar.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }), 80);
+}
+
+// ── Mai frissítések felhívó a főcsempén ──
+(function() {
+  const today = new Date().toISOString().slice(0,10);
+  const todayCount = excelData.filter(r => r['Frissítés'] === today).length;
+  const wrap = document.getElementById('todayUpdateWrap');
+  const msg  = document.getElementById('todayUpdateMsg');
+  if (todayCount > 0 && wrap && msg) {
+    msg.textContent = 'Ma ' + todayCount + ' tégla frissült – nézd meg!';
+    wrap.style.display = 'block';
   }
 })();
 
@@ -4255,7 +4399,7 @@ Számold ki te is: ${url}`;
       szja = 0;
       szjaMentessegMegtakaritás = Math.round(szjaAlap * SZJA_RATE);
       items.push({ 
-        nev: `SZJA mentesség: ${anyaInfo.mentessegOk}`, 
+        nev: `SZJA megtakarítás: ${anyaInfo.mentessegOk}`, 
         osszeg: szjaMentessegMegtakaritás, 
         tipus: 'positive',
         megjegyzes: '0% SZJA!'
@@ -4332,7 +4476,7 @@ Számold ki te is: ${url}`;
         
         if (kedvTbbol > 0) {
           items.push({ 
-            nev: 'Családi kedvezmény TB-ből (maradék)', 
+            nev: 'Családi kedvezmény TB-ből csökkenti az adót', 
             osszeg: kedvTbbol, 
             tipus: 'positive'
           });
@@ -4415,7 +4559,12 @@ Számold ki te is: ${url}`;
           nettó / hó
         </div>
         <div style="border-top:1px solid var(--border-subtle); padding-top:12px;">
+          <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; opacity:0.7;">Hogyan jön ki a nettó?</div>
           ${resBefore.items.map(renderItem).join('')}
+          <div style="margin-top:10px; padding-top:10px; border-top:1.5px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:13px; font-weight:800; color:var(--text-main);">= Nettó fizetés</div>
+            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${fmt(resBefore.netto)}</div>
+          </div>
         </div>
       </div>
       
@@ -4431,7 +4580,12 @@ Számold ki te is: ${url}`;
           nettó / hó
         </div>
         <div style="border-top:1px solid rgba(232,64,90,0.2); padding-top:12px;">
+          <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; opacity:0.7;">Hogyan jön ki a nettó?</div>
           ${resAfter.items.map(renderItem).join('')}
+          <div style="margin-top:10px; padding-top:10px; border-top:1.5px solid rgba(232,64,90,0.3); display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:13px; font-weight:800; color:#e8405a;">= Nettó fizetés</div>
+            <div style="font-size:15px; font-weight:900; color:#e8405a;">${fmt(resAfter.netto)}</div>
+          </div>
           ${tiszaTobblet > 0 ? `
           <div style="margin-top:12px; padding-top:12px; border-top:2px solid #e8405a;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:linear-gradient(135deg, rgba(232,64,90,0.15), rgba(232,64,90,0.08)); border-radius:10px; border:1.5px solid #e8405a;">
