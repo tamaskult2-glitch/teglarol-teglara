@@ -3627,6 +3627,12 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
 
 // ── Legfrissebb rendezés aktiválása ──
 function activateNewestSort() {
+  // Kalkulátor elrejtése ha látható
+  const calcSection = document.getElementById('calcSection');
+  if (calcSection) calcSection.style.display = 'none';
+  // Kategória szekciók visszaállítása
+  document.querySelectorAll('.category-section').forEach(s => s.style.display = '');
+  // Sort btn aktiválás
   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector('.sort-btn[data-sort="newest"]');
   if (btn) btn.classList.add('active');
