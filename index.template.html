@@ -989,7 +989,7 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
 }
 
 /* ========= KALKULÁTOR ========= */
-.calc-section { margin-bottom: 40px; position:relative; isolation:isolate; }
+.calc-section { margin-bottom: 40px; position:relative; z-index:10; isolation:isolate; }
 .calc-card { background:var(--bg-card); border-radius:20px; padding:24px; box-shadow:var(--shadow-soft); overflow:hidden; box-sizing:border-box; position:relative; isolation:isolate; }
 .calc-title { font-size:20px; font-weight:800; color:var(--text-main); margin-bottom:4px; }
 .calc-subtitle { font-size:13px; color:var(--text-secondary); margin-bottom:20px; }
@@ -1064,7 +1064,7 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
   width:100%; padding:12px 14px; border-radius:12px;
   border:1.5px solid var(--border-subtle); background:var(--bg-main);
   color:var(--text-main); font-size:16px; font-weight:600; box-sizing:border-box;
-  position:relative; z-index:5;
+  position:relative; z-index:100;
   pointer-events:auto !important;
   -webkit-user-select:text; user-select:text;
   cursor:text;
@@ -1432,19 +1432,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <p style="text-align:center;margin:4px 0 12px;font-size:13px;color:var(--text-secondary);">
   📲 Oszd meg, ha tetszik!
  </p>
- <div class="share-row">
-  <a class="share-btn fb" id="shareFacebook" href="#" onclick="return false;">
-   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-   Facebook
-  </a>
-  <a class="share-btn tw" id="shareTwitter" href="#" onclick="return false;">
-   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-   X
-  </a>
-  <a class="share-btn wa" id="shareWhatsapp" href="#" onclick="return false;">
-   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.5 2C6.261 2 2 6.261 2 11.5c0 1.746.478 3.38 1.306 4.786L2 22l5.877-1.288A9.435 9.435 0 0011.5 21c5.239 0 9.5-4.261 9.5-9.5S16.739 2 11.5 2zm0 17.5c-1.564 0-3.02-.46-4.241-1.248l-.302-.18-3.487.764.793-3.395-.198-.312A7.461 7.461 0 014 11.5C4 7.364 7.364 4 11.5 4S19 7.364 19 11.5 15.636 19.5 11.5 19.5z"/></svg>
-   WhatsApp
-  </a>
+ <div class="share-row" style="grid-template-columns:1fr;">
   <button class="share-btn cp" id="shareCopy">
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
    <span id="copyLabel">Link másolás</span>
@@ -2022,11 +2010,11 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <div class="calc-input-row">
     <div class="calc-input-group" id="calcBruttoWrap">
      <label>Bruttó havi fizetés (Ft)</label>
-     <input type="number" id="calcBrutto" placeholder="pl. 450000" min="0" step="10000">
+     <input type="number" id="calcBrutto" maxlength="10" oninput="if(this.value.length>10)this.value=this.value.slice(0,10)" style="position:relative;z-index:10;pointer-events:auto!important;" placeholder="pl. 450000" min="0" step="10000">
     </div>
     <div class="calc-input-group" id="calcCsedGyedWrap" style="display:none;">
      <label>Eredeti bruttó bér (CSED/GYED alapja)</label>
-     <input type="number" id="calcCsedGyedBrutto" placeholder="pl. 500000" min="0" step="10000">
+     <input type="number" id="calcCsedGyedBrutto" maxlength="10" oninput="if(this.value.length>10)this.value=this.value.slice(0,10)" style="position:relative;z-index:10;pointer-events:auto!important;" placeholder="pl. 500000" min="0" step="10000">
      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px;" class="csed-gyed-info">
       <strong>CSED:</strong> 100% bruttó, SZJA 0%<br>
       <strong>GYED:</strong> 70% bruttó (max 451 920), SZJA 0%, 10% nyugdíj
@@ -2034,12 +2022,12 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     </div>
     <div class="calc-input-group" id="calcKataWrap" style="display:none;">
      <label>Havi bevétel (Ft) — KATA előtt</label>
-     <input type="number" id="calcKataBev" placeholder="pl. 800000" min="0" step="50000">
+     <input type="number" id="calcKataBev" maxlength="10" oninput="if(this.value.length>10)this.value=this.value.slice(0,10)" style="position:relative;z-index:10;pointer-events:auto!important;" placeholder="pl. 800000" min="0" step="50000">
      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">Max. 1.500.000 Ft/hó (18M/év limit)</div>
     </div>
     <div class="calc-input-group" id="calcNyugdijWrap" style="display:none;">
      <label>Havi nyugdíj összege (Ft)</label>
-     <input type="number" id="calcNyugdij" placeholder="pl. 180000" min="0" step="5000">
+     <input type="number" id="calcNyugdij" maxlength="10" oninput="if(this.value.length>10)this.value=this.value.slice(0,10)" style="position:relative;z-index:10;pointer-events:auto!important;" placeholder="pl. 180000" min="0" step="5000">
     </div>
     <button class="calc-btn" id="calcBtn">Számítás →</button>
    </div>
