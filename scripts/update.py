@@ -12,7 +12,7 @@ TEMPLATE_FILE = ROOT / "index.template.html"
 OUTPUT_FILE = ROOT / "index.html"
 
 # Hány téglát vizsgáljon meg egyszerre
-BATCH_SIZE = 10
+BATCH_SIZE = 5
 
 
 def load_data():
@@ -182,10 +182,12 @@ def main():
     )
 
     total_changed = 0
-    # Batch-ekben dolgozunk
-    for i in range(0, min(len(candidates), BATCH_SIZE * 3), BATCH_SIZE):
-        batch = candidates[i : i + BATCH_SIZE]
-        print(f"\nBatch {i//BATCH_SIZE + 1}: {len(batch)} igeret ({batch[0]['TiSZa ígéret'][:30]}...)")
+    batches = [candidates[i:i+BATCH_SIZE] for i in range(0, min(len(candidates), BATCH_SIZE * 2), BATCH_SIZE)]
+    for bi, batch in enumerate(batches):
+        if bi > 0:
+            print("  Varakozas 70mp (rate limit)...")
+            import time; time.sleep(70)
+        print(f"\nBatch {bi+1}: {len(batch)} igeret ({batch[0]['TiSZa ígéret'][:30]}...)")
         updates = ask_claude_batch(client, batch)
         if updates:
             changed = apply_updates(data, batch, updates)
