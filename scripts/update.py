@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tégláról-téglára frissítő – optimalizált, alacsony API költség"""
+"""Tégláról-téglára frissítő – web search + előrelépés frissítés"""
 import os, re, json
 from datetime import date
 from pathlib import Path
@@ -11,104 +11,154 @@ DATA_FILE = ROOT / "data.json"
 TEMPLATE_FILE = ROOT / "index.template.html"
 OUTPUT_FILE = ROOT / "index.html"
 
+# Hány téglát vizsgáljon meg egyszerre
+BATCH_SIZE = 10
+
 
 def load_data():
-    if not DATA_FILE.exists():
-        html_file = ROOT / "index.html"
-        if html_file.exists():
-            content = html_file.read_text(encoding="utf-8")
-            match = re.search(r'excelData = (\[.*?\]);', content, re.DOTALL)
-            if match:
-                data = json.loads(match.group(1))
-                save_data(data)
-                return data
-        raise FileNotFoundError(f"Nem található: {DATA_FILE}")
-    return json.loads(DATA_FILE.read_text(encoding="utf-8"))
+    if DATA_FILE.exists():
+        return json.loads(DATA_FILE.read_text(encoding="utf-8"))
+    # Fallback: kinyerjük az index.html-ből
+    html_file = ROOT / "index.html"
+    if html_file.exists():
+        content = html_file.read_text(encoding="utf-8")
+        start = content.find("const excelData = [") + len("const excelData = ")
+        end = content.find("\n];", start) + 2
+        raw = re.sub(r",\s*\]$", "\n]", content[start:end].strip())
+        data = json.loads(raw)
+        save_data(data)
+        return data
+    raise FileNotFoundError(f"Nem található: {DATA_FILE}")
 
 
 def save_data(data):
-    DATA_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    DATA_FILE.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
 
 def build_html(data):
     template = TEMPLATE_FILE.read_text(encoding="utf-8")
     data_js = json.dumps(data, ensure_ascii=False)
-    html = template.replace("excelData = __DATA_PLACEHOLDER__;", f"excelData = {data_js};")
+    html = template.replace(
+        "excelData = __DATA_PLACEHOLDER__;", f"excelData = {data_js};"
+    )
     OUTPUT_FILE.write_text(html, encoding="utf-8")
     print(f"index.html: {len(html):,} byte, datum: {TODAY}")
 
 
-def ask_claude(data):
-    """Optimalizalt API hivas: max 5 igeret, ultra-rovid prompt"""
-    client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+def ask_claude_batch(client, batch):
+    """Egy batch téglára kér frissítést web search-csel"""
 
-    pending = [d for d in data
-               if d["Változás"] not in ("kész", "teljesítve")
-               and d.get("Prioritás") == "azonnali"]
-    pending = pending[:5]
+    items_text = "\n".join(
+        f"{i+1}. [{d['Változás']}] {d['TiSZa ígéret'][:60]}"
+        f" | Utolsó: {d.get('Frissítés','?')} | {d.get('Volt előrelépést jelentő bejelentés?','')[:80]}"
+        for i, d in enumerate(batch)
+    )
 
-    if not pending:
-        print("Nincs azonnali frissitendo igeret.")
-        return []
+    prompt = f"""Mai dátum: {TODAY}. Magyar politika, Tisza Párt kormány ígéretei.
 
-    items = "\n".join([f"{i+1}. {d['TiSZa ígéret'][:50]} [{d['Változás']}]"
-                       for i, d in enumerate(pending)])
+Vizsgáld meg az alábbi ígéreteket web search segítségével és keresd a mai vagy tegnapi friss híreket:
 
-    prompt = f"""Datum: {TODAY}. TISZA Part igeretek:
-{items}
+{items_text}
 
-Ha BIZTOS statuszvaltozas van, valaszolj: [{{"n":1,"s":"bejelentve"}}]
-Ha nincs valtozas: []
-Csak JSON, semmi mas!"""
+FELADAT: Minden ígérethez keresd meg a legfrissebb hírt (ha van {TODAY} vagy közeli dátumú).
 
-    print(f"Prompt: {len(prompt)} kar, {len(pending)} igeret")
+Válaszolj CSAK JSON tömbben, minden frissítendő ígérethez egy objektum:
+[
+  {{
+    "n": <sorszám 1-től>,
+    "elore": "<új előrelépés szöveg max 120 kar, magyar nyelven>",
+    "datum": "{TODAY}",
+    "forras": "<url>",
+    "valtozas": "<csak ha státusz változott: bejelentve|kész|igéret>"
+  }}
+]
+
+Ha nincs friss hír egy ígéretnél, ne szerepeljen a válaszban.
+Ha semmiben nincs változás: []
+CSAK JSON, semmi más!"""
 
     try:
         msg = client.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=150,
-            messages=[{"role": "user", "content": prompt}]
+            max_tokens=800,
+            tools=[{"type": "web_search_20250305", "name": "web_search"}],
+            messages=[{"role": "user", "content": prompt}],
         )
     except Exception as e:
-        print(f"API hiba: {e}")
+        print(f"  API hiba: {e}")
         return []
 
     u = msg.usage
     cost = (u.input_tokens / 1_000_000 * 0.80) + (u.output_tokens / 1_000_000 * 4.00)
-    print(f"Tokens: in={u.input_tokens}, out={u.output_tokens}, ~${cost:.4f}")
+    print(f"  Tokens: in={u.input_tokens}, out={u.output_tokens}, ~${cost:.4f}")
 
-    text = "".join(b.text for b in msg.content if b.type == "text").strip()
+    # Összegyűjtjük a text blokkokat
+    text = "".join(
+        b.text for b in msg.content if hasattr(b, "text") and b.type == "text"
+    ).strip()
+
+    if not text:
+        return []
+
+    # JSON kinyerés
     if text.startswith("```"):
-        text = re.sub(r'^```\w*\n?', '', text)
-        text = re.sub(r'\n?```$', '', text)
+        text = re.sub(r"^```\w*\n?", "", text)
+        text = re.sub(r"\n?```$", "", text)
+
+    # Ha csak [] akkor üres
+    text = text.strip()
+    if text == "[]":
+        return []
 
     try:
         updates = json.loads(text)
+        return updates if isinstance(updates, list) else []
     except Exception:
-        print(f"Nem JSON valasz: {text[:200]}")
+        # Próbáljuk kinyerni a JSON tömböt
+        m = re.search(r"\[[\s\S]*\]", text)
+        if m:
+            try:
+                return json.loads(m.group(0))
+            except Exception:
+                pass
+        print(f"  Nem JSON: {text[:150]}")
         return []
 
-    result = []
-    for u in updates:
-        if 'n' in u and 's' in u:
-            idx = u['n'] - 1
-            if 0 <= idx < len(pending):
-                result.append({"TiSZa ígéret": pending[idx]['TiSZa ígéret'], "Változás": u['s']})
-    return result
 
-
-def apply_updates(data, updates):
-    if not updates:
-        return 0
+def apply_updates(data, batch, updates):
+    """Updates alkalmazása a batch-re"""
     count = 0
     for upd in updates:
+        n = upd.get("n")
+        if not n or not isinstance(n, int):
+            continue
+        idx = n - 1
+        if idx < 0 or idx >= len(batch):
+            continue
+
+        igeret_nev = batch[idx]["TiSZa ígéret"]
         for d in data:
-            if d['TiSZa ígéret'] == upd['TiSZa ígéret']:
-                if d.get('Változás') != upd.get('Változás'):
-                    d['Változás'] = upd['Változás']
-                    d['Frissítés'] = TODAY
+            if d["TiSZa ígéret"] == igeret_nev:
+                changed = False
+
+                if upd.get("elore") and upd["elore"] != d.get("Volt előrelépést jelentő bejelentés?"):
+                    d["Volt előrelépést jelentő bejelentés?"] = upd["elore"]
+                    changed = True
+
+                if upd.get("forras") and upd["forras"] != d.get("Forrás link"):
+                    d["Forrás link"] = upd["forras"]
+                    changed = True
+
+                if upd.get("valtozas") and upd["valtozas"] != d.get("Változás"):
+                    d["Változás"] = upd["valtozas"]
+                    changed = True
+
+                if changed:
+                    d["Frissítés"] = TODAY
                     count += 1
-                    print(f"  Valtozas: {d['TiSZa ígéret'][:50]}")
+                    print(f"  ✓ {igeret_nev[:55]}")
                 break
     return count
 
@@ -118,14 +168,36 @@ def main():
     data = load_data()
     print(f"Adat: {len(data)} igeret")
 
-    updates = ask_claude(data)
-    changed = apply_updates(data, updates)
+    client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
-    if changed > 0:
+    # Prioritás szerint sorba rendezés: azonnali > rovid > hosszu
+    # + régebben frissítettek előre
+    priority_order = {"Azonnali": 0, "azonnali": 0, "rovid": 1, "hosszu": 2}
+    candidates = sorted(
+        [d for d in data if d.get("Változás") not in ("kész", "teljesítve")],
+        key=lambda d: (
+            priority_order.get(d.get("Prioritás", "rovid"), 1),
+            d.get("Frissítés", "2000-01-01"),
+        ),
+    )
+
+    total_changed = 0
+    # Batch-ekben dolgozunk
+    for i in range(0, min(len(candidates), BATCH_SIZE * 3), BATCH_SIZE):
+        batch = candidates[i : i + BATCH_SIZE]
+        print(f"\nBatch {i//BATCH_SIZE + 1}: {len(batch)} igeret ({batch[0]['TiSZa ígéret'][:30]}...)")
+        updates = ask_claude_batch(client, batch)
+        if updates:
+            changed = apply_updates(data, batch, updates)
+            total_changed += changed
+        else:
+            print("  Nincs frissités")
+
+    if total_changed > 0:
         save_data(data)
-        print(f"{changed} valtozas mentve")
+        print(f"\n{total_changed} valtozas mentve → data.json")
     else:
-        print("Nincs uj valtozas")
+        print("\nNincs uj valtozas")
 
     build_html(data)
     print("=== Kesz ===")
