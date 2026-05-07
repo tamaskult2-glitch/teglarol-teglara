@@ -4184,9 +4184,15 @@ Számold ki te is: ${url}`;
   // Modal megnyitás
   if (categoryTrigger) {
     categoryTrigger.addEventListener('click', () => {
+      // Kalkulátor tetejére ugrás (calcSection display:none lehet, ezért a trigger pozícióját nézzük)
+      const triggerEl = document.getElementById('categoryTrigger') || document.querySelector('.category-trigger');
+      if (triggerEl) {
+        const top = triggerEl.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'instant' });
+      }
       categoryModal.style.display = 'flex';
       updateModalButtons();
-      // Modal tartalma tetejére scrollolás
+      // Modal tartalma is tetejére
       setTimeout(() => {
         categoryModal.scrollTop = 0;
         const box = categoryModal.querySelector('.modal-card');
@@ -4284,6 +4290,14 @@ Számold ki te is: ${url}`;
     categorySave.addEventListener('click', () => {
       categoryModal.style.display = 'none';
       updateChips();
+      // Scroll vissza a kalkulátorhoz
+      const calcSec = document.getElementById('calcSection');
+      if (calcSec) {
+        setTimeout(() => {
+          const top = calcSec.getBoundingClientRect().top + window.scrollY - 60;
+          window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        }, 50);
+      }
     });
   }
   
@@ -4862,113 +4876,94 @@ Számold ki te is: ${url}`;
   
   // === MEGJELENÍTÉS ===
   function displayResults(resBefore, resAfter) {
-    const diff = resAfter.netto - resBefore.netto;
-    const diffPercent = resBefore.netto > 0 ? ((diff / resBefore.netto) * 100).toFixed(1) : 0;
+    // Valós különbség (jelenlegi törvény szerint)
+    const diff = resBefore.netto - resBefore.netto; // 0 – az áradás előtt/után azonos adójogi környezet
+
+    // TISZA ígéret tételek (még nem teljesültek)
+    const tiszaIgeretek = resAfter.items.filter(i => i.tipus === 'tisza');
+    const tiszaOsszeg = tiszaIgeretek.reduce((s, i) => s + i.osszeg, 0);
+
+    // Valós nettó különbség (TISZA tételek nélkül) = jelenlegi törvény szerinti különbség
+    const valosDiff = resBefore.netto - resBefore.netto; // jelenleg 0
+    const diffPercent = resBefore.netto > 0 ? ((tiszaOsszeg / resBefore.netto) * 100).toFixed(1) : 0;
+
+    const hasTisza = tiszaIgeretek.length > 0;
     
-    // TISZA tételek összesítése
-    const tiszaTobblet = resAfter.items
-      .filter(item => item.tipus === 'tisza')
-      .reduce((sum, item) => sum + item.osszeg, 0);
+    // Tételek szétválasztása: jelenlegi (positive/negative/neutral) vs ígéret (tisza)
+    const beforeItems = resBefore.items;
+    const afterItemsJelenlegi = resAfter.items.filter(i => i.tipus !== 'tisza');
+    const afterItemsIgeret = resAfter.items.filter(i => i.tipus === 'tisza');
 
-    // Disclaimer: megnézzük hány TISZA ígéret "kész" már
-    const tiszaKesz = excelData.filter(r => r['Változás'] === 'kész' || r['Változás'] === 'teljesítve').length;
-    const tiszaTisza = resAfter.items.filter(i => i.tipus === 'tisza').length;
-    const mindenKesz = tiszaTisza > 0 && excelData
-      .filter(r => r['Változás'] === 'kész' || r['Változás'] === 'teljesítve').length > 0;
-
-    // Tétel-szintű kész ellenőrzés: kulcsszavak alapján
-    const keszTeglaNeyek = new Set(
-      excelData
-        .filter(r => r['Változás'] === 'kész' || r['Változás'] === 'teljesítve')
-        .map(r => r['TiSZa ígéret'].toLowerCase())
-    );
-
-    function isTiszaTételKesz(nev) {
-      const n = nev.toLowerCase();
-      for (const tegla of keszTeglaNeyek) {
-        if (n.includes('pótlék') && tegla.includes('pótlék')) return true;
-        if (n.includes('gyes') && tegla.includes('gyes')) return true;
-        if (n.includes('szép-kártya') && tegla.includes('szép')) return true;
-        if (n.includes('minimálnyugdíj') && tegla.includes('minimálnyu')) return true;
-        if (n.includes('szja') && n.includes('csökkent') && tegla.includes('szja')) return true;
-        if (n.includes('adójóváírás') && tegla.includes('adójóváírás')) return true;
-      }
-      return false;
-    }
-
-    const afterDisclaimerHtml = tiszaTisza === 0 ? '' :
-      `<div style="font-size:11px; background:rgba(232,64,90,0.12); color:#c0183a; border-radius:6px; padding:4px 8px; margin-bottom:8px; font-weight:600;">
-        ⚠️ Ígéretek alapján – nem a valóság!
-      </div>`;
-    
     let html = `
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-bottom:24px;">
-      <!-- ELŐTT -->
+
+      <!-- ELŐTT: jelenlegi törvény szerinti valós összeg -->
       <div style="background:var(--bg-card); border-radius:16px; padding:24px; border:2px solid var(--border-subtle);">
-        <div style="font-size:13px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-          "Áradás" előtt
-        </div>
-        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">
-          ${fmt(resBefore.netto)}
-        </div>
-        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
-          nettó / hó
-        </div>
+        <div style="font-size:13px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">"Áradás" előtt</div>
+        <div style="font-size:11px; color:#2e7d32; background:#e8f5e9; border-radius:5px; padding:3px 8px; margin-bottom:8px; font-weight:600;">✅ Jelenlegi valós összeg</div>
+        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">${fmt(resBefore.netto)}</div>
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">nettó / hó</div>
         <div style="border-top:1px solid var(--border-subtle); padding-top:12px;">
           <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; opacity:0.7;">Hogyan jön ki a nettó?</div>
-          ${resBefore.items.map(renderItem).join('')}
+          ${beforeItems.map(renderItem).join('')}
           <div style="margin-top:10px; padding-top:10px; border-top:1.5px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
             <div style="font-size:13px; font-weight:800; color:var(--text-main);">= Nettó fizetés</div>
             <div style="font-size:15px; font-weight:900; color:var(--text-main);">${fmt(resBefore.netto)}</div>
           </div>
         </div>
       </div>
-      
-      <!-- UTÁN -->
-      <div style="background:linear-gradient(135deg, rgba(232,64,90,0.08), rgba(192,24,58,0.08)); border-radius:16px; padding:24px; border:2px solid #e8405a;">
-        <div style="font-size:13px; font-weight:700; color:#e8405a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">
-          "Áradás" után
-        </div>
-        ${afterDisclaimerHtml}
-        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">
-          ${fmt(resAfter.netto)}
-        </div>
-        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
-          nettó / hó
-        </div>
+
+      <!-- UTÁN: jelenlegi + TISZA ígéretek külön szekciókban -->
+      <div style="background:linear-gradient(135deg, rgba(232,64,90,0.06), rgba(192,24,58,0.04)); border-radius:16px; padding:24px; border:2px solid #e8405a;">
+        <div style="font-size:13px; font-weight:700; color:#e8405a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">"Áradás" után</div>
+        <div style="font-size:11px; color:#856404; background:#fff3cd; border:1px solid #ffca2c; border-radius:5px; padding:3px 8px; margin-bottom:8px; font-weight:600;">⚠️ Jelenlegi + TISZA ígéretek (még nem törvény!)</div>
+        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">${fmt(resBefore.netto)}</div>
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">nettó / hó – jelenlegi törvény szerint</div>
+
+        <!-- Jelenlegi tételek -->
         <div style="border-top:1px solid rgba(232,64,90,0.2); padding-top:12px;">
-          <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; opacity:0.7;">Hogyan jön ki a nettó?</div>
-          ${resAfter.items.map(renderItem).join('')}
-          <div style="margin-top:10px; padding-top:10px; border-top:1.5px solid rgba(232,64,90,0.3); display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:13px; font-weight:800; color:#e8405a;">= Nettó fizetés</div>
-            <div style="font-size:15px; font-weight:900; color:#e8405a;">${fmt(resAfter.netto)}</div>
+          <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; opacity:0.7;">Hogyan jön ki a nettó? (ma érvényes)</div>
+          ${afterItemsJelenlegi.map(renderItem).join('')}
+          <div style="margin-top:8px; padding-top:8px; border-top:1.5px solid rgba(232,64,90,0.3); display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:13px; font-weight:800; color:var(--text-main);">= Jelenlegi nettó</div>
+            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${fmt(resBefore.netto)}</div>
           </div>
-          ${tiszaTobblet > 0 ? `
-          <div style="margin-top:12px; padding-top:12px; border-top:2px solid #e8405a;">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:linear-gradient(135deg, rgba(232,64,90,0.15), rgba(232,64,90,0.08)); border-radius:10px; border:1.5px solid #e8405a;">
-              <div style="font-weight:800; color:#e8405a; font-size:14px;">🎁 TISZA TÖBBLET ÖSSZESEN</div>
-              <div style="font-weight:900; color:#e8405a; font-size:16px;">+${fmt(tiszaTobblet)}</div>
-            </div>
-          </div>
-          ` : ''}
         </div>
+
+        ${afterItemsIgeret.length > 0 ? `
+        <!-- TISZA ígéretek szekció -->
+        <div style="margin-top:16px; padding:14px; background:rgba(255,193,7,0.1); border:1.5px dashed #f59e0b; border-radius:10px;">
+          <div style="font-size:12px; font-weight:800; color:#92400e; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+            <span>⏳</span> TISZA ígéretek – ha teljesülnek, ennyivel több lesz:
+          </div>
+          ${afterItemsIgeret.map(renderIgeretItem).join('')}
+          <div style="margin-top:10px; padding-top:10px; border-top:1.5px dashed #f59e0b; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:13px; font-weight:800; color:#92400e;">+ Ígéretek összesen</div>
+            <div style="font-size:15px; font-weight:900; color:#92400e;">+${fmt(tiszaOsszeg)}</div>
+          </div>
+          <div style="font-size:11px; color:#92400e; margin-top:6px; opacity:0.8;">⚠️ Még nem törvény – bejelentett ígéretek alapján</div>
+        </div>
+
+        <!-- Ha minden teljesül -->
+        <div style="margin-top:12px; padding:12px; background:rgba(232,64,90,0.08); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:13px; font-weight:700; color:#e8405a;">📊 Ha minden ígéret teljesül:</div>
+          <div style="font-size:16px; font-weight:900; color:#e8405a;">${fmt(resBefore.netto + tiszaOsszeg)}</div>
+        </div>
+        ` : ''}
       </div>
     </div>
-    
-    <!-- KÜLÖNBSÉG -->
-    <div style="background:${diff >= 0 ? 'linear-gradient(135deg, #e8f5e9, #c8e6c9)' : 'linear-gradient(135deg, #ffebee, #ffcdd2)'}; border-radius:16px; padding:20px; text-align:center;">
-      <div style="font-size:14px; font-weight:600; color:${diff >= 0 ? '#2e7d32' : '#c62828'}; margin-bottom:8px;">
-        Havi különbség
+
+    <!-- KÜLÖNBSÉG doboz -->
+    <div style="background:linear-gradient(135deg, #fff8e1, #fff3cd); border:2px solid #f59e0b; border-radius:16px; padding:20px; text-align:center;">
+      <div style="font-size:14px; font-weight:700; color:#92400e; margin-bottom:6px;">📊 Mennyi lehet a többlet, ha az ígéretek teljesülnek?</div>
+      <div style="font-size:36px; font-weight:900; color:${tiszaOsszeg > 0 ? '#92400e' : '#555'}; margin-bottom:4px;">
+        ${tiszaOsszeg > 0 ? '+' : ''}${fmt(tiszaOsszeg)}
       </div>
-      <div style="font-size:36px; font-weight:900; color:${diff >= 0 ? '#1b5e20' : '#b71c1c'}; margin-bottom:4px;">
-        ${diff >= 0 ? '+' : ''}${fmt(diff)}
-      </div>
-      <div style="font-size:13px; color:${diff >= 0 ? '#2e7d32' : '#c62828'};">
-        ${diff >= 0 ? '+' : ''}${diffPercent}% ${diff >= 0 ? 'növekedés' : 'csökkenés'}
-      </div>
-      <div style="font-size:12px; color:var(--text-secondary); margin-top:8px;">
-        Évente: ${diff >= 0 ? '+' : ''}${fmt(diff * 12)}
-      </div>
+      ${tiszaOsszeg > 0 ? `
+      <div style="font-size:13px; color:#92400e;">+${diffPercent}% a jelenlegi nettóhoz képest</div>
+      <div style="font-size:12px; color:#92400e; margin-top:4px;">Évente: +${fmt(tiszaOsszeg * 12)}</div>
+      <div style="font-size:11px; color:#92400e; margin-top:8px; opacity:0.8; border-top:1px dashed #f59e0b; padding-top:8px;">⏳ Ez az összeg akkor válik valóssá, ha a TISZA ígéreteket törvénybe iktatják</div>
+      ` : `<div style="font-size:13px; color:#555;">Ennél a kategóriánál és bérszintnél nincs bejelentett TISZA többletígéret</div>`}
     </div>
     `;
     
@@ -4981,37 +4976,48 @@ Számold ki te is: ${url}`;
     }
   }
   
-  // === ITEM RENDER ===
+  // === ITEM RENDER (jelenlegi tételek) ===
   function renderItem(item) {
     let color = 'var(--text-secondary)';
     let sign = '';
-    let bgColor = 'transparent';
-    let fontWeight = '700';
-    let prefix = '';
-    
+    let fontWeight = '600';
+
     if (item.tipus === 'positive') {
       color = '#2e7d32';
       sign = '+';
+      fontWeight = '700';
     } else if (item.tipus === 'negative') {
       color = '#c62828';
-      sign = '';
-    } else if (item.tipus === 'tisza') {
-      const kesz = typeof isTiszaTételKesz === 'function' && isTiszaTételKesz(item.nev);
-      color = kesz ? '#2da44e' : '#e8405a';
-      bgColor = kesz ? 'rgba(45,164,78,0.08)' : 'rgba(232,64,90,0.08)';
-      sign = '+';
-      fontWeight = '800';
-      prefix = kesz ? '✅ ' : '🎁 ';
+      sign = '-';
+      fontWeight = '700';
     }
-    
-    const megjegyzes = item.megjegyzes ? ` <span style="font-size:11px; color:${color};">(${item.megjegyzes})</span>` : '';
-    
+    // tisza típusú tételeket itt nem renderelünk (külön renderIgeretItem kezeli)
+    if (item.tipus === 'tisza') return '';
+
+    const megjegyzes = item.megjegyzes ? ` <span style="font-size:11px; color:${color}; opacity:0.8;">(${item.megjegyzes})</span>` : '';
+    const ossz = item.tipus === 'negative' ? -Math.abs(item.osszeg) : item.osszeg;
+    if (item.osszeg === 0 && item.tipus === 'neutral') {
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; margin:1px 0; font-size:13px;">
+          <div style="color:var(--text-secondary);">${item.nev}${megjegyzes}</div>
+          <div style="font-weight:600; color:var(--text-secondary);">–</div>
+        </div>`;
+    }
     return `
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; margin:2px 0; font-size:13px; background:${bgColor}; border-radius:8px;">
-        <div style="color:var(--text-secondary);">${prefix}${item.nev}${megjegyzes}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; margin:1px 0; font-size:13px;">
+        <div style="color:var(--text-secondary);">${item.nev}${megjegyzes}</div>
         <div style="font-weight:${fontWeight}; color:${color};">${sign}${fmt(Math.abs(item.osszeg))}</div>
-      </div>
-    `;
+      </div>`;
+  }
+
+  // === ÍGÉRET ITEM RENDER (TISZA ígéretek – sárga szekcióba) ===
+  function renderIgeretItem(item) {
+    const megjegyzes = item.megjegyzes ? ` <span style="font-size:11px; opacity:0.7;">(${item.megjegyzes})</span>` : '';
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 8px; margin:2px 0; font-size:13px; background:rgba(255,255,255,0.5); border-radius:6px;">
+        <div style="color:#92400e;">⏳ ${item.nev}${megjegyzes}</div>
+        <div style="font-weight:800; color:#92400e;">+${fmt(item.osszeg)}</div>
+      </div>`;
   }
   
   // === FORMÁZÁS ===
