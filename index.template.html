@@ -140,9 +140,9 @@ body.dark .logo-future .logo-tint { background:rgba(30,35,60,0.55); }
 .share-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; justify-content:center; align-items:center; margin-top:16px; max-width:320px; margin-left:auto; margin-right:auto; }
 
 /* Feliratkozó szekció */
-.subscribe-section { margin:20px 0 8px; padding:16px 20px; background:rgba(232,64,90,0.07); border-radius:16px; border:1px solid rgba(232,64,90,0.2); position:relative; isolation:isolate; }
+.subscribe-section { margin:20px 0 8px; padding:16px 20px; background:rgba(232,64,90,0.07); border-radius:16px; border:1px solid rgba(232,64,90,0.2); }
 .subscribe-row { display:flex; gap:8px; margin-top:10px; }
-.subscribe-row input { flex:1; padding:10px 14px; border-radius:10px; border:1.5px solid var(--border-subtle); background:var(--bg-main); color:var(--text-main); font-size:14px; box-sizing:border-box; position:relative; z-index:5; pointer-events:auto !important; }
+.subscribe-row input { flex:1; padding:10px 14px; border-radius:10px; border:1.5px solid var(--border-subtle); background:var(--bg-main); color:var(--text-main); font-size:14px; box-sizing:border-box; }
 .subscribe-row input:focus { outline:none; border-color:#e8405a; }
 .subscribe-row button { padding:10px 16px; background:linear-gradient(135deg,#e8405a,#c0183a); color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; }
 .subscribe-row button:disabled { opacity:0.6; cursor:default; }
@@ -324,7 +324,8 @@ body.dark #stickyCatHeader {
 .card { background:var(--bg-card); padding:22px; border-radius:14px; margin-bottom:16px; box-shadow:var(--shadow-soft); border:1px solid var(--border-subtle); transition:background 0.3s,transform 0.18s,box-shadow 0.18s; word-break:break-word; overflow-wrap:break-word; max-width:100%; box-sizing:border-box; overflow:hidden; display:block; position:relative; isolation:isolate; }
 .card::before { content:''; position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.05)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.05)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); background-repeat:repeat; background-size:200px 120px; pointer-events:none; z-index:0; border-radius:14px; }
 .card > * { position:relative; z-index:1; }
-
+.card::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background-image: url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.08)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.08)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); background-repeat: repeat; background-size: 200px 120px; pointer-events:none; z-index:0; opacity:1; }
+.card > * { position:relative; z-index:1; }
 .card h3 { font-size:17px; line-height:1.4; margin:0 0 10px; word-break:break-word; font-weight:700; }
 .card p { font-size:15px; line-height:1.6; margin:5px 0; word-break:break-word; }
 .card h3 { margin:0 0 10px; font-size:17px; color:var(--text-main); font-weight:700; letter-spacing:-0.2px; }
@@ -417,7 +418,7 @@ body.dark .mini-bar { background:rgba(192,202,245,0.08); }
 .mini-value { flex:0 0 auto; font-size:10.5px; color:var(--text-secondary); font-variant-numeric:tabular-nums; }
 
 /* ---- MODAL ---- */
-.modal-overlay { display:none; position:fixed; inset:0; background:rgba(20,20,28,0.6); z-index:200; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(8px); pointer-events:auto; }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(20,20,28,0.6); z-index:200; align-items:flex-start; justify-content:center; padding:16px; padding-top:max(16px, env(safe-area-inset-top)); backdrop-filter:blur(8px); pointer-events:auto; overflow-y:auto; }
 .modal-overlay.active { display:flex; }
 .modal-box { pointer-events:auto; }
 .modal-box { background:var(--bg-card); border-radius:20px; padding:36px; max-width:620px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.25); border:1px solid var(--border-subtle); position:relative; animation:modalIn 0.22s ease; }
@@ -1947,6 +1948,9 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <!-- ========= KALKULÁTOR SZEKCIÓ ========= -->
  <div class="calc-section" id="calcSection" style="display:none;">
   <div class="calc-card">
+   <div style="background:#FFF3CD; border:1px solid #FFCA2C; border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:13px; color:#856404; font-weight:600;">
+    🚧 Fejlesztés alatt – az adatok tájékoztató jellegűek, előfordulhatnak pontatlanságok.
+   </div>
    <div class="calc-title">💰 Mennyit jelent neked az „áradás"?</div>
    <div class="calc-subtitle">Add meg a bruttó havi fizetésedet, és kiszámítjuk a várható változást az „áradás" előtti és utáni időszakban.</div>
 
@@ -1976,6 +1980,23 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     </div>
     <div style="margin-top:8px; font-size:11px; color:var(--text-secondary);">
      <strong>SZJA mentesség:</strong> 30 alatt + 1 gyerek VAGY 40 alatt + 2 gyerek VAGY 3+ gyerek = teljes SZJA mentesség!
+    </div>
+   </div>
+
+   <!-- Egyedülálló szülő nem/kor -->
+   <div id="egyedulalloWrap" style="display:none; margin:12px 0; padding:12px; background:var(--bg-main); border-radius:10px;">
+    <div style="font-size:13px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">Egyedülálló szülő – nem:</div>
+    <div style="display:flex; gap:8px; margin-bottom:10px;">
+     <button class="calc-age-btn active" data-egynem="ferfi">👨 Férfi</button>
+     <button class="calc-age-btn" data-egynem="no">👩 Nő</button>
+    </div>
+    <div id="egyedulalloKorWrap" style="display:none;">
+     <div style="font-size:13px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">Életkora:</div>
+     <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="calc-age-btn active" data-egykor="30alatt">👩 30 év alatt</button>
+      <button class="calc-age-btn" data-egykor="40alatt">👩 30-39 között</button>
+      <button class="calc-age-btn" data-egykor="40felett">👩‍🦳 40 év felett</button>
+     </div>
     </div>
    </div>
 
@@ -2009,6 +2030,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
        <button class="cat-modal-btn" data-type="anya">👩 Anya vagyok</button>
        <button class="cat-modal-btn" data-type="elsohazas">💍 Első házasok</button>
        <button class="cat-modal-btn" data-type="fogyatekos">♿ Fogyatékossággal élő</button>
+       <button class="cat-modal-btn" data-type="egyedulallo">👤 Egyedülálló szülő</button>
       </div>
      </div>
      
@@ -4124,6 +4146,29 @@ Számold ki te is: ${url}`;
   const kataWrap = document.getElementById('calcKataWrap');
   const nyugdijWrap = document.getElementById('calcNyugdijWrap');
   const anyaAgeWrap = document.getElementById('anyaAgeWrap');
+  const egyedulalloWrap = document.getElementById('egyedulalloWrap');
+  const egyedulalloKorWrap = document.getElementById('egyedulalloKorWrap');
+  let egyedulalloNem = 'ferfi';
+  let egyedulalloKor = '30alatt';
+
+  // Egyedülálló nem gombok
+  document.querySelectorAll('[data-egynem]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-egynem]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      egyedulalloNem = btn.dataset.egynem;
+      if (egyedulalloKorWrap) egyedulalloKorWrap.style.display = egyedulalloNem === 'no' ? 'block' : 'none';
+    });
+  });
+
+  // Egyedülálló kor gombok
+  document.querySelectorAll('[data-egykor]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-egykor]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      egyedulalloKor = btn.dataset.egykor;
+    });
+  });
   
   // === STATE ===
   let activeCategories = new Set(['gyermektelen']);
@@ -4141,6 +4186,12 @@ Számold ki te is: ${url}`;
     categoryTrigger.addEventListener('click', () => {
       categoryModal.style.display = 'flex';
       updateModalButtons();
+      // Modal tartalma tetejére scrollolás
+      setTimeout(() => {
+        categoryModal.scrollTop = 0;
+        const box = categoryModal.querySelector('.modal-card');
+        if (box) box.scrollTop = 0;
+      }, 30);
     });
   }
   
@@ -4304,6 +4355,9 @@ Számold ki te is: ${url}`;
     if (kataWrap) kataWrap.style.display = hasKata ? 'flex' : 'none';
     if (nyugdijWrap) nyugdijWrap.style.display = hasNyugdij ? 'flex' : 'none';
     if (anyaAgeWrap) anyaAgeWrap.style.display = hasAnya ? 'block' : 'none';
+    const hasEgyedulallo = activeCategories.has('egyedulallo');
+    if (egyedulalloWrap) egyedulalloWrap.style.display = hasEgyedulallo ? 'block' : 'none';
+    if (egyedulalloKorWrap) egyedulalloKorWrap.style.display = (hasEgyedulallo && egyedulalloNem === 'no') ? 'block' : 'none';
   }
   
   // === SZÁMÍTÁS GOMB ===
@@ -4326,8 +4380,16 @@ Számold ki te is: ${url}`;
     const isCsed = cats.includes('csed');
     const isGyed = cats.includes('gyed');
     
-    // ANYA státusz
-    const anyaInfo = isAnya ? getAnyaInfo(anyaAge, gyerekSzam) : null;
+    // ANYA és EGYEDÜLÁLLÓ státusz
+    const isEgyedulallo = cats.includes('egyedulallo');
+    const getEgyedulalloAnyaInfo = () => {
+      if (!isEgyedulallo || egyedulalloNem !== 'no') return null;
+      if (gyerekSzam >= 3) return { szjaMentes: true, mentessegOk: 'egyedülálló anya 3+ gyerekkel' };
+      if (egyedulalloKor === '30alatt' && gyerekSzam >= 1) return { szjaMentes: true, mentessegOk: 'egyedülálló anya 30 év alatt' };
+      if (egyedulalloKor === '40alatt' && gyerekSzam >= 2) return { szjaMentes: true, mentessegOk: 'egyedülálló anya 30-39 év, 2+ gyerek' };
+      return null;
+    };
+    const anyaInfo = isAnya ? getAnyaInfo(anyaAge, gyerekSzam) : getEgyedulalloAnyaInfo();
     
     let resultBefore, resultAfter;
     
@@ -4360,7 +4422,7 @@ Számold ki te is: ${url}`;
       const brutto = parseFloat(bruttoInput.value) || 0;
       if (brutto <= 0) { alert('Add meg a bruttó fizetésed!'); return; }
       
-      const params = { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, anyaInfo };
+      const params = { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, isEgyedulallo, anyaInfo };
       resultBefore = calcBer(brutto, params, false);
       resultAfter = calcBer(brutto, params, true);
     }
@@ -4459,7 +4521,9 @@ Számold ki te is: ${url}`;
       extra += gyedOsszeg;
       // Dupla családi pótlék
       if (gyerekSzam > 0) {
-        const potlek = gyerekSzam === 1 ? 25900 : gyerekSzam === 2 ? 32600 : 43700;
+        const potlek = params?.isEgyedulallo
+          ? (gyerekSzam === 1 ? 13700 : gyerekSzam === 2 ? 29600 : 51000)
+          : (gyerekSzam === 1 ? 12200 : gyerekSzam === 2 ? 26600 : 48000);
         items.push({ nev: `+ Dupla családi pótlék (${gyerekSzam} gyerek)`, osszeg: potlek, tipus: 'tisza', megjegyzes: 'külön juttatás' });
         extra += potlek;
       }
@@ -4647,12 +4711,28 @@ Számold ki te is: ${url}`;
       }
     }
     
+    // === JELENLEGI CSALÁDI PÓTLÉK (mindig jár, áradás előtt is) ===
+    if (gyerekSzam > 0) {
+      const potlekJelenlegi = params.isEgyedulallo
+        ? (gyerekSzam === 1 ? 13700 : gyerekSzam === 2 ? 29600 : 51000)
+        : (gyerekSzam === 1 ? 12200 : gyerekSzam === 2 ? 26600 : 48000);
+      items.push({
+        nev: `Családi pótlék (${gyerekSzam} gyerek)`,
+        osszeg: potlekJelenlegi,
+        tipus: 'positive',
+        megjegyzes: 'készpénz juttatás'
+      });
+    }
+
     // === TISZA EXTRA JUTTATÁSOK ===
     if (isTisza) {
 
-      // 1. Dupla családi pótlék (ha van gyerek)
+      // 1. Dupla családi pótlék (ha van gyerek) - +ugyanannyi plusz
       if (gyerekSzam > 0) {
-        const potlekPlusz = gyerekSzam === 1 ? 25900 : gyerekSzam === 2 ? 32600 : 43700;
+        const potlekAlap = params.isEgyedulallo
+          ? (gyerekSzam === 1 ? 13700 : gyerekSzam === 2 ? 29600 : 51000)
+          : (gyerekSzam === 1 ? 12200 : gyerekSzam === 2 ? 26600 : 48000);
+        const potlekPlusz = potlekAlap;
         items.push({
           nev: `+ Dupla családi pótlék (${gyerekSzam} gyerek)`,
           osszeg: potlekPlusz,
@@ -4753,9 +4833,17 @@ Számold ki te is: ${url}`;
       }
     }
     
+    // Jelenlegi pótlék (mindkét esetben hozzáadódik)
+    const potlekJelenlegi = gyerekSzam > 0
+      ? (params.isEgyedulallo
+        ? (gyerekSzam === 1 ? 13700 : gyerekSzam === 2 ? 29600 : 51000)
+        : (gyerekSzam === 1 ? 12200 : gyerekSzam === 2 ? 26600 : 48000))
+      : 0;
+
     // TISZA extra tételek összesítése a nettóba
+    // A dupla pótlék TISZA-tételből csak a PLUSZ rész számít (az alap már a potlekJelenlegi-ben van)
     const tiszaExtra = isTisza ? items
-      .filter(i => i.tipus === 'tisza' && !i.nev.includes('adójóváírás'))
+      .filter(i => i.tipus === 'tisza' && !i.nev.includes('adójóváírás') && !i.nev.includes('Dupla családi pótlék'))
       .reduce((s, i) => s + i.osszeg, 0) : 0;
 
     // SZJA csökkentés (mediánbér alatt) külön vonjuk le
@@ -4763,7 +4851,7 @@ Számold ki te is: ${url}`;
       ? Math.round(szjaAlap * (0.15 - 0.08)) : 0;
     if (tiszaSzjaKedv > 0) szjaUtanKedv = Math.max(0, szjaUtanKedv - tiszaSzjaKedv);
 
-    const netto = brutto - tbUtanKedv - szjaUtanKedv + tiszaExtra;
+    const netto = brutto - tbUtanKedv - szjaUtanKedv + tiszaExtra + potlekJelenlegi;
     
     return {
       netto: netto,
