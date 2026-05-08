@@ -4653,12 +4653,16 @@ Számold ki te is: ${url}`;
   
   // === NYUGDÍJ SZÁMÍTÁS ===
   function calcNyugdij(nyugdij, gyerekSzam, isTisza) {
+    // 13. havi nyugdíj 2022 óta érvényes – mindkét esetben jár (havi vetítve: 1/12)
+    const tizenharmadik = Math.round(nyugdij / 12);
+
     const items = [
       { nev: 'Nyugdíj összege', osszeg: nyugdij, tipus: 'neutral' },
-      { nev: 'SZJA (nincs nyugdíjból)', osszeg: 0, tipus: 'neutral' }
+      { nev: 'SZJA (nincs nyugdíjból)', osszeg: 0, tipus: 'neutral' },
+      { nev: '13. havi nyugdíj (havi vetítve)', osszeg: tizenharmadik, tipus: 'positive', megjegyzes: '2022 óta érvényes' }
     ];
 
-    let extra = 0;
+    let extra = tizenharmadik;
 
     if (isTisza) {
       // 1. Minimálnyugdíj kiegészítés 120 000 Ft-ra
