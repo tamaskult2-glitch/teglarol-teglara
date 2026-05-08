@@ -2774,7 +2774,7 @@ function buildCard(item) {
  const priLabel = pri === "azonnali" ? "🔴 Azonnali" : pri === "hosszu" ? "🟢 Hosszú táv" : "🟡 Rövid táv";
  const priCls = `priority-${pri}`;
  card.dataset.priority = pri;
- const today = new Date().toISOString().slice(0,10);
+ const today = new Date(Date.now() + 2*60*60*1000).toISOString().slice(0,10);
  const freshBadge = item["Frissítés"] === today ? '<span class="fresh-badge">● Ma</span>' : '';
 
  const bodyHTML = `
@@ -2819,7 +2819,7 @@ function renderDashboard(data) {
 
  // Legfrissebb módban: flat lista, nem kategóriánként csoportosítva
  if (typeof currentSort !== 'undefined' && currentSort === 'newest') {
-   const today = new Date().toISOString().slice(0,10);
+   const today = new Date(Date.now() + 2*60*60*1000).toISOString().slice(0,10);
    const todayItems = data.filter(r => r['Frissítés'] === today);
    const restItems  = data.filter(r => r['Frissítés'] !== today);
 
@@ -4545,7 +4545,7 @@ const excelData = [
   "Frissítés": "2026-05-05",
   "Forrás link": "https://444.hu/2026/05/05/magyar-peter-orban-viktor-az-utolso-heten-meg-teljesen-kifosztana-az-allamkasszat",
   "Prioritás": "Azonnali"
-},,
+},
   {
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Igazságügyi miniszter kinevezése",
