@@ -2757,7 +2757,8 @@ sidebarOverlay.addEventListener("click", closeSidebar);
 
 (function() {
  const electionDate = new Date("2026-04-12");
- const diff = Math.floor((new Date() - electionDate) / 86400000);
+ const nowHU3 = new Date(Date.now() + 2 * 60 * 60 * 1000);
+ const diff = Math.floor((nowHU3 - electionDate) / 86400000);
  document.getElementById("daysSince").textContent = "Az \"áradás\" óta eltelt napok: " + diff;
 })();
 
@@ -3002,7 +3003,8 @@ function updateStats(data) {
   const pb = el("tlProgressBar");
   if (pb && total > 0) pb.style.width = Math.round((yes + done) / total * 100) + "%";
   // Nap számláló
-  const days = Math.floor((new Date() - new Date("2026-04-12")) / 86400000);
+  const nowHU2 = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  const days = Math.floor((nowHU2 - new Date("2026-04-12T00:00:00+02:00")) / 86400000);
   const dc = el("tlDayCount");
   if (dc) dc.textContent = days + " nap";
   
@@ -3747,7 +3749,9 @@ function activateNewestSort() {
 
 // ── Mai frissítések felhívó a főcsempén ──
 (function() {
-  const today = new Date().toISOString().slice(0,10);
+  // UTC+2 (magyar idő) szerinti dátum
+  const nowHU = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  const today = nowHU.toISOString().slice(0,10);
   const todayCount = excelData.filter(r => r['Frissítés'] === today).length;
   const wrap = document.getElementById('todayUpdateWrap');
   const msg  = document.getElementById('todayUpdateMsg');
