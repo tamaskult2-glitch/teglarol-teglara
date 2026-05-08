@@ -139,6 +139,20 @@ body.dark .logo-future .logo-tint { background:rgba(30,35,60,0.55); }
 .header-text h1 { margin:0 0 8px; font-size:32px; font-weight:700; color:var(--text-main); letter-spacing:-0.5px; }
 .share-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; justify-content:center; align-items:center; margin-top:16px; max-width:320px; margin-left:auto; margin-right:auto; }
 
+
+/* Avatás banner */
+.avatas-banner { text-align:center; margin:10px 0 4px; padding:12px 16px; background:linear-gradient(135deg,rgba(206,41,57,0.15),rgba(71,112,80,0.15)); border:1.5px solid rgba(206,41,57,0.4); border-radius:14px; }
+.avatas-banner.done { background:linear-gradient(135deg,rgba(45,164,78,0.2),rgba(45,164,78,0.1)); border-color:#2da44e; }
+.avatas-countdown { font-size:22px; font-weight:900; color:#CE2939; font-variant-numeric:tabular-nums; }
+.avatas-banner.done .avatas-countdown { color:#2da44e; }
+/* Konfetti */
+.konfetti-wrap { position:fixed; inset:0; pointer-events:none; z-index:9999; }
+.konfetti-piece { position:absolute; width:10px; height:10px; border-radius:2px; animation:konfetti-fall linear forwards; }
+@keyframes konfetti-fall {
+  0% { transform:translateY(-20px) rotate(0deg); opacity:1; }
+  100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
+}
+
 /* Feliratkozó szekció */
 .subscribe-section { margin:20px 0 8px; padding:16px 20px; background:rgba(232,64,90,0.07); border-radius:16px; border:1px solid rgba(232,64,90,0.2); }
 .subscribe-row { display:flex; gap:8px; margin-top:10px; }
@@ -1457,10 +1471,18 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  </svg>
 </div>
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára”</h1>
+ <!-- AVATÁS VISSZASZÁMLÁLÓ -->
+ <div id="avatasBanner" class="avatas-banner" style="display:none;">
+  <div style="font-size:13px; font-weight:700; color:var(--text-main); margin-bottom:4px;" id="avatásTitle">
+   🇭🇺 Magyar Péter elnöki avatása
+  </div>
+  <div class="avatas-countdown" id="avatásCountdown">–</div>
+  <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">2026. május 9. · 15:00</div>
+ </div>
+
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
  <p id="tesztBadgeWrap" style="text-align:center;margin-top:12px;">
   <span style="display:inline-block;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1.5px solid rgba(192,24,58,0.3);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:600;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-   <span style="font-size:11px;font-weight:800;color:#c0183a;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">🧪 Teszt verzió</span>
    <span id="tesztMsg">🧱 Az első tégla lerakva — de az építkezés május 9-én kezdődik igazán.</span>
   </span>
  </p>
@@ -4742,6 +4764,79 @@ function activateNewestSort() {
   }
 })();
 
+
+// ── Avatás visszaszámláló + konfetti ──────────────────────────
+(function() {
+  const AVATAS = new Date('2026-05-09T15:00:00+02:00');
+  const banner  = document.getElementById('avatasBanner');
+  const cdEl    = document.getElementById('avatásCountdown');
+  const titleEl = document.getElementById('avatásTitle');
+
+  function fmtNum(n) { return String(n).padStart(2,'0'); }
+
+  function indítKonfetti() {
+    const wrap = document.getElementById('konfettiWrap');
+    if (!wrap || wrap.dataset.done) return;
+    wrap.dataset.done = '1';
+    const colors = ['#CE2939','#477050','#FFD700','#4A9ECC','#ffffff'];
+    for (let i = 0; i < 120; i++) {
+      setTimeout(() => {
+        const p = document.createElement('div');
+        p.className = 'konfetti-piece';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.width = (6 + Math.random() * 10) + 'px';
+        p.style.height = (6 + Math.random() * 10) + 'px';
+        p.style.animationDuration = (2 + Math.random() * 3) + 's';
+        p.style.animationDelay = (Math.random() * 2) + 's';
+        wrap.appendChild(p);
+        setTimeout(() => p.remove(), 6000);
+      }, i * 40);
+    }
+  }
+
+  function tick() {
+    const now  = new Date();
+    const diff = AVATAS - now;
+
+    if (!banner) return;
+
+    if (diff <= -300000) {
+      // 5 perccel az eskü után elrejtjük
+      banner.style.display = 'none';
+      return;
+    }
+
+    banner.style.display = 'block';
+
+    if (diff <= 0) {
+      // Eskü letéve!
+      banner.classList.add('done');
+      titleEl.textContent = '🎉 Magyar Péter letette az elnöki esküt!';
+      cdEl.textContent = '✅ Rendszerváltás elkezdődött!';
+      indítKonfetti();
+      return;
+    }
+
+    // Visszaszámláló
+    banner.classList.remove('done');
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    if (h > 0) {
+      cdEl.textContent = h + ' óra ' + fmtNum(m) + ' perc ' + fmtNum(s) + ' mp';
+    } else if (m > 0) {
+      cdEl.textContent = fmtNum(m) + ' perc ' + fmtNum(s) + ' mp';
+    } else {
+      cdEl.textContent = fmtNum(s) + ' másodperc';
+    }
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+
 // ── Verzió badge automatikus frissítése a story timeline alapján ──
 (function() {
   // Legfrissebb ver a story-tl-ver elemekből
@@ -6323,5 +6418,6 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
 </script>
+<div id="konfettiWrap" class="konfetti-wrap"></div>
 </body>
 </html>
