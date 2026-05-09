@@ -141,9 +141,16 @@ def apply_updates(data, batch, updates):
                     d["Volt előrelépést jelentő bejelentés?"] = upd["elore"]
                     changed = True
 
-                if upd.get("forras") and upd["forras"] != d.get("Forrás link"):
-                    d["Forrás link"] = upd["forras"]
-                    changed = True
+                if upd.get("forras"):
+                    url = upd["forras"].strip()
+                    # Ha nincs protokoll, egészítsük ki
+                    if not url.startswith("http://") and not url.startswith("https://"):
+                        url = "https://" + url
+                    if url != d.get("Forrás link"):
+                        d.["Forrás link"] = url
+                        changed = True
+
+
 
                 if upd.get("valtozas") and upd["valtozas"] != d.get("Változás"):
                     d["Változás"] = upd["valtozas"]
