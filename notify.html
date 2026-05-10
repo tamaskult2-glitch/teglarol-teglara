@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<title>Értesítő küldés</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+body { font-family: system-ui; max-width: 500px; margin: 60px auto; padding: 20px; background: #f5f5f5; }
+.card { background: #fff; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+h2 { margin: 0 0 16px; color: #c0183a; }
+label { font-size: 13px; font-weight: 600; color: #555; display: block; margin-bottom: 4px; }
+input { width: 100%; padding: 10px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 14px; }
+button { width: 100%; padding: 14px; background: #e8405a; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: default; }
+#log { margin-top: 16px; font-size: 13px; color: #555; white-space: pre-line; background: #f9f9f9; border-radius: 8px; padding: 12px; display: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>🧱 Értesítő küldés</h2>
+  <p style="color:#666;font-size:14px;">Küldd el a frissítési értesítőt a feliratkozóknak.</p>
+
+  <label>Frissítések száma / leírás:</label>
+  <input type="text" id="dbInput" value="2 tégla frissült ma">
+
+  <label>Feliratkozók (vesszővel elválasztva):</label>
+  <input type="text" id="emailsInput" value="tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com">
+
+  <button id="sendBtn" onclick="sendAll()">📧 Értesítő küldése</button>
+  <div id="log"></div>
+</div>
+
+<script>
+emailjs.init("0k7yH8d4u-BjgACd1");
+
+async function sendAll() {
+  const btn = document.getElementById('sendBtn');
+  const log = document.getElementById('log');
+  const db = document.getElementById('dbInput').value;
+  const emails = document.getElementById('emailsInput').value
+    .split(',').map(e => e.trim()).filter(Boolean);
+
+  btn.disabled = true;
+  log.style.display = 'block';
+  log.textContent = '⏳ Küldés...\n';
+
+  let sent = 0;
+  for (const email of emails) {
+    try {
+      await emailjs.send('service_x5huqxn', 'template_pfrf10g', {
+        email: email,
+        name: 'Feliratkozó',
+        db: db
+      });
+      log.textContent += `✅ ${email}\n`;
+      sent++;
+    } catch(e) {
+      log.textContent += `❌ ${email} – ${e.text || JSON.stringify(e)}\n`;
+    }
+    await new Promise(r => setTimeout(r, 600));
+  }
+
+  log.textContent += `\n📊 ${sent}/${emails.length} értesítő elküldve`;
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
