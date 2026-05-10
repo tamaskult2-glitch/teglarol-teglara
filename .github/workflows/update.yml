@@ -1,44 +1,39 @@
-name: Napi automatikus frissítés
+name: Daily Update
+
 on:
   schedule:
-    # Minden nap ~9:00 Magyarország (UTC 2:00 + ~5h GitHub késés)
-    - cron: '0 2 * * *'
-  workflow_dispatch:
+    - cron: '0 2 * * *'  # Minden nap hajnali 2 órakor (UTC)
+  workflow_dispatch:  # Manuális futtatás engedélyezése
+
 jobs:
   update:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    
     steps:
-      - name: 📥 Repo letöltése
+      - name: Checkout repository
         uses: actions/checkout@v4
-      - name: 🐍 Python beállítása
+      
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: 📦 Függőségek
-        run: pip install anthropic
-      - name: 🤖 Claude frissítő
-        continue-on-error: true
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python scripts/update.py
-      - name: 📊 Változás ellenőrzés
-        id: check
+      
+      - name: Install dependencies
         run: |
-          if git diff --quiet; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            git diff --stat
-          fi
-      - name: 💾 Commit & push
-        if: steps.check.outputs.changed == 'true'
-        run: |
-          git config user.name "Tégláról-téglára Bot"
-          git config user.email "bot@teglarol-teglara.hu"
-          git add data.json index.html index.template.html
-          git commit -m "🤖 Automatikus frissítés $(date '+%Y-%m-%d %H:%M')"
-          git push
+          pip install requests
+      
+      - name: Run update script
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EMAILJS_PUBLIC_KEY: ${{ secrets.EMAILJS_PUBLIC_KEY }}
+          EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
+          EMAILJS_ADMIN_TEMPLATE_ID: ${{ secrets.EMAILJS_ADMIN_TEMPLATE_ID }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        run: |
+          python scripts/update.py
+      
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data.json index.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 Napi automatikus frissítés - $(date +'%Y-%m-%d %H:%M')" && git push)
