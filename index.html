@@ -1571,7 +1571,129 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  </div>
 
  </header>
+<!-- HERO KÁRTYÁK -->
+<style>
+.hero-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+... [TELJES hero-cards.html TARTALOM]
+</style>
 
+<div class="hero-cards">
+  ...
+</div>
+<style>
+.hero-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.hero-card {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(30,25,20,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+}
+
+.hero-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(30,25,20,0.15);
+}
+
+.hero-card .card-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.hero-card h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1A1918;
+  margin-bottom: 12px;
+}
+
+.hero-card p {
+  font-size: 15px;
+  color: #4A4947;
+  line-height: 1.5;
+}
+
+/* ÚJ! badge villogó animációval */
+.badge-new {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #1A1918;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Pénztárca ikon animáció */
+.wallet-icon {
+  animation: bounce 3s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (max-width: 600px) {
+  .hero-card h2 { font-size: 20px; }
+  .hero-card .card-icon { font-size: 52px; }
+}
+</style>
+
+<div class="hero-cards">
+  <!-- 100 Tégla kártya -->
+  <a href="#teglak" class="hero-card">
+    <div class="card-icon">🧱</div>
+    <h2>100 Tégla</h2>
+    <p>Politikai ígéretek nyomon követése – Átláthatóság, elszámoltathatóság</p>
+  </a>
+  
+  <!-- Pénztárcaindex kártya -->
+  <a href="/penztarca.html" class="hero-card">
+    <div class="badge-new">✨ ÚJ!</div>
+    <div class="card-icon wallet-icon">💰</div>
+    <h2>Pénztárcaindex</h2>
+    <p>Árak a mindennapi életben – Mennyit ér majd a pénztárcád?</p>
+  </a>
+</div>
  <!-- Hidden category filter for JS -->
  <select id="categoryFilter" style="display:none;">
   <option value="__all__">Összes kategória</option>
