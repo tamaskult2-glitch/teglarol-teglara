@@ -33,7 +33,7 @@
     "Kategória": "Államszerkezet és jogállam",
     "TiSZa ígéret": "Igazságszolgáltatás függetlenségének megerősítése",
     "FiDeSZ állapot": "politikailag kontrollált",
-    "Volt előrelépést jelentő bejelentés?": "igen – Melléthei-Barna Márton igazságügyi miniszterjelölt visszalépett (máj.7)! Új igazságügyi miniszter személye még nem ismert",
+    "Volt előrelépést jelentő bejelentés?": "igen – Melléthei-Barna visszalépett (máj.7), helyette dr. Görög Márta SZTE jogász dékán lett az igazságügyi miniszter jelölt (máj.8); jogállam-helyreállítás, uniós keretek, EU-s forrásokhoz szükséges jogszabályok",
     "Változás": "bejelentve",
     "Frissítés": "2026-05-08",
     "Forrás link": "https://www.portfolio.hu/gazdasag/20260507/valasztas-2026-meg-az-utolso-pillanatban-is-alakul-magyar-peter-kormanya-835164",
@@ -53,7 +53,7 @@
     "Kategória": "Államszerkezet és jogállam",
     "TiSZa ígéret": "Pártfinanszírozás és választási törvény átalakítása",
     "FiDeSZ állapot": "Fidesz-érdekek szerint gerrymandering",
-    "Volt előrelépést jelentő bejelentés?": "igen – alakuló ülés máj.9. reggel 10 óra; Magyar Péter miniszterelnöki eskü 15 óra; egész napos rendszerváltó népünnepély Kossuth téren; kormány máj.11-12-én alakul meg",
+    "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter máj.9-én 14:30-kor megválasztva (140 igen, 54 nem), esküt tett, első miniszterelnöki beszédét elmondta; Forsthoffer Ágnes házelnök; Kossuth téri rendszerváltó ünnep",
     "Változás": "bejelentve",
     "Frissítés": "2026-05-04",
     "Forrás link": "https://telex.hu/belfold/2026/05/03/magyar-peter-tisza-part-parlament-alakulo-ules-rendszervalto-unnepseg-kossuth-ter",
@@ -853,10 +853,10 @@
     "Kategória": "Igazságszolgáltatás",
     "TiSZa ígéret": "Ügynökakták teljes megnyitása",
     "FiDeSZ állapot": "részlegesen elérhető akták, sok zárt",
-    "Volt előrelépést jelentő bejelentés?": "Ügynökakták nyilvánosságra hozása és kereshetővé tétele október 22-én",
+    "Volt előrelépést jelentő bejelentés?": "igen – ügynökakták megnyitása a 100 napos tervben; kegyelmi ügy aktája is nyilvánossá válik (ápr.20); Görög Márta igazságügyi miniszterjelölt feladata a nyilvánosságra hozatal koordinálása",
     "Változás": "bejelentve",
-    "Frissítés": "2026-05-09",
-    "Forrás link": "index.hu",
+    "Frissítés": "2026-04-24",
+    "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
     "Prioritás": "azonnali"
   },
   {
@@ -977,6 +977,26 @@
     "Változás": "bejelentve",
     "Frissítés": "2026-05-08",
     "Forrás link": "https://www.portfolio.hu/gazdasag/20260507/valasztas-2026-meg-az-utolso-pillanatban-is-alakul-magyar-peter-kormanya-835164",
+    "Prioritás": "Azonnali"
+  },
+  {
+    "Kategória": "Jogállam és korrupcióellenes intézkedések",
+    "TiSZa ígéret": "Nemzeti Vagyonvisszaszerzési és Védelmi Hivatal felállítása",
+    "FiDeSZ állapot": "Nem volt ilyen hivatal – korrupciós ügyek eltussolva, nyomozások leállítva",
+    "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter első miniszterelnöki törvényjavaslataként bejelentette (máj.9); 20 évre visszamenőleg vizsgálja az állami korrupciót, uniós pénzeket, TAO-t, MNB-t; csak az Országgyűlésnek felelős",
+    "Változás": "bejelentve",
+    "Frissítés": "2026-05-09",
+    "Forrás link": "https://444.hu/2026/05/09/magyar-peter-beszede-eskutetel-alakulo-ules",
+    "Prioritás": "Azonnali"
+  },
+  {
+    "Kategória": "Jogállam és korrupcióellenes intézkedések",
+    "TiSZa ígéret": "Közjogi méltóságok felelősségre vonása / lemondásra szólítása",
+    "FiDeSZ állapot": "Közjogi intézmények politikailag elfoglalva – bíróságok, AB, ÁSZ Fidesz-szimpatizánsokkal töltve fel",
+    "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter az első miniszterelnöki beszédében felszólította Sulyok Tamást és más közjogi méltóságokat a lemondásra máj.31-ig; 'kezdje a sort Sulyok Tamás'",
+    "Változás": "bejelentve",
+    "Frissítés": "2026-05-09",
+    "Forrás link": "https://index.hu/belfold/2026/05/09/magyar-peter-miniszterelnok-tisza-part-orszaggyules-parlament-valasztas2026/",
     "Prioritás": "Azonnali"
   }
 ]

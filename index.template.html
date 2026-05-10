@@ -349,7 +349,9 @@ body.dark #stickyCatHeader {
 .card.clickable .click-hint { font-size:14px; color:#666; margin-top:8px; font-weight:500; }
 
 /* ---- SUMMARY CARDS ---- */
-.summary-card { color:var(--text-main) !important; font-size:15px; font-weight:600; flex:1; min-width:180px; position:relative; cursor:pointer; user-select:none; }
+.summary-card { color:var(--text-main) !important; font-size:15px; font-weight:600; flex:1; min-width:180px; position:relative; cursor:pointer; user-select:none; border:1.5px solid var(--border-subtle); transition:border-color 0.15s, transform 0.15s; }
+.summary-card:hover { border-color:#e8405a; transform:translateY(-1px); }
+.summary-card::after { content:'›'; position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:16px; color:#e8405a; opacity:0.6; }
 .summary-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.12); }
 .summary-card .card-open-icon { position:absolute; top:50%; right:14px; transform:translateY(-50%); font-size:14px; opacity:0.5; transition:transform 0.2s; }
 .summary-card.open .card-open-icon { transform:translateY(-50%) rotate(180deg); opacity:1; }
@@ -742,6 +744,7 @@ body.dark #fabToggle.open { background:linear-gradient(135deg,#e8405a,#c0183a); 
   cursor:pointer; transition:border-color 0.18s, transform 0.15s, box-shadow 0.18s;
   user-select:none;
 }
+.tl-leg-item:hover { border-color:#e8405a; color:#e8405a; transform:translateY(-1px); }
 .tl-leg-item:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(0,0,0,0.1); }
 .tl-leg-item.active { border-width:2px; box-shadow:0 2px 10px rgba(0,0,0,0.15); }
 .tl-leg-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
@@ -1287,9 +1290,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 
  <header class="modern-header" style="position:relative;">
 
- <span class="version-badge">
- <span id="headerVerNum">Ver. 1.7</span>
- </span>
+
  <div class="header-inner">
  <div class="header-left-col" style="display:flex;flex-direction:column;align-items:center;gap:0;">
  <div class="logo-future" style="position:relative;">
@@ -1480,6 +1481,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">2026. május 9. · 15:00</div>
  </div>
 
+ <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
  <p id="tesztBadgeWrap" style="text-align:center;margin-top:12px;">
   <span style="display:inline-block;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1.5px solid rgba(192,24,58,0.3);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:600;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
