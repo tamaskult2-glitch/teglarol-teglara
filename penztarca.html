@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pénztárcaindex | Tegláról-téglára</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #F4F1EC;
+  color: #1A1918;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #e8405a 0%, #c0183a 100%);
+  border-radius: 20px;
+  color: white;
+}
+
+.header h1 {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.header p {
+  font-size: 18px;
+  opacity: 0.95;
+}
+
+.intro {
+  max-width: 800px;
+  margin: 0 auto 40px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4A4947;
+}
+
+.category-section {
+  max-width: 1000px;
+  margin: 0 auto 50px;
+}
+
+.category-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #1A1918;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-icon {
+  font-size: 28px;
+}
+
+.price-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(30,25,20,0.06), 0 8px 24px rgba(30,25,20,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.price-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30,25,20,0.1), 0 12px 32px rgba(30,25,20,0.08);
+}
+
+.price-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.price-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1A1918;
+}
+
+.price-status {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-folyamatban {
+  background: #FFF4E6;
+  color: #E67700;
+}
+
+.status-tervezes {
+  background: #E3F2FD;
+  color: #1976D2;
+}
+
+.status-jovobeli {
+  background: #F3E5F5;
+  color: #7B1FA2;
+}
+
+.price-comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.price-box {
+  text-align: center;
+}
+
+.price-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #4A4947;
+  margin-bottom: 8px;
+}
+
+.price-value {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.price-before .price-value {
+  color: #c0183a;
+}
+
+.price-promised .price-value {
+  color: #28a745;
+}
+
+.price-current .price-value {
+  color: #1A1918;
+}
+
+.price-unit {
+  font-size: 14px;
+  color: #4A4947;
+}
+
+.price-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.price-change.negative {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.price-source {
+  font-size: 13px;
+  color: #4A4947;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #E0E0E0;
+}
+
+.back-link {
+  display: inline-block;
+  margin: 40px auto;
+  padding: 12px 24px;
+  background: #e8405a;
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.back-link:hover {
+  background: #c0183a;
+}
+
+.footer-note {
+  max-width: 800px;
+  margin: 40px auto;
+  text-align: center;
+  font-size: 14px;
+  color: #4A4947;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .header h1 { font-size: 28px; }
+  .price-comparison { grid-template-columns: 1fr; }
+  .price-value { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💰 Pénztárcaindex</h1>
+  <p>Árak összehasonlítása: Áradás előtt vs. TISZA ígéretek</p>
+</div>
+
+<div class="intro">
+  <p>
+    Itt követheted nyomon, hogy a TISZA Párt ígéretei szerint hogyan változnának 
+    a mindennapokat érintő árak. Az "áradás előtti" árak a 2026. május 9-i 
+    (az Orbán-kormány utolsó napjának) árszintet jelentik.
+  </p>
+</div>
+
+<!-- ÜZEMANYAG -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">⛽</span>
+    Üzemanyag
+  </h2>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">95-ös benzin</div>
+      <div class="price-status status-folyamatban">Folyamatban</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">625</div>
+        <div class="price-unit">Ft/liter</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">480</div>
+        <div class="price-unit">Ft/liter</div>
+        <div class="price-change negative">↓ 23%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">625</div>
+        <div class="price-unit">Ft/liter</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Energia fejezet
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Gázolaj</div>
+      <div class="price-status status-folyamatban">Folyamatban</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">640</div>
+        <div class="price-unit">Ft/liter</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">500</div>
+        <div class="price-unit">Ft/liter</div>
+        <div class="price-change negative">↓ 22%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">640</div>
+        <div class="price-unit">Ft/liter</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Energia fejezet
+    </div>
+  </div>
+</div>
+
+<!-- REZSI -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🏠</span>
+    Rezsi
+  </h2>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Villany (háztartási)</div>
+      <div class="price-status status-tervezes">Tervezés</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">70</div>
+        <div class="price-unit">Ft/kWh</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">45</div>
+        <div class="price-unit">Ft/kWh</div>
+        <div class="price-change negative">↓ 36%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">70</div>
+        <div class="price-unit">Ft/kWh</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Rezsiár csökkentés
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Földgáz (háztartási)</div>
+      <div class="price-status status-tervezes">Tervezés</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">280</div>
+        <div class="price-unit">Ft/m³</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">150</div>
+        <div class="price-unit">Ft/m³</div>
+        <div class="price-change negative">↓ 46%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">280</div>
+        <div class="price-unit">Ft/m³</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Rezsiár csökkentés
+    </div>
+  </div>
+</div>
+
+<!-- GYÓGYSZEREK -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🏥</span>
+    Gyógyszerek
+  </h2>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Vényköteles gyógyszer (átlag)</div>
+      <div class="price-status status-tervezes">Tervezés</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">3500</div>
+        <div class="price-unit">Ft/doboz</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">2100</div>
+        <div class="price-unit">Ft/doboz</div>
+        <div class="price-change negative">↓ 40%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">3500</div>
+        <div class="price-unit">Ft/doboz</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Egészségügy, támogatás növelése
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Vény nélküli fájdalomcsillapító</div>
+      <div class="price-status status-tervezes">Tervezés</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">1200</div>
+        <div class="price-unit">Ft/doboz</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">850</div>
+        <div class="price-unit">Ft/doboz</div>
+        <div class="price-change negative">↓ 29%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">1200</div>
+        <div class="price-unit">Ft/doboz</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Becsült adat (ÁFA csökkentés alapján: 27% → 5%)
+    </div>
+  </div>
+</div>
+
+<!-- HENTESÁRU -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🥩</span>
+    Hentesáruk
+  </h2>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Csirkemell filé (1 kg)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">2450</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">1750</div>
+        <div class="price-unit">Ft/kg</div>
+        <div class="price-change negative">↓ 29%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">2450</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Sertéskaraj (1 kg)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">1890</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">1350</div>
+        <div class="price-unit">Ft/kg</div>
+        <div class="price-change negative">↓ 29%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">1890</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Marhahús (1 kg)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">3200</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">2300</div>
+        <div class="price-unit">Ft/kg</div>
+        <div class="price-change negative">↓ 28%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">3200</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+</div>
+
+<!-- PÉKÁRU -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🍞</span>
+    Pékáruk
+  </h2>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Fehér kenyér (1 kg)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">480</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">345</div>
+        <div class="price-unit">Ft/kg</div>
+        <div class="price-change negative">↓ 28%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">480</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Kifli (10 db)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">650</div>
+        <div class="price-unit">Ft/10 db</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">465</div>
+        <div class="price-unit">Ft/10 db</div>
+        <div class="price-change negative">↓ 28%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">650</div>
+        <div class="price-unit">Ft/10 db</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+</div>
+
+<!-- GYÜMÖLCS/ZÖLDSÉG -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🍎</span>
+    Gyümölcs & Zöldség
+  </h2>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Alma (1 kg)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">580</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">415</div>
+        <div class="price-unit">Ft/kg</div>
+        <div class="price-change negative">↓ 28%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">580</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Paradicsom (1 kg)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">890</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">640</div>
+        <div class="price-unit">Ft/kg</div>
+        <div class="price-change negative">↓ 28%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">890</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Burgonya (1 kg)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">320</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">230</div>
+        <div class="price-unit">Ft/kg</div>
+        <div class="price-change negative">↓ 28%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">320</div>
+        <div class="price-unit">Ft/kg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+</div>
+
+<!-- TEJTERMÉKEK -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🥛</span>
+    Tejtermékek
+  </h2>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Tej 2,8% (1 liter)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">420</div>
+        <div class="price-unit">Ft/liter</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">300</div>
+        <div class="price-unit">Ft/liter</div>
+        <div class="price-change negative">↓ 29%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">420</div>
+        <div class="price-unit">Ft/liter</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Étolaj (1 liter)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">950</div>
+        <div class="price-unit">Ft/liter</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">680</div>
+        <div class="price-unit">Ft/liter</div>
+        <div class="price-change negative">↓ 28%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">950</div>
+        <div class="price-unit">Ft/liter</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Forrás: TISZA kormányprogram - Alapélelmiszer ÁFA csökkentés (27% → 5%)
+    </div>
+  </div>
+</div>
+
+<!-- DOHÁNY & SZESZ -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🚬</span>
+    Dohány & Szesz
+  </h2>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Cigaretta (1 doboz)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">1800</div>
+        <div class="price-unit">Ft/doboz</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">1800</div>
+        <div class="price-unit">Ft/doboz</div>
+        <div class="price-change" style="background: #F5F5F5; color: #666;">→ 0%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">1800</div>
+        <div class="price-unit">Ft/doboz</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Becsült adat (TISZA programban nincs csökkentési ígéret - közegészségügyi termék)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Sör 0,5l (átlagos)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">420</div>
+        <div class="price-unit">Ft/üveg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">420</div>
+        <div class="price-unit">Ft/üveg</div>
+        <div class="price-change" style="background: #F5F5F5; color: #666;">→ 0%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">420</div>
+        <div class="price-unit">Ft/üveg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Becsült adat (TISZA programban nincs csökkentési ígéret - szeszesital)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Bor 0,75l (közepes)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">1500</div>
+        <div class="price-unit">Ft/üveg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">1500</div>
+        <div class="price-unit">Ft/üveg</div>
+        <div class="price-change" style="background: #F5F5F5; color: #666;">→ 0%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">1500</div>
+        <div class="price-unit">Ft/üveg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Becsült adat (TISZA programban nincs csökkentési ígéret - szeszesital)
+    </div>
+  </div>
+
+  <div class="price-card">
+    <div class="price-header">
+      <div class="price-name">Pálinka 0,5l (45%)</div>
+      <div class="price-status status-jovobeli">Jövőbeli</div>
+    </div>
+    
+    <div class="price-comparison">
+      <div class="price-box price-before">
+        <div class="price-label">Áradás előtt</div>
+        <div class="price-value">3500</div>
+        <div class="price-unit">Ft/üveg</div>
+      </div>
+      
+      <div class="price-box price-promised">
+        <div class="price-label">TISZA ígéret</div>
+        <div class="price-value">3500</div>
+        <div class="price-unit">Ft/üveg</div>
+        <div class="price-change" style="background: #F5F5F5; color: #666;">→ 0%</div>
+      </div>
+      
+      <div class="price-box price-current">
+        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-value">3500</div>
+        <div class="price-unit">Ft/üveg</div>
+      </div>
+    </div>
+    
+    <div class="price-source">
+      Becsült adat (TISZA programban nincs csökkentési ígéret - szeszesital)
+    </div>
+  </div>
+</div>
+
+<!-- NAGY BEVÁSÁRLÁS KALKULÁTOR -->
+<div class="category-section" style="max-width: 1200px;">
+  <h2 class="category-title" style="text-align: center; font-size: 28px; margin-bottom: 30px;">
+    <span class="category-icon">🛒</span>
+    Nagy Bevásárlás Kalkulátor
+  </h2>
+
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 40px; color: white; margin-bottom: 30px; text-align: center;">
+    <h3 style="font-size: 20px; margin-bottom: 16px; opacity: 0.95;">Tipikus 4 fős család havi bevásárlása</h3>
+    <p style="font-size: 15px; opacity: 0.9; line-height: 1.6;">
+      Az alábbi kalkuláció egy átlagos magyar család havi alapvető kiadásait mutatja be. 
+      Az árak a 2026. május 9-i (áradás előtti) árszintet tükrözik.
+    </p>
+  </div>
+
+  <!-- Kosár tartalma -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+    
+    <!-- Üzemanyag -->
+    <div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(30,25,20,0.06);">
+      <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #c0183a;">⛽ Üzemanyag</h4>
+      <div style="font-size: 14px; color: #4A4947; line-height: 2;">
+        <div style="display: flex; justify-content: space-between;"><span>Benzin (200L/hó)</span><span style="font-weight: 600;">125.000 Ft</span></div>
+      </div>
+    </div>
+
+    <!-- Rezsi -->
+    <div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(30,25,20,0.06);">
+      <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #c0183a;">🏠 Rezsi</h4>
+      <div style="font-size: 14px; color: #4A4947; line-height: 2;">
+        <div style="display: flex; justify-content: space-between;"><span>Villany (400 kWh)</span><span style="font-weight: 600;">28.000 Ft</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>Gáz (150 m³)</span><span style="font-weight: 600;">42.000 Ft</span></div>
+      </div>
+    </div>
+
+    <!-- Gyógyszer -->
+    <div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(30,25,20,0.06);">
+      <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #c0183a;">🏥 Gyógyszer</h4>
+      <div style="font-size: 14px; color: #4A4947; line-height: 2;">
+        <div style="display: flex; justify-content: space-between;"><span>Gyógyszerek (átlag)</span><span style="font-weight: 600;">15.000 Ft</span></div>
+      </div>
+    </div>
+
+    <!-- Élelmiszer -->
+    <div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(30,25,20,0.06);">
+      <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #c0183a;">🛒 Élelmiszer</h4>
+      <div style="font-size: 14px; color: #4A4947; line-height: 2;">
+        <div style="display: flex; justify-content: space-between;"><span>Hús (10 kg)</span><span style="font-weight: 600;">24.500 Ft</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>Pékáru</span><span style="font-weight: 600;">18.000 Ft</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>Gyümölcs/zöldség (30 kg)</span><span style="font-weight: 600;">19.500 Ft</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>Tejtermékek</span><span style="font-weight: 600;">22.000 Ft</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Összesítő kártyák -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+    
+    <!-- Áradás előtt -->
+    <div style="background: linear-gradient(135deg, #c0183a 0%, #8b0000 100%); border-radius: 20px; padding: 32px; color: white; text-align: center; box-shadow: 0 8px 24px rgba(192, 24, 58, 0.3);">
+      <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 12px;">Áradás előtt</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">294.000</div>
+      <div style="font-size: 16px; opacity: 0.95;">Ft/hó</div>
+    </div>
+
+    <!-- TISZA ígéret -->
+    <div style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); border-radius: 20px; padding: 32px; color: white; text-align: center; box-shadow: 0 8px 24px rgba(40, 167, 69, 0.3);">
+      <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 12px;">TISZA ígéret</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">209.000</div>
+      <div style="font-size: 16px; opacity: 0.95;">Ft/hó</div>
+    </div>
+
+    <!-- Megtakarítás -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 32px; color: white; text-align: center; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);">
+      <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 12px;">Megtakarítás</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">85.000</div>
+      <div style="font-size: 16px; opacity: 0.95;">Ft/hó (↓ 29%)</div>
+    </div>
+
+  </div>
+
+  <!-- Éves megtakarítás -->
+  <div style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); border-radius: 20px; padding: 40px; margin-top: 30px; text-align: center; box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);">
+    <div style="font-size: 18px; font-weight: 700; color: #1A1918; margin-bottom: 12px;">🎯 Éves megtakarítás egy családnál</div>
+    <div style="font-size: 64px; font-weight: 900; color: #1A1918; margin-bottom: 8px;">1.020.000 Ft</div>
+    <div style="font-size: 16px; color: #1A1918; opacity: 0.9;">Ez egy új autó vagy nyaralás értéke!</div>
+  </div>
+
+  <!-- Megjegyzés -->
+  <div style="background: #FFF9E6; border-left: 4px solid #FFC107; padding: 20px; margin-top: 30px; border-radius: 8px;">
+    <p style="font-size: 14px; color: #666; line-height: 1.6; margin: 0;">
+      <strong>⚠️ Fontos:</strong> Ez egy számított példa egy tipikus 4 fős család havi kiadásaira. 
+      A tényleges megtakarítás családonként eltérő lehet a fogyasztási szokások függvényében. 
+      Az árak a TISZA kormányprogram ígéretei alapján lettek becsülve.
+    </p>
+  </div>
+
+</div>
+
+<div style="text-align: center;">
+  <a href="/" class="back-link">← Vissza a főoldalra</a>
+</div>
+
+<div class="footer-note">
+  <p>
+    <strong>Fontos:</strong> Az "áradás előtti" árak a 2026. május 9-i (az Orbán-kormány utolsó napjának) 
+    árszintet jelentik. Csak azok az árak szerepelnek "Forrás: TISZA kormányprogram" jelöléssel, 
+    amelyek konkrétan szerepelnek a programban. A becsült adatok tájékoztató jellegűek.
+  </p>
+  <p style="margin-top: 12px;">
+    TISZA program: <a href="https://tiszapart.hu" target="_blank" style="color: #e8405a;">tiszapart.hu</a>
+  </p>
+</div>
+
+</body>
+</html>
