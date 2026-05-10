@@ -2,67 +2,282 @@
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
-<title>Értesítő küldés</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tegláról-téglára - Értesítő küldés</title>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
-body { font-family: system-ui; max-width: 500px; margin: 60px auto; padding: 20px; background: #f5f5f5; }
-.card { background: #fff; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-h2 { margin: 0 0 16px; color: #c0183a; }
-label { font-size: 13px; font-weight: 600; color: #555; display: block; margin-bottom: 4px; }
-input { width: 100%; padding: 10px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 14px; }
-button { width: 100%; padding: 14px; background: #e8405a; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
-button:disabled { opacity: 0.5; cursor: default; }
-#log { margin-top: 16px; font-size: 13px; color: #555; white-space: pre-line; background: #f9f9f9; border-radius: 8px; padding: 12px; display: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container {
+  width: 100%;
+  max-width: 500px;
+}
+.card { 
+  background: #fff; 
+  border-radius: 20px; 
+  padding: 40px; 
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: slideIn 0.5s ease-out;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.logo {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+h1 { 
+  font-size: 24px;
+  color: #c0183a; 
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.subtitle {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+label { 
+  font-size: 13px; 
+  font-weight: 600; 
+  color: #333; 
+  display: block; 
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+input, textarea { 
+  width: 100%; 
+  padding: 12px 16px; 
+  border: 2px solid #e0e0e0; 
+  border-radius: 12px; 
+  font-size: 15px; 
+  font-family: inherit;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+button { 
+  width: 100%; 
+  padding: 16px; 
+  background: linear-gradient(135deg, #e8405a 0%, #c0183a 100%);
+  color: #fff; 
+  border: none; 
+  border-radius: 12px; 
+  font-size: 16px; 
+  font-weight: 700; 
+  cursor: pointer;
+  margin-top: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(232, 64, 90, 0.3);
+}
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(232, 64, 90, 0.4);
+}
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+button:disabled { 
+  opacity: 0.6; 
+  cursor: not-allowed;
+  transform: none;
+}
+#log { 
+  margin-top: 20px; 
+  font-size: 13px; 
+  color: #333; 
+  white-space: pre-wrap; 
+  background: #f8f9fa; 
+  border-radius: 12px; 
+  padding: 16px; 
+  display: none;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 2px solid #e0e0e0;
+}
+.log-success { color: #28a745; font-weight: 600; }
+.log-error { color: #dc3545; font-weight: 600; }
+.log-info { color: #667eea; font-weight: 600; }
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  color: rgba(255,255,255,0.9);
+  font-size: 13px;
+}
+.footer a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+@media (max-width: 600px) {
+  .card { padding: 30px 24px; }
+  h1 { font-size: 20px; }
+  .logo { font-size: 40px; }
+}
 </style>
 </head>
 <body>
-<div class="card">
-  <h2>🧱 Értesítő küldés</h2>
-  <p style="color:#666;font-size:14px;">Küldd el a frissítési értesítőt a feliratkozóknak.</p>
+<div class="container">
+  <div class="card">
+    <div class="header">
+      <div class="logo">🧱</div>
+      <h1>Értesítő küldés</h1>
+      <p class="subtitle">Küldd el a frissítési értesítőt a tegláról-téglára.hu feliratkozóinak</p>
+    </div>
 
-  <label>Frissítések száma / leírás:</label>
-  <input type="text" id="dbInput" value="2 tégla frissült ma">
+    <label for="dbInput">📊 Frissítések leírása:</label>
+    <input type="text" id="dbInput" value="2 tégla frissült ma" placeholder="Pl: 5 új ígéret hozzáadva">
 
-  <label>Feliratkozók (vesszővel elválasztva):</label>
-  <input type="text" id="emailsInput" value="tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com">
+    <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
+    <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
 
-  <button id="sendBtn" onclick="sendAll()">📧 Értesítő küldése</button>
-  <div id="log"></div>
+    <button id="sendBtn" onclick="sendAll()">
+      <span id="btnText">📧 Értesítő küldése</span>
+    </button>
+    
+    <div id="log"></div>
+  </div>
+
+  <div class="footer">
+    <a href="https://teglarol-teglara.hu" target="_blank">← Vissza a főoldalra</a>
+  </div>
 </div>
 
 <script>
-emailjs.init("0k7yH8d4u-BjgACd1");
+// EmailJS konfiguráció
+const CONFIG = {
+  publicKey: "0k7yH8d4u-BjgACd1",
+  serviceId: "service_x5huqxn",
+  templateId: "template_pfrf10g"
+};
+
+// Inicializálás
+emailjs.init(CONFIG.publicKey);
+
+function addLog(message, type = 'info') {
+  const log = document.getElementById('log');
+  log.style.display = 'block';
+  const span = document.createElement('span');
+  span.className = `log-${type}`;
+  span.textContent = message + '\n';
+  log.appendChild(span);
+  log.scrollTop = log.scrollHeight;
+}
 
 async function sendAll() {
   const btn = document.getElementById('sendBtn');
+  const btnText = document.getElementById('btnText');
   const log = document.getElementById('log');
-  const db = document.getElementById('dbInput').value;
-  const emails = document.getElementById('emailsInput').value
-    .split(',').map(e => e.trim()).filter(Boolean);
+  const db = document.getElementById('dbInput').value.trim();
+  const emailsRaw = document.getElementById('emailsInput').value;
+  
+  // Email validáció
+  const emails = emailsRaw
+    .split(',')
+    .map(e => e.trim())
+    .filter(e => e && e.includes('@'));
 
-  btn.disabled = true;
-  log.style.display = 'block';
-  log.textContent = '⏳ Küldés...\n';
-
-  let sent = 0;
-  for (const email of emails) {
-    try {
-      await emailjs.send('service_x5huqxn', 'template_pfrf10g', {
-        email: email,
-        name: 'Feliratkozó',
-        db: db
-      });
-      log.textContent += `✅ ${email}\n`;
-      sent++;
-    } catch(e) {
-      log.textContent += `❌ ${email} – ${e.text || JSON.stringify(e)}\n`;
-    }
-    await new Promise(r => setTimeout(r, 600));
+  if (!db) {
+    alert('⚠️ Kérlek, add meg a frissítés leírását!');
+    return;
   }
 
-  log.textContent += `\n📊 ${sent}/${emails.length} értesítő elküldve`;
-  btn.disabled = false;
+  if (emails.length === 0) {
+    alert('⚠️ Kérlek, adj meg legalább egy érvényes email címet!');
+    return;
+  }
+
+  // UI letiltás
+  btn.disabled = true;
+  btnText.textContent = '⏳ Küldés folyamatban...';
+  log.innerHTML = '';
+  log.style.display = 'block';
+  
+  addLog('🚀 Értesítő küldés indítása...', 'info');
+  addLog(`📊 Frissítés: "${db}"`, 'info');
+  addLog(`📧 Címzettek: ${emails.length} db`, 'info');
+  addLog('', 'info');
+
+  let sent = 0;
+  let failed = 0;
+
+  for (let i = 0; i < emails.length; i++) {
+    const email = emails[i];
+    try {
+      addLog(`[${i + 1}/${emails.length}] Küldés: ${email}...`, 'info');
+      
+      const response = await emailjs.send(
+        CONFIG.serviceId,
+        CONFIG.templateId,
+        {
+          email: email,
+          name: 'Feliratkozó',
+          db: db
+        }
+      );
+      
+      addLog(`✅ SIKERES: ${email}`, 'success');
+      sent++;
+      
+    } catch (error) {
+      addLog(`❌ SIKERTELEN: ${email}`, 'error');
+      addLog(`   Hiba: ${error.text || error.message || 'Ismeretlen hiba'}`, 'error');
+      failed++;
+    }
+    
+    // Kis szünet az EmailJS rate limit miatt
+    if (i < emails.length - 1) {
+      await new Promise(r => setTimeout(r, 700));
+    }
+  }
+
+  // Összesítő
+  addLog('', 'info');
+  addLog('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'info');
+  
+  if (sent === emails.length) {
+    addLog(`🎉 KÉSZ! Mind a ${sent} email sikeresen elküldve!`, 'success');
+    btnText.textContent = '✅ Sikeresen elküldve!';
+    setTimeout(() => {
+      btnText.textContent = '📧 Értesítő küldése';
+      btn.disabled = false;
+    }, 3000);
+  } else {
+    addLog(`📊 Eredmény: ${sent} sikeres, ${failed} sikertelen (összesen: ${emails.length})`, 'info');
+    btnText.textContent = '📧 Értesítő küldése';
+    btn.disabled = false;
+  }
 }
+
+// Automatikus teszt betöltéskor
+window.addEventListener('load', () => {
+  console.log('✅ Tegláról-téglára Értesítő rendszer betöltve');
+  console.log('📧 EmailJS inicializálva:', CONFIG.serviceId);
+});
 </script>
 </body>
 </html>
