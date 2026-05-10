@@ -1471,7 +1471,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 
  </svg>
 </div>
- <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára”</h1>
  <!-- AVATÁS VISSZASZÁMLÁLÓ -->
  <div id="avatasBanner" class="avatas-banner" style="display:none;">
   <div style="font-size:13px; font-weight:700; color:var(--text-main); margin-bottom:4px;" id="avatásTitle">
@@ -4773,25 +4772,16 @@ function activateNewestSort() {
   if (sortBar) setTimeout(() => window.scrollTo({ top: sortBar.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }), 80);
 }
 
-// ── Frissítések felhívó a főcsempén ──
+// ── Mai frissítések felhívó a főcsempén ──
 (function() {
+  // UTC+2 (magyar idő) szerinti dátum
   const nowHU = new Date(Date.now() + 2 * 60 * 60 * 1000);
   const today = nowHU.toISOString().slice(0,10);
-  // Tegnap is
-  const yesterday = new Date(Date.now() + 2*60*60*1000 - 86400000).toISOString().slice(0,10);
-
+  const todayCount = excelData.filter(r => r['Frissítés'] === today).length;
   const wrap = document.getElementById('todayUpdateWrap');
   const msg  = document.getElementById('todayUpdateMsg');
-  if (!wrap || !msg) return;
-
-  const todayCount = excelData.filter(r => r['Frissítés'] === today).length;
-  const yestCount  = excelData.filter(r => r['Frissítés'] === yesterday).length;
-
-  if (todayCount > 0) {
+  if (todayCount > 0 && wrap && msg) {
     msg.textContent = 'Ma ' + todayCount + ' tégla frissült – nézd meg!';
-    wrap.style.display = 'block';
-  } else if (yestCount > 0) {
-    msg.textContent = 'Tegnap ' + yestCount + ' tégla frissült – nézd meg!';
     wrap.style.display = 'block';
   }
 })();
