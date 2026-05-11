@@ -1569,7 +1569,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </button>
  </div>
-<!-- HEADER NAVIGÁCIÓS GOMBOK - Logo két oldalán -->
+  <!-- HEADER NAVIGÁCIÓS GOMBOK - ILLESZD BE A </header> TAG ELŐTT! -->
 <style>
 /* Header gombok konténer */
 .header-nav-buttons {
@@ -1582,6 +1582,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   align-items: flex-end;
   padding: 0 40px;
   pointer-events: none;
+  z-index: 10;
 }
 
 .header-nav-buttons > * {
@@ -1627,6 +1628,7 @@ body.dark .header-nav-btn {
   font-weight: 700;
   color: #1A1918;
   text-align: center;
+  line-height: 1.2;
 }
 
 body.dark .header-nav-btn .label {
@@ -1723,10 +1725,10 @@ body.dark .header-nav-btn .label {
 }
 </style>
 
-<!-- GOMBOK A HEADER-EN BELÜL, A ZÁRÓ </header> TAG ELŐTT -->
+<!-- GOMBOK -->
 <div class="header-nav-buttons">
-  <!-- Bal oldal: Téglák -->
-  <a href="#teglak" class="header-nav-btn">
+  <!-- Bal oldal: Téglák - ugrás a téglák listához -->
+  <a href="#timelineSection" class="header-nav-btn" onclick="document.getElementById('categoryFilter').scrollIntoView({behavior: 'smooth', block: 'start'}); return false;">
     <div class="icon">🧱</div>
     <div class="label">100 Tégla</div>
   </a>
