@@ -1516,6 +1516,159 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   </button>
  </div>
 
+<!-- PÉNZTÁRCAINDEX GOMB (kalkulátor gomb után, email előtt) -->
+<style>
+/* Pénztárcaindex gomb konténer */
+.wallet-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 20px 0;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* Pénztárcaindex gomb */
+.wallet-nav-btn {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(232, 64, 90, 0.3);
+  border-radius: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+body.dark .wallet-nav-btn {
+  background: rgba(42, 46, 66, 0.98);
+  border-color: rgba(192, 202, 245, 0.3);
+}
+
+.wallet-nav-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(232, 64, 90, 0.4);
+  border-color: #e8405a;
+}
+
+.wallet-nav-btn .icon {
+  font-size: 28px;
+  line-height: 1;
+  animation: walletPulse 2s ease-in-out infinite;
+}
+
+.wallet-nav-btn .label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1918;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+body.dark .wallet-nav-btn .label {
+  color: #E8DDD2;
+}
+
+/* Pénztárca pulzáló animáció */
+@keyframes walletPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* ÚJ badge */
+.new-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #1A1918;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Mobilra optimalizálás */
+@media (max-width: 768px) {
+  .wallet-btn-wrapper {
+    padding: 14px 0 18px 0;
+  }
+  
+  .wallet-nav-btn {
+    padding: 8px 16px;
+    gap: 6px;
+  }
+  
+  .wallet-nav-btn .icon {
+    font-size: 24px;
+  }
+  
+  .wallet-nav-btn .label {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet-btn-wrapper {
+    padding: 12px 0 16px 0;
+  }
+  
+  .wallet-nav-btn {
+    padding: 6px 14px;
+    gap: 6px;
+    border-radius: 16px;
+  }
+  
+  .wallet-nav-btn .icon {
+    font-size: 22px;
+  }
+  
+  .wallet-nav-btn .label {
+    font-size: 11px;
+  }
+  
+  .new-badge {
+    font-size: 8px;
+    padding: 2px 5px;
+    top: -6px;
+    right: -6px;
+  }
+}
+</style>
+
+<div class="wallet-btn-wrapper">
+  <a href="./penztarca.html" class="wallet-nav-btn">
+    <div class="new-badge">ÚJ!</div>
+    <div class="icon">💰</div>
+    <div class="label">Pénztárcaindex</div>
+  </a>
+</div>
+
  <div class="subscribe-section">
   <div style="font-size:14px;font-weight:700;color:var(--text-main);">🔔 Értesítést kérek frissítésekről</div>
   <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Ha új tégla kerül fel vagy státusz változik, e-mailben értesítünk.</div>
@@ -1569,178 +1722,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </button>
  </div>
-
-<!-- HEADER NAVIGÁCIÓS GOMBOK -->
-<style>
-/* Header gombok konténer */
-.header-nav-buttons {
-  display: none; /* IDEIGLENESEN ELREJTVE */
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 0 40px;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.header-nav-buttons > * {
-  pointer-events: auto;
-}
-
-/* Navigációs gomb alap stílus */
-.header-nav-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(232, 64, 90, 0.2);
-  border-radius: 20px;
-  padding: 16px 20px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 120px;
-}
-
-body.dark .header-nav-btn {
-  background: rgba(42, 46, 66, 0.95);
-  border-color: rgba(192, 202, 245, 0.2);
-}
-
-.header-nav-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(232, 64, 90, 0.3);
-  border-color: #e8405a;
-}
-
-.header-nav-btn .icon {
-  font-size: 48px;
-  line-height: 1;
-}
-
-.header-nav-btn .label {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1A1918;
-  text-align: center;
-  line-height: 1.2;
-}
-
-body.dark .header-nav-btn .label {
-  color: #E8DDD2;
-}
-
-/* Pénztárca pulzáló animáció */
-.wallet-pulse {
-  animation: walletPulse 2s ease-in-out infinite;
-}
-
-@keyframes walletPulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
-}
-
-/* ÚJ badge a pénztárcán */
-.new-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-  color: #1A1918;
-  font-size: 10px;
-  font-weight: 800;
-  padding: 4px 8px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
-  animation: badgePulse 2s ease-in-out infinite;
-}
-
-@keyframes badgePulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
-  }
-  50% {
-    transform: scale(1.1);
-    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.6);
-  }
-}
-
-/* Mobilra optimalizálás */
-@media (max-width: 768px) {
-  .header-nav-buttons {
-    padding: 0 20px;
-    bottom: 16px;
-  }
-  
-  .header-nav-btn {
-    min-width: 100px;
-    padding: 12px 16px;
-  }
-  
-  .header-nav-btn .icon {
-    font-size: 40px;
-  }
-  
-  .header-nav-btn .label {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header-nav-buttons {
-    padding: 0 12px;
-    bottom: 12px;
-  }
-  
-  .header-nav-btn {
-    min-width: 80px;
-    padding: 10px 12px;
-    gap: 6px;
-  }
-  
-  .header-nav-btn .icon {
-    font-size: 32px;
-  }
-  
-  .header-nav-btn .label {
-    font-size: 11px;
-  }
-  
-  .new-badge {
-    font-size: 9px;
-    padding: 3px 6px;
-  }
-}
-</style>
-
-<!-- GOMBOK -->
-<div class="header-nav-buttons">
-  <!-- Bal oldal: Téglák - ugrás a téglák listához -->
-  <a href="#timelineSection" class="header-nav-btn">
-    <div class="icon">🧱</div>
-    <div class="label">100 Tégla</div>
-  </a>
-  
-  <!-- Jobb oldal: Pénztárcaindex -->
-  <a href="/penztarca.html" class="header-nav-btn" style="position: relative;">
-    <div class="new-badge">ÚJ!</div>
-    <div class="icon wallet-pulse">💰</div>
-    <div class="label">Pénztárca<br>index</div>
-  </a>
-</div>
 
  </header>
 
