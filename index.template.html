@@ -3458,7 +3458,7 @@ document.querySelectorAll(".cat-item").forEach(item => {
  s.style.display = s.getAttribute("data-cat") === cat ? "" : "none";
  });
  const sec = document.querySelector(`.category-section[data-cat="${cat}"]`);
- if (sec) setTimeout(() => window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - 52, behavior: 'smooth' }), 50);
+ if (sec) setTimeout(() => scrollToWithOffset(sec, 80), 100);
  }
  if (window.innerWidth < 900) closeSidebar();
  });
