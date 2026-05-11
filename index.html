@@ -112,7 +112,7 @@ body.dark .sidebar .cat-item:hover { filter:brightness(1.15); }
 .content { margin-left:var(--sidebar-width); padding:40px; }
 
 /* ---- HEADER ---- */
-.modern-header { background:linear-gradient(135deg,#E8DDD2 0%,#C9B8A8 60%,#B5A498 100%); padding:60px 20px 56px; border-radius:24px; box-shadow:var(--shadow-soft); margin-bottom:40px; position:relative; overflow:hidden; min-height:120px; }
+.modern-header { background:linear-gradient(135deg,#E8DDD2 0%,#C9B8A8 60%,#B5A498 100%); padding:60px 20px 56px; border-radius:24px; box-shadow:var(--shadow-soft); margin-bottom:40px; position:relative; overflow:visible; min-height:120px; }
 body.dark .modern-header { background:linear-gradient(135deg,#24283B 0%,#2A2E42 60%,#1F2235 100%); }
 .header-inner { display:flex; align-items:center; gap:40px; flex-wrap:wrap; justify-content:center; }
 .logo-future { width:200px; height:200px; border-radius:40px; overflow:visible; position:relative; box-shadow:0 8px 24px rgba(30,25,20,0.18),inset 0 1px 0 rgba(255,255,255,0.2); flex-shrink:0; }
@@ -1569,15 +1569,16 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </button>
  </div>
-  <!-- HEADER NAVIGÁCIÓS GOMBOK - ILLESZD BE A </header> TAG ELŐTT! -->
+
+<!-- HEADER NAVIGÁCIÓS GOMBOK -->
 <style>
 /* Header gombok konténer */
 .header-nav-buttons {
+  display: none; /* IDEIGLENESEN ELREJTVE */
   position: absolute;
   bottom: 20px;
   left: 0;
   right: 0;
-  display: flex;
   justify-content: space-between;
   align-items: flex-end;
   padding: 0 40px;
@@ -1740,6 +1741,7 @@ body.dark .header-nav-btn .label {
     <div class="label">Pénztárca<br>index</div>
   </a>
 </div>
+
  </header>
 
  <!-- Hidden category filter for JS -->

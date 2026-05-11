@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
- <meta charset="UTFigen – Ganz Ábrahám gazdaságfejlesztési terv: KKV-fókusz, exportfejlesztés, energiahatékonyság; Kapitány István gazdasági miniszter koordinál8">
+ <meta charset="UTF-8">
  <title>Tégláról-téglára | teglarol-teglara.hu</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="Független nyomonkövetés: Magyar Péter és a TISZA Párt ígéreteinek teljesülése tégláról-téglára.">
 <meta property="og:title" content="Tégláról-téglára | TISZA ígéretkövető">
-<meta property="og:description" content="Független nyomonkövetés: Magyar Péter és a TISZA Párt ígéreteinek teljesülése tégláról-téglára.">
+<meta property="og:description" content="Független nyomonkövetés: Magyar Péter és a TISZA Párt 100 ígérete – Átláthatóság, elszámoltathatóság, valóság.">
 <meta property="og:url" content="https://teglarol-teglara.hu">
 <meta property="og:image" content="https://teglarol-teglara.hu/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@ body.dark .sidebar .cat-item:hover { filter:brightness(1.15); }
 .content { margin-left:var(--sidebar-width); padding:40px; }
 
 /* ---- HEADER ---- */
-.modern-header { background:linear-gradient(135deg,#E8DDD2 0%,#C9B8A8 60%,#B5A498 100%); padding:60px 20px 56px; border-radius:24px; box-shadow:var(--shadow-soft); margin-bottom:40px; position:relative; overflow:hidden; min-height:120px; }
+.modern-header { background:linear-gradient(135deg,#E8DDD2 0%,#C9B8A8 60%,#B5A498 100%); padding:60px 20px 56px; border-radius:24px; box-shadow:var(--shadow-soft); margin-bottom:40px; position:relative; overflow:visible; min-height:120px; }
 body.dark .modern-header { background:linear-gradient(135deg,#24283B 0%,#2A2E42 60%,#1F2235 100%); }
 .header-inner { display:flex; align-items:center; gap:40px; flex-wrap:wrap; justify-content:center; }
 .logo-future { width:200px; height:200px; border-radius:40px; overflow:visible; position:relative; box-shadow:0 8px 24px rgba(30,25,20,0.18),inset 0 1px 0 rgba(255,255,255,0.2); flex-shrink:0; }
@@ -1569,6 +1569,178 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </button>
  </div>
+
+<!-- HEADER NAVIGÁCIÓS GOMBOK -->
+<style>
+/* Header gombok konténer */
+.header-nav-buttons {
+  display: none; /* IDEIGLENESEN ELREJTVE */
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 40px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.header-nav-buttons > * {
+  pointer-events: auto;
+}
+
+/* Navigációs gomb alap stílus */
+.header-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(232, 64, 90, 0.2);
+  border-radius: 20px;
+  padding: 16px 20px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+}
+
+body.dark .header-nav-btn {
+  background: rgba(42, 46, 66, 0.95);
+  border-color: rgba(192, 202, 245, 0.2);
+}
+
+.header-nav-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(232, 64, 90, 0.3);
+  border-color: #e8405a;
+}
+
+.header-nav-btn .icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.header-nav-btn .label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1918;
+  text-align: center;
+  line-height: 1.2;
+}
+
+body.dark .header-nav-btn .label {
+  color: #E8DDD2;
+}
+
+/* Pénztárca pulzáló animáció */
+.wallet-pulse {
+  animation: walletPulse 2s ease-in-out infinite;
+}
+
+@keyframes walletPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* ÚJ badge a pénztárcán */
+.new-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #1A1918;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Mobilra optimalizálás */
+@media (max-width: 768px) {
+  .header-nav-buttons {
+    padding: 0 20px;
+    bottom: 16px;
+  }
+  
+  .header-nav-btn {
+    min-width: 100px;
+    padding: 12px 16px;
+  }
+  
+  .header-nav-btn .icon {
+    font-size: 40px;
+  }
+  
+  .header-nav-btn .label {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-nav-buttons {
+    padding: 0 12px;
+    bottom: 12px;
+  }
+  
+  .header-nav-btn {
+    min-width: 80px;
+    padding: 10px 12px;
+    gap: 6px;
+  }
+  
+  .header-nav-btn .icon {
+    font-size: 32px;
+  }
+  
+  .header-nav-btn .label {
+    font-size: 11px;
+  }
+  
+  .new-badge {
+    font-size: 9px;
+    padding: 3px 6px;
+  }
+}
+</style>
+
+<!-- GOMBOK -->
+<div class="header-nav-buttons">
+  <!-- Bal oldal: Téglák - ugrás a téglák listához -->
+  <a href="#timelineSection" class="header-nav-btn">
+    <div class="icon">🧱</div>
+    <div class="label">100 Tégla</div>
+  </a>
+  
+  <!-- Jobb oldal: Pénztárcaindex -->
+  <a href="/penztarca.html" class="header-nav-btn" style="position: relative;">
+    <div class="new-badge">ÚJ!</div>
+    <div class="icon wallet-pulse">💰</div>
+    <div class="label">Pénztárca<br>index</div>
+  </a>
+</div>
 
  </header>
 
