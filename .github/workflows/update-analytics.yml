@@ -1,0 +1,37 @@
+name: Update Analytics Stats
+
+on:
+  schedule:
+    # Minden nap 06:00 UTC-kor (08:00 magyar idő)
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # Manuális futtatás is engedélyezett
+
+jobs:
+  update-analytics:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install google-analytics-data
+        
+    - name: Fetch Analytics data
+      env:
+        GA_CREDENTIALS_JSON: ${{ secrets.GA_CREDENTIALS_JSON }}
+      run: |
+        python fetch_analytics.py
+        
+    - name: Commit and push if changed
+      run: |
+        git config --global user.name 'GitHub Actions Bot'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add analytics-stats.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 Analytics frissítés - $(date +'%Y-%m-%d')" && git push)
