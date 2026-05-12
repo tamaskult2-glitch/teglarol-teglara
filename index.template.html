@@ -2,6 +2,16 @@
 <html lang="hu">
 <head>
  <meta charset="UTF-8">
+ 
+ <!-- Google tag (gtag.js) -->
+ <script async src="https://www.googletagmanager.com/gtag/js?id=G-XJSL3HS07B"></script>
+ <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XJSL3HS07B');
+ </script>
+ 
  <title>Tégláról-téglára | teglarol-teglara.hu</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="Független nyomonkövetés: Magyar Péter és a TISZA Párt ígéreteinek teljesülése tégláról-téglára.">
@@ -5450,6 +5460,21 @@ function openStory() {
       const cached = JSON.parse(localStorage.getItem('igmero_cache') || '{}');
       if (cached.total) sa('statVisitors', cached.total.toLocaleString('hu-HU'));
     } catch(e) {}
+    
+    // Google Analytics látogatószám betöltése
+    fetch('analytics-stats.json')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d && d.totalSessions) {
+          const vBox = document.getElementById('statVisitorBox');
+          if(vBox) vBox.style.display='block';
+          document.getElementById('statVisitors').textContent = d.totalSessions.toLocaleString('hu-HU');
+        }
+      })
+      .catch(() => {
+        console.log('Analytics stats not available yet');
+      });
+    
     // Feliratkozók száma: subscribers.json-ból
     fetch('https://raw.githubusercontent.com/tamaskult2-glitch/teglarol-teglara/main/subscribers.json')
       .then(r => r.ok ? r.json() : null)
