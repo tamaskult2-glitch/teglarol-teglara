@@ -75,12 +75,14 @@ def main():
     data = get_analytics_data()
     
     if data:
-        # Mentés JSON fájlba
+        # Mentés JSON fájlba (current working directory)
         output_file = 'analytics-stats.json'
-        with open(output_file, 'w', encoding='utf-8') as f:
+        output_path = os.path.join(os.getcwd(), output_file)
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         
-        print(f"✅ Adatok mentve: {output_file}")
+        print(f"✅ Adatok mentve: {output_path}")
         print(f"📊 Statisztikák:")
         print(f"   - Aktív felhasználók: {data['activeUsers']:,}")
         print(f"   - Összes session: {data['totalSessions']:,}")
