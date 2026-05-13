@@ -156,6 +156,7 @@ button:disabled {
     <label for="typeSelect">📋 Üzenet típusa:</label>
     <select id="typeSelect" onchange="updateTemplate()">
       <option value="tegla">🧱 Tégla frissítés</option>
+      <option value="aradas">🌊 Áradás-frissítés – teljes adatbázis update</option>
       <option value="penztarca">💰 Pénztárcaindex launch</option>
       <option value="custom">✏️ Egyéni üzenet</option>
     </select>
@@ -197,6 +198,22 @@ function updateTemplate() {
   if (type === 'tegla') {
     dbInput.value = '2 tégla frissült ma';
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
+  } else if (type === 'aradas') {
+    dbInput.value = `🌊 Áradás-frissítés – teljes adatbázis update!
+
+Ma elvégeztük az oldal teljes frissítését. Összefoglaló:
+
+🧱 101 tégla ellenőrizve
+📣 Bejelentve: 71  |  ✅ Megvalósult: 2  |  ❌ Ígéret: 28
+
+📰 Mai legfontosabb változások:
+– [ide írd a frissítés lényegét]
+
+📊 Kövesd az összes ígéretet:
+https://teglarol-teglara.hu
+
+🧱 Tegláról-téglára – Független ígéretkövető`;
+    dbInput.placeholder = 'Áradás-frissítés sablon...';
   } else if (type === 'penztarca') {
     dbInput.value = `💰 ÚJ! Pénztárcaindex elindult!
 
