@@ -2967,7 +2967,8 @@ function buildCard(item) {
  const priLabel = pri === "azonnali" ? "🔴 Azonnali" : pri === "hosszu" ? "🟢 Hosszú táv" : "🟡 Rövid táv";
  const priCls = `priority-${pri}`;
  card.dataset.priority = pri;
- const today = new Date(Date.now() + 2*60*60*1000).toISOString().slice(0,10);
+ const _nowHU = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+ const today = _nowHU.getFullYear() + '-' + String(_nowHU.getMonth()+1).padStart(2,'0') + '-' + String(_nowHU.getDate()).padStart(2,'0');
  const freshBadge = item["Frissítés"] === today ? '<span class="fresh-badge">● Ma</span>' : '';
 
  const bodyHTML = `
@@ -3012,7 +3013,8 @@ function renderDashboard(data) {
 
  // Legfrissebb módban: flat lista, nem kategóriánként csoportosítva
  if (typeof currentSort !== 'undefined' && currentSort === 'newest') {
-   const today = new Date(Date.now() + 2*60*60*1000).toISOString().slice(0,10);
+   const _nowHU2 = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+   const today = _nowHU2.getFullYear() + '-' + String(_nowHU2.getMonth()+1).padStart(2,'0') + '-' + String(_nowHU2.getDate()).padStart(2,'0');
    const todayItems = data.filter(r => r['Frissítés'] === today);
    const restItems  = data.filter(r => r['Frissítés'] !== today);
 
@@ -3775,7 +3777,7 @@ const excelData = [
   "FiDeSZ állapot": "Alaptörvény XII. módosítása 2024",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 meghallgatás, bizottság támogatta); Igazságügyi Minisztérium felel az alkotmányozási folyamatért; Görög Márta: \"Demokratikusabb, stabilabb alkotmányos rendszer a cél. Az alkotmányozási folyamat széleskörű lesz\"; hosszabb távú konszenzusos alkotmányozás, felülvizsgálják a sarkalatos törvényeket",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://telex.hu/belfold/2026/05/12/gorog-marta-igazsagugyi-miniszter-parlament-bizottsagi-meghallgatas",
   "Prioritás": "azonnali"
  },
@@ -3785,7 +3787,7 @@ const excelData = [
   "FiDeSZ állapot": "rendkívüli jogrendben él az ország 2020 óta",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 meghallgatás); veszélyhelyzeti kormányzás május 13-án lejár; Görög Márta bírálta a veszélyhelyzeti kormányzást; új alkotmányozási folyamatban szabályozzák",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://telex.hu/belfold/2026/05/12/gorog-marta-igazsagugyi-miniszter-parlament-bizottsagi-meghallgatas",
   "Prioritás": "azonnali"
  },
@@ -3795,7 +3797,7 @@ const excelData = [
   "FiDeSZ állapot": "nincs korlátozás",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 bizottsági meghallgatás, bizottság támogatta); az alkotmányozási folyamat első lépései között szerepel a miniszterelnöki mandátum 2 ciklusra korlátozása; Görög Márta: \"Demokratikusabb, stabilabb alkotmányos rendszer a cél. Az alkotmányozási folyamat széleskörű lesz\"; alaptörvény módosítás szükséges, hosszabb távú konszenzusos alkotmányozás",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260512/gorog-marta-aranyosabb-valasztasi-rendszer-kialakitasa-a-cel-836084",
   "Prioritás": "azonnali"
  },
@@ -3805,7 +3807,7 @@ const excelData = [
   "FiDeSZ állapot": "politikailag kontrollált",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 bizottsági meghallgatás, bizottság támogatta); megerősítik a bíróságok és ügyészségek intézményes függetlenségét, szélesítik az Országos Bírói Tanács (OBT) jogköreit; Görög Márta: \"A bíróságok függetlenségének megerősítése széleskörű szakmai párbeszéddel, amely a bírók kinevezési folyamatára is kiterjedhet\"; javítják a munkakörülményeket, egyszerűsítik az eljárásokat",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://telex.hu/belfold/2026/05/12/gorog-marta-igazsagugyi-miniszter-parlament-bizottsagi-meghallgatas",
   "Prioritás": "azonnali"
  },
@@ -3815,7 +3817,7 @@ const excelData = [
   "FiDeSZ állapot": "közmédia propagandaeszköz",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 meghallgatás); új választási törvény benyújtása tervben; Görög Márta: \"Indokolt a jelenleginél átláthatóbb, tisztességesebb és arányosabb választási rendszer megalkotása\"; MTVA hírszolgáltatás felfüggesztve; független közmédia feltételei megteremtendők",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260512/gorog-marta-aranyosabb-valasztasi-rendszer-kialakitasa-a-cel-836084",
   "Prioritás": "azonnali"
  },
@@ -3835,7 +3837,7 @@ const excelData = [
   "FiDeSZ állapot": "nem csatlakozott",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 bizottsági meghallgatás, bizottság támogatta); Görög Márta: \"El kívánjuk végezni az Európai Ügyészséghez történő csatlakozás alkotmányos és szakmai kereteinek kidolgozását és megteremtését\"; haladéktalanul csatlakoznak, nem jelenti a magyar ügyészség hatáskörének csökkentését",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://10perc.hu/hir/belfold/2026/05/12/gorog-marta-csatlakozunk-az-europai-ugyeszseghez-es-nemzeti-vagyonvisszaszerzesi-hivatalt-alapitunk",
   "Prioritás": "azonnali"
  },
@@ -3865,7 +3867,7 @@ const excelData = [
   "FiDeSZ állapot": "nincs ilyen hivatal",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 meghallgatás); a Miniszterelnökséggel és Belügyminiszterrel közösen alakítják ki a jogi környezetet; Görög Márta: \"Széleskörű hatáskörökkel fog rendelkezni a Vagyonvisszaszerzési Hivatal, elnökét kétharmados többséggel kell majd megválasztania az Országgyűlésnek\"; zéró tolerancia a korrupcióval szemben",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://10perc.hu/hir/belfold/2026/05/12/gorog-marta-csatlakozunk-az-europai-ugyeszseghez-es-nemzeti-vagyonvisszaszerzesi-hivatalt-alapitunk",
   "Prioritás": "azonnali"
  },
@@ -4135,7 +4137,7 @@ const excelData = [
   "FiDeSZ állapot": "visszaélések fedezve",
   "Volt előrelépést jelentő bejelentés?": "igen – Ruff Bálint kancelláriaminiszter-jelölt (máj.12 meghallgatás); Ruff Bálint: \"Vissza kell állítani azt, hogy a gyerekeket védeni kell. Az állam évente százmilliárd forintot nem költhet arra, hogy más embereket vegzáljon\"; Görög Márta: zéró tolerancia az erőszakkal szemben; a gyermekvédelmi rendszer teljes felülvizsgálata tervben",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://hvg.hu/itthon/20260512_ruff-balint-meghallgatas-igazsagugyi-bizottsag",
   "Prioritás": "azonnali"
  },
@@ -4145,7 +4147,7 @@ const excelData = [
   "FiDeSZ állapot": "8000 Mrd Ft befagyasztva",
   "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter ápr.29-én Brüsszelben tárgyalt Von der Leyennel; Kapitány István gazdasági miniszter (máj.11 meghallgatás, 12 igen, 3 tartózkodás, bizottság támogatta); 10,4 milliárd euró lehívható 2026.08.31-ig (6,9 Mrd€ vissza nem térítendő támogatás, 3,5 Mrd€ hitel); Kapitány István: \"A 10,4 milliárd eurónyi uniós forrás lehívásáról elkezdték a tárgyalásokat, folyamatosan dolgozunk, a projektek menedzselését el kell végezni az uniós szabályok szerint, a struktúra kialakítása tart, a kifizetéseknek szeptember végéig kell megtörténniük. A vissza nem térítendő rész 6,9 milliárd euró, a többi hitel, haladékra nincs lehetőség\"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://index.hu/belfold/2026/05/11/eloben-a-parlamentbol-megkezdodtek-magyar-peter-miniszterjeloltjeinek-meghallgatasai/kapitany-istvan-elarulta-hogy-mennyi-ideje-maradt-magyarorszagnak-az-unios-forrasok-lehivasara/",
   "Prioritás": "azonnali"
  },
@@ -4255,7 +4257,7 @@ const excelData = [
   "FiDeSZ állapot": "visszaélések nem vizsgálva; bicskei ig. ma szabadult",
   "Volt előrelépést jelentő bejelentés?": "igen – Ruff Bálint kancelláriaminiszter-jelölt (máj.12 meghallgatás); felháborodásának adott hangot amiatt, hogy a fideszes képviselők a gyermekvédelemről kérdezték, \"ezt csak bocsánatkérés után tehetnék meg\"; Ruff Bálint: \"Az állam feladata az, hogy minden magyar embert szolgáljon\"; a gyermekvédelmi rendszer teljes felülvizsgálata kiemelt prioritás",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://hvg.hu/itthon/20260512_ruff-balint-meghallgatas-igazsagugyi-bizottsag",
   "Prioritás": "azonnali"
  },
@@ -4315,7 +4317,7 @@ const excelData = [
   "FiDeSZ állapot": "átláthatatlan rendszer",
   "Volt előrelépést jelentő bejelentés?": "igen – Ruff Bálint kancelláriaminiszter-jelölt (máj.12 meghallgatás); Ruff Bálint: \"Elmondta, ha kinevezik, azonnal elindítja a valaha volt legnagyobb átvilágítást, politikait és gazdaságit is\"; Nemzeti Vagyonvisszaszerzési Hivatal felállítása párhuzamosan; zéró tolerancia a közbeszerzési visszaélésekkel szemben; Görög Márta: átlátható jogalkotás, érdemi szakmai és társadalmi egyeztetés minden törvénynél",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://hvg.hu/itthon/20260512_ruff-balint-meghallgatas-igazsagugyi-bizottsag",
   "Prioritás": "azonnali"
  },
@@ -4325,7 +4327,7 @@ const excelData = [
   "FiDeSZ állapot": "gyenge átláthatóság",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 meghallgatás); zéró tolerancia a korrupcióval szemben; Görög Márta: \"A korrupció gyengíti az államot, rombolja a versenyt, elbizonytalanítja a tisztességes befektetőket és vállalkozókat. A jogalkotás szakmai minőségének helyreállítása és annak elérése, hogy a törvényalkotás átlátható legyen, és a jogszabályok elfogadását érdemi szakmai és társadalmi egyeztetés előzze meg\"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://telex.hu/belfold/2026/05/12/gorog-marta-igazsagugyi-miniszter-parlament-bizottsagi-meghallgatas",
   "Prioritás": "azonnali"
  },
@@ -4415,7 +4417,7 @@ const excelData = [
   "FiDeSZ állapot": "2022-ben visszaállított vármegyék és főispánok",
   "Volt előrelépést jelentő bejelentés?": "igen – Görög Márta igazságügyi miniszter (máj.12 meghallgatás); közigazgatási reform a sarkalatos törvények felülvizsgálatával; Görög Márta: \"Visszaállítjuk a közigazgatás jogállami működését, a főispáni rendszer átalakítása az alkotmányozási csomag része\"; az önkormányzati rendszer megerősítése tervben",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://telex.hu/belfold/2026/05/12/gorog-marta-igazsagugyi-miniszter-parlament-bizottsagi-meghallgatas",
   "Prioritás": "azonnali"
  },
@@ -4575,7 +4577,7 @@ const excelData = [
   "FiDeSZ állapot": "nincs átfogó vagyonosodási vizsgálat",
   "Volt előrelépést jelentő bejelentés?": "igen – Ruff Bálint kancelláriaminiszter-jelölt (máj.12 meghallgatás, 8 igen, 3 nem); Ruff Bálint: \"Legfőbb feladata elérni, hogy az igazságszolgáltatás felelősségre vonja azt a kört, amely legalább húszezer milliárd forinttól fosztotta meg Magyarországot\"; Nemzeti Vagyonvisszaszerzési Hivatal a keretrendszer; Görög Márta: \"A korrupció gyengíti az államot, rombolja a versenyt\"; vagyonosodási vizsgálat 1990-2026 időszakra terjed ki",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://nepszava.hu/3322120_ruff-balint-kancellariaminiszter-tisza-kormany-meghallgatas-elszamoltatas-jogallam",
   "Prioritás": "azonnali"
  },
@@ -4625,7 +4627,7 @@ const excelData = [
   "FiDeSZ állapot": "részlegesen elérhető akták, sok zárt",
   "Volt előrelépést jelentő bejelentés?": "igen – Ruff Bálint kancelláriaminiszter-jelölt (máj.12 bizottsági meghallgatás, 8 igen, 3 nem, bizottság támogatta); Ruff Bálint: \"A minisztérium az első naptól azon lesz, hogy a lehető leghamarabb nyilvánosságra hozzuk az ügynökaktákat, a lehető legkevesebb nemzetbiztonsági érdekre hivatkozó kitakarással. Ez az első pont, ami a még nem létező irodám falára van írva\"; Magyar Péter is megerősítette; október 22-i határidő kitűzve; szakértőkre (nem politikusokra) bízzák a kivitelezést",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://10perc.hu/hir/belfold/2026/05/12/ruff-balint-a-valaha-volt-legnagyobb-atvilagitast-fogom-megcsinalni",
   "Prioritás": "azonnali"
  },
@@ -4695,7 +4697,7 @@ const excelData = [
   "FiDeSZ állapot": "Magyarország kimaradt az EPPO-ból",
   "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 bizottsági meghallgatás, bizottság támogatta); Görög Márta: \"El kívánjuk végezni az Európai Ügyészséghez történő csatlakozás alkotmányos és szakmai kereteinek kidolgozását és megteremtését\"; haladéktalanul csatlakoznak",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-12",
+  "Frissítés": "2026-05-13",
   "Forrás link": "https://10perc.hu/hir/belfold/2026/05/12/gorog-marta-csatlakozunk-az-europai-ugyeszseghez-es-nemzeti-vagyonvisszaszerzesi-hivatalt-alapitunk",
   "Prioritás": "azonnali"
  },
@@ -4953,9 +4955,16 @@ function activateNewestSort() {
 
 // ── Frissítések felhívó (ma vagy tegnap) ──
 (function() {
-  const nowHU = new Date(Date.now() + 2 * 60 * 60 * 1000);
-  const today = nowHU.toISOString().slice(0,10);
-  const yesterday = new Date(Date.now() + 2*60*60*1000 - 86400000).toISOString().slice(0,10);
+  // Magyar idő (CET/CEST) megbízható számítása
+  const nowHU = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+  const today = nowHU.getFullYear() + '-' +
+    String(nowHU.getMonth()+1).padStart(2,'0') + '-' +
+    String(nowHU.getDate()).padStart(2,'0');
+  const yestD = new Date(nowHU);
+  yestD.setDate(yestD.getDate() - 1);
+  const yesterday = yestD.getFullYear() + '-' +
+    String(yestD.getMonth()+1).padStart(2,'0') + '-' +
+    String(yestD.getDate()).padStart(2,'0');
   const wrap = document.getElementById('todayUpdateWrap');
   const msg  = document.getElementById('todayUpdateMsg');
   if (!wrap || !msg) return;

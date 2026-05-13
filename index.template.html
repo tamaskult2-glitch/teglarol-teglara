@@ -2967,7 +2967,8 @@ function buildCard(item) {
  const priLabel = pri === "azonnali" ? "🔴 Azonnali" : pri === "hosszu" ? "🟢 Hosszú táv" : "🟡 Rövid táv";
  const priCls = `priority-${pri}`;
  card.dataset.priority = pri;
- const today = new Date(Date.now() + 2*60*60*1000).toISOString().slice(0,10);
+ const _nowHU = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+ const today = _nowHU.getFullYear() + '-' + String(_nowHU.getMonth()+1).padStart(2,'0') + '-' + String(_nowHU.getDate()).padStart(2,'0');
  const freshBadge = item["Frissítés"] === today ? '<span class="fresh-badge">● Ma</span>' : '';
 
  const bodyHTML = `
@@ -3012,7 +3013,8 @@ function renderDashboard(data) {
 
  // Legfrissebb módban: flat lista, nem kategóriánként csoportosítva
  if (typeof currentSort !== 'undefined' && currentSort === 'newest') {
-   const today = new Date(Date.now() + 2*60*60*1000).toISOString().slice(0,10);
+   const _nowHU2 = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+   const today = _nowHU2.getFullYear() + '-' + String(_nowHU2.getMonth()+1).padStart(2,'0') + '-' + String(_nowHU2.getDate()).padStart(2,'0');
    const todayItems = data.filter(r => r['Frissítés'] === today);
    const restItems  = data.filter(r => r['Frissítés'] !== today);
 
@@ -3942,9 +3944,16 @@ function activateNewestSort() {
 
 // ── Frissítések felhívó (ma vagy tegnap) ──
 (function() {
-  const nowHU = new Date(Date.now() + 2 * 60 * 60 * 1000);
-  const today = nowHU.toISOString().slice(0,10);
-  const yesterday = new Date(Date.now() + 2*60*60*1000 - 86400000).toISOString().slice(0,10);
+  // Magyar idő (CET/CEST) megbízható számítása
+  const nowHU = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+  const today = nowHU.getFullYear() + '-' +
+    String(nowHU.getMonth()+1).padStart(2,'0') + '-' +
+    String(nowHU.getDate()).padStart(2,'0');
+  const yestD = new Date(nowHU);
+  yestD.setDate(yestD.getDate() - 1);
+  const yesterday = yestD.getFullYear() + '-' +
+    String(yestD.getMonth()+1).padStart(2,'0') + '-' +
+    String(yestD.getDate()).padStart(2,'0');
   const wrap = document.getElementById('todayUpdateWrap');
   const msg  = document.getElementById('todayUpdateMsg');
   if (!wrap || !msg) return;
