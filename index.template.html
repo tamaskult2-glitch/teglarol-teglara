@@ -1764,9 +1764,9 @@ body.dark .wallet-nav-btn .label {
      <span class="tl-leg-label">📣 Bejelentve</span>
      <span class="tl-leg-num" id="tlYes" style="color:#FF9933;font-size:20px;font-weight:800;">–</span>
     </div>
-    <div class="tl-leg-item" data-status="kész" style="cursor:pointer;">
+    <div class="tl-leg-item" data-status="megvalósult" style="cursor:pointer;">
      <span class="tl-leg-dot" style="background:#7ED957"></span>
-     <span class="tl-leg-label">✅ Teljesítve</span>
+     <span class="tl-leg-label">✅ Megvalósult</span>
      <span class="tl-leg-num" id="tlDone" style="color:#7ED957;font-size:20px;font-weight:800;">–</span>
     </div>
     <div class="tl-leg-item" data-status="ígéret" style="cursor:pointer;">
@@ -1842,13 +1842,6 @@ body.dark .wallet-nav-btn .label {
     <div class="milestone-content">
      <div class="milestone-date" style="font-weight:700;color:#5ab040;">2026. máj. 9. — Kormányalakítás</div>
      <div class="milestone-desc">🏛️ Magyar Péter miniszterelnöki eskütétele · Az összes miniszter kinevezése · A TISZA-kormány megkezdi munkáját · Az ígéretek teljesítése indul</div>
-    </div>
-   </div>
-   <div class="milestone" data-date="2026-05-13">
-    <div class="milestone-dot" style="background:linear-gradient(135deg,#FF6B35,#E55A2B);"></div>
-    <div class="milestone-content">
-     <div class="milestone-date">2026. máj. 13. — Első kormányülés, Ópusztaszer</div>
-     <div class="milestone-desc">🏛️ Kihelyezett kormányülés az Ópusztaszeri Nemzeti Történeti Emlékparkban · Statútumrendelet elfogadva (16 minisztérium jogkörei) · Magyar Péter: alkotmánymódosítással eltávolítható Sulyok Tamás · Titkosított dokumentumok felülvizsgálata elrendelve · Propagandaköltések leállítása · Aszályhelyzet: vis maior intézkedések · Tóth Péter: nemzetbiztonsági főtanácsadó kinevezve · Miniszterelnöki mandátum max. 8 évre korlátozása bejelentve</div>
     </div>
    </div>
 
@@ -2513,9 +2506,9 @@ body.dark .wallet-nav-btn .label {
    </blockquote>
   </div>
 
-  <!-- INTERAKTÍV TÚRA - 4 lépés -->
+  <!-- INTERAKTÍV TÚRA - 3 lépés -->
   <div class="tour-wrap" id="tourWrap">
-   <p class="tour-intro">👋 <strong>Első látogatás?</strong> 4 lépés, ~30 másodperc.</p>
+   <p class="tour-intro">👋 <strong>Első látogatás?</strong> 3 lépés, ~20 másodperc.</p>
    <div class="tour-steps" id="tourSteps">
 
     <div class="tour-step active" data-step="0">
@@ -2542,18 +2535,9 @@ body.dark .wallet-nav-btn .label {
      </div>
     </div>
 
-    <div class="tour-step" data-step="3">
-     <span class="tour-step-icon" style="font-size:36px;">👛</span>
-     <div class="tour-step-body">
-      <div class="tour-step-title">Pénztárcaindex</div>
-      <div class="tour-step-desc">Mennyibe kerül most az élet? Üzemanyagárak, élelmiszerek, rezsi — és mit hozna a TISZA program a mindennapi kiadásaidra. <a href="./penztarca.html" style="color:#e8405a;font-weight:700;">→ Megnyitás</a></div>
-     </div>
-    </div>
-
    </div>
    <div class="tour-progress" id="tourProgress">
     <div class="tour-dot active"></div>
-    <div class="tour-dot"></div>
     <div class="tour-dot"></div>
     <div class="tour-dot"></div>
    </div>
@@ -2597,13 +2581,6 @@ body.dark .wallet-nav-btn .label {
    <div class="story-section-title">📋 Verziótörténet</div>
 
    <div class="story-timeline">
-    <div class="story-tl-item">
-     <div class="story-tl-dot" style="background:#FF6B35"></div>
-     <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 1.8 <span class="story-tl-date">2026.05.13</span></div>
-      <div class="story-tl-desc">🏛️ Teljes frissítés: első kormányülés (Ópusztaszer, máj.13) alapján – 3 tégla Melléthei-Barna javítva, dr. Görög Márta igazságügyi miniszter kinevezése megvalósultra frissítve. Miniszterelnöki mandátumkorlátozás bejelentve (máj.13). 101 tégla: 71 bejelentve, 2 megvalósult, 28 ígéret.</div>
-     </div>
-    </div>
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#7ED957"></div>
      <div class="story-tl-content">
@@ -2679,12 +2656,7 @@ body.dark .wallet-nav-btn .label {
     <div class="story-struct-item">
      <div class="story-struct-icon">📋</div>
      <div class="story-struct-label">Tégla­kártyák</div>
-     <div class="story-struct-desc">101 tégla, mindegyikhez státusz, „áradás előtt" előzmény, forráslink és mini vizualizáció.</div>
-    </div>
-    <div class="story-struct-item">
-     <div class="story-struct-icon">👛</div>
-     <div class="story-struct-label">Pénztárcaindex</div>
-     <div class="story-struct-desc">Üzemanyag, élelmiszer, rezsi aktuális árak – és mit hozna a TISZA program a mindennapi kiadásokra.</div>
+     <div class="story-struct-desc">95 tégla, mindegyikhez státusz, „áradás előtt" előzmény, forráslink és mini vizualizáció.</div>
     </div>
    </div>
   </div>
@@ -2717,8 +2689,8 @@ function _dAgo(ds) {
 
 function getStatus(valtozas) {
   switch((valtozas||'').toLowerCase()) {
-    case 'kész': case 'teljesítve':
-      return { cls:'badge-done', label:'✅ Teljesítve' };
+    case 'kész': case 'teljesítve': case 'megvalósult':
+      return { cls:'badge-done', label:'✅ Megvalósult' };
     case 'bejelentve': case 'folyamatban':
       return { cls:'badge-yes', label:'📣 Bejelentve' };
     default:
@@ -3215,7 +3187,7 @@ function renderDashboard(data) {
 function updateStats(data) {
   const total = data.length;
   const yes  = data.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
-  const done = data.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+  const done = data.filter(r => ["kész","teljesítve","megvalósult"].includes(r["Változás"])).length;
   const no   = data.filter(r => r["Változás"] === "ígéret").length;
   const el = (id) => document.getElementById(id);
   if (el("tlTotal")) el("tlTotal").textContent = total;
@@ -3237,8 +3209,8 @@ function updateStats(data) {
 function drawChart(data) {
   const container = document.getElementById("statusChartInner");
   if (!container) return;
-  const yes  = data.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "bejelentve" || r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
-  const done = data.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+  const yes  = data.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
+  const done = data.filter(r => ["kész","teljesítve","megvalósult"].includes(r["Változás"])).length;
   const no   = data.filter(r => r["Változás"] === "ígéret").length;
   const total = yes + done + no;
   if (!total) return;
@@ -3313,7 +3285,7 @@ function buildStatusDropdown(status) {
  }
  const label = status === "__all__" ? "Összes tégla" :
  status === "bejelentve" ? "📣 Bejelentve" :
- status === "kész" ? "✅ Teljesítve" : "❌ Csak ígéret";
+ (status === "kész" || status === "teljesítve" || status === "megvalósult") ? "✅ Megvalósult" : "❌ Csak ígéret";
 
  dropdown.innerHTML = `
  <div class="status-dropdown-header">${label} – ${items.length} tétel</div>
@@ -3396,12 +3368,12 @@ document.querySelectorAll(".tl-leg-item").forEach(item => {
       document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
       document.querySelector(".sort-btn[data-sort='default']").classList.add("active");
       currentSort = "default";
-    } else if (status === "kész") {
-      // Teljesítve → "Teljesített előre" rendezés gomb aktiválása
+    } else if (status === "kész" || status === "megvalósult") {
+      // Megvalósult → "Megvalósult előre" rendezés gomb aktiválása
       document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
       document.querySelector(".sort-btn[data-sort='done']").classList.add("active");
       currentSort = "done";
-      const doneCount = excelData.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+      const doneCount = excelData.filter(r => ["kész","teljesítve","megvalósult"].includes(r["Változás"])).length;
       if (doneCount === 0) {
         renderDonePlaceholder();
       } else {
@@ -3883,7 +3855,7 @@ function renderDonePlaceholder() {
 
 function getSortedData(data, sort) {
   const clone = [...data];
-  const statusOrder = { 'kész':0,'teljesítve':0,'bejelentve':1,'folyamatban':1,'ígéret':2 };
+  const statusOrder = { 'kész':0,'teljesítve':0,'megvalósult':0,'bejelentve':1,'folyamatban':1,'ígéret':2 };
   switch(sort) {
     case 'newest':
       return clone.sort((a,b) => (b.Frissítés||'').localeCompare(a.Frissítés||''));
@@ -3893,8 +3865,8 @@ function getSortedData(data, sort) {
       return clone.sort((a,b) => (statusOrder[b.Változás]||2) - (statusOrder[a.Változás]||2));
     case 'done':
       return clone.sort((a,b) => {
-        const ad = (a.Változás==='kész'||a.Változás==='teljesítve') ? 0 : 1;
-        const bd = (b.Változás==='kész'||b.Változás==='teljesítve') ? 0 : 1;
+        const ad = ["kész","teljesítve","megvalósult"].includes(a.Változás) ? 0 : 1;
+        const bd = ["kész","teljesítve","megvalósult"].includes(b.Változás) ? 0 : 1;
         return ad - bd;
       });
     default:

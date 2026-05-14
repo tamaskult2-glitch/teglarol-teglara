@@ -1764,9 +1764,9 @@ body.dark .wallet-nav-btn .label {
      <span class="tl-leg-label">📣 Bejelentve</span>
      <span class="tl-leg-num" id="tlYes" style="color:#FF9933;font-size:20px;font-weight:800;">–</span>
     </div>
-    <div class="tl-leg-item" data-status="kész" style="cursor:pointer;">
+    <div class="tl-leg-item" data-status="megvalósult" style="cursor:pointer;">
      <span class="tl-leg-dot" style="background:#7ED957"></span>
-     <span class="tl-leg-label">✅ Teljesítve</span>
+     <span class="tl-leg-label">✅ Megvalósult</span>
      <span class="tl-leg-num" id="tlDone" style="color:#7ED957;font-size:20px;font-weight:800;">–</span>
     </div>
     <div class="tl-leg-item" data-status="ígéret" style="cursor:pointer;">
@@ -1842,13 +1842,6 @@ body.dark .wallet-nav-btn .label {
     <div class="milestone-content">
      <div class="milestone-date" style="font-weight:700;color:#5ab040;">2026. máj. 9. — Kormányalakítás</div>
      <div class="milestone-desc">🏛️ Magyar Péter miniszterelnöki eskütétele · Az összes miniszter kinevezése · A TISZA-kormány megkezdi munkáját · Az ígéretek teljesítése indul</div>
-    </div>
-   </div>
-   <div class="milestone" data-date="2026-05-13">
-    <div class="milestone-dot" style="background:linear-gradient(135deg,#FF6B35,#E55A2B);"></div>
-    <div class="milestone-content">
-     <div class="milestone-date">2026. máj. 13. — Első kormányülés, Ópusztaszer</div>
-     <div class="milestone-desc">🏛️ Kihelyezett kormányülés az Ópusztaszeri Nemzeti Történeti Emlékparkban · Statútumrendelet elfogadva (16 minisztérium jogkörei) · Magyar Péter: alkotmánymódosítással eltávolítható Sulyok Tamás · Titkosított dokumentumok felülvizsgálata elrendelve · Propagandaköltések leállítása · Aszályhelyzet: vis maior intézkedések · Tóth Péter: nemzetbiztonsági főtanácsadó kinevezve · Miniszterelnöki mandátum max. 8 évre korlátozása bejelentve</div>
     </div>
    </div>
 
@@ -2513,9 +2506,9 @@ body.dark .wallet-nav-btn .label {
    </blockquote>
   </div>
 
-  <!-- INTERAKTÍV TÚRA - 4 lépés -->
+  <!-- INTERAKTÍV TÚRA - 3 lépés -->
   <div class="tour-wrap" id="tourWrap">
-   <p class="tour-intro">👋 <strong>Első látogatás?</strong> 4 lépés, ~30 másodperc.</p>
+   <p class="tour-intro">👋 <strong>Első látogatás?</strong> 3 lépés, ~20 másodperc.</p>
    <div class="tour-steps" id="tourSteps">
 
     <div class="tour-step active" data-step="0">
@@ -2542,18 +2535,9 @@ body.dark .wallet-nav-btn .label {
      </div>
     </div>
 
-    <div class="tour-step" data-step="3">
-     <span class="tour-step-icon" style="font-size:36px;">👛</span>
-     <div class="tour-step-body">
-      <div class="tour-step-title">Pénztárcaindex</div>
-      <div class="tour-step-desc">Mennyibe kerül most az élet? Üzemanyagárak, élelmiszerek, rezsi — és mit hozna a TISZA program a mindennapi kiadásaidra. <a href="./penztarca.html" style="color:#e8405a;font-weight:700;">→ Megnyitás</a></div>
-     </div>
-    </div>
-
    </div>
    <div class="tour-progress" id="tourProgress">
     <div class="tour-dot active"></div>
-    <div class="tour-dot"></div>
     <div class="tour-dot"></div>
     <div class="tour-dot"></div>
    </div>
@@ -2597,13 +2581,6 @@ body.dark .wallet-nav-btn .label {
    <div class="story-section-title">📋 Verziótörténet</div>
 
    <div class="story-timeline">
-    <div class="story-tl-item">
-     <div class="story-tl-dot" style="background:#FF6B35"></div>
-     <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 1.8 <span class="story-tl-date">2026.05.13</span></div>
-      <div class="story-tl-desc">🏛️ Teljes frissítés: első kormányülés (Ópusztaszer, máj.13) alapján – 3 tégla Melléthei-Barna javítva, dr. Görög Márta igazságügyi miniszter kinevezése megvalósultra frissítve. Miniszterelnöki mandátumkorlátozás bejelentve (máj.13). 101 tégla: 71 bejelentve, 2 megvalósult, 28 ígéret.</div>
-     </div>
-    </div>
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#7ED957"></div>
      <div class="story-tl-content">
@@ -2679,12 +2656,7 @@ body.dark .wallet-nav-btn .label {
     <div class="story-struct-item">
      <div class="story-struct-icon">📋</div>
      <div class="story-struct-label">Tégla­kártyák</div>
-     <div class="story-struct-desc">101 tégla, mindegyikhez státusz, „áradás előtt" előzmény, forráslink és mini vizualizáció.</div>
-    </div>
-    <div class="story-struct-item">
-     <div class="story-struct-icon">👛</div>
-     <div class="story-struct-label">Pénztárcaindex</div>
-     <div class="story-struct-desc">Üzemanyag, élelmiszer, rezsi aktuális árak – és mit hozna a TISZA program a mindennapi kiadásokra.</div>
+     <div class="story-struct-desc">95 tégla, mindegyikhez státusz, „áradás előtt" előzmény, forráslink és mini vizualizáció.</div>
     </div>
    </div>
   </div>
@@ -2717,8 +2689,8 @@ function _dAgo(ds) {
 
 function getStatus(valtozas) {
   switch((valtozas||'').toLowerCase()) {
-    case 'kész': case 'teljesítve':
-      return { cls:'badge-done', label:'✅ Teljesítve' };
+    case 'kész': case 'teljesítve': case 'megvalósult':
+      return { cls:'badge-done', label:'✅ Megvalósult' };
     case 'bejelentve': case 'folyamatban':
       return { cls:'badge-yes', label:'📣 Bejelentve' };
     default:
@@ -3215,7 +3187,7 @@ function renderDashboard(data) {
 function updateStats(data) {
   const total = data.length;
   const yes  = data.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
-  const done = data.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+  const done = data.filter(r => ["kész","teljesítve","megvalósult"].includes(r["Változás"])).length;
   const no   = data.filter(r => r["Változás"] === "ígéret").length;
   const el = (id) => document.getElementById(id);
   if (el("tlTotal")) el("tlTotal").textContent = total;
@@ -3237,8 +3209,8 @@ function updateStats(data) {
 function drawChart(data) {
   const container = document.getElementById("statusChartInner");
   if (!container) return;
-  const yes  = data.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "bejelentve" || r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
-  const done = data.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+  const yes  = data.filter(r => r["Változás"] === "bejelentve" || r["Változás"] === "folyamatban").length;
+  const done = data.filter(r => ["kész","teljesítve","megvalósult"].includes(r["Változás"])).length;
   const no   = data.filter(r => r["Változás"] === "ígéret").length;
   const total = yes + done + no;
   if (!total) return;
@@ -3313,7 +3285,7 @@ function buildStatusDropdown(status) {
  }
  const label = status === "__all__" ? "Összes tégla" :
  status === "bejelentve" ? "📣 Bejelentve" :
- status === "kész" ? "✅ Teljesítve" : "❌ Csak ígéret";
+ (status === "kész" || status === "teljesítve" || status === "megvalósult") ? "✅ Megvalósult" : "❌ Csak ígéret";
 
  dropdown.innerHTML = `
  <div class="status-dropdown-header">${label} – ${items.length} tétel</div>
@@ -3396,12 +3368,12 @@ document.querySelectorAll(".tl-leg-item").forEach(item => {
       document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
       document.querySelector(".sort-btn[data-sort='default']").classList.add("active");
       currentSort = "default";
-    } else if (status === "kész") {
-      // Teljesítve → "Teljesített előre" rendezés gomb aktiválása
+    } else if (status === "kész" || status === "megvalósult") {
+      // Megvalósult → "Megvalósult előre" rendezés gomb aktiválása
       document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
       document.querySelector(".sort-btn[data-sort='done']").classList.add("active");
       currentSort = "done";
-      const doneCount = excelData.filter(r => r["Változás"] === "kész" || r["Változás"] === "teljesítve").length;
+      const doneCount = excelData.filter(r => ["kész","teljesítve","megvalósult"].includes(r["Változás"])).length;
       if (doneCount === 0) {
         renderDonePlaceholder();
       } else {
@@ -4083,10 +4055,10 @@ const excelData = [
   "Kategória": "Családpolitika",
   "TiSZa ígéret": "13. havi nyugdíj megtartása",
   "FiDeSZ állapot": "Fidesz visszaállította 2022-ben (2010-ben megszüntette Bajnai-kormány), megtartják",
-  "Volt előrelépést jelentő bejelentés?": "igen – 13. havi nyugdíj 2026.02.12-én kifizetésre került (Magyar Államkincstár); 585 milliárd Ft költségvetésben; teljes egyhavi ellátás; TISZA megtartja + 14. havi nyugdíj bevezetését ígéri",
-  "Változás": "megvalósult",
-  "Frissítés": "2026-02-12",
-  "Forrás link": "https://www.allamkincstar.gov.hu/hirek/a-magyar-allamkincstar-kozlemenye-a-2026-februari-nyugdij-es-nyugdijszeru-ellatasok-kifizeteserol",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter-jelölt (máj.12 bizottsági meghallgatás); Kármán András: \"A 13. és 14. havi nyugdíjat megtartják, az alacsony járandóságokat rendkívüli emeléssel növelik\"; Magyar Péter RTL Híradónak: \"a legfontosabb szociális és nyugdíjvédelmi intézkedések nem váratnak magukra\"; TISZA program: senki nem kaphat 120 ezer forintnál kevesebb nyugdíjat; MEGJEGYZÉS: a februári kifizetés még az Orbán-kormány alatt történt, a TISZA csak ígéretet tett a megtartásra",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-05-13",
+  "Forrás link": "https://www.tudasfaja.com/13-havi-nyugdij-rendkivuli-bejelentest-tett-a-tisza-kormany-penzugyminisztere/",
   "Prioritás": "azonnali"
  },
  {
@@ -4363,10 +4335,10 @@ const excelData = [
   "Kategória": "Közigazgatás",
   "TiSZa ígéret": "Állami bürokrácia csökkentése",
   "FiDeSZ állapot": "terjedelmes bürokratikus rendszer",
-  "Volt előrelépést jelentő bejelentés?": "igen – 16 minisztérium statútumrendelete elfogadva (máj.13 kormányülés, Ópusztaszer); Magyar Péter: „Fontos, hogy a statútumrendeletet elfogadják a kormányülésen, ami nagy vonalakban meghatározza a 16 minisztérium jogköreit\"; Ruff Bálint koordinálja az átadás-átvételt; minden szakterületnek saját tárca",
+  "Volt előrelépést jelentő bejelentés?": "igen – 16 minisztérium kész (ápr.30); Melléthei-Barna visszalép (máj.7), új igazságügyi miniszter kell; Ruff Bálint koordinálja az átadás-átvételt; kormány máj.11-12-én alakulen szakterületnek saját tárca",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-13",
-  "Forrás link": "https://telex.hu/belfold/2026/05/13/magyar-peter-tisza-part-elso-kormanyules-opusztaszer-vizugy",
+  "Frissítés": "2026-04-20",
+  "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
   "Prioritás": "rovid"
  },
  {
@@ -4733,10 +4705,10 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Miniszterelnöki mandátum 2 ciklusra (max 8 év) korlátozása",
   "FiDeSZ állapot": "Orbán Viktor 5 cikluson át (1998-2002, 2010-2026)",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13 sajtótájékoztató, Ópusztaszer): nyolc évben maximalizálnák a miniszterelnöki ciklusok hosszát; dr. Görög Márta igazságügyi miniszter koordinálja az alkotmányozási folyamatot; Alaptörvény módosítás szükséges",
-  "Változás": "bejelentve",
-  "Frissítés": "2026-05-13",
-  "Forrás link": "https://index.hu/belfold/2026/05/13/kormanyules-tisza-part-2026-magyar-peter-sajtotajekoztato-opusztaszer-orosz-drontamadas-karpatalja/",
+  "Volt előrelépést jelentő bejelentés?": "igen – Alaptörvény módosítás: mandátumkorlátozás az első intézkedések között; Melléthei-Barna igazságügyi miniszter koordinálésze",
+  "Változás": "ígéret",
+  "Frissítés": "2026-05-04",
+  "Forrás link": "https://index.hu/belfold/2026/04/30/magyar-peter-varga-judit-igazsagugyi-miniszterium-bejelentes-tisza-part-kormany-2026/",
   "Prioritás": "rovid"
  },
  {
@@ -4773,10 +4745,10 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Igazságügyi miniszter kinevezése",
   "FiDeSZ állapot": "Varga Judit 5 évig vezette – kegyelmi botrány véget vetett",
-  "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta SZTE Állam- és Jogtudományi Kar dékánja igazságügyi miniszter (kinevezve máj.12, eskütétel máj.12); jogállam helyreállítása, EU-s forrásokhoz szükséges jogi keretek megteremtése; máj.13 első kormányülésen részt vett Ópusztaszeren",
-  "Változás": "megvalósult",
-  "Frissítés": "2026-05-13",
-  "Forrás link": "https://www.portfolio.hu/global/20260512/megalakult-a-tisza-kormany-szerdan-erkeznek-az-uj-bejelentesek-az-elso-kormanyules-utan-836088",
+  "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta SZTE Állam- és Jogtudományi Kar dékánja igazságügyi miniszter (Melléthei-Barna máj.7 visszalépett); jogállam helyreállítása, EU-s forrásokhoz szükséges jogi keretek megteremtése",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-05-11",
+  "Forrás link": "https://szeged.hu/cikk/gorog-marta-a-jogi-kar-dekanja-lesz-az-igazsagugyi-miniszter-szegedi-hirado-2026-majus-8",
   "Prioritás": "Azonnali"
  },
  {
@@ -4894,7 +4866,7 @@ function renderDonePlaceholder() {
 
 function getSortedData(data, sort) {
   const clone = [...data];
-  const statusOrder = { 'kész':0,'teljesítve':0,'bejelentve':1,'folyamatban':1,'ígéret':2 };
+  const statusOrder = { 'kész':0,'teljesítve':0,'megvalósult':0,'bejelentve':1,'folyamatban':1,'ígéret':2 };
   switch(sort) {
     case 'newest':
       return clone.sort((a,b) => (b.Frissítés||'').localeCompare(a.Frissítés||''));
@@ -4904,8 +4876,8 @@ function getSortedData(data, sort) {
       return clone.sort((a,b) => (statusOrder[b.Változás]||2) - (statusOrder[a.Változás]||2));
     case 'done':
       return clone.sort((a,b) => {
-        const ad = (a.Változás==='kész'||a.Változás==='teljesítve') ? 0 : 1;
-        const bd = (b.Változás==='kész'||b.Változás==='teljesítve') ? 0 : 1;
+        const ad = ["kész","teljesítve","megvalósult"].includes(a.Változás) ? 0 : 1;
+        const bd = ["kész","teljesítve","megvalósult"].includes(b.Változás) ? 0 : 1;
         return ad - bd;
       });
     default:
