@@ -156,16 +156,28 @@ button:disabled {
     <label for="typeSelect">📋 Üzenet típusa:</label>
     <select id="typeSelect" onchange="updateTemplate()">
       <option value="tegla">🧱 Tégla frissítés</option>
-      <option value="aradas">🌊 Áradás-frissítés – teljes adatbázis update</option>
       <option value="penztarca">💰 Pénztárcaindex launch</option>
       <option value="custom">✏️ Egyéni üzenet</option>
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">2 tégla frissült ma</textarea>
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">✅ MEGVALÓSULT: A rendeleti kormányzás megszüntetése!
+
+2026. május 14-én hatályba lépett – hat év után megszűnt a különleges jogrend Magyarországon.
+
+📊 v1.8 frissítés – 16 tégla frissült ma:
+• Közbeszerzési rendszer: 250M Ft feletti kifizetések felfüggesztve
+• Ügynökakták: 2010–2026 kormányülési emlékeztetők nyilvánosságra
+• Átláthatósági szabályok: titkosított szerződések feloldása
+• Gyermekvédelem: bicskei ügy nyilvános kivizsgálása
+• EU Ügyészség, vagyonosodási vizsgálat, külpolitika és további téglák...
+
+💰 ÚJ: Pénztárcaindex oldal – árak összehasonlítása áradás előtt vs. TISZA ígéretek
+
+👉 teglarol-teglara.hu</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
-    <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
+    <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
 
     <button id="sendBtn" onclick="sendAll()">
       <span id="btnText">📧 Értesítő küldése</span>
@@ -196,24 +208,21 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = '2 tégla frissült ma';
+    dbInput.value = `✅ MEGVALÓSULT: A rendeleti kormányzás megszüntetése!
+
+2026. május 14-én hatályba lépett – hat év után megszűnt a különleges jogrend Magyarországon.
+
+📊 v1.8 frissítés – 16 tégla frissült ma:
+• Közbeszerzési rendszer: 250M Ft feletti kifizetések felfüggesztve
+• Ügynökakták: 2010–2026 kormányülési emlékeztetők nyilvánosságra
+• Átláthatósági szabályok: titkosított szerződések feloldása
+• Gyermekvédelem: bicskei ügy nyilvános kivizsgálása
+• EU Ügyészség, vagyonosodási vizsgálat, külpolitika és további téglák...
+
+💰 ÚJ: Pénztárcaindex oldal – árak összehasonlítása áradás előtt vs. TISZA ígéretek
+
+👉 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
-  } else if (type === 'aradas') {
-    dbInput.value = `🌊 Áradás-frissítés – teljes adatbázis update!
-
-Ma elvégeztük az oldal teljes frissítését. Összefoglaló:
-
-🧱 101 tégla ellenőrizve
-📣 Bejelentve: 71  |  ✅ Megvalósult: 2  |  ❌ Ígéret: 28
-
-📰 Mai legfontosabb változások:
-– [ide írd a frissítés lényegét]
-
-📊 Kövesd az összes ígéretet:
-https://teglarol-teglara.hu
-
-🧱 Tegláról-téglára – Független ígéretkövető`;
-    dbInput.placeholder = 'Áradás-frissítés sablon...';
   } else if (type === 'penztarca') {
     dbInput.value = `💰 ÚJ! Pénztárcaindex elindult!
 
