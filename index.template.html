@@ -2551,7 +2551,7 @@ body.dark .wallet-nav-btn .label {
    <div class="story-section-title">📊 Statisztikák</div>
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
     <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
-     <div style="font-size:24px;font-weight:800;color:#e8405a;" id="statPromises">82</div>
+     <div style="font-size:24px;font-weight:800;color:#e8405a;" id="statPromises">101</div>
      <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Ígéret összesen</div>
     </div>
     <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
@@ -2584,7 +2584,7 @@ body.dark .wallet-nav-btn .label {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#e8405a"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 1.8 <span class="story-tl-date">2026.05.14</span></div>
+      <div class="story-tl-ver">Ver. 1.9 <span class="story-tl-date">2026.05.15</span></div>
       <div class="story-tl-desc">🏛️ Rendeleti kormányzás megszüntetése: MEGVALÓSULT (máj.14 hatályba lépett). 16 tégla frissítve az ópusztaszeri első kormányülés döntései alapján. ✅ Megvalósult státusz bevezetése (volt: Teljesítve). 💰 Pénztárcaindex oldal hozzáadva: árak összehasonlítása áradás előtt vs. TISZA ígéretek. 🌙 Auto dark mód (este 8 – reggel 6). Melléthei-Barna hivatkozások eltávolítva. Időzóna számítás javítva (Europe/Budapest).</div>
      </div>
     </div>
@@ -2962,7 +2962,7 @@ sidebarOverlay.addEventListener("click", closeSidebar);
 
 (function() {
  const electionDate = new Date("2026-04-12");
- const nowHU3 = new Date(Date.now() + 2 * 60 * 60 * 1000);
+ const nowHU3 = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
  const diff = Math.floor((nowHU3 - electionDate) / 86400000);
  document.getElementById("daysSince").textContent = "Az \"áradás\" óta eltelt napok: " + diff;
 })();
@@ -3129,7 +3129,7 @@ function renderDashboard(data) {
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
    <div class="priority-badge ${priCls}">${priLabel}</div>
    <span class="badge ${st.cls}">${st.label}</span>
-   ${item["Frissítés"] === new Date().toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma</span>' : ''}
+   ${item["Frissítés"] === new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'})).toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma</span>' : ''}
   </div>
   <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
   <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
@@ -3155,7 +3155,7 @@ function renderDashboard(data) {
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
    <div class="priority-badge ${priCls}">${priLabel}</div>
    <span class="badge ${st.cls}">${st.label}</span>
-   ${item["Frissítés"] === new Date().toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma</span>' : ''}
+   ${item["Frissítés"] === new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'})).toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma</span>' : ''}
   </div>
   <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
   <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
