@@ -2962,7 +2962,7 @@ sidebarOverlay.addEventListener("click", closeSidebar);
 
 (function() {
  const electionDate = new Date("2026-04-12");
- const nowHU3 = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+ const nowHU3 = (() => { const d = new Date(); const s = new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(d); const t = new Intl.DateTimeFormat('en-GB', {timeZone: 'Europe/Budapest', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false}).format(d); return new Date(s + 'T' + t); })();
  const diff = Math.floor((nowHU3 - electionDate) / 86400000);
  document.getElementById("daysSince").textContent = "Az \"áradás\" óta eltelt napok: " + diff;
 })();
@@ -2979,8 +2979,7 @@ function buildCard(item) {
  const priLabel = pri === "azonnali" ? "🔴 Azonnali" : pri === "hosszu" ? "🟢 Hosszú táv" : "🟡 Rövid táv";
  const priCls = `priority-${pri}`;
  card.dataset.priority = pri;
- const _nowHU = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
- const today = _nowHU.getFullYear() + '-' + String(_nowHU.getMonth()+1).padStart(2,'0') + '-' + String(_nowHU.getDate()).padStart(2,'0');
+ const today = getBudapestDate();
  const freshBadge = item["Frissítés"] === today ? '<span class="fresh-badge">● Ma</span>' : '';
 
  const bodyHTML = `
@@ -3025,8 +3024,7 @@ function renderDashboard(data) {
 
  // Legfrissebb módban: flat lista, nem kategóriánként csoportosítva
  if (typeof currentSort !== 'undefined' && currentSort === 'newest') {
-   const _nowHU2 = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
-   const today = _nowHU2.getFullYear() + '-' + String(_nowHU2.getMonth()+1).padStart(2,'0') + '-' + String(_nowHU2.getDate()).padStart(2,'0');
+   const today = getBudapestDate();
    const todayItems = data.filter(r => r['Frissítés'] === today);
    const restItems  = data.filter(r => r['Frissítés'] !== today);
 
@@ -3129,7 +3127,7 @@ function renderDashboard(data) {
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
    <div class="priority-badge ${priCls}">${priLabel}</div>
    <span class="badge ${st.cls}">${st.label}</span>
-   ${item["Frissítés"] === new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'})).toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma</span>' : ''}
+   ${item["Frissítés"] === new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(new Date()) ? '<span class="fresh-badge">● Ma</span>' : ''}
   </div>
   <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
   <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
@@ -3155,7 +3153,7 @@ function renderDashboard(data) {
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
    <div class="priority-badge ${priCls}">${priLabel}</div>
    <span class="badge ${st.cls}">${st.label}</span>
-   ${item["Frissítés"] === new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'})).toISOString().slice(0,10) ? '<span class="fresh-badge">● Ma</span>' : ''}
+   ${item["Frissítés"] === new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(new Date()) ? '<span class="fresh-badge">● Ma</span>' : ''}
   </div>
   <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
   <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
@@ -3210,7 +3208,7 @@ function updateStats(data) {
   const pb = el("tlProgressBar");
   if (pb && total > 0) pb.style.width = Math.round((yes + done) / total * 100) + "%";
   // Nap számláló
-  const nowHU2 = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+  const nowHU2 = (() => { const d = new Date(); const s = new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(d); const t = new Intl.DateTimeFormat('en-GB', {timeZone: 'Europe/Budapest', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false}).format(d); return new Date(s + 'T' + t); })();
   const days = Math.floor((nowHU2 - new Date("2026-04-12T00:00:00+02:00")) / 86400000);
   const dc = el("tlDayCount");
   if (dc) dc.textContent = days + " nap";
@@ -4164,8 +4162,6 @@ const excelData = [
   "Prioritás": "azonnali"
  },
  {
-  "Kategória": "Gazdaság",
-   {
   "Kategória": "Gazdaság és adórendszer",
   "TiSZa ígéret": "SZJA csökkentése 9%-ra a mediánbér alatt + KATA visszaállítása",
   "FiDeSZ állapot": "SZJA kulcs: 15% flat rate; KATA 2022-ben erősen beszűkítve (bevételi határ 18 M Ft/év, B2B korlátozás); kisvállalkozók adminisztrációs terhe magas; különadók rendszere torzítja a versenyt",
@@ -4807,8 +4803,6 @@ const excelData = [
  },
  {
   "Kategória": "Jogállam és korrupcióellenes intézkedések",
-   {
-  "Kategória": "Jogállam és korrupcióellenes intézkedések",
   "TiSZa ígéret": "Fidesz-korszak gyanús szerződéseinek felülvizsgálata és felmondása",
   "FiDeSZ állapot": "Az Orbán-kormány utolsó hónapjaiban számos nagy összegű, átláthatóság nélküli szerződést kötött alapítványokkal és állami cégekkel (KEKVA-rendszer); összesen ezermilliárdokra rúgó állami vagyon átcsoportosítás",
   "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.15, Facebook): \"A kormány felbontja a Krausz Ferenc Nobel-díjas kutató alapítványával kötött 261,7 milliárd forintos szerződést. Professzor urat a már kifizetett 22 milliárd forint visszautalására kérjük\"; az Élvonal Csúcskutatási és Tehetséggondozó Alapítványt Hankó Balázs KIM vezette, a szerződést a választások előtt 2 hónappal (2026. február 20.) írták alá; Magyar Hang közérdekű adatigényléssel tárta fel; a 22,381 milliárd Ft kifizetés megtörtént, visszakövetelés folyamatban; Krausz Ferenc kuratóriuma nyílt levélben reagált (máj.16), szakmai egyeztetést kér, tagjai közt Nobel- és Abel-díjas kutatók; Gulyás Gergely (Fidesz): \"politikai bosszú, szakmai érvekkel nem alátámasztható\" – felülvizsgálatot javasol; JOGI HELYZET: a szerződést \"mindkét fél egyetértésével\" lehet megváltoztatni – az egyoldalú felbontás bírósági vitát generálhat; az Élvonal korábban kihátrált a Nemzeti Tudósképző Akadémia finanszírozása mögül",
@@ -4828,6 +4822,12 @@ const excelData = [
   "Prioritás": "Azonnali"
  }
 ];
+
+
+// Budapest dátum megbízható lekérése (iOS Safari kompatibilis)
+function getBudapestDate() {
+  return new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(new Date());
+}
 
 let currentSort = 'default';
 renderDashboard(excelData);
@@ -5002,7 +5002,7 @@ function activateNewestSort() {
 // ── Frissítések felhívó (ma vagy tegnap) ──
 (function() {
   // Magyar idő (CET/CEST) megbízható számítása
-  const nowHU = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+  const nowHU = (() => { const d = new Date(); const s = new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(d); const t = new Intl.DateTimeFormat('en-GB', {timeZone: 'Europe/Budapest', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false}).format(d); return new Date(s + 'T' + t); })();
   const today = nowHU.getFullYear() + '-' +
     String(nowHU.getMonth()+1).padStart(2,'0') + '-' +
     String(nowHU.getDate()).padStart(2,'0');
