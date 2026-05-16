@@ -2551,7 +2551,7 @@ body.dark .wallet-nav-btn .label {
    <div class="story-section-title">📊 Statisztikák</div>
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
     <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
-     <div style="font-size:24px;font-weight:800;color:#e8405a;" id="statPromises">102</div>
+     <div style="font-size:24px;font-weight:800;color:#e8405a;" id="statPromises">104</div>
      <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Ígéret összesen</div>
     </div>
     <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
@@ -2584,7 +2584,7 @@ body.dark .wallet-nav-btn .label {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#e8405a"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 1.9 <span class="story-tl-date">2026.05.15</span></div>
+      <div class="story-tl-ver">Ver. 2.0 <span class="story-tl-date">2026.05.16</span></div>
       <div class="story-tl-desc">🏛️ Rendeleti kormányzás megszüntetése: MEGVALÓSULT (máj.14 hatályba lépett). 16 tégla frissítve az ópusztaszeri első kormányülés döntései alapján. ✅ Megvalósult státusz bevezetése (volt: Teljesítve). 💰 Pénztárcaindex oldal hozzáadva: árak összehasonlítása áradás előtt vs. TISZA ígéretek. 🌙 Auto dark mód (este 8 – reggel 6). Melléthei-Barna hivatkozások eltávolítva. Időzóna számítás javítva (Europe/Budapest).</div>
      </div>
     </div>
@@ -3210,7 +3210,7 @@ function updateStats(data) {
   const pb = el("tlProgressBar");
   if (pb && total > 0) pb.style.width = Math.round((yes + done) / total * 100) + "%";
   // Nap számláló
-  const nowHU2 = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  const nowHU2 = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
   const days = Math.floor((nowHU2 - new Date("2026-04-12T00:00:00+02:00")) / 86400000);
   const dc = el("tlDayCount");
   if (dc) dc.textContent = days + " nap";
@@ -4165,6 +4165,18 @@ const excelData = [
  },
  {
   "Kategória": "Gazdaság",
+   {
+  "Kategória": "Gazdaság és adórendszer",
+  "TiSZa ígéret": "SZJA csökkentése 9%-ra a mediánbér alatt + KATA visszaállítása",
+  "FiDeSZ állapot": "SZJA kulcs: 15% flat rate; KATA 2022-ben erősen beszűkítve (bevételi határ 18 M Ft/év, B2B korlátozás); kisvállalkozók adminisztrációs terhe magas; különadók rendszere torzítja a versenyt",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter (máj.12, bizottsági meghallgatás, 9 igen – 2 tartózkodás): a mediánbér alattiaknál az SZJA 15-ről 9%-ra csökken adójóváírással (minimálbéren 240 000 Ft/év plusz nettó bér); az SZJA-változás 2027. januártól lép életbe (idén nem fér bele a büdzsé keretébe – máj.12 doorstep); KATA visszaállítása: közel 400 000 potenciális érintett, a jogosulti kör az eredeti szélességre bővül, részletszabályok később; különadók fokozatos kivezetése; ÁFA csökkentés bizonyos termékeknél már 2026-ban elképzelhető; EURÓ bevezetés célja 2030; pótköltségvetés: nyár végén az Országgyűlés elé terjesztik",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-05-16",
+  "Forrás link": "https://www.economx.hu/magyar-gazdasag/2026/05/12/9-szazalekos-szja-a-kata-visszater-zero-tolerancia-korrupcio-karman-andras-tisza-kormany-gazdasagi-program/",
+  "Prioritás": "magas"
+ },
+ {
+  "Kategória": "Gazdaság és adórendszer",
   "TiSZa ígéret": "Euró bevezetésének előkészítése",
   "FiDeSZ állapot": "aktívan ellenzi, Orbán: \"nem az unió menetrendje szerint\" – nincs csatlakozási terv",
   "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter megerősítette: euró bevezetés 2030-ra; Maastrichti kritériumok maradéktalan teljesítése cél",
@@ -4795,12 +4807,24 @@ const excelData = [
  },
  {
   "Kategória": "Jogállam és korrupcióellenes intézkedések",
+   {
+  "Kategória": "Jogállam és korrupcióellenes intézkedések",
+  "TiSZa ígéret": "Fidesz-korszak gyanús szerződéseinek felülvizsgálata és felmondása",
+  "FiDeSZ állapot": "Az Orbán-kormány utolsó hónapjaiban számos nagy összegű, átláthatóság nélküli szerződést kötött alapítványokkal és állami cégekkel (KEKVA-rendszer); összesen ezermilliárdokra rúgó állami vagyon átcsoportosítás",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.15, Facebook): \"A kormány felbontja a Krausz Ferenc Nobel-díjas kutató alapítványával kötött 261,7 milliárd forintos szerződést. Professzor urat a már kifizetett 22 milliárd forint visszautalására kérjük\"; az Élvonal Csúcskutatási és Tehetséggondozó Alapítványt Hankó Balázs KIM vezette, a szerződést a választások előtt 2 hónappal (2026. február 20.) írták alá; Magyar Hang közérdekű adatigényléssel tárta fel; a 22,381 milliárd Ft kifizetés megtörtént, visszakövetelés folyamatban; Krausz Ferenc kuratóriuma nyílt levélben reagált (máj.16), szakmai egyeztetést kér, tagjai közt Nobel- és Abel-díjas kutatók; Gulyás Gergely (Fidesz): \"politikai bosszú, szakmai érvekkel nem alátámasztható\" – felülvizsgálatot javasol; JOGI HELYZET: a szerződést \"mindkét fél egyetértésével\" lehet megváltoztatni – az egyoldalú felbontás bírósági vitát generálhat; az Élvonal korábban kihátrált a Nemzeti Tudósképző Akadémia finanszírozása mögül",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-05-16",
+  "Forrás link": "https://telex.hu/techtud/2026/05/15/krausz-ferenc-elvonal-alapitvany-allami-tamogatas-magyar-peter-kormany-felbontja",
+  "Prioritás": "magas"
+ },
+ {
+  "Kategória": "Jogállam és korrupcióellenes intézkedések",
   "TiSZa ígéret": "Közjogi méltóságok felelősségre vonása / lemondásra szólítása",
   "FiDeSZ állapot": "Közjogi intézmények politikailag elfoglalva – bíróságok, AB, ÁSZ Fidesz-szimpatizánsokkal töltve fel",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter az első miniszterelnöki beszédében felszólította Sulyok Tamást és más közjogi méltóságokat a lemondásra máj.31-ig; 'kezdje a sort Sulyok Tamás'",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.9, első parlamenti beszéd) felszólította Sulyok Tamást és más közjogi méltóságokat a lemondásra legkésőbb máj.31-ig; \"Legyen bennük bátorság és kezdje a sort Sulyok Tamás\"; máj.13 megerősítette: ha önként nem mennek, alkotmánymódosítással eltávolíthatók; máj.16 aktuális: Sulyok Tamás nem akar lemondani (\"az Alaptörvény egyértelműen szabályozza a köztársasági elnök jogállását\"), GVH elnöke és Polt Péter legfőbb ügyész egyértelműen nemet mondott a lemondásra; máj.31 határidő után alkotmánymódosítás várható",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-09",
-  "Forrás link": "https://index.hu/belfold/2026/05/09/magyar-peter-miniszterelnok-tisza-part-orszaggyules-parlament-valasztas2026/",
+  "Frissítés": "2026-05-16",
+  "Forrás link": "https://nepszava.hu/3322359_sulyok-tamas-lemondas-megalaztatas-sandor-palota-csend",
   "Prioritás": "Azonnali"
  }
 ];

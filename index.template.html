@@ -2551,7 +2551,7 @@ body.dark .wallet-nav-btn .label {
    <div class="story-section-title">📊 Statisztikák</div>
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
     <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
-     <div style="font-size:24px;font-weight:800;color:#e8405a;" id="statPromises">102</div>
+     <div style="font-size:24px;font-weight:800;color:#e8405a;" id="statPromises">104</div>
      <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Ígéret összesen</div>
     </div>
     <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
@@ -2584,7 +2584,7 @@ body.dark .wallet-nav-btn .label {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#e8405a"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 1.9 <span class="story-tl-date">2026.05.15</span></div>
+      <div class="story-tl-ver">Ver. 2.0 <span class="story-tl-date">2026.05.16</span></div>
       <div class="story-tl-desc">🏛️ Rendeleti kormányzás megszüntetése: MEGVALÓSULT (máj.14 hatályba lépett). 16 tégla frissítve az ópusztaszeri első kormányülés döntései alapján. ✅ Megvalósult státusz bevezetése (volt: Teljesítve). 💰 Pénztárcaindex oldal hozzáadva: árak összehasonlítása áradás előtt vs. TISZA ígéretek. 🌙 Auto dark mód (este 8 – reggel 6). Melléthei-Barna hivatkozások eltávolítva. Időzóna számítás javítva (Europe/Budapest).</div>
      </div>
     </div>
@@ -3210,7 +3210,7 @@ function updateStats(data) {
   const pb = el("tlProgressBar");
   if (pb && total > 0) pb.style.width = Math.round((yes + done) / total * 100) + "%";
   // Nap számláló
-  const nowHU2 = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  const nowHU2 = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
   const days = Math.floor((nowHU2 - new Date("2026-04-12T00:00:00+02:00")) / 86400000);
   const dc = el("tlDayCount");
   if (dc) dc.textContent = days + " nap";
