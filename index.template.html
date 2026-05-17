@@ -284,7 +284,7 @@ body.dark #stickyCatHeader {
 }
 
 
-/* Teljesített-0 placeholder */
+/* Megvalósult-0 placeholder */
 .done-placeholder {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   padding:56px 24px; text-align:center;
@@ -2373,7 +2373,7 @@ body.dark .wallet-nav-btn .label {
   <button class="sort-btn" data-sort="newest">🆕 Legfrissebb</button>
   <button class="sort-btn" data-sort="announced">📣 Bejelentve előre</button>
   <button class="sort-btn" data-sort="promise">❌ Csak ígéret előre</button>
-  <button class="sort-btn" data-sort="done">✅ Teljesített előre</button>
+  <button class="sort-btn" data-sort="done">✅ Megvalósult előre</button>
  </div>
 
  <div id="categorySections" style="margin-top:0;"></div>
@@ -2515,7 +2515,7 @@ body.dark .wallet-nav-btn .label {
      <span class="tour-step-icon" style="font-size:36px;">🧱</span>
      <div class="tour-step-body">
       <div class="tour-step-title">Minden kártya = egy ígéret</div>
-      <div class="tour-step-desc">📣 Bejelentve &nbsp;·&nbsp; ✅ Teljesítve &nbsp;·&nbsp; ❌ Csak ígéret<br>Kattints bármelyikre a részletekért és forrásért.</div>
+      <div class="tour-step-desc">📣 Bejelentve &nbsp;·&nbsp; ✅ Megvalósult &nbsp;·&nbsp; ❌ Csak ígéret<br>Kattints bármelyikre a részletekért és forrásért.</div>
      </div>
     </div>
 
@@ -2573,7 +2573,7 @@ body.dark .wallet-nav-btn .label {
      <div id="statProgress" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#FF9933,#7ED957);transition:width 0.8s ease;width:0%;"></div>
     </div>
     <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text-secondary);">
-     <span id="statProgressLabel">Bejelentve + Teljesítve</span>
+     <span id="statProgressLabel">Bejelentve + Megvalósult</span>
      <span id="statProgressPct">–%</span>
     </div>
    </div>
@@ -3078,6 +3078,53 @@ function renderDashboard(data) {
    return;
  }
 
+ // ── STÁTUSZ ALAPÚ FLAT RENDEZÉS (done / announced / promise) ──
+ if (typeof currentSort !== 'undefined' && (currentSort === 'done' || currentSort === 'announced' || currentSort === 'promise')) {
+   const statusGroups = {
+     done:      { label: '✅ Megvalósult',  items: [], bg: 'linear-gradient(135deg,rgba(40,167,69,0.10),rgba(40,167,69,0.04))',  border: '2px solid rgba(40,167,69,0.3)'  },
+     announced: { label: '📣 Bejelentve',   items: [], bg: 'linear-gradient(135deg,rgba(255,153,51,0.10),rgba(255,153,51,0.04))', border: '2px solid rgba(255,153,51,0.3)' },
+     promise:   { label: '❌ Csak ígéret',  items: [], bg: 'var(--bg-card)', border: '1.5px solid var(--border-subtle)' },
+   };
+   const isDone = v => ['kész','teljesítve','megvalósult'].includes(v);
+   const isAnnounced = v => ['bejelentve','folyamatban'].includes(v);
+   data.forEach(row => {
+     const v = row['Változás'] || '';
+     if (isDone(v))           statusGroups.done.items.push(row);
+     else if (isAnnounced(v)) statusGroups.announced.items.push(row);
+     else                     statusGroups.promise.items.push(row);
+   });
+   let groupOrder;
+   if (currentSort === 'done')           groupOrder = ['done','announced','promise'];
+   else if (currentSort === 'announced') groupOrder = ['announced','done','promise'];
+   else                                  groupOrder = ['promise','announced','done'];
+   groupOrder.forEach(key => {
+     const grp = statusGroups[key];
+     if (grp.items.length === 0) return;
+     const sec = document.createElement('div');
+     sec.className = 'category-section';
+     sec.style.background = grp.bg;
+     sec.style.border = grp.border;
+     const secTitle = document.createElement('div');
+     secTitle.className = 'category-title';
+     secTitle.textContent = grp.label + ' – ' + grp.items.length + ' tégla';
+     sec.appendChild(secTitle);
+     const grid = document.createElement('div');
+     grid.className = 'cards-grid';
+     grp.items.forEach(item => grid.appendChild(buildCard(item)));
+     sec.appendChild(grid);
+     container.appendChild(sec);
+   });
+   const filterS = document.getElementById('categoryFilter');
+   if (filterS) {
+     const allCatsS = [...new Set(data.map(r => r['Kategória']))];
+     filterS.innerHTML = '<option value="__all__">Összes kategória</option>';
+     allCatsS.forEach(cat => { const o = document.createElement('option'); o.value = cat; o.textContent = cat; filterS.appendChild(o); });
+   }
+   updateStats(data);
+   drawChart(data);
+   return;
+ }
+
  const categories = [...new Set(data.map(r => r["Kategória"]))];
 
  // Kategória szűrő feltöltése
@@ -3379,7 +3426,7 @@ document.querySelectorAll(".tl-leg-item").forEach(item => {
       document.querySelector(".sort-btn[data-sort='default']").classList.add("active");
       currentSort = "default";
     } else if (status === "kész" || status === "megvalósult") {
-      // Megvalósult → "Megvalósult előre" rendezés gomb aktiválása
+      // Megvalósult → "Megvalósult előre" rendezési gomb aktiválása
       document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
       document.querySelector(".sort-btn[data-sort='done']").classList.add("active");
       currentSort = "done";
@@ -3845,7 +3892,7 @@ function buildCalcShareUrl() {
 // ── Rendezés logika ──
 
 
-// Teljesített placeholder ha nincs egyetlen kész tégla sem
+// Megvalósult placeholder ha nincs egyetlen megvalósult tégla sem
 function renderDonePlaceholder() {
   const container = document.getElementById('categorySections');
   container.innerHTML = '';
@@ -3863,7 +3910,7 @@ function renderDonePlaceholder() {
     <div class="done-placeholder">
       <div class="done-placeholder-brick">🧱</div>
       <div class="done-placeholder-count">0</div>
-      <div class="done-placeholder-title">Még nincs teljesített ígéret</div>
+      <div class="done-placeholder-title">Még nincs megvalósult ígéret</div>
       <div class="done-placeholder-sub">${subText}</div>
     </div>
   `;
@@ -3897,7 +3944,7 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
     currentSort = btn.dataset.sort;
     // Ha "done" rendezés és nincs egyetlen teljesített tégla sem → placeholder
     if (currentSort === 'done') {
-      const doneCount = excelData.filter(r => r['Változás'] === 'kész' || r['Változás'] === 'teljesítve').length;
+      const doneCount = excelData.filter(r => r['Változás'] === 'kész' || r['Változás'] === 'teljesítve' || r['Változás'] === 'megvalósult').length;
       if (doneCount === 0) {
         renderDonePlaceholder();
         return;
