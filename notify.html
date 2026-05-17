@@ -150,7 +150,7 @@ button:disabled {
     <div class="header">
       <div class="logo">🧱</div>
       <h1>Értesítő küldés</h1>
-      <p class="subtitle">Küldd el a frissítési értesítőt a tegláról-téglára.hu feliratkozóinak</p>
+      <p class="subtitle">Frissítési értesítő küldése a feliratkozóknak</p>
     </div>
 
     <label for="typeSelect">📋 Üzenet típusa:</label>
@@ -170,11 +170,7 @@ button:disabled {
 • Ügynökakták: 2010–2026 kormányülési emlékeztetők nyilvánosságra
 • Átláthatósági szabályok: titkosított szerződések feloldása
 • Gyermekvédelem: bicskei ügy nyilvános kivizsgálása
-• EU Ügyészség, vagyonosodási vizsgálat, külpolitika és további téglák...
-
-💰 ÚJ: Pénztárcaindex oldal – árak összehasonlítása áradás előtt vs. TISZA ígéretek
-
-👉 teglarol-teglara.hu</textarea>
+• EU Ügyészség, vagyonosodási vizsgálat, külpolitika és további téglák...</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
@@ -217,25 +213,15 @@ function updateTemplate() {
 • Ügynökakták: 2010–2026 kormányülési emlékeztetők nyilvánosságra
 • Átláthatósági szabályok: titkosított szerződések feloldása
 • Gyermekvédelem: bicskei ügy nyilvános kivizsgálása
-• EU Ügyészség, vagyonosodási vizsgálat, külpolitika és további téglák...
-
-💰 ÚJ: Pénztárcaindex oldal – árak összehasonlítása áradás előtt vs. TISZA ígéretek
-
-👉 teglarol-teglara.hu`;
+• EU Ügyészség, vagyonosodási vizsgálat, külpolitika és további téglák...`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 ÚJ! Pénztárcaindex elindult!
+    dbInput.value = `💰 ÚJ: Pénztárcaindex oldal elindult!
 
-Mennyit ér majd a pénztárcád? Egy tipikus 4 fős család havonta 85.000 Ft-ot takaríthatna meg a TISZA ígéretek szerint - ez évi 1.020.000 Ft!
+Egy tipikus 4 fős család havonta 79 000 Ft-ot takaríthatna meg a TISZA ígéretek szerint.
+20+ termék nyomon követve: üzemanyag, rezsi, élelmiszer, gyógyszer.
 
-👉 Nézd meg a kalkulátort:
-https://teglarol-teglara.hu/penztarca.html
-
-📊 20+ termék nyomon követve:
-⛽ Üzemanyag | 🏠 Rezsi | 🏥 Gyógyszer
-🥩 Hús | 🍞 Pékáru | 🍎 Gyümölcs
-
-🧱 Tegláról-téglára - Független ígéretkövető`;
+👉 teglarol-teglara.hu/penztarca.html`;
     dbInput.placeholder = 'Pénztárcaindex launch üzenet';
   } else {
     dbInput.value = '';
