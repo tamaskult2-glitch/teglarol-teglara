@@ -2551,7 +2551,7 @@ body.dark .wallet-nav-btn .label {
    <div class="story-section-title">📊 Statisztikák</div>
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
     <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
-     <div style="font-size:24px;font-weight:800;color:#e8405a;" id="statPromises">104</div>
+     <div style="font-size:24px;font-weight:800;color:#e8405a;" id="statPromises">106</div>
      <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Ígéret összesen</div>
     </div>
     <div style="background:var(--bg-card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft);border:1px solid var(--border-subtle);">
@@ -2584,7 +2584,7 @@ body.dark .wallet-nav-btn .label {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#e8405a"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 2.0 <span class="story-tl-date">2026.05.16</span></div>
+      <div class="story-tl-ver">Ver. 2.1 <span class="story-tl-date">2026.05.17</span></div>
       <div class="story-tl-desc">🏛️ Rendeleti kormányzás megszüntetése: MEGVALÓSULT (máj.14 hatályba lépett). 16 tégla frissítve az ópusztaszeri első kormányülés döntései alapján. ✅ Megvalósult státusz bevezetése (volt: Teljesítve). 💰 Pénztárcaindex oldal hozzáadva: árak összehasonlítása áradás előtt vs. TISZA ígéretek. 🌙 Auto dark mód (este 8 – reggel 6). Melléthei-Barna hivatkozások eltávolítva. Időzóna számítás javítva (Europe/Budapest).</div>
      </div>
     </div>
@@ -4505,10 +4505,10 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Iskolakezdési támogatás – 100 000 Ft rászoruló családoknak",
   "FiDeSZ állapot": "nincs ilyen célzott támogatás",
-  "Volt előrelépést jelentő bejelentés?": "igen – 2026 augusztustól 100 eFt minden rászoruló családnak; Magyar Péter (ápr.27) és Tisza program is tartalmazza",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (2025. december, kampányígéret): 2026 augusztusától 100 ezer Ft/gyerek, ~700 ezer rászoruló család, 70 milliárd Ft-os tétel; Kátai-Németh Vilmos szociális- és családügyi miniszter (máj.12, bizottsági meghallgatás) megerősítette: \"a Tisza Párt tartja magát a vállalásához, az iskolakezdési támogatást még szeptember előtt megkaphatják az érintett családok\"; felhasználható ruhára, cipőre, tanszerre; 50 ezer Ft értékű kelengyecsomag is tervezett újszülöttek után",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-04",
-  "Forrás link": "https://magyartisza.hu/",
+  "Frissítés": "2026-05-17",
+  "Forrás link": "https://eduline.hu/kozoktatas/20260513_iskolakezdesi-tamogatas-tisza-part-igeret-katai-nemeth-vilmos",
   "Prioritás": "rovid"
  },
  {
@@ -4701,16 +4701,7 @@ const excelData = [
   "Forrás link": "https://telex.hu/gazdasag/2026/04/13/tisza-kormany-gazdasagpolitika-adozas-koltsegvetes",
   "Prioritás": "hosszu"
  },
- {
-  "Kategória": "Szociálpolitika",
-  "TiSZa ígéret": "Iskolakezdési támogatás minden rászoruló családnak (100.000 Ft/gyerek)",
-  "FiDeSZ állapot": "Évek óta nem volt iskolakezdési támogatás",
-  "Volt előrelépést jelentő bejelentés?": "igen – 2026 augusztusától minden rászoruló család kap 100 eFt-ot (ápr.27 megerősítve); Kátai-Németh szociális miniszter rászoruló család 100.000 Ft iskolakezdési támogatást kap (Balatonfüred, frakcióülés)",
-  "Változás": "bejelentve",
-  "Frissítés": "2026-04-30",
-  "Forrás link": "https://magyartisza.hu/",
-  "Prioritás": "rovid"
- },
+
  {
   "Kategória": "Igazságszolgáltatás",
   "TiSZa ígéret": "Csatlakozás az Európai Ügyészséghez (EPPO)",
@@ -4790,6 +4781,16 @@ const excelData = [
   "Frissítés": "2026-05-09",
   "Forrás link": "https://444.hu/2026/05/09/magyar-peter-beszede-eskutetel-alakulo-ules",
   "Prioritás": "Azonnali"
+ },
+ {
+  "Kategória": "Jogállam és korrupcióellenes intézkedések",
+  "TiSZa ígéret": "Előző kormány politikai kinevezettjeinek és közigazgatási vezetőinek leváltása / állami átvilágítás",
+  "FiDeSZ állapot": "Az Orbán-kormány 16 év alatt a közigazgatás minden szintjét politikailag lojális személyekkel töltötte meg; közigazgatási államtitkárok határozatlan idejű jogviszonyban maradnak automatikusan kormányváltáskor; a politikai vezetők (politikai ÁT-ok, főispánok, kormányszóvivők) automatikusan megszűnnek.",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13, ópusztaszeri 1. kormányülés): bejelentette a minisztériumok és állami cégek azonnali teljes körű átvilágítását; a 250 millió Ft feletti kötelezettségvállalásokhoz és 100 millió Ft feletti beruházásokhoz pénzügyminiszteri aláírás kell; máj.16 Magyar Közlöny: Sulyok Tamás Magyar Péter javaslatára azonnali hatállyal felmentette az előző kormány 13 közigazgatási államtitkárát – ők kulcsszerepet töltöttek be az állandó közigazgatásban, minden minisztériumi döntés és előterjesztés rajtuk ment keresztül; párhuzamosan megkezdődött az új kormányzat kiépítése; Tóth Péter (TISZA kampányfőnök) a miniszterelnök nemzetbiztonsági főtanácsadója lett; Orbán Anita miniszterelnök-helyettes szombaton vette át a feladatokat",
+  "Változás": "megvalósult",
+  "Frissítés": "2026-05-17",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260516/ejjel-erkezett-a-bejelentes-azonnal-tavozniuk-kellett-a-magyar-miniszteriumok-legbefolyasosabb-vezetoinek-837194",
+  "Prioritás": "magas"
  },
  {
   "Kategória": "Jogállam és korrupcióellenes intézkedések",
