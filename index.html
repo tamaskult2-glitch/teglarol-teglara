@@ -1376,11 +1376,64 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    <span style="font-size:12px; font-weight:700;">Szavazz!</span>
   </button>
   
+  <!-- Támogató gomb -->
+  <button id="supportHeaderBtn" class="story-btn" style="padding:10px 12px; flex-direction:row; gap:6px; background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!">
+   <span style="font-size:16px;">❤️</span>
+   <span style="font-size:12px; font-weight:700;">Támogass!</span>
+  </button>
+
   <!-- Dark mode toggle -->
   <button id="darkToggleHeader" class="story-btn" style="padding:10px 12px; flex-direction:row; gap:0;" aria-label="Sötét/világos mód váltása" title="Téma váltás">
    <span id="darkToggleIconHeader" style="font-size:20px;">🌙</span>
   </button>
  </div><!-- /Névjegy + Szavazó + Dark toggle -->
+
+ <!-- TÁMOGATÓ MODAL -->
+ <div id="supportModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--bg-card);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.25);">
+   <button onclick="closeSupportModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);line-height:1;">×</button>
+   <div style="font-size:22px;margin-bottom:8px;">❤️ Támogasd az oldalt!</div>
+   <div style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:18px;">Ha hasznosnak találod az oldalt, fizess egy kávét – <strong style="color:var(--text-main);">250 Ft-tól</strong>. Egyszeri, regisztráció nélkül. A cél: fedezni a napi automatikus frissítés költségét (havi 6 500 Ft).</div>
+   <div style="background:rgba(0,0,0,0.08);border-radius:999px;height:10px;margin-bottom:8px;overflow:hidden;">
+    <div id="supportBarModal" style="height:10px;border-radius:999px;background:linear-gradient(90deg,#CE2939,#e8405a);width:0%;transition:width .5s;"></div>
+   </div>
+   <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:18px;color:var(--text-muted);">
+    <span>Összegyűlt: <strong id="supportCollectedModal" style="color:var(--text-main);">–</strong></span>
+    <span>Cél: <strong style="color:var(--text-main);">6 500 Ft/hó</strong></span>
+   </div>
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+    <button onclick="selectSupportModal(this,250)" class="sup-modal-btn sup-modal-sel" style="padding:10px 4px;border:1.5px solid #CE2939;border-radius:10px;background:var(--bg-card);color:#CE2939;font-size:13px;font-weight:700;cursor:pointer;">250 Ft</button>
+    <button onclick="selectSupportModal(this,500)" class="sup-modal-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">500 Ft</button>
+    <button onclick="selectSupportModal(this,1000)" class="sup-modal-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">1 000 Ft</button>
+   </div>
+   <a id="supportLinkModal" href="https://ko-fi.com/teglarolteglara" target="_blank" rel="noopener" style="display:block;width:100%;padding:14px;background:linear-gradient(135deg,#CE2939,#a01020);color:#fff;border-radius:12px;font-size:15px;font-weight:700;text-align:center;text-decoration:none;box-sizing:border-box;margin-bottom:8px;">❤️ Küldök egy kávét – <span id="supportModalAmtLabel">250</span> Ft</a>
+   <div style="font-size:11px;color:var(--text-muted);text-align:center;">Egyszeri · Regisztráció nélkül · Ko-fi</div>
+   <div id="supporterCountModal" style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:6px;">– támogató eddig</div>
+  </div>
+ </div>
+
+ <script>
+ document.getElementById('supportHeaderBtn').addEventListener('click', function() {
+   document.getElementById('supportModal').style.display = 'flex';
+ });
+ function closeSupportModal() {
+   document.getElementById('supportModal').style.display = 'none';
+ }
+ document.getElementById('supportModal').addEventListener('click', function(e) {
+   if (e.target === this) closeSupportModal();
+ });
+ function selectSupportModal(el, amt) {
+   document.querySelectorAll('.sup-modal-btn').forEach(b => {
+     b.style.border = '1px solid var(--border-subtle)';
+     b.style.color = 'var(--text-main)';
+     b.style.fontWeight = '600';
+   });
+   el.style.border = '1.5px solid #CE2939';
+   el.style.color = '#CE2939';
+   el.style.fontWeight = '700';
+   document.getElementById('supportModalAmtLabel').textContent = amt.toLocaleString('hu-HU');
+ }
+ </script>
 
  </div><!-- /header-left-col -->
  <div class="header-text">
@@ -2190,7 +2243,195 @@ body.dark .wallet-nav-btn .label {
  </script>
 
 
- <!-- ========= KALKULÁTOR SZEKCIÓ ========= -->
+ <!-- ========= FELMÉRÉS WIDGET ========= -->
+ <div id="surveyWidget" style="max-width:800px;margin:0 auto 24px;background:var(--bg-card);border-radius:16px;padding:24px 28px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+  <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:6px;">🤔 Gyors kérdés – segíts nekünk!</div>
+  <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:18px;">Az oldal napi frissítéséhez havi <strong style="color:var(--text-main);">6 500 Ft</strong> szükséges. Támogatnád az oldalt önkéntes adománnyal?</div>
+  
+  <div id="surveyButtons" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
+   <button onclick="submitSurvey(this,'250')" class="survey-opt-btn" style="padding:14px 8px;border:1.5px solid var(--border-subtle);border-radius:12px;background:var(--bg-card);color:var(--text-main);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;line-height:1.4;">☕ Igen<br><span style="font-size:12px;font-weight:400;color:var(--text-muted);">~250 Ft/hó</span></button>
+   <button onclick="submitSurvey(this,'500')" class="survey-opt-btn" style="padding:14px 8px;border:1.5px solid var(--border-subtle);border-radius:12px;background:var(--bg-card);color:var(--text-main);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;line-height:1.4;">💪 Igen<br><span style="font-size:12px;font-weight:400;color:var(--text-muted);">~500 Ft/hó</span></button>
+   <button onclick="submitSurvey(this,'more')" class="survey-opt-btn" style="padding:14px 8px;border:1.5px solid var(--border-subtle);border-radius:12px;background:var(--bg-card);color:var(--text-main);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;line-height:1.4;">🙌 Igen<br><span style="font-size:12px;font-weight:400;color:var(--text-muted);">Többet is</span></button>
+  </div>
+  <button onclick="submitSurvey(this,'no')" style="width:100%;padding:10px;border:1px solid var(--border-subtle);border-radius:10px;background:transparent;color:var(--text-muted);font-size:13px;cursor:pointer;">Nem tudok most támogatni</button>
+
+  <div id="surveyResult" style="display:none;margin-top:16px;padding:14px;background:var(--bg-secondary);border-radius:10px;">
+   <div style="font-size:14px;font-weight:600;color:var(--text-main);margin-bottom:10px;">📊 Eddigi válaszok:</div>
+   <div id="surveyBars"></div>
+   <div style="font-size:12px;color:var(--text-muted);margin-top:10px;text-align:center;" id="surveyTotal"></div>
+  </div>
+ </div>
+
+ <script type="module">
+ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+ import { getDatabase, ref, onValue, runTransaction } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+ try {
+   const app = initializeApp({
+     apiKey: "AIzaSyCGcAomnRph4bZ35EWc45YT862PQUtRwSg",
+     databaseURL: "https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app",
+     projectId: "teglarol-teglara-voting",
+     appId: "1:304700871491:web:337089ed923d1fc362d5f6"
+   }, 'survey-app');
+   const db = getDatabase(app);
+   const surveyRef = ref(db, 'survey');
+
+   window._surveyDb = db;
+   window._surveyRef = surveyRef;
+   window._surveyRunTransaction = runTransaction;
+
+   // Élő eredmények betöltése
+   onValue(surveyRef, snap => {
+     const d = snap.val() || {};
+     window._surveyData = d;
+     if (document.getElementById('surveyResult').style.display !== 'none') {
+       renderSurveyBars(d);
+     }
+   });
+ } catch(e) { console.error('Survey Firebase error:', e); }
+ </script>
+
+ <script>
+ const SURVEY_KEY = 'ttr_survey_voted';
+ // Ha már szavazott: mutasd az eredményt
+ if (localStorage.getItem(SURVEY_KEY)) {
+   document.getElementById('surveyButtons').style.display = 'none';
+   document.querySelector('#surveyWidget button:last-of-type').style.display = 'none';
+   document.getElementById('surveyResult').style.display = 'block';
+ }
+
+ function renderSurveyBars(d) {
+   const labels = {'250':'☕ ~250 Ft/hó','500':'💪 ~500 Ft/hó','more':'🙌 Többet is','no':'Nem tudok most'};
+   const total = Object.values(d).reduce((s,v)=>s+(v||0),0) || 1;
+   const bars = document.getElementById('surveyBars');
+   if (!bars) return;
+   bars.innerHTML = Object.entries(labels).map(([k,label]) => {
+     const v = d[k] || 0;
+     const pct = Math.round(v/total*100);
+     const color = k==='no' ? '#aaa' : '#CE2939';
+     return `<div style="margin-bottom:8px;">
+       <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+         <span style="color:var(--text-main)">${label}</span>
+         <span style="color:var(--text-muted)">${v} szavazat (${pct}%)</span>
+       </div>
+       <div style="background:rgba(0,0,0,0.08);border-radius:999px;height:8px;overflow:hidden;">
+         <div style="width:${pct}%;height:8px;background:${color};border-radius:999px;transition:width .4s;"></div>
+       </div>
+     </div>`;
+   }).join('');
+   const totalEl = document.getElementById('surveyTotal');
+   if (totalEl) totalEl.textContent = `Összesen ${total} válasz`;
+ }
+
+ async function submitSurvey(el, val) {
+   if (localStorage.getItem(SURVEY_KEY)) return;
+   // Gomb visszajelzés
+   document.querySelectorAll('.survey-opt-btn').forEach(b => b.disabled = true);
+   el.style.background = '#CE2939';
+   el.style.color = '#fff';
+   el.style.borderColor = '#CE2939';
+   localStorage.setItem(SURVEY_KEY, val);
+   // Firebase mentés
+   if (window._surveyRef && window._surveyRunTransaction) {
+     try {
+       await window._surveyRunTransaction(
+         (await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js')).ref(window._surveyDb, 'survey/' + val),
+         cur => (cur || 0) + 1
+       );
+     } catch(e) { console.error('Survey submit error:', e); }
+   }
+   // Eredmény megmutatása
+   setTimeout(() => {
+     document.getElementById('surveyButtons').style.display = 'none';
+     document.querySelector('#surveyWidget > button') && (document.querySelector('#surveyWidget > button').style.display = 'none');
+     document.getElementById('surveyResult').style.display = 'block';
+     if (window._surveyData) renderSurveyBars(window._surveyData);
+   }, 400);
+ }
+ </script>
+
+ <!-- ========= TÁMOGATÓI WIDGET ========= -->
+ <div id="supportWidget" style="max-width:800px; margin:0 auto 40px; background:var(--bg-card); border-radius:16px; padding:24px 28px; box-shadow:0 2px 12px rgba(0,0,0,0.08); position:relative; overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:url(\"data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.06)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E\");background-repeat:repeat;background-size:200px 120px;pointer-events:none;z-index:0;border-radius:16px;"></div>
+  <div style="position:relative;z-index:1;">
+   <div style="font-size:18px;font-weight:700;color:var(--text-main);margin-bottom:6px;">🧱 Támogasd a független ígéretkövetőt</div>
+   <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">A napi automatikus frissítéshez és az oldal fejlesztéséhez havi <strong>6 500 Ft</strong> szükséges (Claude Pro előfizetés). Ha hasznosnak találod az oldalt, segíts elérni a célt!</div>
+
+   <!-- Progress bar -->
+   <div style="background:rgba(0,0,0,0.08);border-radius:999px;height:12px;margin-bottom:8px;overflow:hidden;">
+    <div id="supportBar" style="height:12px;border-radius:999px;background:linear-gradient(90deg,#CE2939,#e8405a);transition:width .5s ease;" ></div>
+   </div>
+   <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:18px;">
+    <span style="color:var(--text-muted);">Összegyűlt: <strong id="supportCollected" style="color:var(--text-main);">–</strong></span>
+    <span style="color:var(--text-muted);">Cél: <strong style="color:var(--text-main);">6 500 Ft/hó</strong></span>
+   </div>
+
+   <!-- Összeg gombok -->
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;" id="supportAmounts">
+    <button onclick="selectSupport(this,250)" class="support-amt-btn support-amt-selected" style="padding:10px 4px;border:1.5px solid #CE2939;border-radius:10px;background:var(--bg-card);color:#CE2939;font-size:13px;font-weight:700;cursor:pointer;">250 Ft</button>
+    <button onclick="selectSupport(this,500)" class="support-amt-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">500 Ft</button>
+    <button onclick="selectSupport(this,1000)" class="support-amt-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">1 000 Ft</button>
+   </div>
+
+   <!-- Támogat gomb -->
+   <a id="supportLink" href="https://ko-fi.com/teglarolteglara" target="_blank" rel="noopener" style="display:block;width:100%;padding:14px;background:linear-gradient(135deg,#CE2939,#a01020);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;margin-bottom:8px;">
+    ❤️ Küldök egy kávét – <span id="supportAmtLabel">250</span> Ft
+   </a>
+
+   <div style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.6;">Egyszeri · Regisztráció nélkül · Biztonságos Ko-fi fizetés</div>
+   <div id="supporterCount" style="font-size:13px;color:var(--text-muted);text-align:center;margin-top:6px;">– támogató eddig</div>
+  </div>
+ </div>
+
+ <script type="module">
+ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+ import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+ try {
+   const app = initializeApp({
+     apiKey: "AIzaSyCGcAomnRph4bZ35EWc45YT862PQUtRwSg",
+     databaseURL: "https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app",
+     projectId: "teglarol-teglara-voting",
+     appId: "1:304700871491:web:337089ed923d1fc362d5f6"
+   }, 'support-app');
+   const db = getDatabase(app);
+   onValue(ref(db, 'support'), snap => {
+     const d = snap.val() || {};
+     const collected = d.collected || 0;
+     const supporters = d.supporters || 0;
+     const goal = 6500;
+     const pct = Math.min(100, Math.round(collected / goal * 100));
+     document.getElementById('supportBar').style.width = pct + '%';
+     document.getElementById('supportCollected').textContent = collected.toLocaleString('hu-HU') + ' Ft';
+     document.getElementById('supporterCount').textContent = supporters + ' támogató eddig';
+     // Modal szinkronizálás
+     const pctM = Math.min(100, Math.round(collected / goal * 100));
+     const barM = document.getElementById('supportBarModal');
+     const colM = document.getElementById('supportCollectedModal');
+     const cntM = document.getElementById('supporterCountModal');
+     if (barM) barM.style.width = pctM + '%';
+     if (colM) colM.textContent = collected.toLocaleString('hu-HU') + ' Ft';
+     if (cntM) cntM.textContent = supporters + ' támogató eddig';
+   });
+ } catch(e) {
+   document.getElementById('supportCollected').textContent = '–';
+ }
+ </script>
+
+ <script>
+ let supportAmt = 250;
+ function selectSupport(el, amt) {
+   supportAmt = amt;
+   document.querySelectorAll('.support-amt-btn').forEach(b => {
+     b.style.border = '1px solid var(--border-subtle)';
+     b.style.color = 'var(--text-main)';
+     b.style.fontWeight = '600';
+   });
+   el.style.border = '1.5px solid #CE2939';
+   el.style.color = '#CE2939';
+   el.style.fontWeight = '700';
+   document.getElementById('supportAmtLabel').textContent = amt.toLocaleString('hu-HU');
+ }
+ </script>
+ <!-- ========= KALKULÁTOR SZEKCIÓ =========  -->
  <div class="calc-section" id="calcSection" style="display:none;">
   <div class="calc-card">
    <div style="background:#FFF3CD; border:1px solid #FFCA2C; border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:13px; color:#856404; font-weight:600;">
@@ -2584,7 +2825,7 @@ body.dark .wallet-nav-btn .label {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#e8405a"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 2.2 <span class="story-tl-date">2026.05.17</span></div>
+      <div class="story-tl-ver">Ver. 2.3 <span class="story-tl-date">2026.05.18</span></div>
       <div class="story-tl-desc">🏛️ Rendeleti kormányzás megszüntetése: MEGVALÓSULT (máj.14 hatályba lépett). 16 tégla frissítve az ópusztaszeri első kormányülés döntései alapján. ✅ Megvalósult státusz bevezetése (volt: Teljesítve). 💰 Pénztárcaindex oldal hozzáadva: árak összehasonlítása áradás előtt vs. TISZA ígéretek. 🌙 Auto dark mód (este 8 – reggel 6). Melléthei-Barna hivatkozások eltávolítva. Időzóna számítás javítva (Europe/Budapest).</div>
      </div>
     </div>
@@ -3852,20 +4093,32 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Miniszterelnöki mandátum két ciklusra korlátozása",
   "FiDeSZ állapot": "nincs korlátozás",
-  "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 bizottsági meghallgatás, bizottság támogatta); az alkotmányozási folyamat első lépései között szerepel a miniszterelnöki mandátum 2 ciklusra korlátozása; Görög Márta: \"Demokratikusabb, stabilabb alkotmányos rendszer a cél. Az alkotmányozási folyamat széleskörű lesz\"; alaptörvény módosítás szükséges",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18 sajtótájékoztató): a miniszterelnöki ciklusok korlátozásáról \"a javaslat nem jogállamellenes, és rá is vonatkozni fog\"; alkotmánymódosítás szükséges; a Tisza program 2 ciklusban (max 8 év) maximalizálná a miniszterelnöki mandátumot"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-14",
-  "Forrás link": "https://www.portfolio.hu/gazdasag/20260512/gorog-marta-aranyosabb-valasztasi-rendszer-kialakitasa-a-cel-836084",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://index.hu/belfold/2026/05/18/magyar-peter-kormanyules-kormanyzati-tajekoztatas-dontesek-kegyelmi-ugy/",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
+   {
+  "Kategória": "Jogállam és korrupcióellenes intézkedések",
+  "TiSZa ígéret": "Végrehajtási rendszer nonprofit átalakítása és kilakoltatások felfüggesztése",
+  "FiDeSZ állapot": "Jelenleg üzleti alapon működik a bírósági végrehajtás; 2024-ben 670 ezer folyamatban lévő végrehajtási ügy volt, amelyek ~2 millió embert érintenek; a végrehajtók piaci alapon dolgoznak, magas díjak és kiszámíthatatlan eljárások jellemzik a rendszert",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18, 2. kormányülés): döntöttek a végrehajtási rendszer teljes átalakításának előkészítéséről; cél: végrehajtás állami kézbe, nonprofit alapokra helyezése; kilakoltatások végrehajtásának felfüggesztése az új törvény hatályba lépéséig; az Igazságügyi Minisztérium június közepéig készíti el a törvénymódosítás tervezetét; felszámolási eljárások visszakerülnek érdemi bírósági kontroll alá; közjegyzői rendszer átalakításának előkészítése is napirenden; Szondi Vanda kormányszóvivő: \"a cél az, hogy a végrehajtás közszolgáltatásként működjön, ne pedig üzleti modellként\"",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://www.origo.hu/belpol/2026/05/kormanyules-sajtotajekoztato-magyar-peter-tisza-kormany",
+  "Prioritás": "magas"
+ },
+ {
+  "Kategória": "Jogállam és korrupcióellenes intézkedések",
   "TiSZa ígéret": "Igazságszolgáltatás függetlenségének megerősítése",
   "FiDeSZ állapot": "politikailag kontrollált",
-  "Volt előrelépést jelentő bejelentés?": "igen – dr. Görög Márta igazságügyi miniszter (máj.12 bizottsági meghallgatás, bizottság támogatta); megerősítik a bíróságok és ügyészségek intézményes függetlenségét, szélesítik az Országos Bírói Tanács (OBT) jogköreit; Görög Márta: \"A bíróságok függetlenségének megerősítése széleskörű szakmai párbeszéddel, amely a bírók kinevezési folyamatára is kiterjedhet\"; javítják a munkakörülményeket, egyszerűsítik az eljárásokat",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18 kormányülés): a végrehajtási rendszer teljes átalakítása napirenden; cél: végrehajtás állami kézbe, nonprofit modellre (670 ezer folyamatban lévő ügy, ~2 millió érintett); kilakoltatások felfüggesztése az új törvény hatályba lépéséig; az IM június közepéig készíti el a törvénymódosítás tervezetét; felszámolási eljárások is érdemi bírósági kontroll alá; közjegyzői rendszer átalakításának előkészítése; Görög Márta igazságügyi miniszter irányítja"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-13",
-  "Forrás link": "https://telex.hu/belfold/2026/05/12/gorog-marta-igazsagugyi-miniszter-parlament-bizottsagi-meghallgatas",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://www.origo.hu/belpol/2026/05/kormanyules-sajtotajekoztato-magyar-peter-tisza-kormany",
   "Prioritás": "azonnali"
  },
  {
@@ -4212,7 +4465,7 @@ const excelData = [
   "Kategória": "Gazdaság és adórendszer",
   "TiSZa ígéret": "SZJA csökkentése 9%-ra a mediánbér alatt + KATA visszaállítása",
   "FiDeSZ állapot": "SZJA kulcs: 15% flat rate; KATA 2022-ben erősen beszűkítve (bevételi határ 18 M Ft/év, B2B korlátozás); kisvállalkozók adminisztrációs terhe magas; különadók rendszere torzítja a versenyt",
-  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter (máj.12, bizottsági meghallgatás, 9 igen – 2 tartózkodás): a mediánbér alattiaknál az SZJA 15-ről 9%-ra csökken adójóváírással (minimálbéren 240 000 Ft/év plusz nettó bér); az SZJA-változás 2027. januártól lép életbe (idén nem fér bele a büdzsé keretébe – máj.12 doorstep); KATA visszaállítása: közel 400 000 potenciális érintett, a jogosulti kör az eredeti szélességre bővül, részletszabályok később; különadók fokozatos kivezetése; ÁFA csökkentés bizonyos termékeknél már 2026-ban elképzelhető; EURÓ bevezetés célja 2030; pótköltségvetés: nyár végén az Országgyűlés elé terjesztik",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter (máj.12, bizottsági meghallgatás, 9 igen – 2 tartózkodás): a bruttó mediánbér (~600 000 Ft/hó, KSH 2026) alatt keresőknél az SZJA effektív kulcsa 9%-ra csökken adójóváírással; példa: minimálbéren (322 800 Ft/hó) kb. 20 000 Ft/hó nettó béremelés; az SZJA-változás 2027. januártól lép életbe (idén nem fér bele a büdzsé keretébe – máj.12 doorstep); KATA visszaállítása: közel 400 000 potenciális érintett, a jogosulti kör az eredeti szélességre bővül, részletszabályok később; különadók fokozatos kivezetése; ÁFA csökkentés bizonyos termékeknél már 2026-ban elképzelhető; EURÓ bevezetés célja 2030; pótköltségvetés: nyár végén az Országgyűlés elé terjesztik",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-16",
   "Forrás link": "https://www.economx.hu/magyar-gazdasag/2026/05/12/9-szazalekos-szja-a-kata-visszater-zero-tolerancia-korrupcio-karman-andras-tisza-kormany-gazdasagi-program/",
@@ -4322,10 +4575,10 @@ const excelData = [
   "Kategória": "Egyéb",
   "TiSZa ígéret": "Gyermekvédelmi rendszer megerősítése",
   "FiDeSZ állapot": "visszaélések nem vizsgálva; bicskei ig. ma szabadult",
-  "Volt előrelépést jelentő bejelentés?": "igen – első kormányülésen (máj.13) napirenden volt a gyermekvédelem; Magyar Péter: \"A kormány határozni fog arról, hogy nyilvánosan vizsgálják ki a bicskei gyermekotthonban történt jogsértéseket\"; átfogó felülvizsgálat elrendelve; Ruff Bálint: \"Vissza kell állítani azt, hogy a gyerekeket védeni kell\"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): bejelentette a bicskei gyermekotthon ügyének kivizsgálását; máj.18 sajtótájékoztató: a kegyelmi ügy teljes dossziéját kedden nyilvánosságra hozzák (kormany.hu/igazsagtetel); Varga Judit nemlegesen terjesztette fel K. Endre kérvényét, Novák Katalin felülírta; parlamenti vizsgálóbizottság alakul, kötelező megjelenéssel (bírság + rendőrségi kivezetés); a kegyelmi döntések nyilvánosságra hozatala törvényi kötelezettség lesz"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-14",
-  "Forrás link": "https://www.economx.hu/belfold/2026/05/13/tisza-kormany-opusztaszer-sajtotajekoztato-magyar-peter/",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://telex.hu/belfold/2026/05/18/magyar-peter-kedden-nyilvanossagra-hozzak-a-kegyelmi-ugy-egyik-dossziejat",
   "Prioritás": "azonnali"
  },
  {
@@ -4382,20 +4635,20 @@ const excelData = [
   "Kategória": "Korrupcióellenes intézkedések",
   "TiSZa ígéret": "Közbeszerzési rendszer átalakítása",
   "FiDeSZ állapot": "átláthatatlan rendszer",
-  "Volt előrelépést jelentő bejelentés?": "igen – első kormányülésen (máj.13, Ópusztaszer) a kormány döntött a minisztériumok és állami cégek azonnali, teljes körű átvilágításáról; felfüggesztik a rendes gazdálkodás körét meghaladó kifizetéseket és kötelezettségvállalásokat (250 M Ft felett pénzügyminiszteri aláírás kell, 100 M Ft felett beruházásoknál); Magyar Péter: \"Döntünk a kiemelt beruházások felülvizsgálatáról – ha kell, elállunk tőlük, ha kell, módosítjuk őket\"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13, ópusztaszeri kormányülés): 250 M Ft feletti kötelezettségvállalásokhoz és 100 M Ft feletti beruházásokhoz pénzügyminiszteri aláírás kell; máj.18: Lázár János volt Építési Minisztériumában talált ledarált iratokra és DPK-anyagokra feljelentés készül – szervezett bűncselekmény (állami és pártfinanszírozás összekeverése); kiemelt beruházások felülvizsgálata folyamatban; Mielőtt Balásy Gyula cégeinek átvételéről döntenének, előbb átvilágítják azokat"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-14",
-  "Forrás link": "https://contextus.hu/magyar-peter-elso-kormanyules-opusztaszer-alaptorvenymodositas-titkositas-feloldas-2026/",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://444.hu/2026/05/18/a-kegyelmi-ugy-iratai-a-vegrehajtas-atalakitasa-azbesztszennyezes-sajtotajekoztato-a-kormanyules-utan",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Korrupcióellenes intézkedések",
   "TiSZa ígéret": "Átláthatósági szabályok szigorítása",
   "FiDeSZ állapot": "gyenge átláthatóság",
-  "Volt előrelépést jelentő bejelentés?": "igen – első kormányülésen (máj.13) döntöttek a titkosított kormányhatározatok és nemzetközi szerződések nyilvánosságra hozataláról; Magyar Péter: \"Döntünk a 2010–2026 közötti kormányülések emlékeztetőinek nyilvánosságra hozásáról\"; Görög Márta: \"A jogalkotás szakmai minőségének helyreállítása, hogy a törvényalkotás átlátható legyen\"; NAV elnöke (Vágujhelyi Ferenc) távozik posztjáról",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): titkosított állami szerződések, kormányhatározatok és kormányülési emlékeztetők nyilvánosságra hozatalát rendelte el; máj.18 bejelentés: a kegyelmi döntéseket jövőben törvény alapján kötelező nyilvánosságra hozni indoklással együtt; Lázár-minisztériumban talált ledarált dokumentumokra feljelentés készül (csoportos bűncselekmény – állami és pártfinanszírozás összekeverése); Magyar Péter: az igazságügyi miniszter vizsgálja a feljelentés lehetőségét a szándékosan hiányos 2026-os költségvetés miatt; a kormány üléseiről hangfelvétel készül, igény esetén nyilvánosságra hozható"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-14",
-  "Forrás link": "https://www.portfolio.hu/gazdasag/20260513/tisza-kormany-az-elso-ules-utan-erkeznek-a-fontos-bejelentesek-836324",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://444.hu/2026/05/18/a-kegyelmi-ugy-iratai-a-vegrehajtas-atalakitasa-azbesztszennyezes-sajtotajekoztato-a-kormanyules-utan",
   "Prioritás": "azonnali"
  },
  {
@@ -4482,10 +4735,10 @@ const excelData = [
   "Kategória": "Közigazgatás",
   "TiSZa ígéret": "Vármegye elnevezés és főispáni pozíció megszüntetése",
   "FiDeSZ állapot": "2022-ben visszaállított vármegyék és főispánok",
-  "Volt előrelépést jelentő bejelentés?": "igen – Görög Márta igazságügyi miniszter (máj.12 meghallgatás); közigazgatási reform a sarkalatos törvények felülvizsgálatával; Görög Márta: \"Visszaállítjuk a közigazgatás jogállami működését, a főispáni rendszer átalakítása az alkotmányozási csomag része\"; az önkormányzati rendszer megerősítése tervben",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18, második kormányülés utáni sajtótájékoztató): bejelentette, hogy idővel megszűnik a vármegyerendszer; a leköszönő főispánok helyett nem újabb politikai kinevezettek jönnek; a döntés pontos ütemezése még kidolgozás alatt; az önkormányzati rendszer visszaállamosított hatásköreinek visszaadása is napirenden"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-13",
-  "Forrás link": "https://telex.hu/belfold/2026/05/12/gorog-marta-igazsagugyi-miniszter-parlament-bizottsagi-meghallgatas",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://telex.hu/belfold/2026/05/18/tisza-part-kormanyules-sajtotajekoztato-magyar-peter-kegyelmi-ugy",
   "Prioritás": "azonnali"
  },
  {
@@ -4682,20 +4935,20 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Vendégmunkás-stop 2026. június 1-től",
   "FiDeSZ állapot": "tömeges vendégmunkás-foglalkoztatás engedélyezett",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter újévi beszédben bejelentette, Kapitány István máj.11 meghallgatáson megerősítette; Magyar Péter: \"2026. június 1-től további intézkedésig nulla, azaz nulla Európai Unión kívüli nem magyar vendégmunkás behozatalát fogjuk engedélyezni\"; Kapitány István: \"június 1-től felfüggesztenék a vendégmunkások behozatalát, és ezzel párhuzamosan felülvizsgálnák a vendégmunkások jogi szabályozását\"; munkaerőpiaci hatásvizsgálat folyamatban",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): bejelentette a nem EU-s vendégmunkás vízumok leállítását júniustól; máj.18: Reuters cikk foglalkozik a döntéssel – Randstad, Német és Amerikai Kereskedelmi Kamara figyelmeztetett a munkaerőhiány kockázatára (egyes cégeknél 20% külföldi); Magyar kormány fenntartja az álláspontot, kivéve egyedi, stratégiai eseteket"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-11",
-  "Forrás link": "https://tozsdeforum.hu/gazdasag/kapitany-istvan-bejelentette-milyen-gazdasagi-lepesek-johetnek-eloszor-nagy-valtozasokra-keszulnek/",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://mandiner.hu/kulfold/2026/05/reuters-magyar-peter-dontese-juniustol-mukodeskeptelenne-teheti-magyarorszagot",
   "Prioritás": "azonnali"
  },
  {
   "Kategória": "Igazságszolgáltatás",
   "TiSZa ígéret": "Ügynökakták teljes megnyitása",
   "FiDeSZ állapot": "részlegesen elérhető akták, sok zárt",
-  "Volt előrelépést jelentő bejelentés?": "igen – első kormányülésen (máj.13, Ópusztaszer) a kormány döntött a korábban titkosított kormányhatározatok és nemzetközi szerződések titkosításának feloldásáról; Magyar Péter: \"Felülvizsgálja a kormány a titkosított nemzetközi szerződéseket, a titkosított kormányhatározatokat, és amit lehet, nyilvánosságra hoznak\"; a 2010–2026 közötti kormányülések emlékeztetőit is nyilvánosságra fogják hozni; Ruff Bálint: első naptól az ügynökaktákra összpontosítanak; október 22-i határidő kitűzve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13, ópusztaszeri kormányülés): bejelentette, hogy a 2010–2026 közötti kormányülések emlékeztetőit nyilvánosságra hozzák; máj.18 kormányülésen: döntöttek az ügynökakták nyilvánosságra hozatalának előkészítéséről; Magyar HVG-nek: lassan mennek a dolgok, sokan még csak most lépnek hivatalba; a folyamat megkezdődött"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-14",
-  "Forrás link": "https://infostart.hu/belfold/2026/05/13/megkezdodott-a-tisza-kormany-elso-kormanyszovivoi-sajtotajekoztatoja-cikkunk-frissul",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://444.hu/2026/05/18/a-kegyelmi-ugy-iratai-a-vegrehajtas-atalakitasa-azbesztszennyezes-sajtotajekoztato-a-kormanyules-utan",
   "Prioritás": "azonnali"
  },
  {
@@ -4863,10 +5116,10 @@ const excelData = [
   "Kategória": "Jogállam és korrupcióellenes intézkedések",
   "TiSZa ígéret": "Közjogi méltóságok felelősségre vonása / lemondásra szólítása",
   "FiDeSZ állapot": "Közjogi intézmények politikailag elfoglalva – bíróságok, AB, ÁSZ Fidesz-szimpatizánsokkal töltve fel",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.9, első parlamenti beszéd) felszólította Sulyok Tamást és más közjogi méltóságokat a lemondásra legkésőbb máj.31-ig; \"Legyen bennük bátorság és kezdje a sort Sulyok Tamás\"; máj.13 megerősítette: ha önként nem mennek, alkotmánymódosítással eltávolíthatók; máj.16 aktuális: Sulyok Tamás nem akar lemondani (\"az Alaptörvény egyértelműen szabályozza a köztársasági elnök jogállását\"), GVH elnöke és Polt Péter legfőbb ügyész egyértelműen nemet mondott a lemondásra; máj.31 határidő után alkotmánymódosítás várható",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.9, első parlamenti beszéd) felszólította Sulyok Tamást és más közjogi méltóságokat a lemondásra legkésőbb máj.31-ig; \"Legyen bennük bátorság és kezdje a sort Sulyok Tamás\"; máj.18 sajtótájékoztató: megerősítette a máj.31-i határidőt, ha önként nem mennek, alkotmánymódosítással eltávolíthatók; \"Ha a magyar nemzet akaratát tiszteletben tartja Sulyok Tamás és a többi közjogi méltóság, nem tehetnek mást, csak azt, hogy lemondanak\"; Sulyok szereptévesztésben van Magyar szerint: nem pártpolitizálhat, de politizálnia kell; 16–17%-os népszerűsége szégyen; felszólította Sulyokot a Sándor-palotai kegyelmi dosszié nyilvánosságra hozatalára kedd munkaidő végéig; érintett méltóságok: Sulyok Tamás, Polt Péter legfőbb ügyész, AB elnöke, Állami Számvevőszék elnöke"",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-16",
-  "Forrás link": "https://nepszava.hu/3322359_sulyok-tamas-lemondas-megalaztatas-sandor-palota-csend",
+  "Frissítés": "2026-05-18",
+  "Forrás link": "https://telex.hu/belfold/2026/05/18/tisza-part-kormanyules-sajtotajekoztato-magyar-peter-kegyelmi-ugy",
   "Prioritás": "Azonnali"
  }
 ];
@@ -5593,7 +5846,7 @@ Számold ki te is: ${url}`;
   
   // === KONSTANSOK (2026) ===
   const MINBER = 322800;
-  const MEDIANBER = 625000;
+  const MEDIANBER = 600000; // KSH 2026 jan-feb átlag: ~595-599 ezer Ft
   const TB_RATE = 0.185;
   const SZJA_RATE = 0.15;
   const HUSZONOT_HATAR = 715765;
