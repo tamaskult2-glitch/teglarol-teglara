@@ -1391,7 +1391,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  </div><!-- /Névjegy + Szavazó + Dark toggle -->
 
  <!-- TÁMOGATÓ MODAL -->
- <div id="supportModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;padding:20px;">
+ <div id="supportModal" style="visibility:hidden;pointer-events:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.2s;">
   <div style="background:var(--bg-card);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.25);">
    <button onclick="closeSupportModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);line-height:1;">×</button>
    <div style="font-size:22px;margin-bottom:8px;">❤️ Támogasd az oldalt!</div>
@@ -1408,6 +1408,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     <button onclick="selectSupportModal(this,500)" class="sup-modal-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">500 Ft</button>
     <button onclick="selectSupportModal(this,1000)" class="sup-modal-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">1 000 Ft</button>
    </div>
+   <div id="supportFunMsg" style="display:none;margin:10px 0 2px;padding:10px 14px;background:var(--color-background-secondary,rgba(0,0,0,0.05));border-radius:10px;font-size:13px;color:var(--text-main);line-height:1.5;font-style:italic;text-align:center;"></div>
    <a id="supportLinkModal" href="https://ko-fi.com/teglarolteglara" target="_blank" rel="noopener" style="display:block;width:100%;padding:14px;background:linear-gradient(135deg,#CE2939,#a01020);color:#fff;border-radius:12px;font-size:15px;font-weight:700;text-align:center;text-decoration:none;box-sizing:border-box;margin-bottom:8px;">❤️ Küldök egy kávét – <span id="supportModalAmtLabel">250</span> Ft</a>
    <div style="font-size:11px;color:var(--text-muted);text-align:center;">Egyszeri · Regisztráció nélkül · Ko-fi</div>
    <div id="supporterCountModal" style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:6px;">– támogató eddig</div>
@@ -1415,15 +1416,10 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  </div>
 
  <script>
- document.getElementById('supportHeaderBtn').addEventListener('click', function() {
-   document.getElementById('supportModal').style.display = 'flex';
- });
  function closeSupportModal() {
-   document.getElementById('supportModal').style.display = 'none';
+   const m = document.getElementById('supportModal');
+   if (m) { m.style.visibility='hidden'; m.style.pointerEvents='none'; m.style.opacity='0'; }
  }
- document.getElementById('supportModal').addEventListener('click', function(e) {
-   if (e.target === this) closeSupportModal();
- });
  function selectSupportModal(el, amt) {
    document.querySelectorAll('.sup-modal-btn').forEach(b => {
      b.style.border = '1px solid var(--border-subtle)';
@@ -1434,7 +1430,43 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    el.style.color = '#CE2939';
    el.style.fontWeight = '700';
    document.getElementById('supportModalAmtLabel').textContent = amt.toLocaleString('hu-HU');
+   // Vicces üzenet összeg alapján
+   const viccek = {
+     250: [
+       "☕ Ennyi a reggeli kávéd ára. Mi meg egy egész kormányt követünk nyomon. Megér annyit?",
+       "🧱 250 Ft. Egy tégla. Szó szerint.",
+       "„Az emberek fele alulról szavaz." – Valaki, de most te fentről adsz. 🗳️"
+     ],
+     500: [
+       "🍺 Fél sör. De ez nem folyik le a lefolyón – ez téglákat követ.",
+       "„Elhagyta a süllyedő hajót." – Magyar Péter Orbánról. Te meg inkább az ígéretkövetőt támogatod. 👍",
+       "500 Ft = 2 napig figyeljük helyetted a kormányt. Megéri."
+     ],
+     1000: [
+       "🏆 Ezer forint! Ezzel már Rogán Antal végkielégítésének a 23-milliomod részét követed nyomon.",
+       "„Az én értelmezésem szerint ez bűncselekmény. Ez csalás." – Magyar Péter. Te meg támogatod, hogy számon kérjük. ✊",
+       "1000 Ft-ért egy hétig frissítjük az oldalt. Te fizeted, mi dolgozunk. Fair deal."
+     ]
+   };
+   const msgEl = document.getElementById('supportFunMsg');
+   if (msgEl && viccek[amt]) {
+     const list = viccek[amt];
+     msgEl.textContent = list[Math.floor(Math.random() * list.length)];
+     msgEl.style.display = 'block';
+   }
  }
+ document.addEventListener('DOMContentLoaded', function() {
+   const btn = document.getElementById('supportHeaderBtn');
+   const modal = document.getElementById('supportModal');
+   if (btn && modal) {
+     btn.addEventListener('click', function() {
+       modal.style.visibility='visible'; modal.style.pointerEvents='auto'; modal.style.opacity='1';
+     });
+     modal.addEventListener('click', function(e) {
+       if (e.target === this) closeSupportModal();
+     });
+   }
+ });
  </script>
 
  </div><!-- /header-left-col -->
@@ -1549,7 +1581,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
  <p id="tesztBadgeWrap" style="text-align:center;margin-top:12px;">
   <span style="display:inline-block;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1.5px solid rgba(192,24,58,0.3);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:600;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-   <span id="tesztMsg">🧱 A kormány 36 napja épít — figyeld velünk, hogy valóban tégláról-téglára haladnak-e!</span>
+   <span id="tesztMsg">🧱 Figyeld velünk, hogy valóban tégláról-téglára haladnak-e!</span>
   </span>
  </p>
 
@@ -3208,6 +3240,8 @@ sidebarOverlay.addEventListener("click", closeSidebar);
  const nowHU3 = (() => { const d = new Date(); const s = new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(d); const t = new Intl.DateTimeFormat('en-GB', {timeZone: 'Europe/Budapest', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false}).format(d); return new Date(s + 'T' + t); })();
  const diff = Math.floor((nowHU3 - electionDate) / 86400000);
  document.getElementById("daysSince").textContent = "Az \"áradás\" óta eltelt napok: " + diff;
+  const tesztMsg = document.getElementById("tesztMsg");
+  if (tesztMsg) tesztMsg.textContent = "🧱 A kormány " + diff + " napja épít — figyeld velünk, hogy valóban tégláról-téglára haladnak-e!";
 })();
 
 
@@ -4095,15 +4129,13 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Miniszterelnöki mandátum két ciklusra korlátozása",
   "FiDeSZ állapot": "nincs korlátozás",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18 sajtótájékoztató): a miniszterelnöki ciklusok korlátozásáról \"a javaslat nem jogállamellenes, és rá is vonatkozni fog\"; alkotmánymódosítás szükséges; a Tisza program 2 ciklusban (max 8 év) maximalizálná a miniszterelnöki mandátumot"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18 sajtótájékoztató): a miniszterelnöki ciklusok korlátozásáról \"a javaslat nem jogállamellenes, és rá is vonatkozni fog\"; alkotmánymódosítás szükséges; a Tisza program 2 ciklusban (max 8 év) maximalizálná a miniszterelnöki mandátumot",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://index.hu/belfold/2026/05/18/magyar-peter-kormanyules-kormanyzati-tajekoztatas-dontesek-kegyelmi-ugy/",
   "Prioritás": "azonnali"
  },
  {
-  "Kategória": "Államszerkezet és jogállam",
-   {
   "Kategória": "Jogállam és korrupcióellenes intézkedések",
   "TiSZa ígéret": "Végrehajtási rendszer nonprofit átalakítása és kilakoltatások felfüggesztése",
   "FiDeSZ állapot": "Jelenleg üzleti alapon működik a bírósági végrehajtás; 2024-ben 670 ezer folyamatban lévő végrehajtási ügy volt, amelyek ~2 millió embert érintenek; a végrehajtók piaci alapon dolgoznak, magas díjak és kiszámíthatatlan eljárások jellemzik a rendszert",
@@ -4117,7 +4149,7 @@ const excelData = [
   "Kategória": "Jogállam és korrupcióellenes intézkedések",
   "TiSZa ígéret": "Igazságszolgáltatás függetlenségének megerősítése",
   "FiDeSZ állapot": "politikailag kontrollált",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18 kormányülés): a végrehajtási rendszer teljes átalakítása napirenden; cél: végrehajtás állami kézbe, nonprofit modellre (670 ezer folyamatban lévő ügy, ~2 millió érintett); kilakoltatások felfüggesztése az új törvény hatályba lépéséig; az IM június közepéig készíti el a törvénymódosítás tervezetét; felszámolási eljárások is érdemi bírósági kontroll alá; közjegyzői rendszer átalakításának előkészítése; Görög Márta igazságügyi miniszter irányítja"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18 kormányülés): a végrehajtási rendszer teljes átalakítása napirenden; cél: végrehajtás állami kézbe, nonprofit modellre (670 ezer folyamatban lévő ügy, ~2 millió érintett); kilakoltatások felfüggesztése az új törvény hatályba lépéséig; az IM június közepéig készíti el a törvénymódosítás tervezetét; felszámolási eljárások is érdemi bírósági kontroll alá; közjegyzői rendszer átalakításának előkészítése; Görög Márta igazságügyi miniszter irányítja",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://www.origo.hu/belpol/2026/05/kormanyules-sajtotajekoztato-magyar-peter-tisza-kormany",
@@ -4577,7 +4609,7 @@ const excelData = [
   "Kategória": "Egyéb",
   "TiSZa ígéret": "Gyermekvédelmi rendszer megerősítése",
   "FiDeSZ állapot": "visszaélések nem vizsgálva; bicskei ig. ma szabadult",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): bejelentette a bicskei gyermekotthon ügyének kivizsgálását; máj.18 sajtótájékoztató: a kegyelmi ügy teljes dossziéját kedden nyilvánosságra hozzák (kormany.hu/igazsagtetel); Varga Judit nemlegesen terjesztette fel K. Endre kérvényét, Novák Katalin felülírta; parlamenti vizsgálóbizottság alakul, kötelező megjelenéssel (bírság + rendőrségi kivezetés); a kegyelmi döntések nyilvánosságra hozatala törvényi kötelezettség lesz"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): bejelentette a bicskei gyermekotthon ügyének kivizsgálását; máj.18 sajtótájékoztató: a kegyelmi ügy teljes dossziéját kedden nyilvánosságra hozzák (kormany.hu/igazsagtetel); Varga Judit nemlegesen terjesztette fel K. Endre kérvényét, Novák Katalin felülírta; parlamenti vizsgálóbizottság alakul, kötelező megjelenéssel (bírság + rendőrségi kivezetés); a kegyelmi döntések nyilvánosságra hozatala törvényi kötelezettség lesz",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://telex.hu/belfold/2026/05/18/magyar-peter-kedden-nyilvanossagra-hozzak-a-kegyelmi-ugy-egyik-dossziejat",
@@ -4637,7 +4669,7 @@ const excelData = [
   "Kategória": "Korrupcióellenes intézkedések",
   "TiSZa ígéret": "Közbeszerzési rendszer átalakítása",
   "FiDeSZ állapot": "átláthatatlan rendszer",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13, ópusztaszeri kormányülés): 250 M Ft feletti kötelezettségvállalásokhoz és 100 M Ft feletti beruházásokhoz pénzügyminiszteri aláírás kell; máj.18: Lázár János volt Építési Minisztériumában talált ledarált iratokra és DPK-anyagokra feljelentés készül – szervezett bűncselekmény (állami és pártfinanszírozás összekeverése); kiemelt beruházások felülvizsgálata folyamatban; Mielőtt Balásy Gyula cégeinek átvételéről döntenének, előbb átvilágítják azokat"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13, ópusztaszeri kormányülés): 250 M Ft feletti kötelezettségvállalásokhoz és 100 M Ft feletti beruházásokhoz pénzügyminiszteri aláírás kell; máj.18: Lázár János volt Építési Minisztériumában talált ledarált iratokra és DPK-anyagokra feljelentés készül – szervezett bűncselekmény (állami és pártfinanszírozás összekeverése); kiemelt beruházások felülvizsgálata folyamatban; Mielőtt Balásy Gyula cégeinek átvételéről döntenének, előbb átvilágítják azokat",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://444.hu/2026/05/18/a-kegyelmi-ugy-iratai-a-vegrehajtas-atalakitasa-azbesztszennyezes-sajtotajekoztato-a-kormanyules-utan",
@@ -4647,7 +4679,7 @@ const excelData = [
   "Kategória": "Korrupcióellenes intézkedések",
   "TiSZa ígéret": "Átláthatósági szabályok szigorítása",
   "FiDeSZ állapot": "gyenge átláthatóság",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): titkosított állami szerződések, kormányhatározatok és kormányülési emlékeztetők nyilvánosságra hozatalát rendelte el; máj.18 bejelentés: a kegyelmi döntéseket jövőben törvény alapján kötelező nyilvánosságra hozni indoklással együtt; Lázár-minisztériumban talált ledarált dokumentumokra feljelentés készül (csoportos bűncselekmény – állami és pártfinanszírozás összekeverése); Magyar Péter: az igazságügyi miniszter vizsgálja a feljelentés lehetőségét a szándékosan hiányos 2026-os költségvetés miatt; a kormány üléseiről hangfelvétel készül, igény esetén nyilvánosságra hozható"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): titkosított állami szerződések, kormányhatározatok és kormányülési emlékeztetők nyilvánosságra hozatalát rendelte el; máj.18 bejelentés: a kegyelmi döntéseket jövőben törvény alapján kötelező nyilvánosságra hozni indoklással együtt; Lázár-minisztériumban talált ledarált dokumentumokra feljelentés készül (csoportos bűncselekmény – állami és pártfinanszírozás összekeverése); Magyar Péter: az igazságügyi miniszter vizsgálja a feljelentés lehetőségét a szándékosan hiányos 2026-os költségvetés miatt; a kormány üléseiről hangfelvétel készül, igény esetén nyilvánosságra hozható",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://444.hu/2026/05/18/a-kegyelmi-ugy-iratai-a-vegrehajtas-atalakitasa-azbesztszennyezes-sajtotajekoztato-a-kormanyules-utan",
@@ -4737,7 +4769,7 @@ const excelData = [
   "Kategória": "Közigazgatás",
   "TiSZa ígéret": "Vármegye elnevezés és főispáni pozíció megszüntetése",
   "FiDeSZ állapot": "2022-ben visszaállított vármegyék és főispánok",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18, második kormányülés utáni sajtótájékoztató): bejelentette, hogy idővel megszűnik a vármegyerendszer; a leköszönő főispánok helyett nem újabb politikai kinevezettek jönnek; a döntés pontos ütemezése még kidolgozás alatt; az önkormányzati rendszer visszaállamosított hatásköreinek visszaadása is napirenden"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18, második kormányülés utáni sajtótájékoztató): bejelentette, hogy idővel megszűnik a vármegyerendszer; a leköszönő főispánok helyett nem újabb politikai kinevezettek jönnek; a döntés pontos ütemezése még kidolgozás alatt; az önkormányzati rendszer visszaállamosított hatásköreinek visszaadása is napirenden",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://telex.hu/belfold/2026/05/18/tisza-part-kormanyules-sajtotajekoztato-magyar-peter-kegyelmi-ugy",
@@ -4937,7 +4969,7 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Vendégmunkás-stop 2026. június 1-től",
   "FiDeSZ állapot": "tömeges vendégmunkás-foglalkoztatás engedélyezett",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): bejelentette a nem EU-s vendégmunkás vízumok leállítását júniustól; máj.18: Reuters cikk foglalkozik a döntéssel – Randstad, Német és Amerikai Kereskedelmi Kamara figyelmeztetett a munkaerőhiány kockázatára (egyes cégeknél 20% külföldi); Magyar kormány fenntartja az álláspontot, kivéve egyedi, stratégiai eseteket"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13): bejelentette a nem EU-s vendégmunkás vízumok leállítását júniustól; máj.18: Reuters cikk foglalkozik a döntéssel – Randstad, Német és Amerikai Kereskedelmi Kamara figyelmeztetett a munkaerőhiány kockázatára (egyes cégeknél 20% külföldi); Magyar kormány fenntartja az álláspontot, kivéve egyedi, stratégiai eseteket",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://mandiner.hu/kulfold/2026/05/reuters-magyar-peter-dontese-juniustol-mukodeskeptelenne-teheti-magyarorszagot",
@@ -4947,7 +4979,7 @@ const excelData = [
   "Kategória": "Igazságszolgáltatás",
   "TiSZa ígéret": "Ügynökakták teljes megnyitása",
   "FiDeSZ állapot": "részlegesen elérhető akták, sok zárt",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13, ópusztaszeri kormányülés): bejelentette, hogy a 2010–2026 közötti kormányülések emlékeztetőit nyilvánosságra hozzák; máj.18 kormányülésen: döntöttek az ügynökakták nyilvánosságra hozatalának előkészítéséről; Magyar HVG-nek: lassan mennek a dolgok, sokan még csak most lépnek hivatalba; a folyamat megkezdődött"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.13, ópusztaszeri kormányülés): bejelentette, hogy a 2010–2026 közötti kormányülések emlékeztetőit nyilvánosságra hozzák; máj.18 kormányülésen: döntöttek az ügynökakták nyilvánosságra hozatalának előkészítéséről; Magyar HVG-nek: lassan mennek a dolgok, sokan még csak most lépnek hivatalba; a folyamat megkezdődött",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://444.hu/2026/05/18/a-kegyelmi-ugy-iratai-a-vegrehajtas-atalakitasa-azbesztszennyezes-sajtotajekoztato-a-kormanyules-utan",
@@ -5118,7 +5150,7 @@ const excelData = [
   "Kategória": "Jogállam és korrupcióellenes intézkedések",
   "TiSZa ígéret": "Közjogi méltóságok felelősségre vonása / lemondásra szólítása",
   "FiDeSZ állapot": "Közjogi intézmények politikailag elfoglalva – bíróságok, AB, ÁSZ Fidesz-szimpatizánsokkal töltve fel",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.9, első parlamenti beszéd) felszólította Sulyok Tamást és más közjogi méltóságokat a lemondásra legkésőbb máj.31-ig; \"Legyen bennük bátorság és kezdje a sort Sulyok Tamás\"; máj.18 sajtótájékoztató: megerősítette a máj.31-i határidőt, ha önként nem mennek, alkotmánymódosítással eltávolíthatók; \"Ha a magyar nemzet akaratát tiszteletben tartja Sulyok Tamás és a többi közjogi méltóság, nem tehetnek mást, csak azt, hogy lemondanak\"; Sulyok szereptévesztésben van Magyar szerint: nem pártpolitizálhat, de politizálnia kell; 16–17%-os népszerűsége szégyen; felszólította Sulyokot a Sándor-palotai kegyelmi dosszié nyilvánosságra hozatalára kedd munkaidő végéig; érintett méltóságok: Sulyok Tamás, Polt Péter legfőbb ügyész, AB elnöke, Állami Számvevőszék elnöke"",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.9, első parlamenti beszéd) felszólította Sulyok Tamást és más közjogi méltóságokat a lemondásra legkésőbb máj.31-ig; \"Legyen bennük bátorság és kezdje a sort Sulyok Tamás\"; máj.18 sajtótájékoztató: megerősítette a máj.31-i határidőt, ha önként nem mennek, alkotmánymódosítással eltávolíthatók; \"Ha a magyar nemzet akaratát tiszteletben tartja Sulyok Tamás és a többi közjogi méltóság, nem tehetnek mást, csak azt, hogy lemondanak\"; Sulyok szereptévesztésben van Magyar szerint: nem pártpolitizálhat, de politizálnia kell; 16–17%-os népszerűsége szégyen; felszólította Sulyokot a Sándor-palotai kegyelmi dosszié nyilvánosságra hozatalára kedd munkaidő végéig; érintett méltóságok: Sulyok Tamás, Polt Péter legfőbb ügyész, AB elnöke, Állami Számvevőszék elnöke",
   "Változás": "bejelentve",
   "Frissítés": "2026-05-18",
   "Forrás link": "https://telex.hu/belfold/2026/05/18/tisza-part-kormanyules-sajtotajekoztato-magyar-peter-kegyelmi-ugy",

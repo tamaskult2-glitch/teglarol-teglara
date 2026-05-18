@@ -1391,7 +1391,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  </div><!-- /Névjegy + Szavazó + Dark toggle -->
 
  <!-- TÁMOGATÓ MODAL -->
- <div id="supportModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;padding:20px;">
+ <div id="supportModal" style="visibility:hidden;pointer-events:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.2s;">
   <div style="background:var(--bg-card);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.25);">
    <button onclick="closeSupportModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);line-height:1;">×</button>
    <div style="font-size:22px;margin-bottom:8px;">❤️ Támogasd az oldalt!</div>
@@ -1408,6 +1408,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
     <button onclick="selectSupportModal(this,500)" class="sup-modal-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">500 Ft</button>
     <button onclick="selectSupportModal(this,1000)" class="sup-modal-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">1 000 Ft</button>
    </div>
+   <div id="supportFunMsg" style="display:none;margin:10px 0 2px;padding:10px 14px;background:var(--color-background-secondary,rgba(0,0,0,0.05));border-radius:10px;font-size:13px;color:var(--text-main);line-height:1.5;font-style:italic;text-align:center;"></div>
    <a id="supportLinkModal" href="https://ko-fi.com/teglarolteglara" target="_blank" rel="noopener" style="display:block;width:100%;padding:14px;background:linear-gradient(135deg,#CE2939,#a01020);color:#fff;border-radius:12px;font-size:15px;font-weight:700;text-align:center;text-decoration:none;box-sizing:border-box;margin-bottom:8px;">❤️ Küldök egy kávét – <span id="supportModalAmtLabel">250</span> Ft</a>
    <div style="font-size:11px;color:var(--text-muted);text-align:center;">Egyszeri · Regisztráció nélkül · Ko-fi</div>
    <div id="supporterCountModal" style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:6px;">– támogató eddig</div>
@@ -1415,15 +1416,10 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  </div>
 
  <script>
- document.getElementById('supportHeaderBtn').addEventListener('click', function() {
-   document.getElementById('supportModal').style.display = 'flex';
- });
  function closeSupportModal() {
-   document.getElementById('supportModal').style.display = 'none';
+   const m = document.getElementById('supportModal');
+   if (m) { m.style.visibility='hidden'; m.style.pointerEvents='none'; m.style.opacity='0'; }
  }
- document.getElementById('supportModal').addEventListener('click', function(e) {
-   if (e.target === this) closeSupportModal();
- });
  function selectSupportModal(el, amt) {
    document.querySelectorAll('.sup-modal-btn').forEach(b => {
      b.style.border = '1px solid var(--border-subtle)';
@@ -1434,7 +1430,43 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    el.style.color = '#CE2939';
    el.style.fontWeight = '700';
    document.getElementById('supportModalAmtLabel').textContent = amt.toLocaleString('hu-HU');
+   // Vicces üzenet összeg alapján
+   const viccek = {
+     250: [
+       "☕ Ennyi a reggeli kávéd ára. Mi meg egy egész kormányt követünk nyomon. Megér annyit?",
+       "🧱 250 Ft. Egy tégla. Szó szerint.",
+       "„Az emberek fele alulról szavaz." – Valaki, de most te fentről adsz. 🗳️"
+     ],
+     500: [
+       "🍺 Fél sör. De ez nem folyik le a lefolyón – ez téglákat követ.",
+       "„Elhagyta a süllyedő hajót." – Magyar Péter Orbánról. Te meg inkább az ígéretkövetőt támogatod. 👍",
+       "500 Ft = 2 napig figyeljük helyetted a kormányt. Megéri."
+     ],
+     1000: [
+       "🏆 Ezer forint! Ezzel már Rogán Antal végkielégítésének a 23-milliomod részét követed nyomon.",
+       "„Az én értelmezésem szerint ez bűncselekmény. Ez csalás." – Magyar Péter. Te meg támogatod, hogy számon kérjük. ✊",
+       "1000 Ft-ért egy hétig frissítjük az oldalt. Te fizeted, mi dolgozunk. Fair deal."
+     ]
+   };
+   const msgEl = document.getElementById('supportFunMsg');
+   if (msgEl && viccek[amt]) {
+     const list = viccek[amt];
+     msgEl.textContent = list[Math.floor(Math.random() * list.length)];
+     msgEl.style.display = 'block';
+   }
  }
+ document.addEventListener('DOMContentLoaded', function() {
+   const btn = document.getElementById('supportHeaderBtn');
+   const modal = document.getElementById('supportModal');
+   if (btn && modal) {
+     btn.addEventListener('click', function() {
+       modal.style.visibility='visible'; modal.style.pointerEvents='auto'; modal.style.opacity='1';
+     });
+     modal.addEventListener('click', function(e) {
+       if (e.target === this) closeSupportModal();
+     });
+   }
+ });
  </script>
 
  </div><!-- /header-left-col -->
@@ -1549,7 +1581,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
  <p id="tesztBadgeWrap" style="text-align:center;margin-top:12px;">
   <span style="display:inline-block;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1.5px solid rgba(192,24,58,0.3);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:600;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-   <span id="tesztMsg">🧱 A kormány 36 napja épít — figyeld velünk, hogy valóban tégláról-téglára haladnak-e!</span>
+   <span id="tesztMsg">🧱 Figyeld velünk, hogy valóban tégláról-téglára haladnak-e!</span>
   </span>
  </p>
 
@@ -3208,6 +3240,8 @@ sidebarOverlay.addEventListener("click", closeSidebar);
  const nowHU3 = (() => { const d = new Date(); const s = new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(d); const t = new Intl.DateTimeFormat('en-GB', {timeZone: 'Europe/Budapest', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false}).format(d); return new Date(s + 'T' + t); })();
  const diff = Math.floor((nowHU3 - electionDate) / 86400000);
  document.getElementById("daysSince").textContent = "Az \"áradás\" óta eltelt napok: " + diff;
+  const tesztMsg = document.getElementById("tesztMsg");
+  if (tesztMsg) tesztMsg.textContent = "🧱 A kormány " + diff + " napja épít — figyeld velünk, hogy valóban tégláról-téglára haladnak-e!";
 })();
 
 
