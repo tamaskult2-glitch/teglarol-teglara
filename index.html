@@ -507,6 +507,8 @@ body.dark .cat-all { border-color:rgba(192,202,245,0.2); }
   cursor:pointer; letter-spacing:0.3px;
   transition:background 0.18s, transform 0.15s;
 }
+.support-btn-label { display:inline; }
+@media (max-width:380px) { .support-btn-label { display:none; } }
 .story-btn:hover { background:rgba(255,255,255,0.32); transform:translateY(-2px); }
 .story-btn svg { width:22px; height:22px; }
 body.dark .story-btn { background:rgba(192,202,245,0.12); border-color:rgba(192,202,245,0.2); color:#C0CAF5; }
@@ -1377,9 +1379,9 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   </button>
   
   <!-- Támogató gomb -->
-  <button id="supportHeaderBtn" class="story-btn" style="padding:10px 12px; flex-direction:row; gap:6px; background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!">
+  <button id="supportHeaderBtn" class="story-btn" style="padding:10px 10px; flex-direction:row; gap:4px; background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!">
    <span style="font-size:16px;">❤️</span>
-   <span style="font-size:12px; font-weight:700;">Támogass!</span>
+   <span style="font-size:11px; font-weight:700;" class="support-btn-label">Támogass!</span>
   </button>
 
   <!-- Dark mode toggle -->
@@ -1547,7 +1549,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
  <p id="tesztBadgeWrap" style="text-align:center;margin-top:12px;">
   <span style="display:inline-block;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1.5px solid rgba(192,24,58,0.3);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:600;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-   <span id="tesztMsg">🧱 Az első tégla lerakva — de az építkezés május 9-én kezdődik igazán.</span>
+   <span id="tesztMsg">🧱 A kormány 36 napja épít — figyeld velünk, hogy valóban tégláról-téglára haladnak-e!</span>
   </span>
  </p>
 
@@ -5302,16 +5304,14 @@ function activateNewestSort() {
 
 // ── Frissítések felhívó (ma vagy tegnap) ──
 (function() {
-  // Magyar idő (CET/CEST) megbízható számítása
-  const nowHU = (() => { const d = new Date(); const s = new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(d); const t = new Intl.DateTimeFormat('en-GB', {timeZone: 'Europe/Budapest', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false}).format(d); return new Date(s + 'T' + t); })();
-  const today = nowHU.getFullYear() + '-' +
-    String(nowHU.getMonth()+1).padStart(2,'0') + '-' +
-    String(nowHU.getDate()).padStart(2,'0');
-  const yestD = new Date(nowHU);
-  yestD.setDate(yestD.getDate() - 1);
-  const yesterday = yestD.getFullYear() + '-' +
-    String(yestD.getMonth()+1).padStart(2,'0') + '-' +
-    String(yestD.getDate()).padStart(2,'0');
+  const today = getBudapestDate();
+  // Tegnap: getBudapestDate() - 1 nap
+  const todayParts = today.split('-');
+  const d = new Date(Date.UTC(+todayParts[0], +todayParts[1]-1, +todayParts[2]));
+  d.setUTCDate(d.getUTCDate() - 1);
+  const yesterday = d.getUTCFullYear() + '-' +
+    String(d.getUTCMonth()+1).padStart(2,'0') + '-' +
+    String(d.getUTCDate()).padStart(2,'0');
   const wrap = document.getElementById('todayUpdateWrap');
   const msg  = document.getElementById('todayUpdateMsg');
   if (!wrap || !msg) return;
