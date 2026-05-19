@@ -1379,9 +1379,10 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   </button>
   
   <!-- Támogató gomb -->
-  <button id="supportHeaderBtn" class="story-btn" style="padding:10px 10px; flex-direction:row; gap:4px; background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!">
-   <span style="font-size:16px;">❤️</span>
-   <span style="font-size:11px; font-weight:700;" class="support-btn-label">Támogass!</span>
+  <button id="supportHeaderBtn" class="story-btn" style="padding:8px 10px; flex-direction:column; gap:2px; background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!">
+   <span style="font-size:14px;">❤️</span>
+   <span style="font-size:10px; font-weight:700; line-height:1.1;" class="support-btn-label">Támogass!</span>
+   <span style="font-size:9px; font-weight:700; color:#FFE066; line-height:1.1; letter-spacing:0.3px;">FELMÉRÉS</span>
   </button>
 
   <!-- Dark mode toggle -->
@@ -1459,7 +1460,12 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    const modal = document.getElementById('supportModal');
    if (btn && modal) {
      btn.addEventListener('click', function() {
-       modal.style.visibility='visible'; modal.style.pointerEvents='auto'; modal.style.opacity='1';
+       const survey = document.getElementById('surveyWidget');
+       if (survey) {
+         survey.scrollIntoView({behavior:'smooth', block:'center'});
+         survey.style.outline = '2px solid #CE2939';
+         setTimeout(() => { survey.style.outline = ''; }, 1500);
+       }
      });
      modal.addEventListener('click', function(e) {
        if (e.target === this) closeSupportModal();
@@ -2382,88 +2388,6 @@ body.dark .wallet-nav-btn .label {
  }
  </script>
 
- <!-- ========= TÁMOGATÓI WIDGET ========= -->
- <div id="supportWidget" style="max-width:800px; margin:0 auto 40px; background:var(--bg-card); border-radius:16px; padding:24px 28px; box-shadow:0 2px 12px rgba(0,0,0,0.08); position:relative; overflow:hidden;">
-  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:url(\"data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.06)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E\");background-repeat:repeat;background-size:200px 120px;pointer-events:none;z-index:0;border-radius:16px;"></div>
-  <div style="position:relative;z-index:1;">
-   <div style="font-size:18px;font-weight:700;color:var(--text-main);margin-bottom:6px;">🧱 Támogasd a független ígéretkövetőt</div>
-   <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">A napi automatikus frissítéshez és az oldal fejlesztéséhez havi <strong>6 500 Ft</strong> szükséges (Claude Pro előfizetés). Ha hasznosnak találod az oldalt, segíts elérni a célt!</div>
-
-   <!-- Progress bar -->
-   <div style="background:rgba(0,0,0,0.08);border-radius:999px;height:12px;margin-bottom:8px;overflow:hidden;">
-    <div id="supportBar" style="height:12px;border-radius:999px;background:linear-gradient(90deg,#CE2939,#e8405a);transition:width .5s ease;" ></div>
-   </div>
-   <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:18px;">
-    <span style="color:var(--text-muted);">Összegyűlt: <strong id="supportCollected" style="color:var(--text-main);">–</strong></span>
-    <span style="color:var(--text-muted);">Cél: <strong style="color:var(--text-main);">6 500 Ft/hó</strong></span>
-   </div>
-
-   <!-- Összeg gombok -->
-   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;" id="supportAmounts">
-    <button onclick="selectSupport(this,250)" class="support-amt-btn support-amt-selected" style="padding:10px 4px;border:1.5px solid #CE2939;border-radius:10px;background:var(--bg-card);color:#CE2939;font-size:13px;font-weight:700;cursor:pointer;">250 Ft</button>
-    <button onclick="selectSupport(this,500)" class="support-amt-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">500 Ft</button>
-    <button onclick="selectSupport(this,1000)" class="support-amt-btn" style="padding:10px 4px;border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-weight:600;cursor:pointer;">1 000 Ft</button>
-   </div>
-
-   <!-- Támogat gomb -->
-   <a id="supportLink" href="https://ko-fi.com/teglarolteglara" target="_blank" rel="noopener" style="display:block;width:100%;padding:14px;background:linear-gradient(135deg,#CE2939,#a01020);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;margin-bottom:8px;">
-    ❤️ Küldök egy kávét – <span id="supportAmtLabel">250</span> Ft
-   </a>
-
-   <div style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.6;">Egyszeri · Regisztráció nélkül · Biztonságos Ko-fi fizetés</div>
-   <div id="supporterCount" style="font-size:13px;color:var(--text-muted);text-align:center;margin-top:6px;">– támogató eddig</div>
-  </div>
- </div>
-
- <script type="module">
- import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
- import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
- try {
-   const app = initializeApp({
-     apiKey: "AIzaSyCGcAomnRph4bZ35EWc45YT862PQUtRwSg",
-     databaseURL: "https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app",
-     projectId: "teglarol-teglara-voting",
-     appId: "1:304700871491:web:337089ed923d1fc362d5f6"
-   }, 'support-app');
-   const db = getDatabase(app);
-   onValue(ref(db, 'support'), snap => {
-     const d = snap.val() || {};
-     const collected = d.collected || 0;
-     const supporters = d.supporters || 0;
-     const goal = 6500;
-     const pct = Math.min(100, Math.round(collected / goal * 100));
-     document.getElementById('supportBar').style.width = pct + '%';
-     document.getElementById('supportCollected').textContent = collected.toLocaleString('hu-HU') + ' Ft';
-     document.getElementById('supporterCount').textContent = supporters + ' támogató eddig';
-     // Modal szinkronizálás
-     const pctM = Math.min(100, Math.round(collected / goal * 100));
-     const barM = document.getElementById('supportBarModal');
-     const colM = document.getElementById('supportCollectedModal');
-     const cntM = document.getElementById('supporterCountModal');
-     if (barM) barM.style.width = pctM + '%';
-     if (colM) colM.textContent = collected.toLocaleString('hu-HU') + ' Ft';
-     if (cntM) cntM.textContent = supporters + ' támogató eddig';
-   });
- } catch(e) {
-   document.getElementById('supportCollected').textContent = '–';
- }
- </script>
-
- <script>
- let supportAmt = 250;
- function selectSupport(el, amt) {
-   supportAmt = amt;
-   document.querySelectorAll('.support-amt-btn').forEach(b => {
-     b.style.border = '1px solid var(--border-subtle)';
-     b.style.color = 'var(--text-main)';
-     b.style.fontWeight = '600';
-   });
-   el.style.border = '1.5px solid #CE2939';
-   el.style.color = '#CE2939';
-   el.style.fontWeight = '700';
-   document.getElementById('supportAmtLabel').textContent = amt.toLocaleString('hu-HU');
- }
- </script>
  <!-- ========= KALKULÁTOR SZEKCIÓ =========  -->
  <div class="calc-section" id="calcSection" style="display:none;">
   <div class="calc-card">
