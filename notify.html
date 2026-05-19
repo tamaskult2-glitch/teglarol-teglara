@@ -161,16 +161,17 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">✅ MEGVALÓSULT: A rendeleti kormányzás megszüntetése!
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">✅ ÚJ MEGVALÓSULT: Kegyelmi dosszié nyilvánosan!
 
-2026. május 14-én hatályba lépett – hat év után megszűnt a különleges jogrend Magyarországon.
+2026. május 19-én Magyar Péter rendkívüli sajtótájékoztatón bemutatta
+a bicskei kegyelmi ügy IM-dossziéját (kormany.hu/igazsagtetel).
 
-📊 v1.8 frissítés – 16 tégla frissült ma:
-• Közbeszerzési rendszer: 250M Ft feletti kifizetések felfüggesztve
-• Ügynökakták: 2010–2026 kormányülési emlékeztetők nyilvánosságra
-• Átláthatósági szabályok: titkosított szerződések feloldása
-• Gyermekvédelem: bicskei ügy nyilvános kivizsgálása
-• EU Ügyészség, vagyonosodási vizsgálat, külpolitika és további téglák...</textarea>
+📊 Ver. 2.4 – 4 tégla frissítve:
+• Kegyelmi dosszié: MEGVALÓSULT (6 dokumentum nyilvános)
+• Vendégmunkás döntés: halasztva máj.26-ra
+• Sulyok Tamás: felszólítva Sándor-palotai dosszié közzétételére
+
+📊 105 tégla | 3 megvalósult | 73 bejelentve | 29 ígéret</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
@@ -204,16 +205,17 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `✅ MEGVALÓSULT: A rendeleti kormányzás megszüntetése!
+    dbInput.value = `✅ ÚJ MEGVALÓSULT: Kegyelmi dosszié nyilvánosan!
 
-2026. május 14-én hatályba lépett – hat év után megszűnt a különleges jogrend Magyarországon.
+2026. május 19-én Magyar Péter rendkívüli sajtótájékoztatón bemutatta
+a bicskei kegyelmi ügy IM-dossziéját (kormany.hu/igazsagtetel).
 
-📊 v1.8 frissítés – 16 tégla frissült ma:
-• Közbeszerzési rendszer: 250M Ft feletti kifizetések felfüggesztve
-• Ügynökakták: 2010–2026 kormányülési emlékeztetők nyilvánosságra
-• Átláthatósági szabályok: titkosított szerződések feloldása
-• Gyermekvédelem: bicskei ügy nyilvános kivizsgálása
-• EU Ügyészség, vagyonosodási vizsgálat, külpolitika és további téglák...`;
+📊 Ver. 2.4 – 4 tégla frissítve:
+• Kegyelmi dosszié: MEGVALÓSULT (6 dokumentum nyilvános)
+• Vendégmunkás döntés: halasztva máj.26-ra
+• Sulyok Tamás: felszólítva Sándor-palotai dosszié közzétételére
+
+📊 105 tégla | 3 megvalósult | 73 bejelentve | 29 ígéret`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
     dbInput.value = `💰 ÚJ: Pénztárcaindex oldal elindult!
