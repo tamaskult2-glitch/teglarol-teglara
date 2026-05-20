@@ -433,10 +433,10 @@ body.dark .dark-toggle-switch::after { transform:translateX(16px); }
 
 /* ---- MINI VIZ ---- */
 
-.share-btn { background:#CE2939; border:none; border-radius:8px; padding:4px 10px; font-size:12px; color:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:600; }
-.share-btn:active { opacity:.8; }
-.link-btn { background:none; border:0.5px solid var(--border-subtle); border-radius:8px; padding:4px 10px; font-size:12px; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
-.link-btn:hover { border-color:#CE2939; color:#CE2939; }
+.card-share-btn { background:#CE2939; border:none; border-radius:8px; padding:4px 10px; font-size:12px; color:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:600; }
+.card-share-btn:active { opacity:.8; }
+.card-link-btn { background:none; border:0.5px solid var(--border-subtle); border-radius:8px; padding:4px 10px; font-size:12px; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+.card-link-btn:hover { border-color:#CE2939; color:#CE2939; }
 .share-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:8px 18px; border-radius:10px; font-size:13px; opacity:0; pointer-events:none; transition:opacity .25s; z-index:9999; }
 .share-toast.visible { opacity:1; }
 
@@ -3177,6 +3177,13 @@ sidebarOverlay.addEventListener("click", closeSidebar);
 
 
 // ── Kártyaépítő segédfüggvény ──
+function slugify(str) {
+  return str.toLowerCase()
+    .replace(/[áàâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[íìîï]/g,'i')
+    .replace(/[óòôö]/g,'o').replace(/[úùûü]/g,'u').replace(/ő/g,'o').replace(/ű/g,'u')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+
 function buildCard(item) {
  const card = document.createElement("div");
  card.className = "card clickable";
@@ -3208,8 +3215,8 @@ function buildCard(item) {
    <div style="display:flex;align-items:center;gap:10px;">
     ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">🔗 Forrás</a>` : ""}
     <span style="font-size:13px;color:#888;">👆 Részletek</span>
-    <button class="link-btn" onclick="copyCardLink(event,'${slugify(title)}')" title="Link másolása">🔗 Link</button>
-    <button class="share-btn" onclick="shareCard(event,'${title}','${slugify(title)}')" title="Megosztás">↗ Megoszt</button>
+    <button class="card-link-btn" onclick="copyCardLink(event,this.dataset.slug)" data-slug="${slugify(title)}" title="Link másolása">🔗 Link</button>
+    <button class="card-share-btn" onclick="shareCard(event,this.dataset.slug)" data-slug="${slugify(title)}" title="Megosztás">↗ Megoszt</button>
    </div>
   </div>
  </div>
@@ -3224,6 +3231,8 @@ function buildCard(item) {
 
  card.addEventListener('click', (e) => {
   if (e.target.tagName === 'A') return;
+  if (e.target.tagName === 'BUTTON') return;
+  if (e.target.closest('button')) return;
   openModal(item);
  });
  return card;
@@ -3431,6 +3440,8 @@ function renderDashboard(data) {
 
  card.addEventListener('click', (e) => {
   if (e.target.tagName === 'A') return;
+  if (e.target.tagName === 'BUTTON') return;
+  if (e.target.closest('button')) return;
   openModal(item);
  });
  cardsGrid.appendChild(card);
@@ -3634,12 +3645,6 @@ document.querySelectorAll(".tl-leg-item").forEach(item => {
       // Összes tégla: alapértelmezett rendezés, minden kategória látható
       renderDashboard(excelData);
 
-function slugify(str) {
-  return str.toLowerCase()
-    .replace(/[áàâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[íìîï]/g,'i')
-    .replace(/[óòôö]/g,'o').replace(/[úùûü]/g,'u').replace(/ő/g,'o').replace(/ű/g,'u')
-    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-}
 
 // ── Toast helper ──
 (function() {
@@ -3659,27 +3664,25 @@ function _showToast(msg) {
 }
 
 function copyCardLink(e, slug) {
+  e.preventDefault();
   e.stopPropagation();
-  const url = window.location.origin + window.location.pathname + '#tegla-' + slug;
-  navigator.clipboard.writeText(url).then(() => _showToast('🔗 Link másolva!')).catch(() => {
-    prompt('Másold ki a linket:', url);
-  });
+  var url = location.origin + location.pathname + '#tegla-' + slug;
+  try { navigator.clipboard.writeText(url); _showToast('?? Link másolva!'); }
+  catch(err) { window.prompt('Másold ki:', url); }
 }
 
-async function shareCard(e, title, slug) {
+async function shareCard(e, slug) {
+  e.preventDefault();
   e.stopPropagation();
-  const url = window.location.origin + window.location.pathname + '#tegla-' + slug;
-  const shareData = {
-    title: title + ' – Tégláról-téglára',
-    text: 'Magyar ígéretkövető: ' + title,
-    url: url
-  };
+  var card = e.target.closest('[id^="tegla-"]') || e.target.closest('.card');
+  var titleEl = card ? card.querySelector('h3, strong') : null;
+  var title = titleEl ? titleEl.textContent.trim() : slug.replace(/-/g,' ');
+  var url = location.origin + location.pathname + '#tegla-' + slug;
   if (navigator.share) {
-    try { await navigator.share(shareData); } catch(err) {}
+    navigator.share({ title: title + ' – Tégláról-téglára', text: 'Magyar ígéretkövető: ' + title, url: url }).catch(function(){});
   } else {
-    navigator.clipboard.writeText(url).then(() => _showToast('🔗 Link másolva!')).catch(() => {
-      prompt('Másold ki a linket:', url);
-    });
+    try { navigator.clipboard.writeText(url); _showToast('?? Link másolva!'); }
+    catch(err2) { window.prompt('Másold ki:', url); }
   }
 }
 
