@@ -161,16 +161,15 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🏛️ Sulyok Tamás nem mond le – közjogi patthelyzet
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🌍 Varsó + ukrán gabona – 2 tégla frissítve
 
-Sulyok Index-interjúban visszautasította a lemondási felszólítást.
-Magyar Péter "Orbán Viktor báb köztársasági elnökének" nevezte.
-Máj.31 határidő után alkotmánymódosítás várható.
+• Magyar Péter ma Varsóban tárgyal Tuskkal (V4, EU-források, energiafüggetlenség)
+• Ukrán gabona: a Fidesz törvényjavaslatot nyújtott be a tilalom visszaállítására
+  (a TISZA kormány a veszélyhelyzet megszűntével elmulasztotta meghosszabbítani)
 
-📊 Ver. 2.6 – 1 tégla frissítve:
-• Közjogi méltóságok: Sulyok visszautasítás rögzítve
+📊 Ver. 2.6 – 106 tégla | 3 megvalósult | 73 bejelentve | 30 ígéret
 
-📊 106 tégla | 3 megvalósult | 73 bejelentve | 30 ígéret</textarea>
+⏳ Következő: máj.26 kormányülés (vendégmunkás döntés), máj.31 Sulyok határidő</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
@@ -204,16 +203,15 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🏛️ Sulyok Tamás nem mond le – közjogi patthelyzet
+    dbInput.value = `🌍 Varsó + ukrán gabona – 2 tégla frissítve
 
-Sulyok Index-interjúban visszautasította a lemondási felszólítást.
-Magyar Péter "Orbán Viktor báb köztársasági elnökének" nevezte.
-Máj.31 határidő után alkotmánymódosítás várható.
+• Magyar Péter ma Varsóban tárgyal Tuskkal (V4, EU-források, energiafüggetlenség)
+• Ukrán gabona: a Fidesz törvényjavaslatot nyújtott be a tilalom visszaállítására
+  (a TISZA kormány a veszélyhelyzet megszűntével elmulasztotta meghosszabbítani)
 
-📊 Ver. 2.6 – 1 tégla frissítve:
-• Közjogi méltóságok: Sulyok visszautasítás rögzítve
+📊 Ver. 2.6 – 106 tégla | 3 megvalósult | 73 bejelentve | 30 ígéret
 
-📊 106 tégla | 3 megvalósult | 73 bejelentve | 30 ígéret`;
+⏳ Következő: máj.26 kormányülés (vendégmunkás döntés), máj.31 Sulyok határidő`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
     dbInput.value = `💰 ÚJ: Pénztárcaindex oldal elindult!
