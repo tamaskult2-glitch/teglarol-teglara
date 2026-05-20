@@ -3215,8 +3215,8 @@ function buildCard(item) {
    <div style="display:flex;align-items:center;gap:10px;">
     ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">🔗 Forrás</a>` : ""}
     <span style="font-size:13px;color:#888;">👆 Részletek</span>
-    <button class="card-link-btn" onclick="copyCardLink(event,this.dataset.slug)" data-slug="${slugify(title)}" title="Link másolása">🔗 Link</button>
-    <button class="card-share-btn" onclick="shareCard(event,this.dataset.slug)" data-slug="${slugify(title)}" title="Megosztás">↗ Megoszt</button>
+    <button class="card-link-btn" data-action="copylink" data-slug="${slugify(title)}" title="Link másolása">🔗 Link</button>
+    <button class="card-share-btn" data-action="share" data-slug="${slugify(title)}" title="Megosztás">↗ Megoszt</button>
    </div>
   </div>
  </div>
@@ -3231,7 +3231,17 @@ function buildCard(item) {
 
  card.addEventListener('click', (e) => {
   if (e.target.tagName === 'A') return;
-  if (e.target.tagName === 'BUTTON') return;
+  // Share/link gombok kezelése
+  const btn = e.target.closest('button[data-action]');
+  if (btn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const action = btn.dataset.action;
+    const slug = btn.dataset.slug;
+    if (action === 'copylink') copyCardLink(slug);
+    if (action === 'share') shareCard(slug);
+    return;
+  }
   if (e.target.closest('button')) return;
   openModal(item);
  });
@@ -3440,7 +3450,17 @@ function renderDashboard(data) {
 
  card.addEventListener('click', (e) => {
   if (e.target.tagName === 'A') return;
-  if (e.target.tagName === 'BUTTON') return;
+  // Share/link gombok kezelése
+  const btn = e.target.closest('button[data-action]');
+  if (btn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const action = btn.dataset.action;
+    const slug = btn.dataset.slug;
+    if (action === 'copylink') copyCardLink(slug);
+    if (action === 'share') shareCard(slug);
+    return;
+  }
   if (e.target.closest('button')) return;
   openModal(item);
  });
@@ -3663,17 +3683,13 @@ function _showToast(msg) {
   t._tid = setTimeout(() => t.classList.remove('visible'), 2000);
 }
 
-function copyCardLink(e, slug) {
-  e.preventDefault();
-  e.stopPropagation();
+function copyCardLink(slug) {
   var url = location.origin + location.pathname + '#tegla-' + slug;
   try { navigator.clipboard.writeText(url); _showToast('?? Link másolva!'); }
   catch(err) { window.prompt('Másold ki:', url); }
 }
 
-async function shareCard(e, slug) {
-  e.preventDefault();
-  e.stopPropagation();
+async function shareCard(slug) {
   var card = e.target.closest('[id^="tegla-"]') || e.target.closest('.card');
   var titleEl = card ? card.querySelector('h3, strong') : null;
   var title = titleEl ? titleEl.textContent.trim() : slug.replace(/-/g,' ');
