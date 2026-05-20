@@ -161,17 +161,16 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">✅ ÚJ MEGVALÓSULT: Kegyelmi dosszié nyilvánosan!
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🏛️ Sulyok Tamás nem mond le – közjogi patthelyzet
 
-2026. május 19-én Magyar Péter rendkívüli sajtótájékoztatón bemutatta
-a bicskei kegyelmi ügy IM-dossziéját (kormany.hu/igazsagtetel).
+Sulyok Index-interjúban visszautasította a lemondási felszólítást.
+Magyar Péter "Orbán Viktor báb köztársasági elnökének" nevezte.
+Máj.31 határidő után alkotmánymódosítás várható.
 
-📊 Ver. 2.4 – 4 tégla frissítve:
-• Kegyelmi dosszié: MEGVALÓSULT (6 dokumentum nyilvános)
-• Vendégmunkás döntés: halasztva máj.26-ra
-• Sulyok Tamás: felszólítva Sándor-palotai dosszié közzétételére
+📊 Ver. 2.6 – 1 tégla frissítve:
+• Közjogi méltóságok: Sulyok visszautasítás rögzítve
 
-📊 105 tégla | 3 megvalósult | 73 bejelentve | 29 ígéret</textarea>
+📊 106 tégla | 3 megvalósult | 73 bejelentve | 30 ígéret</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
@@ -205,17 +204,16 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `✅ ÚJ MEGVALÓSULT: Kegyelmi dosszié nyilvánosan!
+    dbInput.value = `🏛️ Sulyok Tamás nem mond le – közjogi patthelyzet
 
-2026. május 19-én Magyar Péter rendkívüli sajtótájékoztatón bemutatta
-a bicskei kegyelmi ügy IM-dossziéját (kormany.hu/igazsagtetel).
+Sulyok Index-interjúban visszautasította a lemondási felszólítást.
+Magyar Péter "Orbán Viktor báb köztársasági elnökének" nevezte.
+Máj.31 határidő után alkotmánymódosítás várható.
 
-📊 Ver. 2.4 – 4 tégla frissítve:
-• Kegyelmi dosszié: MEGVALÓSULT (6 dokumentum nyilvános)
-• Vendégmunkás döntés: halasztva máj.26-ra
-• Sulyok Tamás: felszólítva Sándor-palotai dosszié közzétételére
+📊 Ver. 2.6 – 1 tégla frissítve:
+• Közjogi méltóságok: Sulyok visszautasítás rögzítve
 
-📊 105 tégla | 3 megvalósult | 73 bejelentve | 29 ígéret`;
+📊 106 tégla | 3 megvalósult | 73 bejelentve | 30 ígéret`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
     dbInput.value = `💰 ÚJ: Pénztárcaindex oldal elindult!
