@@ -432,6 +432,14 @@ body.dark .dark-toggle-switch { background:#7B93DB; }
 body.dark .dark-toggle-switch::after { transform:translateX(16px); }
 
 /* ---- MINI VIZ ---- */
+
+.share-btn { background:#CE2939; border:none; border-radius:8px; padding:4px 10px; font-size:12px; color:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:600; }
+.share-btn:active { opacity:.8; }
+.link-btn { background:none; border:0.5px solid var(--border-subtle); border-radius:8px; padding:4px 10px; font-size:12px; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+.link-btn:hover { border-color:#CE2939; color:#CE2939; }
+.share-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:8px 18px; border-radius:10px; font-size:13px; opacity:0; pointer-events:none; transition:opacity .25s; z-index:9999; }
+.share-toast.visible { opacity:1; }
+
 .card-split { display:flex; gap:20px; align-items:stretch; }
 .card-split .card-body { flex:1 1 60%; min-width:0; }
 .card-split .card-viz { flex:0 0 240px; min-width:0; border-left:1px solid var(--border-subtle); padding-left:20px; display:flex; flex-direction:column; justify-content:center; gap:6px; }
@@ -3179,6 +3187,7 @@ function buildCard(item) {
  const priLabel = pri === "azonnali" ? "🔴 Azonnali" : pri === "hosszu" ? "🟢 Hosszú táv" : "🟡 Rövid táv";
  const priCls = `priority-${pri}`;
  card.dataset.priority = pri;
+ card.id = 'tegla-' + slugify(title);
  const today = getBudapestDate();
  const freshBadge = item["Frissítés"] === today ? '<span class="fresh-badge">● Ma</span>' : '';
 
@@ -3199,6 +3208,8 @@ function buildCard(item) {
    <div style="display:flex;align-items:center;gap:10px;">
     ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">🔗 Forrás</a>` : ""}
     <span style="font-size:13px;color:#888;">👆 Részletek</span>
+    <button class="link-btn" onclick="copyCardLink(event,'${slugify(title)}')" title="Link másolása">🔗 Link</button>
+    <button class="share-btn" onclick="shareCard(event,'${title}','${slugify(title)}')" title="Megosztás">↗ Megoszt</button>
    </div>
   </div>
  </div>
@@ -3622,6 +3633,83 @@ document.querySelectorAll(".tl-leg-item").forEach(item => {
     if (status === "__all__") {
       // Összes tégla: alapértelmezett rendezés, minden kategória látható
       renderDashboard(excelData);
+
+function slugify(str) {
+  return str.toLowerCase()
+    .replace(/[áàâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[íìîï]/g,'i')
+    .replace(/[óòôö]/g,'o').replace(/[úùûü]/g,'u').replace(/ő/g,'o').replace(/ű/g,'u')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+
+// ── Toast helper ──
+(function() {
+  const toast = document.createElement('div');
+  toast.className = 'share-toast';
+  toast.id = 'shareToast';
+  document.body.appendChild(toast);
+})();
+
+function _showToast(msg) {
+  const t = document.getElementById('shareToast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('visible');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('visible'), 2000);
+}
+
+function copyCardLink(e, slug) {
+  e.stopPropagation();
+  const url = window.location.origin + window.location.pathname + '#tegla-' + slug;
+  navigator.clipboard.writeText(url).then(() => _showToast('🔗 Link másolva!')).catch(() => {
+    prompt('Másold ki a linket:', url);
+  });
+}
+
+async function shareCard(e, title, slug) {
+  e.stopPropagation();
+  const url = window.location.origin + window.location.pathname + '#tegla-' + slug;
+  const shareData = {
+    title: title + ' – Tégláról-téglára',
+    text: 'Magyar ígéretkövető: ' + title,
+    url: url
+  };
+  if (navigator.share) {
+    try { await navigator.share(shareData); } catch(err) {}
+  } else {
+    navigator.clipboard.writeText(url).then(() => _showToast('🔗 Link másolva!')).catch(() => {
+      prompt('Másold ki a linket:', url);
+    });
+  }
+}
+
+// ── Hash deep link: megnyitáskor ugrik a tégla kártyára ──
+function handleHashDeepLink() {
+  const hash = window.location.hash;
+  if (!hash || !hash.startsWith('#tegla-')) return;
+  const slug = hash.slice(1);
+  // Megvárjuk a renderelést, majd keressük a kártyát
+  const tryScroll = (attempts) => {
+    const el = document.getElementById(slug);
+    if (el) {
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.style.outline = '2.5px solid #CE2939';
+        el.style.outlineOffset = '3px';
+        setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 2500);
+        // Kinyitjuk a részleteket ha össze van csukva
+        el.click();
+      }, 150);
+    } else if (attempts > 0) {
+      setTimeout(() => tryScroll(attempts - 1), 300);
+    }
+  };
+  tryScroll(10);
+}
+
+window.addEventListener('DOMContentLoaded', handleHashDeepLink);
+window.addEventListener('hashchange', handleHashDeepLink);
+
       document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
       document.querySelector(".sort-btn[data-sort='default']").classList.add("active");
       currentSort = "default";
