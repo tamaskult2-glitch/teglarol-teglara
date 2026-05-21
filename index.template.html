@@ -433,11 +433,11 @@ body.dark .dark-toggle-switch::after { transform:translateX(16px); }
 
 /* ---- MINI VIZ ---- */
 
-.card-share-btn { background:#CE2939; border:none; border-radius:8px; padding:4px 10px; font-size:12px; color:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:600; }
-.card-share-btn:active { opacity:.8; }
-.card-link-btn { background:none; border:0.5px solid var(--border-subtle); border-radius:8px; padding:4px 10px; font-size:12px; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
-.card-link-btn:hover { border-color:#CE2939; color:#CE2939; }
-.share-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:8px 18px; border-radius:10px; font-size:13px; opacity:0; pointer-events:none; transition:opacity .25s; z-index:9999; }
+
+
+
+
+
 .share-toast.visible { opacity:1; }
 
 .card-split { display:flex; gap:20px; align-items:stretch; }
@@ -1439,29 +1439,7 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
    el.style.color = '#CE2939';
    el.style.fontWeight = '700';
    document.getElementById('supportModalAmtLabel').textContent = amt.toLocaleString('hu-HU');
-   const viccek = {
-     250: [
-       '\u2615 Ennyi a reggeli k\u00e1v\u00e9d \u00e1ra. Mi meg egy eg\u00e9sz korm\u00e1nyt k\u00f6vet\u00fcnk nyomon.',
-       '\ud83e\udde1 250 Ft. Egy t\u00e9gla. Sz\u00f3 szerint.',
-       '\ud83d\ude04 Magyar P\u00e9ter: "\u00daj \u00e9let kezd\u0151dik." \u2013 Na, akkor t\u00e1mogasd az \u00edg\u00e9retk\u00f6vet\u0151t is!'
-     ],
-     500: [
-       '\ud83c\udf7a F\u00e9l s\u00f6r \u00e1ra. De ez nem folyik le a lefoly\u00f3n \u2013 ez t\u00e9gl\u00e1kat k\u00f6vet.',
-       '\ud83d\udc4d Magyar P\u00e9ter: "Elh\u00e9tta a s\u00fcllyed\u0151 haj\u00f3t." \u2013 Te meg ink\u00e1bb az \u00edg\u00e9retk\u00f6vet\u0151t t\u00e1mogatod.',
-       '500 Ft = 2 napig figy\u00e9lj\u00fck helyetted a korm\u00e1nyt. Meg\u00e9ri.'
-     ],
-     1000: [
-       '\ud83c\udfc6 Ezer forint! Ro\u00f3n Antal v\u00e9gkiel\u00e9g\u00edt\u00e9s\u00e9nek a huszonharmadmilliomod r\u00e9sz\u00e9t k\u00f6veted nyomon.',
-       '\u270a Magyar P\u00e9ter: "Az \u00e9n \u00e9rtelmez\u00e9sem szerint ez b\u0171ncselekmény." \u2013 Te meg t\u00e1mogatod, hogy sz\u00e1mon k\u00e9rj\u00fck.',
-       '1000 Ft-\u00e9rt egy h\u00e9tig friss\u00edt\u00fcnk. Te fizeted, mi dolgozunk. Fair deal.'
-     ]
-   };
-   const msgEl = document.getElementById('supportFunMsg');
-   if (msgEl && viccek[amt]) {
-     const list = viccek[amt];
-     msgEl.textContent = list[Math.floor(Math.random() * list.length)];
-     msgEl.style.display = 'block';
-   }
+   // Vicces üzenetek eltávolítva (emoji surrogate hiba miatt)
  }
  document.addEventListener('DOMContentLoaded', function() {
    const btn = document.getElementById('supportHeaderBtn');
@@ -2210,7 +2188,7 @@ body.dark .wallet-nav-btn .label {
  let selectedVotes = new Set();
  let totalVotes = 0;
  let firebaseInitialized = false;
- function hasVoted() { return localStorage.getItem('teglarol_voted') === 'true'; }
+ function hasVoted() { return safeStorage.getItem('teglarol_voted') === 'true'; }
  function renderVotes(votes) {
    voteLoading.style.display = 'none';
    totalVotes = Object.values(votes).reduce((sum, v) => sum + (v || 0), 0);
@@ -2270,7 +2248,7 @@ body.dark .wallet-nav-btn .label {
          const voteRef = ref(db, `votes/${voteId}`);
          await runTransaction(voteRef, (current) => (current || 0) + 1);
        }
-       localStorage.setItem('teglarol_voted', 'true');
+       safeStorage.setItem('teglarol_voted', 'true');
        successMsg.style.display = 'block';
        voteList.style.opacity = '0.6';
        voteList.style.pointerEvents = 'none';
@@ -2340,7 +2318,7 @@ body.dark .wallet-nav-btn .label {
  <script>
  const SURVEY_KEY = 'ttr_survey_voted';
  // Ha már szavazott: mutasd az eredményt
- if (localStorage.getItem(SURVEY_KEY)) {
+ if (safeStorage.getItem(SURVEY_KEY)) {
    document.getElementById('surveyButtons').style.display = 'none';
    document.querySelector('#surveyWidget button:last-of-type').style.display = 'none';
    document.getElementById('surveyResult').style.display = 'block';
@@ -2370,13 +2348,13 @@ body.dark .wallet-nav-btn .label {
  }
 
  async function submitSurvey(el, val) {
-   if (localStorage.getItem(SURVEY_KEY)) return;
+   if (safeStorage.getItem(SURVEY_KEY)) return;
    // Gomb visszajelzés
    document.querySelectorAll('.survey-opt-btn').forEach(b => b.disabled = true);
    el.style.background = '#CE2939';
    el.style.color = '#fff';
    el.style.borderColor = '#CE2939';
-   localStorage.setItem(SURVEY_KEY, val);
+   safeStorage.setItem(SURVEY_KEY, val);
    // Firebase mentés
    if (window._surveyRef && window._surveyRunTransaction) {
      try {
@@ -2790,7 +2768,7 @@ body.dark .wallet-nav-btn .label {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#e8405a"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 2.6 <span class="story-tl-date">2026.05.20</span></div>
+      <div class="story-tl-ver">Ver. 2.7 <span class="story-tl-date">2026.05.21</span></div>
       <div class="story-tl-desc">🏛️ Rendeleti kormányzás megszüntetése: MEGVALÓSULT (máj.14 hatályba lépett). 16 tégla frissítve az ópusztaszeri első kormányülés döntései alapján. ✅ Megvalósult státusz bevezetése (volt: Teljesítve). 💰 Pénztárcaindex oldal hozzáadva: árak összehasonlítása áradás előtt vs. TISZA ígéretek. 🌙 Auto dark mód (este 8 – reggel 6). Melléthei-Barna hivatkozások eltávolítva. Időzóna számítás javítva (Europe/Budapest).</div>
      </div>
     </div>
@@ -3071,8 +3049,8 @@ if (prevCatBtn) {
 (function() {
   const h = (new Date().getUTCHours() + 2) % 24;
   const autoDark = h >= 20 || h < 6;
-  const hasManual = localStorage.getItem('ttm_dark_manual');
-  const savedDark = localStorage.getItem('ttm_dark');
+  const hasManual = safeStorage.getItem('ttm_dark_manual');
+  const savedDark = safeStorage.getItem('ttm_dark');
 
   if (hasManual) {
     // Manuálisan beállított → megtartjuk
@@ -3080,7 +3058,7 @@ if (prevCatBtn) {
   } else {
     // Automatikus időalapú
     document.body.classList.toggle('dark', autoDark);
-    localStorage.setItem('ttm_dark', autoDark ? '1' : '0');
+    safeStorage.setItem('ttm_dark', autoDark ? '1' : '0');
   }
   // Ikon frissítése
   const iconEl = document.getElementById('darkToggleIconHeader');
@@ -3095,8 +3073,8 @@ if (darkToggleHeader) {
   const isDark = document.body.classList.contains("dark");
   document.getElementById("darkToggleIconHeader").textContent = isDark ? "☀️" : "🌙";
   // Manuális váltás jelzése – ne írja felül az auto
-  localStorage.setItem('ttm_dark_manual', '1');
-  localStorage.setItem('ttm_dark', isDark ? '1' : '0');
+  safeStorage.setItem('ttm_dark_manual', '1');
+  safeStorage.setItem('ttm_dark', isDark ? '1' : '0');
   if (typeof excelData !== 'undefined' && excelData.length) drawChart(excelData);
  });
 }
@@ -3177,12 +3155,7 @@ sidebarOverlay.addEventListener("click", closeSidebar);
 
 
 // ── Kártyaépítő segédfüggvény ──
-function slugify(str) {
-  return str.toLowerCase()
-    .replace(/[áàâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[íìîï]/g,'i')
-    .replace(/[óòôö]/g,'o').replace(/[úùûü]/g,'u').replace(/ő/g,'o').replace(/ű/g,'u')
-    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-}
+
 
 function buildCard(item) {
  const card = document.createElement("div");
@@ -3194,7 +3167,6 @@ function buildCard(item) {
  const priLabel = pri === "azonnali" ? "🔴 Azonnali" : pri === "hosszu" ? "🟢 Hosszú táv" : "🟡 Rövid táv";
  const priCls = `priority-${pri}`;
  card.dataset.priority = pri;
- card.id = 'tegla-' + slugify(title);
  const today = getBudapestDate();
  const freshBadge = item["Frissítés"] === today ? '<span class="fresh-badge">● Ma</span>' : '';
 
@@ -3207,16 +3179,14 @@ function buildCard(item) {
   </div>
   <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
   <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
-   ${item["FiDeSZ állapot"] ? `<div style="font-size:13px;color:var(--text-secondary);padding:6px 10px;background:var(--bg-main);border-radius:8px;line-height:1.4;"><span style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;">Előtte:</span> ${item["FiDeSZ állapot"]}</div>` : ""}
+   ${fidesszHtml}
    <div style="font-size:14px;color:var(--text-main);line-height:1.5;"><span style="font-weight:700;">Előrelépés:</span> ${item["Volt előrelépést jelentő bejelentés?"] || "–"}</div>
   </div>
   <div style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
    <span style="font-size:13px;color:var(--text-secondary);">${_dAgo(item["Frissítés"])}</span>
    <div style="display:flex;align-items:center;gap:10px;">
-    ${item["Forrás link"] ? `<a href="${item["Forrás link"]}" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">🔗 Forrás</a>` : ""}
+    ${item["Forrás link"] ? ('<a href="' + item["Forrás link"] + '" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">\ud83d\udd17 Forrás</a>') : ""}
     <span style="font-size:13px;color:#888;">👆 Részletek</span>
-    <button class="card-link-btn" onclick="event.stopPropagation();cardCopyLink(this.getAttribute('data-s'))" data-s="${slugify(title)}" title="Link másolása">🔗 Link</button>
-    <button class="card-share-btn" onclick="event.stopPropagation();cardShare(this.getAttribute('data-s'))" data-s="${slugify(title)}" title="Megosztás">↗ Megoszt</button>
    </div>
   </div>
  </div>
@@ -3645,128 +3615,23 @@ document.querySelectorAll(".tl-leg-item").forEach(item => {
 
 
 // ── Toast helper ──
-(function() {
-  const toast = document.createElement('div');
-  toast.className = 'share-toast';
-  toast.id = 'shareToast';
-  document.body.appendChild(toast);
-})();
 
-function _showToast(msg) {
-  const t = document.getElementById('shareToast');
-  if (!t) return;
-  t.textContent = msg;
-  t.classList.add('visible');
-  clearTimeout(t._tid);
-  t._tid = setTimeout(() => t.classList.remove('visible'), 2000);
-}
 
-function cardCopyLink(slug) {
-  var url = location.origin + location.pathname + '#tegla-' + slug;
-  // Mindig megmutatjuk a linket + próbálunk másolni
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(url).then(function() {
-      _showToast('🔗 Link másolva!');
-    }).catch(function() {
-      _showLinkPopup(url);
-    });
-  } else {
-    _showLinkPopup(url);
-  }
-}
 
-function _showLinkPopup(url) {
-  var ex = document.getElementById('linkPopup');
-  if (ex) ex.remove();
-  var popup = document.createElement('div');
-  popup.id = 'linkPopup';
-  popup.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg-card,#fff);border:1.5px solid #CE2939;border-radius:12px;padding:14px 16px;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,0.18);max-width:90vw;min-width:280px;';
-  var label = document.createElement('div');
-  label.style.cssText = 'font-size:13px;font-weight:600;color:#CE2939;margin-bottom:8px;';
-  label.textContent = '🔗 Másold ki a linket:';
-  var inp = document.createElement('input');
-  inp.id = 'linkPopupInput';
-  inp.value = url;
-  inp.readOnly = true;
-  inp.style.cssText = 'width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:12px;box-sizing:border-box;';
-  var row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:8px;margin-top:10px;';
-  var copyBtn = document.createElement('button');
-  copyBtn.textContent = 'Másolás';
-  copyBtn.style.cssText = 'flex:1;padding:8px;background:#CE2939;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;';
-  copyBtn.onclick = function() { inp.select(); document.execCommand('copy'); _showToast('🔗 Link másolva!'); popup.remove(); };
-  var closeBtn = document.createElement('button');
-  closeBtn.textContent = '✕';
-  closeBtn.style.cssText = 'padding:8px 14px;background:#f0f0f0;border:none;border-radius:8px;font-size:13px;cursor:pointer;';
-  closeBtn.onclick = function() { popup.remove(); };
-  row.appendChild(copyBtn);
-  row.appendChild(closeBtn);
-  popup.appendChild(label);
-  popup.appendChild(inp);
-  popup.appendChild(row);
-  document.body.appendChild(popup);
-  setTimeout(function() { inp.select(); }, 50);
-}
 
-function cardShare(slug) {
-  var url = location.origin + location.pathname + '#tegla-' + slug;
-  if (navigator.share) {
-    navigator.share({ title: 'Tégláról-téglára', url: url }).catch(function(){});
-  } else {
-    try {
-      navigator.clipboard.writeText(url);
-      _showToast('🔗 Link másolva!');
-    } catch(e2) {
-      window.prompt('Másold ki:', url);
-    }
-  }
-}
 
-function copyCardLink(slug) {
-  var url = location.origin + location.pathname + '#tegla-' + slug;
-  try { navigator.clipboard.writeText(url); _showToast('?? Link másolva!'); }
-  catch(err) { window.prompt('Másold ki:', url); }
-}
 
-async function shareCard(slug) {
-  var card = e.target.closest('[id^="tegla-"]') || e.target.closest('.card');
-  var titleEl = card ? card.querySelector('h3, strong') : null;
-  var title = titleEl ? titleEl.textContent.trim() : slug.replace(/-/g,' ');
-  var url = location.origin + location.pathname + '#tegla-' + slug;
-  if (navigator.share) {
-    navigator.share({ title: title + ' – Tégláról-téglára', text: 'Magyar ígéretkövető: ' + title, url: url }).catch(function(){});
-  } else {
-    try { navigator.clipboard.writeText(url); _showToast('?? Link másolva!'); }
-    catch(err2) { window.prompt('Másold ki:', url); }
-  }
-}
+
+
+
+
+
+
+async 
 
 // ── Hash deep link: megnyitáskor ugrik a tégla kártyára ──
-function handleHashDeepLink() {
-  const hash = window.location.hash;
-  if (!hash || !hash.startsWith('#tegla-')) return;
-  const slug = hash.slice(1);
-  // Megvárjuk a renderelést, majd keressük a kártyát
-  const tryScroll = (attempts) => {
-    const el = document.getElementById(slug);
-    if (el) {
-      setTimeout(() => {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.style.outline = '2.5px solid #CE2939';
-        el.style.outlineOffset = '3px';
-        setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 2500);
-        // Kinyitjuk a részleteket ha össze van csukva
-        el.click();
-      }, 150);
-    } else if (attempts > 0) {
-      setTimeout(() => tryScroll(attempts - 1), 300);
-    }
-  };
-  tryScroll(10);
-}
 
-window.addEventListener('DOMContentLoaded', handleHashDeepLink);
-window.addEventListener('hashchange', handleHashDeepLink);
+
 
       document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
       document.querySelector(".sort-btn[data-sort='default']").classList.add("active");
@@ -3970,15 +3835,7 @@ function openModal(item) {
  tag.style.color = "#333";
 
  const meta = document.getElementById("modalMeta");
- meta.innerHTML = `
- <div class="modal-meta-item">
- <strong>Státusz</strong>
- <span class="badge ${st.cls}">${st.label}</span>
- </div>
- ${item["FiDeSZ állapot"] ? `<div class="modal-meta-item"><strong>„áradás" előtt</strong>${item["FiDeSZ állapot"]}</div>` : ""}
- <div class="modal-meta-item"><strong>Frissítve</strong>${item["Frissítés"] || "-"}</div>
- <div class="modal-meta-item"><strong>Előrelépés</strong>${item["Volt előrelépést jelentő bejelentés?"] || "-"}</div>
- `;
+ meta.innerHTML = '\n <div class="modal-meta-item">\n <strong>St\u00e1tusz</strong>\n <span class="badge ' + st.cls + '">' + st.label + '</span>\n </div>\n' + (item["FiDeSZ \u00e1llapot"] ? '<div class="modal-meta-item"><strong>\u201e\u00e1rad\u00e1s\u201d el\u0151tt</strong>' + item["FiDeSZ \u00e1llapot"] + '</div>' : '') + '\n <div class="modal-meta-item"><strong>Friss\u00edtve</strong>' + (item["Friss\u00edt\u00e9s"] || '-') + '</div>\n <div class="modal-meta-item"><strong>El\u0151rel\u00e9p\u00e9s</strong>' + (item["Volt el\u0151rel\u00e9p\u00e9st jelent\u0151 bejelent\u00e9s?"] || '-') + '</div>\n';
 
  overlay.classList.add("active");
  document.body.style.overflow = "hidden";
@@ -4177,6 +4034,15 @@ const excelData = __DATA_PLACEHOLDER__;
 
 
 // Budapest dátum megbízható lekérése (iOS Safari kompatibilis)
+// Safe safeStorage wrapper (sandbox környezetben is működik)
+var safeStorage = (function() {
+  try { safeStorage.setItem('_t','1'); safeStorage.removeItem('_t'); return safeStorage; }
+  catch(e) {
+    var mem = {};
+    return { getItem: function(k){ return mem[k]||null; }, setItem: function(k,v){ mem[k]=v; }, removeItem: function(k){ delete mem[k]; } };
+  }
+})();
+
 function getBudapestDate() {
   return new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(new Date());
 }
@@ -4672,8 +4538,8 @@ document.getElementById('subBtn').addEventListener('click', async function() {
   }
   document.getElementById('subEmail').style.borderColor = '';
 
-  // Dupla feliratkozás check localStorage-ból
-  const local = JSON.parse(localStorage.getItem('ttm_subs') || '[]');
+  // Dupla feliratkozás check safeStorage-ból
+  const local = JSON.parse(safeStorage.getItem('ttm_subs') || '[]');
   if (local.includes(email)) {
     msg.style.color = '#888';
     msg.textContent = 'Már fel vagy iratkozva!';
@@ -4687,7 +4553,7 @@ document.getElementById('subBtn').addEventListener('click', async function() {
   try {
     await saveSubscriber(email);
     local.push(email);
-    localStorage.setItem('ttm_subs', JSON.stringify(local));
+    safeStorage.setItem('ttm_subs', JSON.stringify(local));
     msg.style.color = '#2da44e';
     msg.textContent = '✅ Feliratkoztál! Frissítésekről értesítünk.';
     msg.style.display = 'block';
@@ -5888,7 +5754,7 @@ function openStory() {
     const pb = document.getElementById('statProgress');
     if (pb) setTimeout(() => pb.style.width = pct + '%', 50);
     try {
-      const cached = JSON.parse(localStorage.getItem('igmero_cache') || '{}');
+      const cached = JSON.parse(safeStorage.getItem('igmero_cache') || '{}');
       if (cached.total) sa('statVisitors', cached.total.toLocaleString('hu-HU'));
     } catch(e) {}
     
@@ -5951,12 +5817,12 @@ if (votingBtn) {
   const dots = document.querySelectorAll(".tour-dot");
 
 // Auto-open névjegy első látogatóknál
-  if (!localStorage.getItem('ttm_visited_v3')) {
+  if (!safeStorage.getItem('ttm_visited_v3')) {
     setTimeout(() => {
       const so = document.getElementById('storyOverlay');
       if (so) { so.classList.add('active'); if(typeof openStory==='function') openStory(); }
     }, 800);
-    localStorage.setItem('ttm_visited_v3', '1');
+    safeStorage.setItem('ttm_visited_v3', '1');
   }
 
   const prev = document.getElementById("tourPrev");
