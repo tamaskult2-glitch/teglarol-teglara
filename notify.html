@@ -161,15 +161,17 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🌍 Varsó + ukrán gabona – 2 tégla frissítve
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 5 tégla frissítve ma (2026. máj. 22.)
 
-• Magyar Péter ma Varsóban tárgyal Tuskkal (V4, EU-források, energiafüggetlenség)
-• Ukrán gabona: a Fidesz törvényjavaslatot nyújtott be a tilalom visszaállítására
-  (a TISZA kormány a veszélyhelyzet megszűntével elmulasztotta meghosszabbítani)
+• 🏛️ EPPO csatlakozás előkészítve: MK 47. szám, 1144/2026. KH – határidő jún. 1.
+• 💰 Vagyonadó jogalkotás megindult: MK 47. szám, 1147/2026. KH – határidő jún. 5.
+• 🇪🇺 Uniós források: Magyar Péter máj.21. Bécsben tárgyalt, aug. 31. határidő megerősítve
+• 🤝 V4 együttműködés: Magyar Péter–Tusk tárgyalás Varsóban (máj. 20.)
+• 🚫 Vendégmunkás-stop: 2026. június 1-től moratórium az EU-n kívüli engedélyekre
 
-📊 Ver. 2.6 – 106 tégla | 3 megvalósult | 73 bejelentve | 30 ígéret
+📊 Ver. 2.8 – 103 tégla | 3 megvalósult | 70 bejelentve | 30 ígéret
 
-⏳ Következő: máj.26 kormányülés (vendégmunkás döntés), máj.31 Sulyok határidő</textarea>
+🔗 teglarol-teglara.hu</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
@@ -203,15 +205,17 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🌍 Varsó + ukrán gabona – 2 tégla frissítve
+    dbInput.value = `🧱 5 tégla frissítve ma (2026. máj. 22.)
 
-• Magyar Péter ma Varsóban tárgyal Tuskkal (V4, EU-források, energiafüggetlenség)
-• Ukrán gabona: a Fidesz törvényjavaslatot nyújtott be a tilalom visszaállítására
-  (a TISZA kormány a veszélyhelyzet megszűntével elmulasztotta meghosszabbítani)
+• 🏛️ EPPO csatlakozás előkészítve: MK 47. szám, 1144/2026. KH – határidő jún. 1.
+• 💰 Vagyonadó jogalkotás megindult: MK 47. szám, 1147/2026. KH – határidő jún. 5.
+• 🇪🇺 Uniós források: Magyar Péter máj.21. Bécsben tárgyalt, aug. 31. határidő megerősítve
+• 🤝 V4 együttműködés: Magyar Péter–Tusk tárgyalás Varsóban (máj. 20.)
+• 🚫 Vendégmunkás-stop: 2026. június 1-től moratórium az EU-n kívüli engedélyekre
 
-📊 Ver. 2.6 – 106 tégla | 3 megvalósult | 73 bejelentve | 30 ígéret
+📊 Ver. 2.8 – 103 tégla | 3 megvalósult | 70 bejelentve | 30 ígéret
 
-⏳ Következő: máj.26 kormányülés (vendégmunkás döntés), máj.31 Sulyok határidő`;
+🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
     dbInput.value = `💰 ÚJ: Pénztárcaindex oldal elindult!
