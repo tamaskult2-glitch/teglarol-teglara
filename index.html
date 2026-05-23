@@ -1596,6 +1596,45 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
+
+ <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
+ <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
+  <svg class="progress-ring-svg" width="90" height="90" viewBox="0 0 90 90">
+   <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border-subtle)" stroke-width="10"/>
+   <!-- Ígéret (piros) - alul -->
+   <circle id="ringProm" cx="45" cy="45" r="38" fill="none" stroke="#e8405a" stroke-width="10"
+    stroke-linecap="butt" stroke-dasharray="0 502"
+    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1)"/>
+   <!-- Bejelentve (narancs) - középen -->
+   <circle id="ringAnn" cx="45" cy="45" r="38" fill="none" stroke="#FF9933" stroke-width="10"
+    stroke-linecap="butt" stroke-dasharray="0 502"
+    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1) 0.15s"/>
+   <!-- Megvalósult (zöld) - felül, kicsit vastagabb hogy látszódjon -->
+   <circle id="ringDone" cx="45" cy="45" r="38" fill="none" stroke="#2ecc71" stroke-width="12"
+    stroke-linecap="round" stroke-dasharray="0 502"
+    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1) 0.3s"/>
+   <text x="45" y="49" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text-main)" id="ringTotal">–</text>
+  </svg>
+  <div class="progress-ring-legend">
+   <div class="prl-item" onclick="filterByStatus('done')" title="Megvalósult téglák">
+    <div class="prl-dot" style="background:#2ecc71"></div>
+    <span class="prl-count" id="ringCountDone">–</span>
+    <span class="prl-label">megvalósult</span>
+   </div>
+   <div class="prl-item" onclick="filterByStatus('announced')" title="Bejelentett téglák">
+    <div class="prl-dot" style="background:#FF9933"></div>
+    <span class="prl-count" id="ringCountAnn">–</span>
+    <span class="prl-label">bejelentve</span>
+   </div>
+   <div class="prl-item" onclick="filterByStatus('promise')" title="Csak ígéret téglák">
+    <div class="prl-dot" style="background:#e8405a"></div>
+    <span class="prl-count" id="ringCountProm">–</span>
+    <span class="prl-label">csak ígéret</span>
+   </div>
+   <div class="prl-total" id="ringTotalLabel">103 ígéret összesen</div>
+  </div>
+ </div>
+
  <p id="tesztBadgeWrap" style="text-align:center;margin-top:12px;">
   <span style="display:inline-block;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1.5px solid rgba(192,24,58,0.3);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:600;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
    <span id="tesztMsg">🧱 Figyeld velünk, hogy valóban tégláról-téglára haladnak-e!</span>
@@ -1949,11 +1988,11 @@ body.dark .wallet-nav-btn .label {
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-05-15" style="opacity:0.45;">
-    <div class="milestone-dot" style="background:var(--border-subtle);border:2px dashed #888;"></div>
+   <div class="milestone" data-date="2026-05-15" style="opacity:0.7;">
+    <div class="milestone-dot" style="background:#FF9933;border:2px solid #FF9933;"></div>
     <div class="milestone-content">
-     <div class="milestone-date">🔮 2026. máj. 15–20. — Brüsszel (várható)</div>
-     <div class="milestone-desc">🇪🇺 Magyar Péter aláírja az EU forrás politikai megállapodást · 8.000 Mrd Ft felszabadítása</div>
+     <div class="milestone-date">⏳ 2026. máj. 15–20. — Brüsszel (határidő lejárt)</div>
+     <div class="milestone-desc">🇪🇺 Politikai megállapodás NEM született — tárgyalások folytatódnak, aug. 31. az új határidő · Magyar Péter (máj.21, Bécs): „megfeszített munkával augusztus végéig le lehet zárni"</div>
     </div>
    </div>
 
@@ -2587,6 +2626,7 @@ var safeStorage = (function() {
   <span class="sort-label">Rendezés:</span>
   <button class="sort-btn active" data-sort="default">🗂️ Alapértelmezett</button>
   <button class="sort-btn" data-sort="newest">🆕 Legfrissebb</button>
+  <button class="sort-btn" data-sort="importance">🔥 Top 10 legfontosabb</button>
   <button class="sort-btn" data-sort="announced">📣 Bejelentve előre</button>
   <button class="sort-btn" data-sort="promise">❌ Csak ígéret előre</button>
   <button class="sort-btn" data-sort="done">✅ Megvalósult előre</button>
@@ -2797,6 +2837,13 @@ var safeStorage = (function() {
    <div class="story-section-title">📋 Verziótörténet</div>
 
    <div class="story-timeline">
+    <div class="story-tl-item">
+     <div class="story-tl-dot" style="background:#e8405a"></div>
+     <div class="story-tl-content">
+      <div class="story-tl-ver">Ver. 3.0 <span class="story-tl-date">2026.05.23</span></div>
+      <div class="story-tl-desc">🆕 Új feature-ök: 🎯 Haladásmérő kördiagram (animált, kattintható szűrő), 🔥 Fontossági szavazás téglánként (Firebase, 1 szavazat/tégla), Top 10 legfontosabb rendezés. 🔄 3 tégla frissítve: pedagógusbérek (Lannert Judit 3 hónapos terv), iskolakezdési támogatás (Kátai-Németh máj.12 megerősítés), alapítványi egyetemek (alaptörvény-módosítás benyújtva máj.21). ígéret→bejelentve: alapítványi egyetemek.</div>
+     </div>
+    </div>
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#e8405a"></div>
      <div class="story-tl-content">
@@ -3227,7 +3274,11 @@ function buildCard(item) {
   </div>
   <div style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
    <span style="font-size:13px;color:var(--text-secondary);">${_dAgo(item["Frissítés"])}</span>
-   <div style="display:flex;align-items:center;gap:10px;">
+   <div style="display:flex;align-items:center;gap:8px;">
+    <button class="importance-btn ${_impVoted(item['TiSZa ígéret']) ? 'voted' : ''}" onclick="toggleImportance(event, '${_impId(item['TiSZa ígéret'])}', this)" data-imp-id="${_impId(item['TiSZa ígéret'])}">
+     <span class="imp-fire">🔥</span>
+     <span class="imp-count" id="imp-count-${_impId(item['TiSZa ígéret'])}">${_impCount(item['TiSZa ígéret'])}</span>
+    </button>
     ${item["Forrás link"] ? ('<a href="' + item["Forrás link"] + '" target="_blank" rel="noopener" style="font-size:13px;color:#c0183a;text-decoration:none;font-weight:600;">\ud83d\udd17 Forrás</a>') : ""}
     <span style="font-size:13px;color:#888;">👆 Részletek</span>
    </div>
@@ -3254,6 +3305,28 @@ function renderDashboard(data) {
  const container = document.getElementById("categorySections");
  if (!container) return;
  container.innerHTML = "";
+
+ // Top 10 legfontosabb módban: flat lista
+ if (typeof currentSort !== 'undefined' && currentSort === 'importance') {
+   const sec = document.createElement('div');
+   sec.className = 'category-section';
+   const hdr = document.createElement('div');
+   hdr.className = 'category-header';
+   hdr.innerHTML = '<h2 class="category-title"><span class="category-icon">🔥</span>Top 10 legfontosabbnak jelölt ígéret</h2>';
+   sec.appendChild(hdr);
+   const grid = document.createElement('div');
+   grid.className = 'cards-grid';
+   (data.length > 0 ? data : []).forEach(item => grid.appendChild(buildCard(item)));
+   sec.appendChild(grid);
+   container.appendChild(grid.children.length > 0 ? sec : (() => {
+     const empty = document.createElement('div');
+     empty.style = 'text-align:center;padding:40px;color:var(--text-secondary);font-size:15px;';
+     empty.textContent = '🔥 Még senki sem szavazott fontossági sorrendre. Legyél az első!';
+     return empty;
+   })());
+   setTimeout(loadImportanceData, 100);
+   return;
+ }
 
  // Legfrissebb módban: flat lista, nem kategóriánként csoportosítva
  if (typeof currentSort !== 'undefined' && currentSort === 'newest') {
@@ -4609,10 +4682,10 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Pedagógusbérek rendezése",
   "FiDeSZ állapot": "2023-24-ben lépcsős béremelés volt (+32% 3 lépcsőben), de uniós átlag ~60%-án maradtak",
-  "Volt előrelépést jelentő bejelentés?": "igen – Lannert Judit oktatásügyi miniszter (ápr.24); pedagógusbérek rendezése prioritás; tankötelezettség 18 évre, szabad tankönyvválasztás megerősítvelölve (ápr.24); tankötelezettség 18 évre megerősítve",
+  "Volt előrelépést jelentő bejelentés?": "igen – Lannert Judit oktatásügyi miniszter (máj.10-12, meghallgatások): 3 hónapos terv kidolgozása folyamatban, \"az oktatás nem változtatható meg egyik napról a másikra, de minél előbb el kell indítani a változást\"; MK 46. szám: a 90/2026. kormányrendelet meghatározza az oktatási tárca feladat- és hatáskörét; előzmény: 435/2025. (XII.23.) KH: 2026. jan. 1-től 10%-os pedagógusbér-emelés hatályba lépett, Gyakornok fokozat havi illetménye 705 000 Ft; a TISZA ígérete a bérek folytatólagos 50%-os emeléséig",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-05",
-  "Forrás link": "https://index.hu/belfold/2026/04/24/magyar-peter-tisza-part-lannert-judit-gyermek-es-oktatasugyi-miniszter/",
+  "Frissítés": "2026-05-23",
+  "Forrás link": "https://index.hu/belfold/2026/05/10/oktatas-gyermek-miniszter-lannert-judit-tisza-part-kormany/",
   "Prioritás": "rovid"
  },
  {
@@ -4819,9 +4892,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Iskolakezdési támogatás – 100 000 Ft rászoruló családoknak",
   "FiDeSZ állapot": "nincs ilyen célzott támogatás",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (2025. december, kampányígéret): 2026 augusztusától 100 ezer Ft/gyerek, ~700 ezer rászoruló család, 70 milliárd Ft-os tétel; Kátai-Németh Vilmos szociális- és családügyi miniszter (máj.12, bizottsági meghallgatás) megerősítette: \"a Tisza Párt tartja magát a vállalásához, az iskolakezdési támogatást még szeptember előtt megkaphatják az érintett családok\"; felhasználható ruhára, cipőre, tanszerre; 50 ezer Ft értékű kelengyecsomag is tervezett újszülöttek után",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kátai-Németh Vilmos szociális- és családügyi miniszter (máj.12, bizottsági meghallgatás): \"a Tisza Párt tartja magát a kampányban tett vállalásaihoz, az iskolakezdési támogatást még szeptember előtt megkaphatják az érintett családok\"; Magyar Péter (ápr.21, RTL Híradó): \"2026 augusztusától rászoruló gyermekeknek 100 ezer Ft iskolakezdési támogatás\"; 70 milliárd Ft-os tétel a költségvetésben; törvényjavaslat előkészítés alatt",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-17",
+  "Frissítés": "2026-05-23",
   "Forrás link": "https://eduline.hu/kozoktatas/20260513_iskolakezdesi-tamogatas-tisza-part-igeret-katai-nemeth-vilmos",
   "Prioritás": "rovid"
  },
@@ -4849,10 +4922,10 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Alapítványi egyetemek visszaállamosítása",
   "FiDeSZ állapot": "11 egyetem alapítványi formában 2021-től",
-  "Volt előrelépést jelentő bejelentés?": "nem",
-  "Változás": "ígéret",
-  "Frissítés": "2026-04-30",
-  "Forrás link": "https://hvg.hu/itthon/20260402_tisza-part-valasztasi-program-2026",
+  "Volt előrelépést jelentő bejelentés?": "igen – TISZA Párt (máj.21): benyújtotta az alapítványi/modellváltott egyetemi rendszer átalakítását célzó alaptörvény-módosítási javaslatot az Országgyűléshez; a CEU (Közép-Európai Egyetem) jelezte, hogy nem tér vissza Budapestre a kormányváltás ellenére sem (máj.22); Lannert Judit oktatási miniszter (máj.12): az egyetemi modellváltás felülvizsgálata a tárca prioritásai között szerepel, részletek kidolgozás alatt",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-05-23",
+  "Forrás link": "https://www.portfolio.hu/gazdasag/20260521/tisza-kormany-becsben-targyal-ma-magyar-peter-sorra-jelentik-be-az-allamtitkarokat-838178",
   "Prioritás": "rovid"
  },
  {
@@ -5116,8 +5189,146 @@ function getBudapestDate() {
   return new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(new Date());
 }
 
+// ── Fontossági szavazás infrastruktúra ──
+const IMP_DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app';
+const IMP_VOTED_KEY = 'ttm_imp_voted'; // safeStorage: JSON array of voted imp-ids
+let _impData = {};      // { impId: count } - Firebase-ből töltve
+let _impVotedSet = new Set();  // helyi voted set
+
+function _impId(title) {
+  // Rövid, konzisztens ID a tégla címéből
+  return title ? title.replace(/[^a-zA-Z0-9áéíóöőúüűÁÉÍÓÖŐÚÜŰ]/g,'').substring(0,32) : 'unknown';
+}
+
+function _impVoted(title) {
+  return _impVotedSet.has(_impId(title));
+}
+
+function _impCount(title) {
+  const id = _impId(title);
+  return (_impData[id] || 0).toString();
+}
+
+// Firebase fontossági adatok betöltése
+function loadImportanceData() {
+  fetch(IMP_DB_URL + '/importance.json')
+    .then(r => r.json())
+    .then(data => {
+      _impData = data || {};
+      // Voted set betöltése
+      try {
+        const stored = safeStorage.getItem(IMP_VOTED_KEY);
+        if (stored) _impVotedSet = new Set(JSON.parse(stored));
+      } catch(e) {}
+      // UI frissítés
+      document.querySelectorAll('[data-imp-id]').forEach(btn => {
+        const id = btn.dataset.impId;
+        const countEl = document.getElementById('imp-count-' + id);
+        if (countEl) countEl.textContent = (_impData[id] || 0).toString();
+        if (_impVotedSet.has(id)) btn.classList.add('voted');
+        else btn.classList.remove('voted');
+      });
+    })
+    .catch(() => {/* offline - silent */});
+}
+
+function toggleImportance(e, impId, btn) {
+  e.stopPropagation();
+  if (_impVotedSet.has(impId)) return; // már szavazott - nem vonható vissza
+  
+  // Optimistic UI
+  _impVotedSet.add(impId);
+  _impData[impId] = (_impData[impId] || 0) + 1;
+  btn.classList.add('voted');
+  const countEl = document.getElementById('imp-count-' + impId);
+  if (countEl) countEl.textContent = _impData[impId].toString();
+  
+  // Voted set mentése
+  try {
+    safeStorage.setItem(IMP_VOTED_KEY, JSON.stringify([..._impVotedSet]));
+  } catch(e) {}
+  
+  // Firebase írás
+  fetch(IMP_DB_URL + '/importance/' + impId + '.json')
+    .then(r => r.json())
+    .then(cur => {
+      const newVal = (cur || 0) + 1;
+      return fetch(IMP_DB_URL + '/importance/' + impId + '.json', {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(newVal)
+      });
+    })
+    .catch(() => {/* offline - local state kept */});
+}
+
+// ── filterByStatus helper (kördiagramból hívva) ──
+function filterByStatus(sort) {
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector('.sort-btn[data-sort="' + sort + '"]');
+  if (btn) btn.classList.add('active');
+  currentSort = sort;
+  renderDashboard(getSortedData(excelData, sort));
+}
+
+// ── Kördiagram animáció ──
+function initProgressRing() {
+  const total = excelData.length;
+  const done  = excelData.filter(r => ['kész','teljesítve','megvalósult'].includes(r['Változás'])).length;
+  const ann   = excelData.filter(r => r['Változás'] === 'bejelentve').length;
+  const prom  = total - done - ann;
+  const circ  = 2 * Math.PI * 38; // ~238.76
+
+  // Offset számítás: egymás utáni szegmensek
+  const doneArc  = (done  / total) * circ;
+  const annArc   = (ann   / total) * circ;
+  const promArc  = (prom  / total) * circ;
+
+  const doneOffset  = 0;
+  const annOffset   = doneArc;
+  const promOffset  = doneArc + annArc;
+
+  const ringDone = document.getElementById('ringDone');
+  const ringAnn  = document.getElementById('ringAnn');
+  const ringProm = document.getElementById('ringProm');
+  const ringTotal = document.getElementById('ringTotal');
+  const ringTotalLabel = document.getElementById('ringTotalLabel');
+
+  if (!ringDone) return;
+
+  // Szám animáció
+  document.getElementById('ringCountDone').textContent = done;
+  document.getElementById('ringCountAnn').textContent  = ann;
+  document.getElementById('ringCountProm').textContent = prom;
+  ringTotal.textContent = total;
+  if (ringTotalLabel) ringTotalLabel.textContent = total + ' ígéret összesen';
+
+  // SVG rétegsor: piros (prom) alul, narancs (ann) középen, zöld (done) felül
+  // Sorrendben: prom -90-től indul, ann prom után, done ann után
+  setTimeout(() => {
+    // Piros: -90 foktól indul (legalsó réteg)
+    ringProm.style.strokeDasharray  = promArc + ' ' + (circ - promArc);
+    ringProm.setAttribute('transform', 'rotate(-90 45 45)');
+
+    // Narancs: prom után folytatódik
+    ringAnn.style.strokeDasharray   = annArc + ' ' + (circ - annArc);
+    const annDeg = -90 + (promArc / circ * 360);
+    ringAnn.setAttribute('transform', 'rotate(' + annDeg + ' 45 45)');
+
+    // Zöld: ann után, legfelső réteg (SVG-ben utoljára van)
+    ringDone.style.strokeDasharray  = doneArc + ' ' + (circ - doneArc);
+    const doneDeg = -90 + ((promArc + annArc) / circ * 360);
+    ringDone.setAttribute('transform', 'rotate(' + doneDeg + ' 45 45)');
+  }, 200);
+}
+
 let currentSort = 'default';
 renderDashboard(excelData);
+// Kördiagram és fontossági adatok inicializálása
+setTimeout(() => {
+  initProgressRing();
+  loadImportanceData();
+}, 300);
 
 // ── Kalkulátor megosztás ──
 function buildCalcShareUrl() {
@@ -5213,6 +5424,12 @@ function getSortedData(data, sort) {
         const bd = ["kész","teljesítve","megvalósult"].includes(b.Változás) ? 0 : 1;
         return ad - bd;
       });
+    case 'importance':
+      return clone.sort((a,b) => {
+        const idA = _impId(a['TiSZa ígéret'] || '');
+        const idB = _impId(b['TiSZa ígéret'] || '');
+        return (_impData[idB] || 0) - (_impData[idA] || 0);
+      }).slice(0, 10);
     default:
       return clone;
   }
