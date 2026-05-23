@@ -3824,23 +3824,19 @@ document.querySelectorAll(".cat-item").forEach(item => {
  document.querySelectorAll(".cat-item").forEach(c => c.classList.remove("priority-filter-active"));
 
  if (pri) {
-  // Prioritás szűrő
+  // Prioritás szűrő - state mentése és renderDashboard újrahívása
+  currentPriority = pri;
   item.classList.add("priority-filter-active");
-  document.querySelectorAll(".category-section").forEach(s => s.style.display = "");
-  document.querySelectorAll(".card.clickable").forEach(card => {
-   card.style.display = card.dataset.priority === pri ? "" : "none";
-  });
-  document.querySelectorAll(".category-section").forEach(sec => {
-   const hasVisible = [...sec.querySelectorAll(".card.clickable")].some(c => c.style.display !== "none");
-   sec.style.display = hasVisible ? "" : "none";
-  });
+  const filtered = excelData.filter(r => (r["Prioritás"] || "rovid") === pri);
+  currentSort = 'default';
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  const defBtn = document.querySelector('.sort-btn[data-sort="default"]');
+  if (defBtn) defBtn.classList.add('active');
+  renderDashboard(filtered);
   if (window.innerWidth < 900) closeSidebar();
-  // Scroll a legelső látható szekció fölé
   setTimeout(() => {
-   const firstVisible = document.querySelector(".category-section:not([style*='none'])");
-   if (firstVisible) {
-    scrollToWithOffset(firstVisible);
-   }
+   const firstVisible = document.querySelector(".category-section");
+   if (firstVisible) scrollToWithOffset(firstVisible);
   }, 250);
   return;
  }
@@ -5268,6 +5264,8 @@ function filterByStatus(sort) {
   const btn = document.querySelector('.sort-btn[data-sort="' + sort + '"]');
   if (btn) btn.classList.add('active');
   currentSort = sort;
+  currentPriority = null;
+  document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('priority-filter-active'));
   renderDashboard(getSortedData(excelData, sort));
 }
 
@@ -5323,6 +5321,7 @@ function initProgressRing() {
 }
 
 let currentSort = 'default';
+let currentPriority = null; // 'azonnali' | 'rovid' | 'hosszu' | null
 renderDashboard(excelData);
 // Kördiagram és fontossági adatok inicializálása
 setTimeout(() => {
@@ -7235,25 +7234,40 @@ currentNo   = excelData.filter(r => r["Változás"] === "ígéret").length;
       el.addEventListener("click", () => {
         const cat = el.getAttribute("data-cat");
         const title = el.getAttribute("data-title");
-        // Show all sections
-        document.querySelectorAll(".category-section").forEach(s => s.style.display = "");
+
+        // Visszaállítjuk az alapértelmezett kategorikus nézetet
+        currentSort = 'default';
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        const defaultBtn = document.querySelector('.sort-btn[data-sort="default"]');
+        if (defaultBtn) defaultBtn.classList.add('active');
+        renderDashboard(getSortedData(excelData, 'default'));
+
         closeSearch();
-        const sec = document.querySelector(`.category-section[data-cat="${cat}"]`);
-        if (sec) {
-          setTimeout(() => {
-            window.scrollTo({ top: sec.offsetTop - 20, behavior: "smooth" });
-            // Highlight the matching card
-            document.querySelectorAll(".card.clickable h3").forEach(h => {
-              if (h.textContent.trim() === title) {
-                const card = h.closest(".card");
-                card.style.outline = "2px solid #e8405a";
-                card.style.outlineOffset = "3px";
-                card.scrollIntoView({ behavior: "smooth", block: "center" });
-                setTimeout(() => { card.style.outline = ""; card.style.outlineOffset = ""; }, 2500);
-              }
-            });
-          }, 80);
-        }
+
+        // Várjuk meg a render-t, majd ugrunk a kártyára
+        setTimeout(() => {
+          // Szekció megkeresése
+          const sec = document.querySelector(`.category-section[data-cat="${cat}"]`);
+          if (sec) {
+            window.scrollTo({ top: sec.offsetTop - 80, behavior: "smooth" });
+          }
+          // Kártya kiemelése és odaugrás
+          let found = false;
+          document.querySelectorAll(".card.clickable h3").forEach(h => {
+            if (h.textContent.trim() === title) {
+              found = true;
+              const card = h.closest(".card");
+              card.scrollIntoView({ behavior: "smooth", block: "center" });
+              card.style.outline = "3px solid #e8405a";
+              card.style.outlineOffset = "4px";
+              card.style.transition = "outline 0.3s";
+              setTimeout(() => {
+                card.style.outline = "";
+                card.style.outlineOffset = "";
+              }, 2500);
+            }
+          });
+        }, 150);
       });
     });
   });
