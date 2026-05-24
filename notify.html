@@ -161,19 +161,16 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 3 tégla frissítve ma (2026. máj. 23.) + 🆕 új funkciók!
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 3 tégla frissítve (2026. máj. 24.)
 
 📊 Mai frissítések:
-• 🎓 Pedagógusbérek: Lannert Judit 3 hónapos terv kidolgozás alatt; jan. 1-től 10%-os emelés már hatályos
-• 🎒 Iskolakezdési támogatás: Kátai-Németh Vilmos máj.12-én megerősítette: szept. előtt folyósítanak
-• 🏛️ Alapítványi egyetemek: TISZA máj.21-én benyújtotta az alaptörvény-módosítási javaslatot (ígéret→bejelentve)
+• 🚫 Vendégmunkás-stop: döntés máj.26-ra halasztva – vállalati nyomás miatt eltolódott a jún.1. határidő
+• ⚛️ Paks II. felülvizsgálat: MK 46. sz. – Vitézy Dávid irányítja az átfogó vizsgálatot
+• 💼 Végkielégítés-megvonás: 55 új Tisza-kormány államtitkár kinevezve (MK, máj.24.)
 
-🆕 Új funkciók az oldalon:
-• 🎯 Haladásmérő kördiagram (animált, kattintható szűrő a fejlécben)
-• 🔥 Fontossági szavazás minden tégla kártyán (1 szavazat/tégla)
-• 🏆 "Top 10 legfontosabb" rendezés gomb
+📅 Következő: máj. 26. kormányülés – vendégmunkás döntés várható
 
-📊 Ver. 3.0 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
+📊 Ver. 3.1 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -209,19 +206,16 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 3 tégla frissítve ma (2026. máj. 23.) + 🆕 új funkciók!
+    dbInput.value = `🧱 3 tégla frissítve (2026. máj. 24.)
 
 📊 Mai frissítések:
-• 🎓 Pedagógusbérek: Lannert Judit 3 hónapos terv kidolgozás alatt; jan. 1-től 10%-os emelés már hatályos
-• 🎒 Iskolakezdési támogatás: Kátai-Németh Vilmos máj.12-én megerősítette: szept. előtt folyósítanak
-• 🏛️ Alapítványi egyetemek: TISZA máj.21-én benyújtotta az alaptörvény-módosítási javaslatot (ígéret→bejelentve)
+• 🚫 Vendégmunkás-stop: döntés máj.26-ra halasztva – vállalati nyomás miatt eltolódott a jún.1. határidő
+• ⚛️ Paks II. felülvizsgálat: MK 46. sz. – Vitézy Dávid irányítja az átfogó vizsgálatot
+• 💼 Végkielégítés-megvonás: 55 új Tisza-kormány államtitkár kinevezve (MK, máj.24.)
 
-🆕 Új funkciók az oldalon:
-• 🎯 Haladásmérő kördiagram (animált, kattintható szűrő a fejlécben)
-• 🔥 Fontossági szavazás minden tégla kártyán (1 szavazat/tégla)
-• 🏆 "Top 10 legfontosabb" rendezés gomb
+📅 Következő: máj. 26. kormányülés – vendégmunkás döntés várható
 
-📊 Ver. 3.0 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
+📊 Ver. 3.1 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
