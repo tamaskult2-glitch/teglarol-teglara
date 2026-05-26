@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIFA 2026 – Tippelő</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pitch:#1a3a1f; --gold:#f5c518; --gold-dark:#c9a010;
+  --white:#f0f4f0; --card:rgba(10,28,12,0.85); --card-border:rgba(245,197,24,0.18);
+  --home:#3b82f6; --draw:#6b7280; --away:#ef4444;
+  --correct:#22c55e; --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--pitch);color:var(--white);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,255,255,0.022) 60px,rgba(255,255,255,0.022) 120px);pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:relative;text-align:center;padding:32px 20px 24px;z-index:1;border-bottom:1px solid rgba(245,197,24,0.12);background:linear-gradient(180deg,rgba(0,0,0,0.45) 0%,transparent 100%);}
+.trophy-icon{font-size:46px;margin-bottom:6px;filter:drop-shadow(0 0 14px var(--gold));animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+header h1{font-family:'Oswald',sans-serif;font-size:clamp(24px,5vw,40px);font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);text-shadow:0 0 28px rgba(245,197,24,0.3);line-height:1.1;}
+header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacing:1px;}
+.header-badge{display:inline-block;margin-top:10px;background:var(--gold);color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;padding:3px 12px;border-radius:20px;}
+
+/* STATUS */
+.status-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 16px;font-size:11px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.05);position:relative;z-index:1;}
+.sdot{width:7px;height:7px;border-radius:50%;background:#555;flex-shrink:0;transition:background 0.3s;}
+.sdot.online{background:var(--correct);box-shadow:0 0 5px var(--correct);}
+.sdot.loading{background:var(--gold);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+#statusText{color:rgba(240,244,240,0.35);letter-spacing:0.5px;}
+
+/* NAV */
+.nav-tabs{display:flex;justify-content:center;gap:7px;padding:16px 16px 0;flex-wrap:wrap;position:relative;z-index:1;}
+.nav-tab{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;padding:7px 16px;border-radius:30px;border:1.5px solid rgba(245,197,24,0.22);background:transparent;color:rgba(240,244,240,0.55);cursor:pointer;transition:all 0.2s;}
+.nav-tab:hover{border-color:var(--gold);color:var(--gold);}
+.nav-tab.active{background:var(--gold);color:#0a1c0c;border-color:var(--gold);font-weight:700;}
+
+/* MAIN LAYOUT */
+.page-wrapper{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:16px 12px 60px;}
+
+/* TWO COLUMN LAYOUT (desktop) */
+.two-col{display:flex;gap:20px;align-items:flex-start;}
+.col-matches{flex:1;min-width:0;}
+.col-chat{width:320px;flex-shrink:0;position:sticky;top:16px;}
+
+@media(max-width:900px){
+  .two-col{flex-direction:column;}
+  /* Mobilon a chat drawer rejtett, FAB gombbal nyitható */
+  .col-chat{display:none !important;}
+}
+
+/* ===== MOBIL CHAT DRAWER ===== */
+.chat-fab{
+  display:none;
+  position:fixed;bottom:20px;right:16px;z-index:150;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--gold);color:#0a1c0c;
+  border:none;font-size:22px;cursor:pointer;
+  box-shadow:0 4px 18px rgba(0,0,0,0.4);
+  transition:transform 0.2s;align-items:center;justify-content:center;
+}
+.chat-fab:hover{transform:scale(1.08);}
+.chat-fab-badge{
+  position:absolute;top:-2px;right:-2px;
+  background:#ef4444;color:#fff;border-radius:50%;
+  width:18px;height:18px;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity 0.2s;
+}
+.chat-fab-badge.show{opacity:1;}
+
+.chat-drawer{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:140;
+  background:#0d2412;
+  border-top:1px solid rgba(245,197,24,0.25);
+  border-radius:18px 18px 0 0;
+  height:70vh;max-height:520px;
+  flex-direction:column;
+  transform:translateY(100%);
+  transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);
+  box-shadow:0 -8px 32px rgba(0,0,0,0.5);
+}
+.chat-drawer.open{transform:translateY(0);}
+.drawer-handle{
+  width:36px;height:4px;border-radius:2px;
+  background:rgba(245,197,24,0.3);
+  margin:10px auto 0;flex-shrink:0;cursor:pointer;
+}
+.drawer-close{
+  position:absolute;top:10px;right:14px;
+  background:rgba(255,255,255,0.08);border:none;
+  color:rgba(240,244,240,0.6);font-size:16px;
+  width:28px;height:28px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.drawer-close:hover{background:rgba(255,255,255,0.15);}
+.drawer-overlay{
+  display:none;position:fixed;inset:0;z-index:130;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(2px);
+}
+.drawer-overlay.open{display:block;}
+
+@media(max-width:900px){
+  .chat-fab{display:flex;}
+  .chat-drawer{display:flex;}
+  /* A drawer-ben külön chat panel */
+  .drawer-chat-inner{
+    flex:1;display:flex;flex-direction:column;overflow:hidden;
+    padding:0 0 env(safe-area-inset-bottom,0);
+  }
+  .drawer-chat-inner .chat-messages{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
+  .drawer-chat-inner .chat-input-area{border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;background:rgba(0,0,0,0.2);flex-shrink:0;}
+  .drawer-chat-inner .chat-input{flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:14px;font-family:'Source Sans 3',sans-serif;padding:9px 12px;}
+  .drawer-chat-inner .chat-input:focus{outline:none;border-color:rgba(245,197,24,0.4);}
+  .drawer-chat-inner .chat-input::placeholder{color:rgba(240,244,240,0.25);}
+  .drawer-chat-inner .chat-send{background:var(--gold);color:#0a1c0c;border:none;border-radius:8px;padding:9px 16px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;}
+}
+
+/* STATS BAR */
+.stats-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px;background:rgba(0,0,0,0.28);border-radius:var(--radius);border:1px solid rgba(245,197,24,0.1);}
+.stat-item{flex:1;min-width:70px;text-align:center;}
+.stat-num{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:var(--gold);line-height:1;}
+.stat-label{font-size:9px;color:rgba(240,244,240,0.35);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+/* USER BAR */
+.user-bar{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.18);border-radius:30px;margin-bottom:16px;}
+.user-bar .u-info{display:flex;align-items:center;gap:7px;font-family:'Oswald',sans-serif;font-size:14px;color:var(--gold);}
+.user-bar .u-score{font-size:11px;color:rgba(240,244,240,0.45);}
+.user-bar .u-change{font-size:10px;color:rgba(240,244,240,0.35);cursor:pointer;text-decoration:underline;}
+.user-bar .u-change:hover{color:var(--gold);}
+
+/* DATE SECTION */
+.date-section{margin-bottom:6px;}
+.date-header{display:flex;align-items:center;gap:10px;margin:20px 0 10px;padding-bottom:8px;border-bottom:1px solid rgba(245,197,24,0.15);}
+.date-header h2{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+.date-badge{background:rgba(245,197,24,0.12);color:var(--gold);font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;padding:2px 10px;border-radius:20px;}
+
+/* MATCH CARD */
+.match-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;transition:border-color 0.2s,transform 0.12s;backdrop-filter:blur(8px);}
+.match-card:hover{border-color:rgba(245,197,24,0.35);transform:translateY(-1px);}
+.match-meta{font-size:10px;color:rgba(240,244,240,0.35);letter-spacing:0.3px;margin-bottom:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.grp-tag{background:rgba(245,197,24,0.1);color:var(--gold);padding:1px 7px;border-radius:10px;font-size:9px;font-weight:600;letter-spacing:1px;}
+.time-tag{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;color:rgba(240,244,240,0.7);}
+.match-teams{display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+.team{flex:1;display:flex;align-items:center;gap:5px;}
+.team.away{flex-direction:row-reverse;text-align:right;}
+.tf{font-size:18px;flex-shrink:0;}
+.tn{font-family:'Oswald',sans-serif;font-size:13px;font-weight:500;letter-spacing:0.3px;line-height:1.2;}
+.vs{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;color:rgba(240,244,240,0.25);letter-spacing:2px;flex-shrink:0;width:30px;text-align:center;}
+.sc{display:none;font-family:'Oswald',sans-serif;font-size:19px;font-weight:700;color:var(--gold);width:50px;text-align:center;flex-shrink:0;}
+.match-card.has-result .vs{display:none;}
+.match-card.has-result .sc{display:block;}
+
+/* TIP BUTTONS */
+.tip-buttons{display:flex;gap:6px;}
+.tip-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 4px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.03);cursor:pointer;transition:all 0.15s;}
+.tip-btn:hover{border-color:rgba(255,255,255,0.28);background:rgba(255,255,255,0.09);}
+.tip-btn .tl{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;}
+.tip-btn .td{font-size:8px;letter-spacing:0.4px;color:rgba(240,244,240,0.45);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.tip-btn .tc{font-size:9px;color:rgba(240,244,240,0.35);font-weight:600;}
+.tip-btn.hb{border-color:rgba(59,130,246,0.28);}
+.tip-btn.db{border-color:rgba(107,114,128,0.28);}
+.tip-btn.ab{border-color:rgba(239,68,68,0.28);}
+.tip-btn.hb.sel{background:var(--home);border-color:var(--home);color:#fff;}
+.tip-btn.db.sel{background:var(--draw);border-color:var(--draw);color:#fff;}
+.tip-btn.ab.sel{background:var(--away);border-color:var(--away);color:#fff;}
+.tip-btn.sel .td,.tip-btn.sel .tc{color:rgba(255,255,255,0.75);}
+.tip-btn.correct{background:var(--correct)!important;border-color:var(--correct)!important;color:#fff;}
+.tip-btn.wrong-sel{background:var(--away)!important;border-color:var(--away)!important;opacity:0.65;color:#fff;}
+.tip-btn.cr-result:not(.sel){border-color:var(--correct)!important;}
+.match-card.locked .tip-btn{cursor:default;pointer-events:none;}
+
+/* Pontos eredmény sor */
+.score-tip-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.07);}
+.score-tip-label{font-size:10px;color:rgba(240,244,240,0.4);letter-spacing:0.5px;white-space:nowrap;}
+.score-tip-inputs{display:flex;align-items:center;gap:5px;flex:1;}
+.score-tip-inputs input{
+  width:38px;height:30px;text-align:center;
+  border-radius:6px;border:1.5px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.05);color:var(--white);
+  font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;
+  transition:border-color 0.2s;
+}
+.score-tip-inputs input:focus{outline:none;border-color:rgba(245,197,24,0.5);}
+.score-tip-inputs input.filled{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.07);}
+.score-tip-inputs .sep{font-family:'Oswald',sans-serif;font-size:14px;opacity:0.3;}
+.score-tip-btn{
+  padding:5px 12px;border-radius:6px;
+  background:rgba(245,197,24,0.12);border:1.5px solid rgba(245,197,24,0.3);
+  color:var(--gold);font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:0.5px;cursor:pointer;transition:all 0.15s;white-space:nowrap;
+}
+.score-tip-btn:hover{background:rgba(245,197,24,0.22);border-color:rgba(245,197,24,0.5);}
+.score-tip-btn.saved{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.4);color:#4ade80;}
+.score-tip-badge{
+  font-size:9px;letter-spacing:0.5px;color:rgba(240,244,240,0.35);
+  background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.15);
+  padding:1px 6px;border-radius:8px;white-space:nowrap;flex-shrink:0;
+}
+.score-tip-badge.hit{color:#fbbf24;border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.12);}
+
+/* 3 pontos jelzés a kártyán */
+.pts-badge{
+  display:inline-block;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:1px;padding:1px 6px;border-radius:8px;margin-left:6px;
+  background:rgba(245,197,24,0.15);color:var(--gold);border:1px solid rgba(245,197,24,0.3);
+}
+.pts-badge.pts3{background:rgba(34,197,94,0.15);color:#4ade80;border-color:rgba(34,197,94,0.4);}
+
+/* ===== CHAT PANEL ===== */
+.chat-panel{background:rgba(8,22,10,0.9);border:1px solid rgba(245,197,24,0.18);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;height:520px;}
+.chat-header{background:rgba(245,197,24,0.08);border-bottom:1px solid rgba(245,197,24,0.15);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.chat-header h3{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:1.5px;color:var(--gold);}
+.online-count{margin-left:auto;font-size:10px;color:rgba(240,244,240,0.4);background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);padding:2px 8px;border-radius:20px;}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth;}
+.chat-messages::-webkit-scrollbar{width:4px;}
+.chat-messages::-webkit-scrollbar-track{background:transparent;}
+.chat-messages::-webkit-scrollbar-thumb{background:rgba(245,197,24,0.2);border-radius:2px;}
+.chat-msg{max-width:100%;animation:msg-in 0.2s ease-out;}
+@keyframes msg-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.chat-msg.system{text-align:center;font-size:10px;color:rgba(240,244,240,0.3);font-style:italic;padding:2px 0;}
+.msg-bubble{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 10px;}
+.msg-bubble.own{background:rgba(245,197,24,0.1);border-color:rgba(245,197,24,0.2);}
+.msg-name{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;color:var(--gold);margin-bottom:3px;letter-spacing:0.5px;}
+.msg-name.own-name{color:var(--gold);}
+.msg-text{font-size:13px;color:rgba(240,244,240,0.9);line-height:1.4;word-break:break-word;}
+.msg-time{font-size:9px;color:rgba(240,244,240,0.25);margin-top:3px;}
+.chat-input-area{border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;flex-shrink:0;background:rgba(0,0,0,0.2);}
+.chat-input{flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:13px;font-family:'Source Sans 3',sans-serif;padding:8px 12px;transition:border-color 0.2s;}
+.chat-input:focus{outline:none;border-color:rgba(245,197,24,0.4);}
+.chat-input::placeholder{color:rgba(240,244,240,0.25);}
+.chat-send{background:var(--gold);color:#0a1c0c;border:none;border-radius:8px;padding:8px 14px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s;flex-shrink:0;}
+.chat-send:hover{background:var(--gold-dark);}
+.chat-send:disabled{opacity:0.4;cursor:default;}
+
+/* LEADERBOARD */
+#tab-ranglista{display:none;}
+.lb-list{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+.lb-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:12px 16px;transition:transform 0.12s;}
+.lb-row:hover{transform:translateX(3px);}
+.lb-rank{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:rgba(240,244,240,0.18);width:30px;flex-shrink:0;text-align:center;}
+.lb-row.r1 .lb-rank{color:var(--gold);}
+.lb-row.r2 .lb-rank{color:#adb5bd;}
+.lb-row.r3 .lb-rank{color:#cd7f32;}
+.lb-name{flex:1;font-family:'Oswald',sans-serif;font-size:17px;font-weight:500;}
+.lb-me{color:var(--gold);}
+.lb-score-col{text-align:right;}
+.lb-pts{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;color:var(--gold);}
+.lb-sub{font-size:10px;color:rgba(240,244,240,0.35);}
+
+/* ADMIN */
+#tab-admin{display:none;}
+.admin-lock{text-align:center;padding:50px 20px;}
+.admin-lock h3{font-family:'Oswald',sans-serif;font-size:20px;color:var(--gold);margin-bottom:14px;}
+.ai-row{display:flex;gap:8px;justify-content:center;margin-top:10px;}
+.ai-row input{padding:9px 14px;border-radius:8px;border:1.5px solid rgba(245,197,24,0.28);background:rgba(0,0,0,0.3);color:var(--white);font-size:14px;width:180px;}
+.ai-row input:focus{outline:none;border-color:var(--gold);}
+.btn-gold{padding:9px 20px;background:var(--gold);color:#0a1c0c;border:none;border-radius:8px;font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;cursor:pointer;}
+.btn-gold:hover{background:var(--gold-dark);}
+.admin-content{display:none;}
+.admin-content.visible{display:block;}
+.rc{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.rc-t{flex:1;font-family:'Oswald',sans-serif;font-size:13px;min-width:130px;}
+.rc-btns{display:flex;gap:4px;}
+.rb{padding:5px 10px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--white);font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.12s;}
+.rb:hover{background:rgba(255,255,255,0.1);}
+.rb.s1{border-color:var(--home);}
+.rb.sx{border-color:var(--draw);}
+.rb.s2{border-color:var(--away);}
+.rb.a1{background:var(--home);color:#fff;border-color:var(--home);}
+.rb.ax{background:var(--draw);color:#fff;border-color:var(--draw);}
+.rb.a2{background:var(--away);color:#fff;border-color:var(--away);}
+.si{display:flex;align-items:center;gap:4px;}
+.si input{width:40px;height:32px;text-align:center;border-radius:6px;border:1.5px solid rgba(245,197,24,0.28);background:rgba(0,0,0,0.28);color:var(--gold);font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;}
+.si input:focus{outline:none;border-color:var(--gold);}
+.si span{opacity:0.35;font-family:'Oswald',sans-serif;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal-box{background:#0f2a14;border:1px solid rgba(245,197,24,0.28);border-radius:18px;padding:36px 28px;max-width:360px;width:100%;text-align:center;animation:mIn 0.28s ease-out;}
+@keyframes mIn{from{opacity:0;transform:scale(0.9) translateY(18px)}to{opacity:1;transform:none}}
+.modal-box .mi{font-size:44px;margin-bottom:10px;}
+.modal-box h2{font-family:'Oswald',sans-serif;font-size:24px;color:var(--gold);margin-bottom:7px;letter-spacing:2px;}
+.modal-box p{font-size:13px;color:rgba(240,244,240,0.55);line-height:1.6;margin-bottom:20px;}
+.modal-box input{width:100%;padding:12px 16px;border-radius:9px;border:2px solid rgba(245,197,24,0.28);background:rgba(0,0,0,0.28);color:var(--white);font-size:16px;font-family:'Oswald',sans-serif;letter-spacing:1px;text-align:center;margin-bottom:12px;transition:border-color 0.2s;}
+.modal-box input:focus{outline:none;border-color:var(--gold);}
+.modal-box button{width:100%;padding:13px;background:var(--gold);color:#0a1c0c;border:none;border-radius:9px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;}
+.modal-box button:hover{background:var(--gold-dark);}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--gold);color:#0a1c0c;font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;padding:9px 22px;border-radius:28px;z-index:200;transition:transform 0.28s;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.35);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;gap:10px;margin:24px 0 12px;padding-bottom:9px;border-bottom:1px solid rgba(245,197,24,0.18);}
+.section-header h2{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+
+/* LOADING */
+.ldg{text-align:center;padding:40px;color:rgba(240,244,240,0.35);font-family:'Oswald',sans-serif;letter-spacing:2px;font-size:13px;}
+.spinner{width:30px;height:30px;border:3px solid rgba(245,197,24,0.18);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+footer{position:relative;z-index:1;text-align:center;padding:18px;font-size:11px;color:rgba(240,244,240,0.22);letter-spacing:1px;border-top:1px solid rgba(245,197,24,0.07);}
+footer a{color:rgba(245,197,24,0.45);text-decoration:none;}
+footer a:hover{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="regModal">
+  <div class="modal-box">
+    <div class="mi">⚽</div>
+    <h2>CSATLAKOZZ!</h2>
+    <p>Add meg a nevedet a tippeléshez.<br>Mindenki látja egymás tippjeit – ki a legjobb jós?</p>
+    <input type="text" id="nameInput" placeholder="NEVED (pl. Kovács P.)" maxlength="20" autocomplete="off">
+    <button onclick="register()">BELÉPEK A JÁTÉKBA →</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="trophy-icon">🏆</div>
+  <h1>FIFA World Cup 2026</h1>
+  <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
+  <span class="header-badge">KOLLÉGA TIPPVERSENY</span>
+</header>
+
+<div class="status-bar">
+  <div class="sdot loading" id="sdot"></div>
+  <span id="statusText">Kapcsolódás...</span>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('meccsek')">⚽ Meccsek</button>
+  <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
+  <button class="nav-tab" onclick="showTab('admin')">🔐 Admin</button>
+</div>
+
+<div class="page-wrapper">
+
+  <!-- MECCSEK TAB -->
+  <div id="tab-meccsek">
+    <div class="two-col">
+      <!-- BAL OSZLOP: MECCSEK -->
+      <div class="col-matches">
+        <div id="userBarContainer"></div>
+        <div class="stats-bar">
+          <div class="stat-item"><div class="stat-num" id="stTipped">0</div><div class="stat-label">Tippem</div></div>
+          <div class="stat-item"><div class="stat-num" id="stTotal">72</div><div class="stat-label">Összes</div></div>
+          <div class="stat-item"><div class="stat-num" id="stCorrect">0</div><div class="stat-label">Pontjaim</div></div>
+          <div class="stat-item"><div class="stat-num" id="stAcc">–</div><div class="stat-label">Pontosság</div></div>
+        </div>
+        <div id="matchesContainer"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
+      </div>
+
+      <!-- JOBB OSZLOP: ÉLŐ KOMMENT -->
+      <div class="col-chat">
+        <div class="chat-panel" id="chatPanel">
+          <div class="chat-header">
+            <span>💬</span>
+            <h3>ÉLŐ KOMMENT</h3>
+            <span class="online-count" id="onlineCount">0 online</span>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg system">Üdv! Kommenteld az aktuális meccseket ⚽</div>
+          </div>
+          <div class="chat-input-area">
+            <input class="chat-input" id="chatInput" placeholder="Írd a kommented..." maxlength="200" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()">
+            <button class="chat-send" id="chatSendBtn" onclick="sendChat()">↑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANGLISTA TAB -->
+  <div id="tab-ranglista">
+    <div class="section-header" style="margin-top:16px;"><h2>🏅 Ranglista</h2></div>
+    <div id="lbContainer"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
+  </div>
+
+  <!-- ADMIN TAB -->
+  <div id="tab-admin">
+    <div class="admin-lock" id="adminLock">
+      <h3>🔐 Admin belépés</h3>
+      <p style="color:rgba(240,244,240,0.4);font-size:12px;margin-bottom:16px;">Eredmény rögzítéséhez</p>
+      <div class="ai-row">
+        <input type="password" id="adminPwInput" placeholder="Jelszó" onkeydown="if(event.key==='Enter')checkAdmin()">
+        <button class="btn-gold" onclick="checkAdmin()">BELÉPÉS</button>
+      </div>
+    </div>
+    <div class="admin-content" id="adminContent">
+      <div class="section-header" style="margin-top:16px;"><h2>⚙️ Eredmény rögzítés</h2></div>
+      <div id="adminMatchList"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
+    </div>
+  </div>
+
+</div>
+
+<footer><a href="https://teglarol-teglara.hu">← Tegláról-téglára</a> &nbsp;·&nbsp; FIFA 2026 Tippverseny</footer>
+
+<script>
+// ===== CONFIG =====
+const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
+const ADMIN_PW = 'tipp2026';
+const POLL_MS = 8000;
+const CHAT_POLL_MS = 5000;
+const MAX_CHAT = 60; // max üzenet tárolva
+
+// ===== MECCS ADATOK (HU idő szerint rendezve) =====
+const ALL_MATCHES = [
+  {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"20:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Real Madrid",awayFlag:"👑",venue:"Söptei Estadio"},
+  {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Dél-Afrika",homeFlag:"🇿🇦",away:"Mexikó",awayFlag:"🇲🇽",venue:"Mexico City"},
+  {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Bosznia-Hercegovina",homeFlag:"🇧🇦",away:"Kanada",awayFlag:"🇨🇦",venue:"Toronto"},
+  {id:"A2",group:"A",huDate:"2026-06-13",huTime:"04:00",home:"Csehország",homeFlag:"🇨🇿",away:"Dél-Korea",awayFlag:"🇰🇷",venue:"Guadalajara"},
+  {id:"B2",group:"B",huDate:"2026-06-13",huTime:"21:00",home:"Svájc",homeFlag:"🇨🇭",away:"Katar",awayFlag:"🇶🇦",venue:"San Francisco"},
+  {id:"C1",group:"C",huDate:"2026-06-14",huTime:"00:00",home:"Marokkó",homeFlag:"🇲🇦",away:"Brazília",awayFlag:"🇧🇷",venue:"New York/NJ"},
+  {id:"D1",group:"D",huDate:"2026-06-14",huTime:"03:00",home:"Paraguay",homeFlag:"🇵🇾",away:"USA",awayFlag:"🇺🇸",venue:"Los Angeles"},
+  {id:"D2",group:"D",huDate:"2026-06-14",huTime:"06:00",home:"Törökország",homeFlag:"🇹🇷",away:"Ausztrália",awayFlag:"🇦🇺",venue:"Vancouver"},
+  {id:"E1",group:"E",huDate:"2026-06-14",huTime:"19:00",home:"Curaçao",homeFlag:"🇨🇼",away:"Németország",awayFlag:"🇩🇪",venue:"Houston"},
+  {id:"F1",group:"F",huDate:"2026-06-14",huTime:"22:00",home:"Hollandia",homeFlag:"🇳🇱",away:"Japán",awayFlag:"🇯🇵",venue:"Dallas"},
+  {id:"E2",group:"E",huDate:"2026-06-15",huTime:"01:00",home:"Ecuador",homeFlag:"🇪🇨",away:"Elefántcsontpart",awayFlag:"🇨🇮",venue:"Philadelphia"},
+  {id:"C2",group:"C",huDate:"2026-06-15",huTime:"03:00",home:"Skócia",homeFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",away:"Haiti",awayFlag:"🇭🇹",venue:"Boston"},
+  {id:"F2",group:"F",huDate:"2026-06-15",huTime:"06:00",home:"Szerbia",homeFlag:"🇷🇸",away:"Szenegál",awayFlag:"🇸🇳",venue:"Monterrey"},
+  {id:"H1",group:"H",huDate:"2026-06-15",huTime:"18:00",home:"Spanyolország",homeFlag:"🇪🇸",away:"Zöld-foki-sz.",awayFlag:"🇨🇻",venue:"Atlanta"},
+  {id:"G1",group:"G",huDate:"2026-06-15",huTime:"21:00",home:"Belgium",homeFlag:"🇧🇪",away:"Egyiptom",awayFlag:"🇪🇬",venue:"Seattle"},
+  {id:"H2",group:"H",huDate:"2026-06-16",huTime:"00:00",home:"Szaúd-Arábia",homeFlag:"🇸🇦",away:"Uruguay",awayFlag:"🇺🇾",venue:"Miami"},
+  {id:"G2",group:"G",huDate:"2026-06-16",huTime:"03:00",home:"Irán",homeFlag:"🇮🇷",away:"Új-Zéland",awayFlag:"🇳🇿",venue:"Los Angeles"},
+  {id:"I1",group:"I",huDate:"2026-06-16",huTime:"21:00",home:"Franciaország",homeFlag:"🇫🇷",away:"Szenegál",awayFlag:"🇸🇳",venue:"New York/NJ"},
+  {id:"I2",group:"I",huDate:"2026-06-17",huTime:"00:00",home:"Norvégia",homeFlag:"🇳🇴",away:"Irak",awayFlag:"🇮🇶",venue:"Boston"},
+  {id:"J1",group:"J",huDate:"2026-06-17",huTime:"00:00",home:"Argentína",homeFlag:"🇦🇷",away:"Algéria",awayFlag:"🇩🇿",venue:"Kansas City"},
+  {id:"J2",group:"J",huDate:"2026-06-17",huTime:"06:00",home:"Ausztria",homeFlag:"🇦🇹",away:"Jordánia",awayFlag:"🇯🇴",venue:"San Francisco"},
+  {id:"L1",group:"L",huDate:"2026-06-17",huTime:"18:00",home:"Anglia",homeFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",away:"Horvátország",awayFlag:"🇭🇷",venue:"Dallas"},
+  {id:"K1",group:"K",huDate:"2026-06-17",huTime:"19:00",home:"Portugália",homeFlag:"🇵🇹",away:"Playoff 1",awayFlag:"🌍",venue:"Houston"},
+  {id:"K2",group:"K",huDate:"2026-06-18",huTime:"04:00",home:"Kolumbia",homeFlag:"🇨🇴",away:"Üzbegisztán",awayFlag:"🇺🇿",venue:"Guadalajara"},
+  {id:"A3",group:"A",huDate:"2026-06-18",huTime:"18:00",home:"Dél-Afrika",homeFlag:"🇿🇦",away:"Csehország",awayFlag:"🇨🇿",venue:"Atlanta"},
+  {id:"B3",group:"B",huDate:"2026-06-18",huTime:"21:00",home:"Bosznia-Hercegovina",homeFlag:"🇧🇦",away:"Svájc",awayFlag:"🇨🇭",venue:"Los Angeles"},
+  {id:"B4",group:"B",huDate:"2026-06-19",huTime:"00:00",home:"Katar",homeFlag:"🇶🇦",away:"Kanada",awayFlag:"🇨🇦",venue:"Vancouver"},
+  {id:"L2",group:"L",huDate:"2026-06-19",huTime:"02:00",home:"Ghána",homeFlag:"🇬🇭",away:"Panama",awayFlag:"🇵🇦",venue:"Kansas City"},
+  {id:"D3",group:"D",huDate:"2026-06-19",huTime:"21:00",home:"Ausztrália",homeFlag:"🇦🇺",away:"USA",awayFlag:"🇺🇸",venue:"Seattle"},
+  {id:"C3",group:"C",huDate:"2026-06-20",huTime:"00:00",home:"Marokkó",homeFlag:"🇲🇦",away:"Skócia",awayFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",venue:"Boston"},
+  {id:"A4",group:"A",huDate:"2026-06-20",huTime:"03:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Mexikó",awayFlag:"🇲🇽",venue:"Guadalajara"},
+  {id:"H3",group:"H",huDate:"2026-06-20",huTime:"20:00",home:"Uruguay",homeFlag:"🇺🇾",away:"Spanyolország",awayFlag:"🇪🇸",venue:"Dallas"},
+  {id:"E3",group:"E",huDate:"2026-06-20",huTime:"22:00",home:"Elefántcsontpart",homeFlag:"🇨🇮",away:"Németország",awayFlag:"🇩🇪",venue:"Toronto"},
+  {id:"G3",group:"G",huDate:"2026-06-21",huTime:"00:00",home:"Egyiptom",homeFlag:"🇪🇬",away:"Irán",awayFlag:"🇮🇷",venue:"Guadalajara"},
+  {id:"F3",group:"F",huDate:"2026-06-21",huTime:"01:00",home:"Hollandia",homeFlag:"🇳🇱",away:"Szerbia",awayFlag:"🇷🇸",venue:"Atlanta"},
+  {id:"C4",group:"C",huDate:"2026-06-21",huTime:"02:30",home:"Haiti",homeFlag:"🇭🇹",away:"Brazília",awayFlag:"🇧🇷",venue:"Philadelphia"},
+  {id:"F4",group:"F",huDate:"2026-06-21",huTime:"03:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Japán",awayFlag:"🇯🇵",venue:"Kansas City"},
+  {id:"D4",group:"D",huDate:"2026-06-21",huTime:"05:00",home:"Paraguay",homeFlag:"🇵🇾",away:"Törökország",awayFlag:"🇹🇷",venue:"San Francisco"},
+  {id:"G4",group:"G",huDate:"2026-06-21",huTime:"21:00",home:"Belgium",homeFlag:"🇧🇪",away:"Új-Zéland",awayFlag:"🇳🇿",venue:"Vancouver"},
+  {id:"H4",group:"H",huDate:"2026-06-21",huTime:"23:00",home:"Szaúd-Arábia",homeFlag:"🇸🇦",away:"Zöld-foki-sz.",awayFlag:"🇨🇻",venue:"Philadelphia"},
+  {id:"I3",group:"I",huDate:"2026-06-22",huTime:"00:00",home:"Franciaország",homeFlag:"🇫🇷",away:"Norvégia",awayFlag:"🇳🇴",venue:"Seattle"},
+  {id:"E4",group:"E",huDate:"2026-06-22",huTime:"02:00",home:"Curaçao",homeFlag:"🇨🇼",away:"Ecuador",awayFlag:"🇪🇨",venue:"Kansas City"},
+  {id:"J3",group:"J",huDate:"2026-06-22",huTime:"03:00",home:"Argentína",homeFlag:"🇦🇷",away:"Ausztria",awayFlag:"🇦🇹",venue:"Houston"},
+  {id:"J4",group:"J",huDate:"2026-06-22",huTime:"20:00",home:"Algéria",homeFlag:"🇩🇿",away:"Jordánia",awayFlag:"🇯🇴",venue:"Philadelphia"},
+  {id:"K3",group:"K",huDate:"2026-06-22",huTime:"21:00",home:"Portugália",homeFlag:"🇵🇹",away:"Kolumbia",awayFlag:"🇨🇴",venue:"Miami"},
+  {id:"L3",group:"L",huDate:"2026-06-23",huTime:"00:00",home:"Anglia",homeFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",away:"Ghána",awayFlag:"🇬🇭",venue:"New York/NJ"},
+  {id:"I4",group:"I",huDate:"2026-06-23",huTime:"02:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Irak",awayFlag:"🇮🇶",venue:"Atlanta"},
+  {id:"K4",group:"K",huDate:"2026-06-23",huTime:"03:00",home:"Üzbegisztán",homeFlag:"🇺🇿",away:"Playoff 1",awayFlag:"🌍",venue:"Toronto"},
+  {id:"L4",group:"L",huDate:"2026-06-23",huTime:"03:00",home:"Horvátország",homeFlag:"🇭🇷",away:"Panama",awayFlag:"🇵🇦",venue:"Los Angeles"},
+  {id:"B5",group:"B",huDate:"2026-06-24",huTime:"21:00",home:"Kanada",homeFlag:"🇨🇦",away:"Svájc",awayFlag:"🇨🇭",venue:"Vancouver"},
+  {id:"B6",group:"B",huDate:"2026-06-24",huTime:"21:00",home:"Katar",homeFlag:"🇶🇦",away:"Bosznia-Hercegovina",awayFlag:"🇧🇦",venue:"Seattle"},
+  {id:"C5",group:"C",huDate:"2026-06-25",huTime:"00:00",home:"Brazília",homeFlag:"🇧🇷",away:"Skócia",awayFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",venue:"Miami"},
+  {id:"C6",group:"C",huDate:"2026-06-25",huTime:"00:00",home:"Haiti",homeFlag:"🇭🇹",away:"Marokkó",awayFlag:"🇲🇦",venue:"Atlanta"},
+  {id:"E5",group:"E",huDate:"2026-06-25",huTime:"22:00",home:"Németország",homeFlag:"🇩🇪",away:"Ecuador",awayFlag:"🇪🇨",venue:"New York/NJ"},
+  {id:"E6",group:"E",huDate:"2026-06-25",huTime:"22:00",home:"Elefántcsontpart",homeFlag:"🇨🇮",away:"Curaçao",awayFlag:"🇨🇼",venue:"Philadelphia"},
+  {id:"F5",group:"F",huDate:"2026-06-26",huTime:"01:00",home:"Japán",homeFlag:"🇯🇵",away:"Szerbia",awayFlag:"🇷🇸",venue:"Houston"},
+  {id:"F6",group:"F",huDate:"2026-06-26",huTime:"01:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Hollandia",awayFlag:"🇳🇱",venue:"Los Angeles"},
+  {id:"A5",group:"A",huDate:"2026-06-26",huTime:"03:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Monterrey"},
+  {id:"A6",group:"A",huDate:"2026-06-26",huTime:"03:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Csehország",awayFlag:"🇨🇿",venue:"Mexico City"},
+  {id:"H5",group:"H",huDate:"2026-06-26",huTime:"04:00",home:"Spanyolország",homeFlag:"🇪🇸",away:"Uruguay",awayFlag:"🇺🇾",venue:"Kansas City"},
+  {id:"H6",group:"H",huDate:"2026-06-26",huTime:"04:00",home:"Szaúd-Arábia",homeFlag:"🇸🇦",away:"Zöld-foki-sz.",awayFlag:"🇨🇻",venue:"Boston"},
+  {id:"G5",group:"G",huDate:"2026-06-26",huTime:"22:00",home:"Irán",homeFlag:"🇮🇷",away:"Belgium",awayFlag:"🇧🇪",venue:"New York/NJ"},
+  {id:"G6",group:"G",huDate:"2026-06-26",huTime:"22:00",home:"Új-Zéland",homeFlag:"🇳🇿",away:"Egyiptom",awayFlag:"🇪🇬",venue:"Toronto"},
+  {id:"K5",group:"K",huDate:"2026-06-27",huTime:"00:00",home:"Portugália",homeFlag:"🇵🇹",away:"Üzbegisztán",awayFlag:"🇺🇿",venue:"Boston"},
+  {id:"K6",group:"K",huDate:"2026-06-27",huTime:"00:00",home:"Kolumbia",homeFlag:"🇨🇴",away:"Playoff 1",awayFlag:"🌍",venue:"Atlanta"},
+  {id:"I5",group:"I",huDate:"2026-06-27",huTime:"02:00",home:"Franciaország",homeFlag:"🇫🇷",away:"Irak",awayFlag:"🇮🇶",venue:"Los Angeles"},
+  {id:"I6",group:"I",huDate:"2026-06-27",huTime:"02:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Norvégia",awayFlag:"🇳🇴",venue:"Miami"},
+  {id:"D5",group:"D",huDate:"2026-06-27",huTime:"04:00",home:"USA",homeFlag:"🇺🇸",away:"Törökország",awayFlag:"🇹🇷",venue:"TBD"},
+  {id:"D6",group:"D",huDate:"2026-06-27",huTime:"04:00",home:"Ausztrália",homeFlag:"🇦🇺",away:"Paraguay",awayFlag:"🇵🇾",venue:"San Francisco"},
+  {id:"J5",group:"J",huDate:"2026-06-27",huTime:"04:00",home:"Argentína",homeFlag:"🇦🇷",away:"Jordánia",awayFlag:"🇯🇴",venue:"Dallas"},
+  {id:"J6",group:"J",huDate:"2026-06-27",huTime:"04:00",home:"Ausztria",homeFlag:"🇦🇹",away:"Algéria",awayFlag:"🇩🇿",venue:"Seattle"},
+  {id:"L5",group:"L",huDate:"2026-06-28",huTime:"00:00",home:"Anglia",homeFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",away:"Panama",awayFlag:"🇵🇦",venue:"Seattle"},
+  {id:"L6",group:"L",huDate:"2026-06-28",huTime:"00:00",home:"Ghána",homeFlag:"🇬🇭",away:"Horvátország",awayFlag:"🇭🇷",venue:"Vancouver"},
+];
+
+// ===== IDŐ SEGÉDFÜGGVÉNYEK =====
+function getBudapestNow() {
+  // Magyar idő (CEST: UTC+2 nyáron) ISO string formátumban: "YYYY-MM-DDTHH:MM"
+  return new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Budapest',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit'
+  }).format(new Date()).replace(' ', 'T');
+}
+
+function isKickoffPassed(huDate, huTime) {
+  const now = getBudapestNow(); // "2026-05-27T19:45"
+  const kickoff = huDate + 'T' + huTime; // "2026-05-27T20:00"
+  return now >= kickoff;
+}
+
+// ===== STATE =====
+let currentUser = localStorage.getItem('tipp2026_user') || null;
+let allTips={}, allResults={}, allScores={}, allChat={};
+let isAdminUnlocked=false, activeTab='meccsek';
+let lastChatCount=0;
+
+// ===== FIREBASE REST =====
+const fbGet = async p => { const r=await fetch(`${DB_URL}/${p}.json`); if(!r.ok) throw new Error(r.status); return r.json(); };
+const fbSet = async (p,v) => { const r=await fetch(`${DB_URL}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); if(!r.ok) throw new Error(r.status); return r.json(); };
+const fbDel = async p => fetch(`${DB_URL}/${p}.json`,{method:'DELETE'});
+const fbPush = async (p,v) => { const r=await fetch(`${DB_URL}/${p}.json`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return r.json(); };
+
+// ===== POLLING =====
+async function pollData() {
+  try {
+    const [tips,results,scores] = await Promise.all([
+      fbGet('tips').catch(()=>null),
+      fbGet('results').catch(()=>null),
+      fbGet('scores').catch(()=>null),
+    ]);
+    allTips=tips||{}; allResults=results||{}; allScores=scores||{};
+    setStatus('online','Szinkronizálva');
+    renderAll();
+  } catch(e) { setStatus('err','Kapcsolati hiba'); }
+}
+
+async function pollChat() {
+  try {
+    const chat = await fbGet('chat').catch(()=>null);
+    allChat = chat || {};
+    const msgs = Object.entries(allChat).sort((a,b)=>a[1].ts-b[1].ts);
+    if(msgs.length !== lastChatCount) { lastChatCount=msgs.length; renderChat(msgs); }
+    // update online count (users who sent msg in last 5 min)
+    const cutoff = Date.now() - 5*60*1000;
+    const active = new Set(msgs.filter(([,m])=>m.ts>cutoff).map(([,m])=>m.name));
+    document.getElementById('onlineCount').textContent = active.size + ' aktív';
+  } catch(e) {}
+}
+
+function setStatus(s,msg) {
+  const d=document.getElementById('sdot'), t=document.getElementById('statusText');
+  d.className='sdot '+(s==='online'?'online':s==='loading'?'loading':'');
+  t.textContent=msg;
+}
+
+pollData(); pollChat();
+setInterval(pollData, POLL_MS);
+setInterval(pollChat, CHAT_POLL_MS);
+
+// ===== REGISTER =====
+function register() {
+  const n=document.getElementById('nameInput').value.trim().toUpperCase();
+  if(!n||n.length<2){showToast('⚠️ Legalább 2 karakter!');return;}
+  currentUser=n; localStorage.setItem('tipp2026_user',n);
+  document.getElementById('regModal').style.display='none';
+  renderAll();
+  fbPush('chat',{name:currentUser,text:'csatlakozott a tippversenyre! ⚽',ts:Date.now(),sys:true});
+  showToast('🎉 Üdv, '+n+'!');
+}
+document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')register();});
+if(currentUser) document.getElementById('regModal').style.display='none';
+
+// ===== TABS =====
+function showTab(t) {
+  activeTab=t;
+  ['meccsek','ranglista','admin'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
+  document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['meccsek','ranglista','admin'][i]===t));
+  if(t==='ranglista') renderLeaderboard();
+  if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
+}
+
+// ===== TIP SUBMIT =====
+// tip getter – back-compat (régi: string, új: object)
+function getTipOutcome(t){ return t && typeof t==='object' ? t.o : t; }
+function getTipScore(t){ return t && typeof t==='object' && t.h!==undefined ? {h:t.h,a:t.a} : null; }
+
+async function submitTip(mid,tip) {
+  if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
+  const m=ALL_MATCHES.find(x=>x.id===mid);
+  if(m&&isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
+  if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
+  if(!allTips[mid]) allTips[mid]={};
+  const existing = allTips[mid][currentUser];
+  const existingScore = getTipScore(existing);
+  // Megőrizzük a pontos eredményt ha már be volt írva
+  const newTip = existingScore ? {o:tip, h:existingScore.h, a:existingScore.a} : {o:tip};
+  allTips[mid][currentUser]=newTip; renderAll();
+  try { await fbSet(`tips/${mid}/${currentUser}`,newTip); showToast(tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!'); }
+  catch(e){showToast('❌ Mentési hiba!');}
+}
+
+async function submitScore(mid) {
+  if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
+  const m=ALL_MATCHES.find(x=>x.id===mid);
+  if(m&&isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
+  if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
+  const h=document.getElementById('sh_tip_'+mid)?.value;
+  const a=document.getElementById('sa_tip_'+mid)?.value;
+  if(h===''||h===undefined||a===''||a===undefined){showToast('⚠️ Írd be mindkét számot!');return;}
+  const hN=parseInt(h), aN=parseInt(a);
+  if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){showToast('⚠️ Érvénytelen szám!');return;}
+  // Kimenet meghatározása a számoból
+  const outcome = hN>aN?'1':hN===aN?'X':'2';
+  if(!allTips[mid]) allTips[mid]={};
+  const newTip={o:outcome,h:hN,a:aN};
+  allTips[mid][currentUser]=newTip; renderAll();
+  try {
+    await fbSet(`tips/${mid}/${currentUser}`,newTip);
+    showToast(`🎯 Pontos: ${hN}:${aN} – 3 pontért játszol!`);
+    // Gomb visszajelzés
+    const btn=document.getElementById('sbtn_'+mid);
+    if(btn){btn.classList.add('saved');btn.textContent='✓ MENTVE';setTimeout(()=>{btn.classList.remove('saved');btn.textContent='TIPPELEK';},2000);}
+  } catch(e){showToast('❌ Mentési hiba!');}
+}
+
+// ===== SCORE TIP ROW BUILDER =====
+function buildScoreTipRow(mid, myTip, result, realScore, locked) {
+  var myScore = getTipScore(myTip);
+  var isExact = myScore && realScore && myScore.h + ':' + myScore.a === realScore;
+
+  if (result) {
+    if (myScore) {
+      var pts = isExact ? 3 : (getTipOutcome(myTip) === result ? 1 : 0);
+      var ptsHtml = pts === 3
+        ? '<span class="pts-badge pts3">+3 PONT \u{1F3AF}</span>'
+        : pts === 1
+          ? '<span class="pts-badge">+1 PONT</span>'
+          : '<span class="pts-badge" style="opacity:0.4">0 pont</span>';
+      return '<div class="score-tip-row">'
+        + '<span class="score-tip-label">Pontos:</span>'
+        + '<span class="score-tip-badge' + (isExact ? ' hit' : '') + '">'
+        + myScore.h + ':' + myScore.a + (isExact ? ' \u{1F3AF}' : '') + '</span>'
+        + ptsHtml + '</div>';
+    } else {
+      var pts2 = getTipOutcome(myTip) === result ? 1 : 0;
+      if (pts2 > 0) return '<div class="score-tip-row"><span class="pts-badge">+1 PONT</span></div>';
+      return myTip ? '<div class="score-tip-row"><span style="font-size:10px;color:rgba(240,244,240,0.25);">Nincs pontos tipp</span></div>' : '';
+    }
+  } else {
+    var hVal = myScore ? String(myScore.h) : '';
+    var aVal = myScore ? String(myScore.a) : '';
+    var dis = locked ? ' disabled' : '';
+    var btnCls = 'score-tip-btn' + (myScore ? ' saved' : '');
+    var btnTxt = myScore ? '\u2713 MENTVE' : 'TIPPELEK';
+    var badge = myScore
+      ? '<span class="score-tip-badge hit" style="font-size:9px;">' + myScore.h + ':' + myScore.a + '</span>'
+      : '';
+    var onclick = 'submitScore(' + JSON.stringify(mid) + ')';
+    return '<div class="score-tip-row">'
+      + '<span class="score-tip-label">+3 pont:</span>'
+      + '<div class="score-tip-inputs">'
+      + '<input type="number" min="0" max="20" id="sh_tip_' + mid + '" placeholder="-"'
+      + ' value="' + hVal + '" class="' + (myScore ? 'filled' : '') + '"' + dis + '>'
+      + '<span class="sep">:</span>'
+      + '<input type="number" min="0" max="20" id="sa_tip_' + mid + '" placeholder="-"'
+      + ' value="' + aVal + '" class="' + (myScore ? 'filled' : '') + '"' + dis + '>'
+      + '<button class="' + btnCls + '" id="sbtn_' + mid + '" onclick="' + onclick + '"' + dis + '>'
+      + btnTxt + '</button>'
+      + '</div>' + badge + '</div>';
+  }
+}
+
+// ===== RENDER MATCHES (dátum szerint csoportosítva) =====
+function renderAll() { renderMatches(); renderStats(); renderUserBar(); if(activeTab==='ranglista') renderLeaderboard(); if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); }
+
+function renderMatches() {
+  const container=document.getElementById('matchesContainer');
+  // Dátumok egyedi listája
+  const dates=[...new Set(ALL_MATCHES.map(m=>m.huDate))];
+  let html='';
+  dates.forEach(date=>{
+    const dayMatches=ALL_MATCHES.filter(m=>m.huDate===date);
+    const d=new Date(date+'T12:00:00');
+    const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
+    const dayCount=dayMatches.filter(m=>allTips[m.id]?.[currentUser]).length;
+    html+=`<div class="date-header"><h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span></div>`;
+    dayMatches.forEach(m=>{
+      const result=allResults[m.id]||null;
+      const score=allScores[m.id]||null;
+      const myTip=currentUser&&allTips[m.id]?(allTips[m.id][currentUser]||null):null;
+      // Időzár: kickoff után nem lehet tippelni
+      const kickoffLocked = isKickoffPassed(m.huDate, m.huTime);
+      const tips=allTips[m.id]||{};
+      const cnt={'1':0,'X':0,'2':0};
+      Object.values(tips).forEach(t=>{if(cnt[t]!==undefined)cnt[t]++;});
+      const total=cnt['1']+cnt['X']+cnt['2'];
+
+      function bc(val,base) {
+        let c=`tip-btn ${base}`;
+        if(myTip===val){if(result&&result===val)c+=' correct';else if(result&&result!==val)c+=' sel wrong-sel';else c+=' sel';}
+        else if(result===val) c+=' cr-result';
+        return c;
+      }
+
+      const hn=m.home.length>11?m.home.substring(0,10)+'…':m.home;
+      const an=m.away.length>11?m.away.substring(0,10)+'…':m.away;
+
+      const cardLocked = result || kickoffLocked;
+      html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}">
+        <div class="match-meta">
+          <span class="time-tag">${m.huTime}</span>
+          <span class="grp-tag">${m.group} csoport</span>
+          <span style="margin-left:auto">${m.venue}</span>
+          ${total>0?`<span style="color:rgba(240,244,240,0.28)">${total}✎</span>`:''}
+          ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;letter-spacing:0.5px;">⏰ ZÁRVA</span>':''}
+        </div>
+        <div class="match-teams">
+          <div class="team"><span class="tf">${m.homeFlag}</span><span class="tn">${m.home}</span></div>
+          <span class="vs">VS</span><span class="sc">${score||'?–?'}</span>
+          <div class="team away"><span class="tf">${m.awayFlag}</span><span class="tn">${m.away}</span></div>
+        </div>
+        <div class="tip-buttons">
+          <button class="${bc('1','hb')}" onclick="submitTip('${m.id}','1')">
+            <span class="tl">1</span><span class="td">${hn}</span><span class="tc">${cnt['1']>0?cnt['1']+'×':''}</span>
+          </button>
+          <button class="${bc('X','db')}" onclick="submitTip('${m.id}','X')">
+            <span class="tl">X</span><span class="td">Döntetlen</span><span class="tc">${cnt['X']>0?cnt['X']+'×':''}</span>
+          </button>
+          <button class="${bc('2','ab')}" onclick="submitTip('${m.id}','2')">
+            <span class="tl">2</span><span class="td">${an}</span><span class="tc">${cnt['2']>0?cnt['2']+'×':''}</span>
+          </button>
+        </div>
+        ${buildScoreTipRow(m.id, myTip, result, allScores[m.id], cardLocked)}
+      </div>`;
+    });
+  });
+  container.innerHTML=html;
+}
+
+function renderStats() {
+  if(!currentUser) return;
+  let tipped=0,pts=0,resolved=0;
+  ALL_MATCHES.forEach(m=>{
+    const tip=allTips[m.id]?.[currentUser];
+    const res=allResults[m.id];
+    const sc=allScores[m.id];
+    if(tip&&getTipOutcome(tip)){
+      tipped++;
+      if(res){
+        resolved++;
+        const outcome=getTipOutcome(tip);
+        const tipSc=getTipScore(tip);
+        if(outcome===res){
+          if(tipSc&&sc&&tipSc.h+':'+tipSc.a===sc) pts+=3;
+          else pts+=1;
+        }
+      }
+    }
+  });
+  document.getElementById('stTipped').textContent=tipped;
+  document.getElementById('stCorrect').textContent=pts;
+  document.getElementById('stAcc').textContent=resolved>0?Math.round(pts/resolved*100)+'%':'–';
+}
+
+function renderUserBar() {
+  const c=document.getElementById('userBarContainer');
+  if(!currentUser){c.innerHTML='';return;}
+  const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[currentUser]).length;
+  c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
+}
+
+function changeName(){localStorage.removeItem('tipp2026_user');currentUser=null;document.getElementById('regModal').style.display='flex';document.getElementById('nameInput').value='';renderAll();}
+
+// ===== LEADERBOARD =====
+function renderLeaderboard() {
+  const c=document.getElementById('lbContainer');
+  const users=new Set();
+  Object.values(allTips).forEach(mt=>Object.keys(mt).forEach(u=>users.add(u)));
+  if(!users.size){c.innerHTML='<div class="ldg" style="padding:40px;">Még nincs tipp ⏳</div>';return;}
+  const sc=[];
+  users.forEach(u=>{
+    let pts=0,tot=0,pend=0,exact=0;
+    ALL_MATCHES.forEach(m=>{
+      const tip=allTips[m.id]?.[u];
+      const res=allResults[m.id];
+      const realSc=allScores[m.id];
+      const outcome=getTipOutcome(tip);
+      if(outcome){
+        tot++;
+        if(res){
+          if(outcome===res){
+            const tipSc=getTipScore(tip);
+            if(tipSc&&realSc&&tipSc.h+':'+tipSc.a===realSc){pts+=3;exact++;}
+            else pts+=1;
+          }
+        } else pend++;
+      }
+    });
+    sc.push({u,pts,tot,pend,exact});
+  });
+  sc.sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.tot-a.tot);
+  const med=['🥇','🥈','🥉'];
+  let html='<div class="lb-list">';
+  sc.forEach((s,i)=>{const me=s.u===currentUser;html+=`<div class="lb-row r${Math.min(i+1,3)}" style="${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div><div class="lb-sub">${s.tot} tipp · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${s.pend} várja</div></div></div>`;});
+  html+='</div>';
+  if(!Object.keys(allResults).length) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ Eredmények után látható a pontszám</div>';
+  c.innerHTML=html;
+}
+
+// ===== CHAT =====
+function buildMsgHtml(msgs) {
+  if(!msgs.length) return '<div class="chat-msg system">Légy az első kommentelő! ⚽</div>';
+  const show=msgs.slice(-40);
+  return show.map(([key,m])=>{
+    const isMe=m.name===currentUser;
+    const time=new Date(m.ts).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
+    if(m.sys) return `<div class="chat-msg system">🔔 <b>${m.name}</b> ${m.text}</div>`;
+    return `<div class="chat-msg"><div class="msg-bubble${isMe?' own':''}"><div class="msg-name${isMe?' own-name':''}">${m.name}</div><div class="msg-text">${escHtml(m.text)}</div><div class="msg-time">${time}</div></div></div>`;
+  }).join('');
+}
+
+function renderChat(msgs) {
+  // Desktop chat box
+  const box=document.getElementById('chatMessages');
+  if(box){const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.innerHTML=buildMsgHtml(msgs);if(atBottom||msgs.length<=5)box.scrollTop=box.scrollHeight;}
+  // Mobil drawer
+  const dbox=document.getElementById('drawerMessages');
+  if(dbox){const atBottom2=dbox.scrollHeight-dbox.scrollTop-dbox.clientHeight<60;dbox.innerHTML=buildMsgHtml(msgs);if(atBottom2||msgs.length<=5)dbox.scrollTop=dbox.scrollHeight;}
+  // Online count sync
+  const oc2=document.getElementById('onlineCount2');
+  if(oc2)oc2.textContent=document.getElementById('onlineCount')?.textContent||'';
+  // FAB badge: új üzenet jelzés ha drawer zárva
+  const drawer=document.getElementById('chatDrawer');
+  if(drawer&&!drawer.classList.contains('open')&&msgs.length>lastRenderedCount){
+    const badge=document.getElementById('fabBadge');
+    const diff=msgs.length-lastRenderedCount;
+    if(diff>0){badge.textContent=diff>9?'9+':diff;badge.classList.add('show');}
+  }
+  lastRenderedCount=msgs.length;
+}
+
+let lastRenderedCount=0;
+
+function openChat(){
+  document.getElementById('chatDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  // Badge törlése
+  const b=document.getElementById('fabBadge');b.textContent='';b.classList.remove('show');
+  // Scroll to bottom
+  setTimeout(()=>{const d=document.getElementById('drawerMessages');if(d)d.scrollTop=d.scrollHeight;},100);
+}
+function closeChat(){
+  document.getElementById('chatDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+async function sendChatDrawer(){
+  const input=document.getElementById('drawerInput');
+  const text=input.value.trim();
+  if(!text)return;
+  if(!currentUser){document.getElementById('regModal').style.display='flex';closeChat();return;}
+  input.value='';
+  try{await fbPush('chat',{name:currentUser,text,ts:Date.now()});await pollChat();}
+  catch(e){showToast('❌ Küldési hiba!');}
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+async function sendChat() {
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text) return;
+  if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
+  input.value='';
+  document.getElementById('chatSendBtn').disabled=true;
+  try {
+    await fbPush('chat',{name:currentUser,text,ts:Date.now()});
+    await pollChat();
+  } catch(e){showToast('❌ Küldési hiba!');}
+  setTimeout(()=>document.getElementById('chatSendBtn').disabled=false,800);
+}
+
+// ===== ADMIN =====
+function checkAdmin(){if(document.getElementById('adminPwInput').value===ADMIN_PW){isAdminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').classList.add('visible');renderAdminMatches();}else showToast('❌ Hibás jelszó!');}
+
+function renderAdminMatches() {
+  const c=document.getElementById('adminMatchList');
+  const dates=[...new Set(ALL_MATCHES.map(m=>m.huDate))];
+  let html='';
+  dates.forEach(date=>{
+    const dms=ALL_MATCHES.filter(m=>m.huDate===date);
+    const d=new Date(date+'T12:00:00');
+    html+=`<div class="section-header" style="margin-top:16px;"><h2>${d.toLocaleDateString('hu-HU',{month:'long',day:'numeric'})}</h2></div>`;
+    dms.forEach(m=>{
+      const res=allResults[m.id]||null;
+      const score=allScores[m.id]||'';const[sh,sa]=score?score.split(':'):['',''];
+      html+=`<div class="rc"><div class="rc-t">${m.huTime} ${m.homeFlag} ${m.home} – ${m.away} ${m.awayFlag}</div>
+        <div class="rc-btns">
+          <button class="rb s1${res==='1'?' a1':''}" onclick="setResult('${m.id}','1')">1</button>
+          <button class="rb sx${res==='X'?' ax':''}" onclick="setResult('${m.id}','X')">X</button>
+          <button class="rb s2${res==='2'?' a2':''}" onclick="setResult('${m.id}','2')">2</button>
+          ${res?`<button class="rb" style="border-color:#ef4444;font-size:10px;" onclick="clearRes('${m.id}')">✕</button>`:''}
+        </div>
+        <div class="si">
+          <input type="number" min="0" max="20" value="${sh}" placeholder="H" id="sh_${m.id}">
+          <span>:</span>
+          <input type="number" min="0" max="20" value="${sa}" placeholder="V" id="sa_${m.id}">
+          <button class="btn-gold" style="padding:5px 10px;font-size:11px;" onclick="saveScore('${m.id}')">✓</button>
+        </div>
+      </div>`;
+    });
+  });
+  c.innerHTML=html;
+}
+
+async function setResult(mid,tip){try{await fbSet(`results/${mid}`,tip);showToast('✅ '+tip+' rögzítve');await pollData();}catch(e){showToast('❌ Hiba!');}}
+async function clearRes(mid){try{await fbDel(`results/${mid}`);showToast('🗑️ Törölve');await pollData();}catch(e){}}
+async function saveScore(mid){const h=document.getElementById('sh_'+mid)?.value;const a=document.getElementById('sa_'+mid)?.value;if(h!==''&&a!==''){try{await fbSet(`scores/${mid}`,`${h}:${a}`);showToast('⚽ '+h+':'+a);await pollData();}catch(e){showToast('❌ Hiba!');}}}
+
+// ===== TOAST =====
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+
+// Init
+renderAll();
+</script>
+
+<!-- MOBIL CHAT DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeChat()"></div>
+<div class="chat-drawer" id="chatDrawer">
+  <div class="drawer-handle" onclick="closeChat()"></div>
+  <button class="drawer-close" onclick="closeChat()">✕</button>
+  <div class="chat-header" style="padding:12px 16px;border-bottom:1px solid rgba(245,197,24,0.12);display:flex;align-items:center;gap:10px;flex-shrink:0;margin-top:8px;">
+    <span>💬</span>
+    <span style="font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:1.5px;color:var(--gold);">ÉLŐ KOMMENT</span>
+    <span class="online-count" id="onlineCount2">0 aktív</span>
+  </div>
+  <div class="drawer-chat-inner">
+    <div class="chat-messages" id="drawerMessages"></div>
+    <div class="chat-input-area">
+      <input class="chat-input" id="drawerInput" placeholder="Írd a kommented..." maxlength="200"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChatDrawer()">
+      <button class="chat-send" onclick="sendChatDrawer()">↑</button>
+    </div>
+  </div>
+</div>
+<button class="chat-fab" id="chatFab" onclick="openChat()" title="Élő komment">
+  💬
+  <span class="chat-fab-badge" id="fabBadge">0</span>
+</button>
+
+</body>
+</html>
