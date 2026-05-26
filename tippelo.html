@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>FIFA 2026 – Tippelő</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
@@ -53,6 +53,59 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
   .col-chat{display:none !important;}
 }
 
+
+/* Havi támogatás mérő */
+.sup-meter-wrap {
+  margin: 14px 0 16px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(245,197,24,0.15);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.sup-meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.sup-meter-label {
+  font-size: 10px;
+  color: rgba(240,244,240,0.4);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.sup-meter-amount {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold);
+}
+.sup-meter-amount span {
+  font-size: 11px;
+  color: rgba(240,244,240,0.35);
+}
+.sup-meter-bar-bg {
+  height: 8px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sup-meter-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #c0183a, #f5c518);
+  transition: width 0.6s ease;
+  min-width: 4px;
+}
+.sup-meter-bar.full {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+.sup-meter-sub {
+  font-size: 10px;
+  color: rgba(240,244,240,0.3);
+  margin-top: 5px;
+  text-align: right;
+}
 /* ===== MOBIL CHAT DRAWER ===== */
 .chat-fab{
   display:none;
@@ -114,8 +167,8 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
     padding:0 0 env(safe-area-inset-bottom,0);
   }
   .drawer-chat-inner .chat-messages{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
-  .drawer-chat-inner .chat-input-area{border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;background:rgba(0,0,0,0.2);flex-shrink:0;}
-  .drawer-chat-inner .chat-input{flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:14px;font-family:'Source Sans 3',sans-serif;padding:9px 12px;}
+  .drawer-chat-inner .chat-input-area{border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px 16px;display:flex;gap:8px;background:rgba(0,0,0,0.2);flex-shrink:0;}
+  .drawer-chat-inner .chat-input{flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:16px;font-family:'Source Sans 3',sans-serif;padding:9px 12px;}
   .drawer-chat-inner .chat-input:focus{outline:none;border-color:rgba(245,197,24,0.4);}
   .drawer-chat-inner .chat-input::placeholder{color:rgba(240,244,240,0.25);}
   .drawer-chat-inner .chat-send{background:var(--gold);color:#0a1c0c;border:none;border-radius:8px;padding:9px 16px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;}
@@ -141,76 +194,86 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .date-badge{background:rgba(245,197,24,0.12);color:var(--gold);font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;padding:2px 10px;border-radius:20px;}
 
 /* MATCH CARD */
-.match-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;transition:border-color 0.2s,transform 0.12s;backdrop-filter:blur(8px);}
-.match-card:hover{border-color:rgba(245,197,24,0.35);transform:translateY(-1px);}
-.match-meta{font-size:10px;color:rgba(240,244,240,0.35);letter-spacing:0.3px;margin-bottom:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+/* ===== MATCH CARD ===== */
+.match-card{
+  background:var(--card);border:1px solid var(--card-border);
+  border-radius:var(--radius);margin-bottom:8px;
+  transition:border-color 0.2s;backdrop-filter:blur(8px);
+  overflow:hidden;width:100%;box-sizing:border-box;
+}
+.match-card:hover{border-color:rgba(245,197,24,0.35);}
+.match-meta{font-size:10px;color:rgba(240,244,240,0.35);padding:7px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,0.05);flex-wrap:wrap;}
 .grp-tag{background:rgba(245,197,24,0.1);color:var(--gold);padding:1px 7px;border-radius:10px;font-size:9px;font-weight:600;letter-spacing:1px;}
-.time-tag{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;color:rgba(240,244,240,0.7);}
-.match-teams{display:flex;align-items:center;gap:6px;margin-bottom:10px;}
-.team{flex:1;display:flex;align-items:center;gap:5px;}
-.team.away{flex-direction:row-reverse;text-align:right;}
-.tf{font-size:18px;flex-shrink:0;}
-.tn{font-family:'Oswald',sans-serif;font-size:13px;font-weight:500;letter-spacing:0.3px;line-height:1.2;}
-.vs{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;color:rgba(240,244,240,0.25);letter-spacing:2px;flex-shrink:0;width:30px;text-align:center;}
-.sc{display:none;font-family:'Oswald',sans-serif;font-size:19px;font-weight:700;color:var(--gold);width:50px;text-align:center;flex-shrink:0;}
-.match-card.has-result .vs{display:none;}
-.match-card.has-result .sc{display:block;}
-
-/* TIP BUTTONS */
-.tip-buttons{display:flex;gap:6px;}
-.tip-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 4px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.03);cursor:pointer;transition:all 0.15s;}
-.tip-btn:hover{border-color:rgba(255,255,255,0.28);background:rgba(255,255,255,0.09);}
-.tip-btn .tl{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;}
-.tip-btn .td{font-size:8px;letter-spacing:0.4px;color:rgba(240,244,240,0.45);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-.tip-btn .tc{font-size:9px;color:rgba(240,244,240,0.35);font-weight:600;}
-.tip-btn.hb{border-color:rgba(59,130,246,0.28);}
-.tip-btn.db{border-color:rgba(107,114,128,0.28);}
-.tip-btn.ab{border-color:rgba(239,68,68,0.28);}
+.time-tag{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;color:rgba(240,244,240,0.85);}
+.match-body{padding:12px 14px 0;width:100%;box-sizing:border-box;overflow:hidden;}
+.match-teams-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;width:100%;}
+.team-blk{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+.team-blk.away-blk{flex-direction:row-reverse;text-align:right;}
+.team-blk .tf{font-size:26px;flex-shrink:0;}
+.team-blk .tn-wrap{min-width:0;overflow:hidden;}
+.team-blk .tn{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;line-height:1.2;color:rgba(240,244,240,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.team-blk .tn-sub{font-size:9px;color:rgba(240,244,240,0.3);letter-spacing:0.5px;display:block;margin-top:1px;}
+.vs-block{font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;color:rgba(240,244,240,0.2);letter-spacing:3px;flex-shrink:0;}
+.sc-block{font-family:'Oswald',sans-serif;font-size:24px;font-weight:700;color:var(--gold);flex-shrink:0;display:none;}
+.match-card.has-result .vs-block{display:none;}
+.match-card.has-result .sc-block{display:block;}
+.tip-buttons{display:flex;gap:8px;width:100%;overflow:hidden;}
+.tip-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:12px 4px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);cursor:pointer;transition:all 0.15s;}
+.tip-btn:hover{border-color:rgba(255,255,255,0.28);background:rgba(255,255,255,0.08);}
+.tip-btn .tl{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;letter-spacing:1px;}
+.tip-btn .tc{font-size:9px;color:rgba(240,244,240,0.3);font-weight:600;}
+.tip-btn.hb{border-color:rgba(59,130,246,0.3);}
+.tip-btn.db{border-color:rgba(107,114,128,0.3);}
+.tip-btn.ab{border-color:rgba(239,68,68,0.3);}
 .tip-btn.hb.sel{background:var(--home);border-color:var(--home);color:#fff;}
 .tip-btn.db.sel{background:var(--draw);border-color:var(--draw);color:#fff;}
 .tip-btn.ab.sel{background:var(--away);border-color:var(--away);color:#fff;}
-.tip-btn.sel .td,.tip-btn.sel .tc{color:rgba(255,255,255,0.75);}
+.tip-btn.sel .tc{color:rgba(255,255,255,0.7);}
 .tip-btn.correct{background:var(--correct)!important;border-color:var(--correct)!important;color:#fff;}
 .tip-btn.wrong-sel{background:var(--away)!important;border-color:var(--away)!important;opacity:0.65;color:#fff;}
 .tip-btn.cr-result:not(.sel){border-color:var(--correct)!important;}
 .match-card.locked .tip-btn{cursor:default;pointer-events:none;}
-
-/* Pontos eredmény sor */
-.score-tip-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.07);}
-.score-tip-label{font-size:10px;color:rgba(240,244,240,0.4);letter-spacing:0.5px;white-space:nowrap;}
-.score-tip-inputs{display:flex;align-items:center;gap:5px;flex:1;}
-.score-tip-inputs input{
-  width:38px;height:30px;text-align:center;
-  border-radius:6px;border:1.5px solid rgba(255,255,255,0.12);
-  background:rgba(255,255,255,0.05);color:var(--white);
-  font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;
-  transition:border-color 0.2s;
+.score-row{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:stretch;gap:8px;
+  padding:10px 14px 14px;
+  box-sizing:border-box;
+  overflow:hidden;
 }
-.score-tip-inputs input:focus{outline:none;border-color:rgba(245,197,24,0.5);}
-.score-tip-inputs input.filled{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.07);}
-.score-tip-inputs .sep{font-family:'Oswald',sans-serif;font-size:14px;opacity:0.3;}
-.score-tip-btn{
-  padding:5px 12px;border-radius:6px;
+.score-row-label{font-size:11px;color:rgba(240,244,240,0.4);letter-spacing:0.5px;white-space:nowrap;align-self:center;}
+.score-inputs-wrap{
+  display:flex;align-items:center;gap:6px;
+  overflow:hidden;min-width:0;
+}
+.score-num-input{
+  width:44px;height:44px;flex-shrink:0;
+  text-align:center;border-radius:8px;
+  border:1.5px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.06);color:var(--white);
+  font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;
+  -moz-appearance:textfield;
+}
+.score-num-input::-webkit-inner-spin-button,
+.score-num-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+.score-num-input:focus{outline:none;border-color:rgba(245,197,24,0.55);background:rgba(245,197,24,0.07);}
+.score-num-input.filled{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.07);}
+.score-num-input:disabled{opacity:0.3;}
+.score-sep{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;opacity:0.2;flex-shrink:0;}
+.score-save-btn{
+  white-space:nowrap;
+  padding:0 14px;min-height:44px;border-radius:8px;
   background:rgba(245,197,24,0.12);border:1.5px solid rgba(245,197,24,0.3);
-  color:var(--gold);font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;
-  letter-spacing:0.5px;cursor:pointer;transition:all 0.15s;white-space:nowrap;
+  color:var(--gold);font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;
+  display:flex;align-items:center;
 }
-.score-tip-btn:hover{background:rgba(245,197,24,0.22);border-color:rgba(245,197,24,0.5);}
-.score-tip-btn.saved{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.4);color:#4ade80;}
-.score-tip-badge{
-  font-size:9px;letter-spacing:0.5px;color:rgba(240,244,240,0.35);
-  background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.15);
-  padding:1px 6px;border-radius:8px;white-space:nowrap;flex-shrink:0;
-}
-.score-tip-badge.hit{color:#fbbf24;border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.12);}
-
-/* 3 pontos jelzés a kártyán */
-.pts-badge{
-  display:inline-block;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;
-  letter-spacing:1px;padding:1px 6px;border-radius:8px;margin-left:6px;
-  background:rgba(245,197,24,0.15);color:var(--gold);border:1px solid rgba(245,197,24,0.3);
-}
-.pts-badge.pts3{background:rgba(34,197,94,0.15);color:#4ade80;border-color:rgba(34,197,94,0.4);}
+.score-save-btn:hover{background:rgba(245,197,24,0.22);}
+.score-save-btn.saved{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.4);color:#4ade80;}
+.score-save-btn:disabled{opacity:0.3;cursor:default;}
+.pts-badge{display:inline-block;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:6px;background:rgba(245,197,24,0.12);color:var(--gold);border:1px solid rgba(245,197,24,0.25);}
+.pts-badge.pts3{background:rgba(34,197,94,0.15);color:#4ade80;border-color:rgba(34,197,94,0.35);}
+.result-footer{padding:4px 14px 10px;display:flex;justify-content:center;gap:8px;align-items:center;}
 
 /* ===== CHAT PANEL ===== */
 .chat-panel{background:rgba(8,22,10,0.9);border:1px solid rgba(245,197,24,0.18);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;height:520px;}
@@ -231,7 +294,7 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .msg-text{font-size:13px;color:rgba(240,244,240,0.9);line-height:1.4;word-break:break-word;}
 .msg-time{font-size:9px;color:rgba(240,244,240,0.25);margin-top:3px;}
 .chat-input-area{border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;flex-shrink:0;background:rgba(0,0,0,0.2);}
-.chat-input{flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:13px;font-family:'Source Sans 3',sans-serif;padding:8px 12px;transition:border-color 0.2s;}
+.chat-input{flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:16px;font-family:'Source Sans 3',sans-serif;padding:8px 12px;transition:border-color 0.2s;}
 .chat-input:focus{outline:none;border-color:rgba(245,197,24,0.4);}
 .chat-input::placeholder{color:rgba(240,244,240,0.25);}
 .chat-send{background:var(--gold);color:#0a1c0c;border:none;border-radius:8px;padding:8px 14px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s;flex-shrink:0;}
@@ -305,9 +368,64 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .spinner{width:30px;height:30px;border:3px solid rgba(245,197,24,0.18);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+
+
 footer{position:relative;z-index:1;text-align:center;padding:18px;font-size:11px;color:rgba(240,244,240,0.22);letter-spacing:1px;border-top:1px solid rgba(245,197,24,0.07);}
 footer a{color:rgba(245,197,24,0.45);text-decoration:none;}
 footer a:hover{color:var(--gold);}
+
+/* ===== TIPPEK TÁBLÁZAT ===== */
+#tab-tippek{display:none;}
+.tipp-table-wrap{overflow-x:auto;margin-top:4px;border-radius:var(--radius);border:1px solid var(--card-border);}
+.tipp-table-wrap::-webkit-scrollbar{height:4px;}
+.tipp-table-wrap::-webkit-scrollbar-track{background:transparent;}
+.tipp-table-wrap::-webkit-scrollbar-thumb{background:rgba(245,197,24,0.25);border-radius:2px;}
+.tipp-table{border-collapse:collapse;width:100%;min-width:320px;font-size:12px;}
+.tipp-table th{
+  background:rgba(0,0,0,0.4);
+  font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;color:rgba(240,244,240,0.5);
+  padding:10px 8px;text-align:center;border-bottom:1px solid rgba(245,197,24,0.15);
+  white-space:nowrap;position:sticky;top:0;z-index:2;
+}
+.tipp-table th.match-col{text-align:left;min-width:120px;position:sticky;left:0;z-index:3;background:rgba(0,0,0,0.5);}
+.tipp-table th.user-col{min-width:70px;}
+.tipp-table td{
+  padding:8px 6px;text-align:center;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  vertical-align:middle;
+}
+.tipp-table td.match-cell{
+  text-align:left;padding:8px 10px;
+  background:rgba(10,28,12,0.7);
+  position:sticky;left:0;z-index:1;
+  border-right:1px solid rgba(245,197,24,0.1);
+  min-width:120px;
+}
+.tipp-table tr:hover td{background:rgba(245,197,24,0.04);}
+.tipp-table tr:hover td.match-cell{background:rgba(10,28,12,0.85);}
+.match-cell-home{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;white-space:nowrap;}
+.match-cell-time{font-size:9px;color:rgba(240,244,240,0.35);letter-spacing:0.5px;margin-top:1px;}
+.match-cell-score{font-family:'Oswald',sans-serif;font-size:11px;color:var(--gold);margin-top:2px;}
+
+/* Tipp cella */
+.tc-empty{color:rgba(255,255,255,0.12);font-size:16px;}
+.tc-1{background:rgba(59,130,246,0.18);color:#93c5fd;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;border-radius:6px;padding:3px 7px;display:inline-block;}
+.tc-x{background:rgba(107,114,128,0.2);color:#d1d5db;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;border-radius:6px;padding:3px 7px;display:inline-block;}
+.tc-2{background:rgba(239,68,68,0.18);color:#fca5a5;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;border-radius:6px;padding:3px 7px;display:inline-block;}
+.tc-1.hit,.tc-x.hit,.tc-2.hit{box-shadow:0 0 0 1.5px var(--correct);}
+.tc-1.exact,.tc-x.exact,.tc-2.exact{background:rgba(34,197,94,0.2);color:#4ade80;box-shadow:0 0 0 1.5px var(--correct);}
+.tc-score{font-size:9px;display:block;opacity:0.7;margin-top:1px;}
+
+/* Filter sor */
+.tipp-filter{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.tipp-filter-label{font-size:11px;color:rgba(240,244,240,0.4);letter-spacing:0.5px;}
+.filter-btn{font-family:'Oswald',sans-serif;font-size:11px;font-weight:500;letter-spacing:1px;padding:5px 12px;border-radius:20px;border:1px solid rgba(245,197,24,0.2);background:transparent;color:rgba(240,244,240,0.5);cursor:pointer;transition:all 0.15s;}
+.filter-btn:hover,.filter-btn.active{background:rgba(245,197,24,0.12);border-color:rgba(245,197,24,0.4);color:var(--gold);}
+
+/* Jelmagyarázat */
+.legend{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;font-size:10px;color:rgba(240,244,240,0.35);}
+.legend-item{display:flex;align-items:center;gap:4px;}
 </style>
 </head>
 <body>
@@ -324,12 +442,87 @@ footer a:hover{color:var(--gold);}
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- TÁMOGATÁS MODAL -->
+<div id="supportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);z-index:150;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#0f2a14;border:1px solid rgba(245,197,24,0.3);border-radius:20px;padding:32px 28px;max-width:360px;width:100%;text-align:center;animation:mIn 0.28s ease-out;position:relative;max-height:90vh;overflow-y:auto;">
+    <button onclick="document.getElementById('supportModal').style.display='none'"
+      style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.08);border:none;color:rgba(240,244,240,0.6);font-size:16px;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    <div style="font-size:40px;margin-bottom:10px;cursor:pointer;" id="supLogoTipp" onclick="(function(){window._supClicks=(window._supClicks||0)+1;if(window._supClicks>=5){document.getElementById('supAdminTipp').style.display='block';window._supClicks=0;}})()" title="">🧱</div>
+    <div style="font-family:'Oswald',sans-serif;font-size:20px;color:var(--gold);letter-spacing:2px;margin-bottom:8px;">TÁMOGASD A PROJEKTET!</div>
+    <div style="font-size:13px;color:rgba(240,244,240,0.55);line-height:1.7;margin-bottom:20px;">
+      Ez az oldal a <a href="https://teglarol-teglara.hu" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">teglarol-teglara.hu</a> projekt részeként jött létre.<br>
+      Fenntartása havi Claude Pro előfizetést igényel.
+    </div>
+    <!-- Összegek -->
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;padding:7px 18px;border-radius:30px;border:1.5px solid rgba(245,197,24,0.35);background:transparent;color:rgba(240,244,240,0.7);text-decoration:none;transition:all 0.2s;">250 Ft</a>
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;padding:7px 18px;border-radius:30px;border:1.5px solid var(--gold);background:rgba(245,197,24,0.12);color:var(--gold);text-decoration:none;">500 Ft</a>
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;padding:7px 18px;border-radius:30px;border:1.5px solid rgba(245,197,24,0.35);background:transparent;color:rgba(240,244,240,0.7);text-decoration:none;">Több ☕</a>
+    </div>
+    <!-- Revolut gomb -->
+    <a href="https://revolut.me/tamsd0pex" target="_blank"
+      style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,0.4);border:1.5px solid rgba(245,197,24,0.4);border-radius:12px;padding:11px 22px;color:var(--gold);font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-decoration:none;margin-bottom:16px;width:100%;justify-content:center;box-sizing:border-box;">
+      💳 &nbsp;Revolut link → revolut.me/tamsd0pex
+    </a>
+    <!-- Havi gyűjtőméter -->
+    <div class="sup-meter-wrap" id="supMeterTipp">
+      <div class="sup-meter-header">
+        <span class="sup-meter-label">🎯 Havi cél: 6 500 Ft</span>
+        <span class="sup-meter-amount"><span id="supAmtTipp">–</span> <span>/ 6 500 Ft</span></span>
+      </div>
+      <div class="sup-meter-bar-bg">
+        <div class="sup-meter-bar" id="supBarTipp" style="width:0%"></div>
+      </div>
+      <div class="sup-meter-sub" id="supSubTipp">Töltés...</div>
+    </div>
+    <!-- Elválasztó -->
+    <div style="display:flex;align-items:center;gap:8px;margin:12px 0;color:rgba(240,244,240,0.2);font-size:11px;letter-spacing:1px;">
+      <div style="flex:1;height:1px;background:rgba(245,197,24,0.12);"></div>
+      Nem Revolutos? Banki utalás:
+      <div style="flex:1;height:1px;background:rgba(245,197,24,0.12);"></div>
+    </div>
+    <!-- IBAN -->
+    <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(245,197,24,0.2);border-radius:10px;padding:12px 16px;margin-bottom:8px;">
+      <div style="font-size:10px;color:rgba(240,244,240,0.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">IBAN (Revolut)</div>
+      <div style="font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;color:var(--gold);letter-spacing:1.5px;word-break:break-all;">LT60 3250 0126 4002 3496</div>
+      <div style="font-size:10px;color:rgba(240,244,240,0.3);margin-top:4px;">BIC: REVOLT21</div>
+      <button onclick="navigator.clipboard.writeText('LT6032500126400234960');showToast('📋 IBAN másolva!')"
+        style="margin-top:8px;background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:rgba(240,244,240,0.6);border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:0.5px;">
+        📋 Másolás
+      </button>
+    </div>
+    <!-- Admin: összeg hozzáadás -->
+    <div id="supAdminTipp" style="display:none;margin-bottom:12px;">
+      <div style="font-size:10px;color:rgba(240,244,240,0.3);margin-bottom:8px;letter-spacing:0.5px;">Admin: összeg rögzítése</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+        <button onclick="addSupportAmount(250).then(a=>a&&showToast('✅ +250 Ft rögzítve! Összesen: '+a+' Ft'))" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:8px;padding:6px 14px;font-family:'Oswald',sans-serif;font-size:13px;cursor:pointer;">+250 Ft</button>
+        <button onclick="addSupportAmount(500).then(a=>a&&showToast('✅ +500 Ft rögzítve! Összesen: '+a+' Ft'))" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:8px;padding:6px 14px;font-family:'Oswald',sans-serif;font-size:13px;cursor:pointer;">+500 Ft</button>
+        <button onclick="(function(){var v=prompt('Egyéni összeg (Ft):');if(v&&!isNaN(v))addSupportAmount(parseInt(v)).then(function(a){if(a)showToast('✅ +'+v+' Ft rögzítve!');});})()" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:8px;padding:6px 14px;font-family:'Oswald',sans-serif;font-size:13px;cursor:pointer;">+Egyéni</button>
+      </div>
+    </div>
+    <!-- QR -->
+    <div style="margin-top:16px;">
+      <div id="sup-qr-tipp" style="display:inline-block;border-radius:10px;border:3px solid var(--gold);padding:6px;background:white;"></div>
+      <div style="font-size:9px;color:rgba(240,244,240,0.25);letter-spacing:1px;text-transform:uppercase;margin-top:6px;">revolut.me/tamsd0pex</div>
+    </div>
+    <div style="font-size:11px;color:rgba(240,244,240,0.2);margin-top:16px;line-height:1.5;">Köszönjük! 🙏 Minden forint segít.</div>
+  </div>
+</div>
+
 <!-- HEADER -->
 <header>
   <div class="trophy-icon">🏆</div>
   <h1>FIFA World Cup 2026</h1>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <span class="header-badge">KOLLÉGA TIPPVERSENY</span>
+  <div style="margin-top:14px;">
+    <button onclick="document.getElementById('supportModal').style.display='flex';initSupportQR&&initSupportQR()"
+      style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#CE2939,#a01020);color:white;border:none;border-radius:12px;padding:8px 16px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 14px rgba(0,0,0,0.35);transition:transform 0.2s;"
+      onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      <span style="font-size:16px;">❤️</span>
+      <span>Támogass!</span>
+    </button>
+  </div>
 </header>
 
 <div class="status-bar">
@@ -339,6 +532,7 @@ footer a:hover{color:var(--gold);}
 
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="showTab('meccsek')">⚽ Meccsek</button>
+  <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')">🔐 Admin</button>
 </div>
@@ -380,6 +574,27 @@ footer a:hover{color:var(--gold);}
     </div>
   </div>
 
+  <!-- TIPPEK TAB -->
+  <div id="tab-tippek">
+    <div class="section-header" style="margin-top:16px;"><h2>📋 Tippek áttekintése</h2></div>
+    <div class="tipp-filter">
+      <span class="tipp-filter-label">Szűrő:</span>
+      <button class="filter-btn active" onclick="setTippFilter('all',this)">Összes</button>
+      <button class="filter-btn" onclick="setTippFilter('today',this)">Mai meccsek</button>
+      <button class="filter-btn" onclick="setTippFilter('tipped',this)">Tippelt</button>
+    </div>
+    <div class="tipp-table-wrap" id="tippTableWrap">
+      <div class="ldg"><div class="spinner"></div>TÖLTÉS...</div>
+    </div>
+    <div class="legend">
+      <span class="legend-item"><span class="tc-1">1</span> Hazai győzelem</span>
+      <span class="legend-item"><span class="tc-x">X</span> Döntetlen</span>
+      <span class="legend-item"><span class="tc-2">2</span> Vendég győzelem</span>
+      <span class="legend-item"><span style="box-shadow:0 0 0 1.5px #22c55e;border-radius:4px;padding:1px 4px;font-family:Oswald;font-size:11px;">✓</span> Helyes</span>
+      <span class="legend-item"><span style="color:#4ade80;font-family:Oswald;font-size:11px;">🎯</span> Pontos eredmény (+3)</span>
+    </div>
+  </div>
+
   <!-- RANGLISTA TAB -->
   <div id="tab-ranglista">
     <div class="section-header" style="margin-top:16px;"><h2>🏅 Ranglista</h2></div>
@@ -416,7 +631,7 @@ const MAX_CHAT = 60; // max üzenet tárolva
 
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
-  {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"20:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Real Madrid",awayFlag:"👑",venue:"Söptei Estadio"},
+  {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"20:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Real Madrid",awayFlag:"👑",venue:"Söptei Estadio",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat"},
   {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Dél-Afrika",homeFlag:"🇿🇦",away:"Mexikó",awayFlag:"🇲🇽",venue:"Mexico City"},
   {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Bosznia-Hercegovina",homeFlag:"🇧🇦",away:"Kanada",awayFlag:"🇨🇦",venue:"Toronto"},
   {id:"A2",group:"A",huDate:"2026-06-13",huTime:"04:00",home:"Csehország",homeFlag:"🇨🇿",away:"Dél-Korea",awayFlag:"🇰🇷",venue:"Guadalajara"},
@@ -507,6 +722,16 @@ function isKickoffPassed(huDate, huTime) {
   return now >= kickoff;
 }
 
+// Firebase path-safe névkonverzió (tiltott: . $ # [ ] / és %)
+function fbSafeName(name) {
+  if(!name) return '';
+  return name.replace(/[^a-zA-Z0-9_-]/g, function(ch) {
+    // Ékezetes magánhangzókat megtartjuk olvasható formában
+    var map = {'Á':'A','á':'a','É':'E','é':'e','Í':'I','í':'i','Ó':'O','ó':'o','Ö':'O','ö':'o','Ő':'O','ő':'o','Ú':'U','ú':'u','Ü':'U','ü':'u','Ű':'U','ű':'u'};
+    return (map[ch] || '_');
+  });
+}
+
 // ===== STATE =====
 let currentUser = localStorage.getItem('tipp2026_user') || null;
 let allTips={}, allResults={}, allScores={}, allChat={};
@@ -515,7 +740,15 @@ let lastChatCount=0;
 
 // ===== FIREBASE REST =====
 const fbGet = async p => { const r=await fetch(`${DB_URL}/${p}.json`); if(!r.ok) throw new Error(r.status); return r.json(); };
-const fbSet = async (p,v) => { const r=await fetch(`${DB_URL}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); if(!r.ok) throw new Error(r.status); return r.json(); };
+const fbSet = async (p,v) => { 
+  const r=await fetch(`${DB_URL}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});
+  if(!r.ok) {
+    var errText = '';
+    try { errText = await r.text(); } catch(x){}
+    throw new Error(r.status + ': ' + errText.slice(0,100));
+  }
+  return r.json();
+};
 const fbDel = async p => fetch(`${DB_URL}/${p}.json`,{method:'DELETE'});
 const fbPush = async (p,v) => { const r=await fetch(`${DB_URL}/${p}.json`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return r.json(); };
 
@@ -527,7 +760,16 @@ async function pollData() {
       fbGet('results').catch(()=>null),
       fbGet('scores').catch(()=>null),
     ]);
-    allTips=tips||{}; allResults=results||{}; allScores=scores||{};
+    // Tips kulcsok normalizálása (fbSafeName alapján)
+    var rawTips=tips||{};
+    allTips={};
+    Object.keys(rawTips).forEach(function(mid){
+      allTips[mid]={};
+      Object.keys(rawTips[mid]).forEach(function(key){
+        allTips[mid][key]=rawTips[mid][key];
+      });
+    });
+    allResults=results||{}; allScores=scores||{};
     setStatus('online','Szinkronizálva');
     renderAll();
   } catch(e) { setStatus('err','Kapcsolati hiba'); }
@@ -570,11 +812,20 @@ document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='
 if(currentUser) document.getElementById('regModal').style.display='none';
 
 // ===== TABS =====
+let tippFilter='all';
+function setTippFilter(f,btn){
+  tippFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTippTable();
+}
+
 function showTab(t) {
   activeTab=t;
-  ['meccsek','ranglista','admin'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
-  document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['meccsek','ranglista','admin'][i]===t));
+  ['meccsek','tippek','ranglista','admin'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
+  document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['meccsek','tippek','ranglista','admin'][i]===t));
   if(t==='ranglista') renderLeaderboard();
+  if(t==='tippek') renderTippTable();
   if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
 }
 
@@ -589,13 +840,13 @@ async function submitTip(mid,tip) {
   if(m&&isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
   if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
   if(!allTips[mid]) allTips[mid]={};
-  const existing = allTips[mid][currentUser];
+  const existing = allTips[mid][fbSafeName(currentUser)];
   const existingScore = getTipScore(existing);
   // Megőrizzük a pontos eredményt ha már be volt írva
   const newTip = existingScore ? {o:tip, h:existingScore.h, a:existingScore.a} : {o:tip};
-  allTips[mid][currentUser]=newTip; renderAll();
-  try { await fbSet(`tips/${mid}/${currentUser}`,newTip); showToast(tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!'); }
-  catch(e){showToast('❌ Mentési hiba!');}
+  allTips[mid][fbSafeName(currentUser)]=newTip; renderAll();
+  try { await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip); showToast(tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!'); }
+  catch(e){showToast('❌ ' + (e.message||'Mentési hiba'));}
 }
 
 async function submitScore(mid) {
@@ -612,65 +863,132 @@ async function submitScore(mid) {
   const outcome = hN>aN?'1':hN===aN?'X':'2';
   if(!allTips[mid]) allTips[mid]={};
   const newTip={o:outcome,h:hN,a:aN};
-  allTips[mid][currentUser]=newTip; renderAll();
+  allTips[mid][fbSafeName(currentUser)]=newTip; renderAll();
   try {
-    await fbSet(`tips/${mid}/${currentUser}`,newTip);
+    await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
     showToast(`🎯 Pontos: ${hN}:${aN} – 3 pontért játszol!`);
     // Gomb visszajelzés
     const btn=document.getElementById('sbtn_'+mid);
     if(btn){btn.classList.add('saved');btn.textContent='✓ MENTVE';setTimeout(()=>{btn.classList.remove('saved');btn.textContent='TIPPELEK';},2000);}
-  } catch(e){showToast('❌ Mentési hiba!');}
+  } catch(e){showToast('❌ ' + (e.message||'Mentési hiba'));}
 }
 
-// ===== SCORE TIP ROW BUILDER =====
-function buildScoreTipRow(mid, myTip, result, realScore, locked) {
+// ===== SCORE ROW BUILDER (kompakt, a match-center-en belül) =====
+function buildScoreRow(mid, myTip, result, realScore, locked) {
   var myScore = getTipScore(myTip);
   var isExact = myScore && realScore && myScore.h + ':' + myScore.a === realScore;
+  var outcome = getTipOutcome(myTip);
+  var dis = locked ? ' disabled' : '';
 
   if (result) {
-    if (myScore) {
-      var pts = isExact ? 3 : (getTipOutcome(myTip) === result ? 1 : 0);
-      var ptsHtml = pts === 3
-        ? '<span class="pts-badge pts3">+3 PONT \u{1F3AF}</span>'
-        : pts === 1
-          ? '<span class="pts-badge">+1 PONT</span>'
-          : '<span class="pts-badge" style="opacity:0.4">0 pont</span>';
-      return '<div class="score-tip-row">'
-        + '<span class="score-tip-label">Pontos:</span>'
-        + '<span class="score-tip-badge' + (isExact ? ' hit' : '') + '">'
-        + myScore.h + ':' + myScore.a + (isExact ? ' \u{1F3AF}' : '') + '</span>'
-        + ptsHtml + '</div>';
-    } else {
-      var pts2 = getTipOutcome(myTip) === result ? 1 : 0;
-      if (pts2 > 0) return '<div class="score-tip-row"><span class="pts-badge">+1 PONT</span></div>';
-      return myTip ? '<div class="score-tip-row"><span style="font-size:10px;color:rgba(240,244,240,0.25);">Nincs pontos tipp</span></div>' : '';
-    }
+    // Meccs lejátszva: pontszám megjelenítés
+    var pts = isExact ? 3 : (outcome === result ? 1 : 0);
+    var ptsBadge = pts === 3
+      ? '<span class="pts-badge pts3">+3 🎯</span>'
+      : pts === 1 ? '<span class="pts-badge">+1</span>'
+      : (outcome ? '<span class="pts-badge" style="opacity:0.35">0 pt</span>' : '');
+    var scoreBadge = myScore
+      ? '<span style="font-size:10px;color:' + (isExact?'#4ade80':'rgba(240,244,240,0.35)') + ';font-family:Oswald,sans-serif;font-weight:600;">' + myScore.h + ':' + myScore.a + (isExact?' 🎯':'') + '</span>'
+      : '';
+    if (!outcome) return '';
+    return '<div class="result-footer">' + scoreBadge + ptsBadge + '</div>';
   } else {
+    // Tippelési mód: kompakt sor
     var hVal = myScore ? String(myScore.h) : '';
     var aVal = myScore ? String(myScore.a) : '';
-    var dis = locked ? ' disabled' : '';
-    var btnCls = 'score-tip-btn' + (myScore ? ' saved' : '');
-    var btnTxt = myScore ? '\u2713 MENTVE' : 'TIPPELEK';
-    var badge = myScore
-      ? '<span class="score-tip-badge hit" style="font-size:9px;">' + myScore.h + ':' + myScore.a + '</span>'
-      : '';
-    var onclick = 'submitScore(' + JSON.stringify(mid) + ')';
-    return '<div class="score-tip-row">'
-      + '<span class="score-tip-label">+3 pont:</span>'
-      + '<div class="score-tip-inputs">'
-      + '<input type="number" min="0" max="20" id="sh_tip_' + mid + '" placeholder="-"'
-      + ' value="' + hVal + '" class="' + (myScore ? 'filled' : '') + '"' + dis + '>'
-      + '<span class="sep">:</span>'
-      + '<input type="number" min="0" max="20" id="sa_tip_' + mid + '" placeholder="-"'
-      + ' value="' + aVal + '" class="' + (myScore ? 'filled' : '') + '"' + dis + '>'
-      + '<button class="' + btnCls + '" id="sbtn_' + mid + '" onclick="' + onclick + '"' + dis + '>'
+    var oc = 'submitScore(' + JSON.stringify(mid) + ')';
+    var btnCls = 'score-save-btn' + (myScore ? ' saved' : '');
+    var btnTxt = myScore ? '✓' : '+3pt';
+    return '<div class="score-row">'
+      + '<span class="score-row-label">+3 pont:</span>'
+      + '<div class="score-inputs-wrap">'
+      + '<input type="number" min="0" max="20" id="sh_tip_' + mid + '" placeholder="–"'
+      + ' value="' + hVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
+      + '<span class="score-sep">:</span>'
+      + '<input type="number" min="0" max="20" id="sa_tip_' + mid + '" placeholder="–"'
+      + ' value="' + aVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
+      + '</div>'
+      + '<button class="' + btnCls + '" id="sbtn_' + mid + '" onclick="' + oc + '"' + dis + '>'
       + btnTxt + '</button>'
-      + '</div>' + badge + '</div>';
+      + '</div>';
   }
 }
 
 // ===== RENDER MATCHES (dátum szerint csoportosítva) =====
-function renderAll() { renderMatches(); renderStats(); renderUserBar(); if(activeTab==='ranglista') renderLeaderboard(); if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); }
+function renderAll() { renderMatches(); renderStats(); renderUserBar(); if(activeTab==='ranglista') renderLeaderboard(); if(activeTab==='tippek') renderTippTable(); if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); }
+
+function renderTippTable() {
+  const wrap = document.getElementById('tippTableWrap');
+  if(!wrap) return;
+
+  // Összes user összegyűjtése
+  const users = [];
+  Object.values(allTips).forEach(mt => Object.keys(mt).forEach(u => { if(!users.includes(u)) users.push(u); }));
+  users.sort();
+
+  // Meccsek szűrése
+  const todayHU = getBudapestNow().slice(0,10);
+  let matches = ALL_MATCHES.filter(m => {
+    if(tippFilter === 'today') return m.huDate === todayHU;
+    if(tippFilter === 'tipped') return Object.values(allTips[m.id]||{}).some(t=>getTipOutcome(t));
+    return true;
+  });
+
+  if(!users.length) {
+    wrap.innerHTML = '<div class="ldg" style="padding:30px;">Még senki nem tippelt ⏳</div>';
+    return;
+  }
+
+  // Fejléc
+  let html = '<table class="tipp-table"><thead><tr>'
+    + '<th class="match-col">Meccs</th>';
+  users.forEach(u => {
+    const isMe = u === currentUser;
+    html += '<th class="user-col" style="' + (isMe?'color:var(--gold);':'') + '">'
+      + (isMe?'⚽ ':'') + u + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  // Sorok
+  matches.forEach(m => {
+    const result = allResults[m.id] || null;
+    const realScore = allScores[m.id] || null;
+
+    html += '<tr>';
+    // Meccs cella
+    html += '<td class="match-cell">'
+      + '<div class="match-cell-home">' + m.homeFlag + ' ' + m.home + ' – ' + m.away + ' ' + m.awayFlag + '</div>'
+      + '<div class="match-cell-time">' + m.huDate.slice(5).replace('-','.') + '. ' + m.huTime + '</div>'
+      + (realScore ? '<div class="match-cell-score">' + realScore + '</div>' : '')
+      + '</td>';
+
+    // Tipp cellák
+    users.forEach(u => {
+      const tip = allTips[m.id] ? allTips[m.id][u] : null;
+      const outcome = getTipOutcome(tip);
+      const score = getTipScore(tip);
+
+      if(!outcome) {
+        html += '<td><span class="tc-empty">–</span></td>';
+        return;
+      }
+
+      const isExact = score && realScore && score.h + ':' + score.a === realScore;
+      const isHit = result && outcome === result;
+      let cls = 'tc-' + outcome.toLowerCase();
+      if(isExact) cls += ' exact';
+      else if(isHit) cls += ' hit';
+
+      const scoreStr = score ? '<span class="tc-score">' + score.h + ':' + score.a + '</span>' : '';
+      html += '<td><span class="' + cls + '">' + outcome + scoreStr + '</span></td>';
+    });
+
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
 
 function renderMatches() {
   const container=document.getElementById('matchesContainer');
@@ -681,55 +999,73 @@ function renderMatches() {
     const dayMatches=ALL_MATCHES.filter(m=>m.huDate===date);
     const d=new Date(date+'T12:00:00');
     const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
-    const dayCount=dayMatches.filter(m=>allTips[m.id]?.[currentUser]).length;
+    const dayCount=dayMatches.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
     html+=`<div class="date-header"><h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span></div>`;
     dayMatches.forEach(m=>{
       const result=allResults[m.id]||null;
       const score=allScores[m.id]||null;
-      const myTip=currentUser&&allTips[m.id]?(allTips[m.id][currentUser]||null):null;
+      const myTip=currentUser&&allTips[m.id]?(allTips[m.id][fbSafeName(currentUser)]||null):null;
       // Időzár: kickoff után nem lehet tippelni
       const kickoffLocked = isKickoffPassed(m.huDate, m.huTime);
       const tips=allTips[m.id]||{};
       const cnt={'1':0,'X':0,'2':0};
-      Object.values(tips).forEach(t=>{if(cnt[t]!==undefined)cnt[t]++;});
+      Object.values(tips).forEach(t=>{var o=getTipOutcome(t);if(cnt[o]!==undefined)cnt[o]++;});
       const total=cnt['1']+cnt['X']+cnt['2'];
 
       function bc(val,base) {
-        let c=`tip-btn ${base}`;
-        if(myTip===val){if(result&&result===val)c+=' correct';else if(result&&result!==val)c+=' sel wrong-sel';else c+=' sel';}
+        var c='tip-btn '+base;
+        var myOut=getTipOutcome(myTip);
+        if(myOut===val){if(result&&result===val)c+=' correct';else if(result&&result!==val)c+=' sel wrong-sel';else c+=' sel';}
         else if(result===val) c+=' cr-result';
         return c;
       }
 
-      const hn=m.home.length>11?m.home.substring(0,10)+'…':m.home;
-      const an=m.away.length>11?m.away.substring(0,10)+'…':m.away;
 
       const cardLocked = result || kickoffLocked;
       html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}">
         <div class="match-meta">
           <span class="time-tag">${m.huTime}</span>
-          <span class="grp-tag">${m.group} csoport</span>
-          <span style="margin-left:auto">${m.venue}</span>
-          ${total>0?`<span style="color:rgba(240,244,240,0.28)">${total}✎</span>`:''}
-          ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;letter-spacing:0.5px;">⏰ ZÁRVA</span>':''}
+          <span class="grp-tag">${/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport'}</span>
+          <span style="margin-left:auto;color:rgba(240,244,240,0.25);">${m.venue}</span>
+          ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
+          ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
         </div>
-        <div class="match-teams">
-          <div class="team"><span class="tf">${m.homeFlag}</span><span class="tn">${m.home}</span></div>
-          <span class="vs">VS</span><span class="sc">${score||'?–?'}</span>
-          <div class="team away"><span class="tf">${m.awayFlag}</span><span class="tn">${m.away}</span></div>
+        ${m.title?'<div style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.5);letter-spacing:1.5px;padding:6px 0 0;">'+m.title+'</div>':''}
+        <div class="match-body">
+          <div class="match-teams-row">
+            <div class="team-blk">
+              <span class="tf">${m.homeFlag}</span>
+              <div class="tn-wrap">
+                <span class="tn">${m.home}</span>
+                ${m.homeLabel?'<span class="tn-sub">'+m.homeLabel+'</span>':''}
+              </div>
+            </div>
+            <span class="vs-block">VS</span>
+            <span class="sc-block">${score||'?–?'}</span>
+            <div class="team-blk away-blk">
+              <span class="tf">${m.awayFlag}</span>
+              <div class="tn-wrap">
+                <span class="tn">${m.away}</span>
+                ${m.awayLabel?'<span class="tn-sub">'+m.awayLabel+'</span>':''}
+              </div>
+            </div>
+          </div>
+          <div class="tip-buttons">
+            <button class="${bc('1','hb')}" onclick="submitTip('${m.id}','1')">
+              <span class="tl">1</span>
+              <span class="tc">${cnt['1']>0?(cnt['1']+'×'):''}</span>
+            </button>
+            <button class="${bc('X','db')}" onclick="submitTip('${m.id}','X')">
+              <span class="tl">X</span>
+              <span class="tc">${cnt['X']>0?(cnt['X']+'×'):''}</span>
+            </button>
+            <button class="${bc('2','ab')}" onclick="submitTip('${m.id}','2')">
+              <span class="tl">2</span>
+              <span class="tc">${cnt['2']>0?(cnt['2']+'×'):''}</span>
+            </button>
+          </div>
+          ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}
         </div>
-        <div class="tip-buttons">
-          <button class="${bc('1','hb')}" onclick="submitTip('${m.id}','1')">
-            <span class="tl">1</span><span class="td">${hn}</span><span class="tc">${cnt['1']>0?cnt['1']+'×':''}</span>
-          </button>
-          <button class="${bc('X','db')}" onclick="submitTip('${m.id}','X')">
-            <span class="tl">X</span><span class="td">Döntetlen</span><span class="tc">${cnt['X']>0?cnt['X']+'×':''}</span>
-          </button>
-          <button class="${bc('2','ab')}" onclick="submitTip('${m.id}','2')">
-            <span class="tl">2</span><span class="td">${an}</span><span class="tc">${cnt['2']>0?cnt['2']+'×':''}</span>
-          </button>
-        </div>
-        ${buildScoreTipRow(m.id, myTip, result, allScores[m.id], cardLocked)}
       </div>`;
     });
   });
@@ -740,7 +1076,7 @@ function renderStats() {
   if(!currentUser) return;
   let tipped=0,pts=0,resolved=0;
   ALL_MATCHES.forEach(m=>{
-    const tip=allTips[m.id]?.[currentUser];
+    const tip=allTips[m.id]?.[fbSafeName(currentUser)];
     const res=allResults[m.id];
     const sc=allScores[m.id];
     if(tip&&getTipOutcome(tip)){
@@ -764,7 +1100,7 @@ function renderStats() {
 function renderUserBar() {
   const c=document.getElementById('userBarContainer');
   if(!currentUser){c.innerHTML='';return;}
-  const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[currentUser]).length;
+  const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
   c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
 }
 
@@ -844,6 +1180,7 @@ function openChat(){
   document.getElementById('chatDrawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
   document.body.style.overflow='hidden';
+  document.getElementById('chatFab').style.display='none';
   // Badge törlése
   const b=document.getElementById('fabBadge');b.textContent='';b.classList.remove('show');
   // Scroll to bottom
@@ -853,6 +1190,7 @@ function closeChat(){
   document.getElementById('chatDrawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
   document.body.style.overflow='';
+  document.getElementById('chatFab').style.display='flex';
 }
 
 async function sendChatDrawer(){
@@ -923,6 +1261,103 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // Init
 renderAll();
+
+
+// QR kód a támogatás modalhoz
+(function() {
+  var qrLoaded = false;
+  window.initSupportQR = function() {
+    var el = document.getElementById('sup-qr-tipp');
+    if(!el || el.children.length > 0) return;
+    function makeQR() {
+      new QRCode(el, {text:'https://revolut.me/tamsd0pex',width:130,height:130,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+    }
+    if(typeof QRCode !== 'undefined') { makeQR(); }
+    else if(!qrLoaded) {
+      qrLoaded = true;
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      s.onload = makeQR;
+      document.head.appendChild(s);
+    }
+  };
+})();
+
+// ===== HAVI TÁMOGATÁS GYŰJTŐMÉTER =====
+const SUPPORT_GOAL = 6500;
+const SUP_DB = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/support';
+
+function getMonthKey() {
+  var now = new Date();
+  return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+}
+
+async function loadSupportAmount() {
+  try {
+    var key = getMonthKey();
+    var r = await fetch(SUP_DB + '/' + key + '.json');
+    var data = await r.json();
+    var amount = (data && data.amount) ? data.amount : 0;
+    updateSupportMeters(amount);
+  } catch(e) {
+    updateSupportMeters(0);
+  }
+}
+
+function updateSupportMeters(amount) {
+  var pct = Math.min(100, Math.round(amount / SUPPORT_GOAL * 100));
+  var full = pct >= 100;
+  var key = getMonthKey();
+  var monthNames = ['jan','feb','már','ápr','máj','jún','júl','aug','szep','okt','nov','dec'];
+  var mIdx = parseInt(key.split('-')[1]) - 1;
+  var sub = monthNames[mIdx] + '. összesített · köszönjük! 🙏';
+  if(amount === 0) sub = 'Légy az első támogató ' + monthNames[mIdx] + 'ban! 💪';
+
+  // Tippelős modal
+  var amtT = document.getElementById('supAmtTipp');
+  var barT = document.getElementById('supBarTipp');
+  var subT = document.getElementById('supSubTipp');
+  if(amtT) amtT.textContent = amount + ' Ft';
+  if(barT) { barT.style.width = pct + '%'; if(full) barT.classList.add('full'); }
+  if(subT) subT.textContent = sub;
+
+  // Főoldal modal
+  var amtI = document.getElementById('supAmtIdx');
+  var barI = document.getElementById('supBarIdx');
+  var subI = document.getElementById('supSubIdx');
+  if(amtI) amtI.textContent = amount + ' Ft';
+  if(barI) { barI.style.width = pct + '%'; if(full) barI.style.background = 'linear-gradient(90deg,#22c55e,#4ade80)'; }
+  if(subI) subI.textContent = sub;
+}
+
+async function addSupportAmount(ft) {
+  try {
+    var key = getMonthKey();
+    // Először lekérjük a jelenlegit
+    var r = await fetch(SUP_DB + '/' + key + '.json');
+    var data = await r.json();
+    var current = (data && data.amount) ? data.amount : 0;
+    var newAmount = current + ft;
+    // Mentés
+    await fetch(SUP_DB + '/' + key + '.json', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({amount: newAmount, updated: new Date().toISOString()})
+    });
+    updateSupportMeters(newAmount);
+    return newAmount;
+  } catch(e) {
+    return null;
+  }
+}
+
+// Betöltéskor lekérjük
+loadSupportAmount();
+// Modalok megnyitásakor is frissítjük (az initSupportQR-ba hookoljuk)
+var _origInitQR = window.initSupportQR;
+window.initSupportQR = function() { if(_origInitQR) _origInitQR(); loadSupportAmount(); };
+var _origInitQRIdx = window.initSupportQRIdx;
+window.initSupportQRIdx = function() { if(_origInitQRIdx) _origInitQRIdx(); loadSupportAmount(); };
 </script>
 
 <!-- MOBIL CHAT DRAWER -->
