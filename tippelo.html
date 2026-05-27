@@ -40,15 +40,45 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .nav-tab.active{background:var(--gold);color:#0a1c0c;border-color:var(--gold);font-weight:700;}
 
 /* MAIN LAYOUT */
-.page-wrapper{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:16px 12px 60px;}
+.page-wrapper{position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:16px 24px 60px;}
 
 /* TWO COLUMN LAYOUT (desktop) */
-.two-col{display:flex;gap:20px;align-items:flex-start;}
+.two-col{display:flex;gap:28px;align-items:flex-start;}
 .col-matches{flex:1;min-width:0;}
-.col-chat{width:320px;flex-shrink:0;position:sticky;top:16px;}
+.col-chat{width:380px;flex-shrink:0;position:sticky;top:16px;}
+
+/* Desktop nagy font */
+@media(min-width:901px){
+  .match-card { font-size: 14px; }
+  .time-tag { font-size: 14px !important; }
+  .team-blk .tf { font-size: 36px !important; }
+  .team-blk .tn { font-size: 32px !important; font-weight:700 !important; }
+  .tip-btn .tl { font-size: 14px !important; }
+  .tip-btn .tc { font-size: 9px !important; }
+  .tip-btn { padding: 8px 4px !important; }
+  .match-teams-row { margin-bottom: 8px !important; }
+  .score-num-input { font-size: 18px !important; width: 44px !important; height: 40px !important; }
+  .score-save-btn { font-size: 12px !important; height: 40px !important; padding: 0 14px !important; }
+  .date-header h2 { font-size: 18px !important; }
+  .stat-num { font-size: 30px !important; }
+  .nav-tab { font-size: 14px !important; padding: 10px 22px !important; }
+  .header-badge { font-size: 16px !important; letter-spacing: 3px !important; }
+  /* Chat 1.5x nagyobb */
+  .chat-header h3 { font-size: 19px !important; }
+  .chat-header { padding: 14px 18px !important; }
+  .msg-bubble { font-size: 15px !important; }
+  .msg-name { font-size: 13px !important; }
+  .msg-time { font-size: 12px !important; }
+  .chat-input { font-size: 15px !important; padding: 10px 14px !important; }
+  #participantsList { font-size: 15px !important; }
+  #participantsList div { padding: 7px 14px !important; }
+  #participantsList span { font-size: 15px !important; }
+  .online-count { font-size: 13px !important; }
+}
 
 @media(max-width:900px){
   .two-col{flex-direction:column;}
+  .page-wrapper{padding:12px 10px 60px;}
   /* Mobilon a chat drawer rejtett, FAB gombbal nyitható */
   .col-chat{display:none !important;}
 }
@@ -1077,25 +1107,31 @@ async function submitTip(mid,tip) {
 
 async function submitScore(mid) {
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
-  const m=ALL_MATCHES.find(x=>x.id===mid);
+  var m=ALL_MATCHES.find(function(x){return x.id===mid;});
   if(m&&isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
   if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
-  const h=document.getElementById('sh_tip_'+mid)?.value;
-  const a=document.getElementById('sa_tip_'+mid)?.value;
-  if(h===''||h===undefined||a===''||a===undefined){showToast('⚠️ Írd be mindkét számot!');return;}
-  const hN=parseInt(h), aN=parseInt(a);
-  if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){showToast('⚠️ Érvénytelen szám!');return;}
-  // Kimenet meghatározása a számoból
-  const outcome = hN>aN?'1':hN===aN?'X':'2';
+  var hEl=document.getElementById('sh_tip_'+mid);
+  var aEl=document.getElementById('sa_tip_'+mid);
+  if(!hEl||!aEl){showToast('⚠️ Nem találom az input mezőt!');return;}
+  var h=hEl.value, a=aEl.value;
+  if(h===''||a===''){showToast('⚠️ Írd be mindkét számot!');return;}
+  var hN=parseInt(h), aN=parseInt(a);
+  if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){showToast('⚠️ Érvénytelen szám (0-20)!');return;}
+  var outcome = hN>aN?'1':hN===aN?'X':'2';
   if(!allTips[mid]) allTips[mid]={};
-  const newTip={o:outcome,h:hN,a:aN};
-  allTips[mid][fbSafeName(currentUser)]=newTip; renderStats(); renderUserBar();
+  var newTip={o:outcome,h:hN,a:aN};
+  allTips[mid][fbSafeName(currentUser)]=newTip;
+  // Gomb azonnali visszajelzés
+  var btn=document.getElementById('sbtn_'+mid);
+  if(btn){btn.classList.add('saved');btn.textContent='✓ Mentve';}
+  renderStats(); renderUserBar();
   try {
     await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
-    showToast('🎯 Pontos: '+hN+':'+aN+' – 3 pontért!');
-    var btn=document.getElementById('sbtn_'+mid);
-    if(btn){btn.classList.add('saved');btn.textContent='✓ Mentve';}
-  } catch(e){showToast('❌ Mentési hiba!');}
+    showToast('🎯 Mentve: '+hN+':'+aN);
+  } catch(e){
+    showToast('❌ Hiba: '+(e.message||e));
+    if(btn){btn.classList.remove('saved');btn.textContent='Mentés';}
+  }
 }
 
 // ===== SCORE ROW BUILDER (kompakt, a match-center-en belül) =====
