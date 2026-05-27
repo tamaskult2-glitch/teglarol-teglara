@@ -529,7 +529,7 @@ footer a:hover{color:var(--gold);}
     <div class="onboard-header">
       <div class="ob-icon">🏆</div>
       <h2>FIFA 2026 Tippverseny</h2>
-      <p>KOLLÉGA TIPPVERSENY · HASZNÁLATI ÚTMUTATÓ</p>
+      <p>GÓLSZAGLÓ BAJNOKSÁG · HASZNÁLATI ÚTMUTATÓ</p>
     </div>
 
     <div class="onboard-steps">
@@ -700,12 +700,12 @@ footer a:hover{color:var(--gold);}
   <div class="trophy-icon">🏆</div>
   <h1>FIFA World Cup 2026</h1>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
-  <span class="header-badge">KOLLÉGA TIPPVERSENY</span>
+  <span class="header-badge">GÓLSZAGLÓ BAJNOKSÁG</span>
   <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;">
     <button onclick="document.getElementById('onboardModal').style.display='flex'"
       style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"
       title="Használati útmutató">?</button>
-    <button onclick="document.getElementById('supportModal').style.display='flex';loadSupportAmount&&loadSupportAmount();initSupportQR&&initSupportQR()"
+    <button onclick="document.getElementById('supportModal').style.display='flex';if(typeof loadSupportAmount==='function')loadSupportAmount();if(typeof initSupportQR==='function')initSupportQR();"
       style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#CE2939,#a01020);color:white;border:none;border-radius:12px;padding:8px 16px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 14px rgba(0,0,0,0.35);transition:transform 0.2s;"
       onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
       <span style="font-size:16px;">❤️</span>
@@ -747,13 +747,16 @@ footer a:hover{color:var(--gold);}
       <div class="col-chat">
         <div class="chat-panel" id="chatPanel">
           <div class="chat-header">
+            <span>👥</span>
+            <h3>RÉSZTVEVŐK</h3>
+            <span class="online-count" id="onlineCount"></span>
+          </div>
+          <div id="participantsList" style="padding:6px 4px;border-bottom:1px solid rgba(255,255,255,0.07);max-height:160px;overflow-y:auto;"></div>
+          <div class="chat-header" style="padding:8px 12px;border-bottom:none;border-top:1px solid rgba(255,255,255,0.07);margin-top:4px;">
             <span>💬</span>
             <h3>ÉLŐ KOMMENT</h3>
-            <span class="online-count" id="onlineCount">0 online</span>
           </div>
-          <div class="chat-messages" id="chatMessages">
-            <div class="chat-msg system">Üdv! Kommenteld az aktuális meccseket ⚽</div>
-          </div>
+          <div class="chat-messages" id="chatMessages"></div>
           <div class="chat-input-area">
             <input class="chat-input" id="chatInput" placeholder="Írd a kommented..." maxlength="200" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()">
             <button class="chat-send" id="chatSendBtn" onclick="sendChat()">↑</button>
@@ -806,78 +809,78 @@ const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
   {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat"},
-  {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Dél-Afrika",homeFlag:"🇿🇦",away:"Mexikó",awayFlag:"🇲🇽",venue:"Mexico City"},
-  {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Bosznia-Hercegovina",homeFlag:"🇧🇦",away:"Kanada",awayFlag:"🇨🇦",venue:"Toronto"},
-  {id:"A2",group:"A",huDate:"2026-06-13",huTime:"04:00",home:"Csehország",homeFlag:"🇨🇿",away:"Dél-Korea",awayFlag:"🇰🇷",venue:"Guadalajara"},
-  {id:"B2",group:"B",huDate:"2026-06-13",huTime:"21:00",home:"Svájc",homeFlag:"🇨🇭",away:"Katar",awayFlag:"🇶🇦",venue:"San Francisco"},
-  {id:"C1",group:"C",huDate:"2026-06-14",huTime:"00:00",home:"Marokkó",homeFlag:"🇲🇦",away:"Brazília",awayFlag:"🇧🇷",venue:"New York/NJ"},
-  {id:"D1",group:"D",huDate:"2026-06-14",huTime:"03:00",home:"Paraguay",homeFlag:"🇵🇾",away:"USA",awayFlag:"🇺🇸",venue:"Los Angeles"},
-  {id:"D2",group:"D",huDate:"2026-06-14",huTime:"06:00",home:"Törökország",homeFlag:"🇹🇷",away:"Ausztrália",awayFlag:"🇦🇺",venue:"Vancouver"},
-  {id:"E1",group:"E",huDate:"2026-06-14",huTime:"19:00",home:"Curaçao",homeFlag:"🇨🇼",away:"Németország",awayFlag:"🇩🇪",venue:"Houston"},
+  {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Mexico City"},
+  {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Kanada",homeFlag:"🇨🇦",away:"Bosznia-Hercegovina",awayFlag:"🇧🇦",venue:"Toronto"},
+  {id:"A2",group:"A",huDate:"2026-06-12",huTime:"04:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Csehország",awayFlag:"🇨🇿",venue:"Guadalajara"},
+  {id:"B2",group:"B",huDate:"2026-06-13",huTime:"21:00",home:"Katar",homeFlag:"🇶🇦",away:"Svájc",awayFlag:"🇨🇭",venue:"San Francisco"},
+  {id:"C1",group:"C",huDate:"2026-06-14",huTime:"00:00",home:"Brazília",homeFlag:"🇧🇷",away:"Marokkó",awayFlag:"🇲🇦",venue:"New York/NJ"},
+  {id:"D1",group:"D",huDate:"2026-06-13",huTime:"03:00",home:"Egyesült Államok",homeFlag:"🇺🇸",away:"Paraguay",awayFlag:"🇵🇾",venue:"Los Angeles"},
+  {id:"D2",group:"D",huDate:"2026-06-14",huTime:"06:00",home:"Ausztrália",homeFlag:"🇦🇺",away:"Törökország",awayFlag:"🇹🇷",venue:"Vancouver"},
+  {id:"E1",group:"E",huDate:"2026-06-14",huTime:"19:00",home:"Németország",homeFlag:"🇩🇪",away:"Curaçao",awayFlag:"🇨🇼",venue:"Houston"},
   {id:"F1",group:"F",huDate:"2026-06-14",huTime:"22:00",home:"Hollandia",homeFlag:"🇳🇱",away:"Japán",awayFlag:"🇯🇵",venue:"Dallas"},
-  {id:"E2",group:"E",huDate:"2026-06-15",huTime:"01:00",home:"Ecuador",homeFlag:"🇪🇨",away:"Elefántcsontpart",awayFlag:"🇨🇮",venue:"Philadelphia"},
-  {id:"C2",group:"C",huDate:"2026-06-15",huTime:"03:00",home:"Skócia",homeFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",away:"Haiti",awayFlag:"🇭🇹",venue:"Boston"},
-  {id:"F2",group:"F",huDate:"2026-06-16",huTime:"04:00",home:"Szerbia",homeFlag:"🇷🇸",away:"Szenegál",awayFlag:"🇸🇳",venue:"Monterrey"},
-  {id:"H1",group:"H",huDate:"2026-06-15",huTime:"18:00",home:"Spanyolország",homeFlag:"🇪🇸",away:"Zöld-foki-sz.",awayFlag:"🇨🇻",venue:"Atlanta"},
+  {id:"E2",group:"E",huDate:"2026-06-15",huTime:"01:00",home:"Elefántcsontpart",homeFlag:"🇨🇮",away:"Ecuador",awayFlag:"🇪🇨",venue:"Philadelphia"},
+  {id:"C2",group:"C",huDate:"2026-06-14",huTime:"03:00",home:"Haiti",homeFlag:"🇭🇹",away:"Skócia",awayFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",venue:"Boston"},
+  {id:"F2",group:"F",huDate:"2026-06-15",huTime:"04:00",home:"Svédország",homeFlag:"🇸🇪",away:"Tunézia",awayFlag:"🇹🇳",venue:"Monterrey"},
+  {id:"H1",group:"H",huDate:"2026-06-15",huTime:"18:00",home:"Spanyolország",homeFlag:"🇪🇸",away:"Zöld-foki-szigetek",awayFlag:"🇨🇻",venue:"Atlanta"},
   {id:"G1",group:"G",huDate:"2026-06-15",huTime:"21:00",home:"Belgium",homeFlag:"🇧🇪",away:"Egyiptom",awayFlag:"🇪🇬",venue:"Seattle"},
   {id:"H2",group:"H",huDate:"2026-06-16",huTime:"00:00",home:"Szaúd-Arábia",homeFlag:"🇸🇦",away:"Uruguay",awayFlag:"🇺🇾",venue:"Miami"},
-  {id:"G2",group:"G",huDate:"2026-06-17",huTime:"03:00",home:"Irán",homeFlag:"🇮🇷",away:"Új-Zéland",awayFlag:"🇳🇿",venue:"Los Angeles"},
+  {id:"G2",group:"G",huDate:"2026-06-16",huTime:"03:00",home:"Irán",homeFlag:"🇮🇷",away:"Új-Zéland",awayFlag:"🇳🇿",venue:"Los Angeles"},
   {id:"I1",group:"I",huDate:"2026-06-16",huTime:"21:00",home:"Franciaország",homeFlag:"🇫🇷",away:"Szenegál",awayFlag:"🇸🇳",venue:"New York/NJ"},
-  {id:"I2",group:"I",huDate:"2026-06-17",huTime:"00:00",home:"Norvégia",homeFlag:"🇳🇴",away:"Irak",awayFlag:"🇮🇶",venue:"Boston"},
-  {id:"J1",group:"J",huDate:"2026-06-17",huTime:"00:00",home:"Argentína",homeFlag:"🇦🇷",away:"Algéria",awayFlag:"🇩🇿",venue:"Kansas City"},
+  {id:"I2",group:"I",huDate:"2026-06-17",huTime:"00:00",home:"Irak",homeFlag:"🇮🇶",away:"Norvégia",awayFlag:"🇳🇴",venue:"Boston"},
+  {id:"J1",group:"J",huDate:"2026-06-17",huTime:"03:00",home:"Argentína",homeFlag:"🇦🇷",away:"Algéria",awayFlag:"🇩🇿",venue:"Kansas City"},
   {id:"J2",group:"J",huDate:"2026-06-17",huTime:"06:00",home:"Ausztria",homeFlag:"🇦🇹",away:"Jordánia",awayFlag:"🇯🇴",venue:"San Francisco"},
-  {id:"L1",group:"L",huDate:"2026-06-17",huTime:"18:00",home:"Anglia",homeFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",away:"Horvátország",awayFlag:"🇭🇷",venue:"Dallas"},
-  {id:"K1",group:"K",huDate:"2026-06-17",huTime:"19:00",home:"Portugália",homeFlag:"🇵🇹",away:"Playoff 1",awayFlag:"🌍",venue:"Houston"},
-  {id:"K2",group:"K",huDate:"2026-06-18",huTime:"04:00",home:"Kolumbia",homeFlag:"🇨🇴",away:"Üzbegisztán",awayFlag:"🇺🇿",venue:"Guadalajara"},
-  {id:"A3",group:"A",huDate:"2026-06-18",huTime:"18:00",home:"Dél-Afrika",homeFlag:"🇿🇦",away:"Csehország",awayFlag:"🇨🇿",venue:"Atlanta"},
-  {id:"B3",group:"B",huDate:"2026-06-18",huTime:"21:00",home:"Bosznia-Hercegovina",homeFlag:"🇧🇦",away:"Svájc",awayFlag:"🇨🇭",venue:"Los Angeles"},
-  {id:"B4",group:"B",huDate:"2026-06-19",huTime:"00:00",home:"Katar",homeFlag:"🇶🇦",away:"Kanada",awayFlag:"🇨🇦",venue:"Vancouver"},
-  {id:"L2",group:"L",huDate:"2026-06-19",huTime:"02:00",home:"Ghána",homeFlag:"🇬🇭",away:"Panama",awayFlag:"🇵🇦",venue:"Kansas City"},
-  {id:"D3",group:"D",huDate:"2026-06-19",huTime:"21:00",home:"Ausztrália",homeFlag:"🇦🇺",away:"USA",awayFlag:"🇺🇸",venue:"Seattle"},
-  {id:"C3",group:"C",huDate:"2026-06-20",huTime:"00:00",home:"Marokkó",homeFlag:"🇲🇦",away:"Skócia",awayFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",venue:"Boston"},
-  {id:"A4",group:"A",huDate:"2026-06-20",huTime:"03:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Mexikó",awayFlag:"🇲🇽",venue:"Guadalajara"},
-  {id:"H3",group:"H",huDate:"2026-06-20",huTime:"20:00",home:"Uruguay",homeFlag:"🇺🇾",away:"Spanyolország",awayFlag:"🇪🇸",venue:"Dallas"},
-  {id:"E3",group:"E",huDate:"2026-06-20",huTime:"22:00",home:"Elefántcsontpart",homeFlag:"🇨🇮",away:"Németország",awayFlag:"🇩🇪",venue:"Toronto"},
-  {id:"G3",group:"G",huDate:"2026-06-21",huTime:"21:00",home:"Egyiptom",homeFlag:"🇪🇬",away:"Irán",awayFlag:"🇮🇷",venue:"Guadalajara"},
-  {id:"F3",group:"F",huDate:"2026-06-20",huTime:"19:00",home:"Hollandia",homeFlag:"🇳🇱",away:"Szerbia",awayFlag:"🇷🇸",venue:"Atlanta"},
-  {id:"C4",group:"C",huDate:"2026-06-21",huTime:"02:30",home:"Haiti",homeFlag:"🇭🇹",away:"Brazília",awayFlag:"🇧🇷",venue:"Philadelphia"},
-  {id:"F4",group:"F",huDate:"2026-06-21",huTime:"06:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Japán",awayFlag:"🇯🇵",venue:"Kansas City"},
-  {id:"D4",group:"D",huDate:"2026-06-21",huTime:"05:00",home:"Paraguay",homeFlag:"🇵🇾",away:"Törökország",awayFlag:"🇹🇷",venue:"San Francisco"},
-  {id:"G4",group:"G",huDate:"2026-06-22",huTime:"12:00",home:"Belgium",homeFlag:"🇧🇪",away:"Új-Zéland",awayFlag:"🇳🇿",venue:"Vancouver"},
-  {id:"H4",group:"H",huDate:"2026-06-21",huTime:"23:00",home:"Szaúd-Arábia",homeFlag:"🇸🇦",away:"Zöld-foki-sz.",awayFlag:"🇨🇻",venue:"Philadelphia"},
-  {id:"I3",group:"I",huDate:"2026-06-22",huTime:"00:00",home:"Franciaország",homeFlag:"🇫🇷",away:"Norvégia",awayFlag:"🇳🇴",venue:"Seattle"},
-  {id:"E4",group:"E",huDate:"2026-06-22",huTime:"02:00",home:"Curaçao",homeFlag:"🇨🇼",away:"Ecuador",awayFlag:"🇪🇨",venue:"Kansas City"},
-  {id:"J3",group:"J",huDate:"2026-06-22",huTime:"03:00",home:"Argentína",homeFlag:"🇦🇷",away:"Ausztria",awayFlag:"🇦🇹",venue:"Houston"},
-  {id:"J4",group:"J",huDate:"2026-06-22",huTime:"20:00",home:"Algéria",homeFlag:"🇩🇿",away:"Jordánia",awayFlag:"🇯🇴",venue:"Philadelphia"},
-  {id:"K3",group:"K",huDate:"2026-06-22",huTime:"21:00",home:"Portugália",homeFlag:"🇵🇹",away:"Kolumbia",awayFlag:"🇨🇴",venue:"Miami"},
-  {id:"L3",group:"L",huDate:"2026-06-23",huTime:"00:00",home:"Anglia",homeFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",away:"Ghána",awayFlag:"🇬🇭",venue:"New York/NJ"},
-  {id:"I4",group:"I",huDate:"2026-06-23",huTime:"02:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Irak",awayFlag:"🇮🇶",venue:"Atlanta"},
-  {id:"K4",group:"K",huDate:"2026-06-23",huTime:"03:00",home:"Üzbegisztán",homeFlag:"🇺🇿",away:"Playoff 1",awayFlag:"🌍",venue:"Toronto"},
-  {id:"L4",group:"L",huDate:"2026-06-23",huTime:"03:00",home:"Horvátország",homeFlag:"🇭🇷",away:"Panama",awayFlag:"🇵🇦",venue:"Los Angeles"},
-  {id:"B5",group:"B",huDate:"2026-06-24",huTime:"21:00",home:"Kanada",homeFlag:"🇨🇦",away:"Svájc",awayFlag:"🇨🇭",venue:"Vancouver"},
-  {id:"B6",group:"B",huDate:"2026-06-24",huTime:"21:00",home:"Katar",homeFlag:"🇶🇦",away:"Bosznia-Hercegovina",awayFlag:"🇧🇦",venue:"Seattle"},
-  {id:"C5",group:"C",huDate:"2026-06-25",huTime:"00:00",home:"Brazília",homeFlag:"🇧🇷",away:"Skócia",awayFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",venue:"Miami"},
-  {id:"C6",group:"C",huDate:"2026-06-25",huTime:"00:00",home:"Haiti",homeFlag:"🇭🇹",away:"Marokkó",awayFlag:"🇲🇦",venue:"Atlanta"},
-  {id:"E5",group:"E",huDate:"2026-06-25",huTime:"22:00",home:"Németország",homeFlag:"🇩🇪",away:"Ecuador",awayFlag:"🇪🇨",venue:"New York/NJ"},
-  {id:"E6",group:"E",huDate:"2026-06-25",huTime:"22:00",home:"Elefántcsontpart",homeFlag:"🇨🇮",away:"Curaçao",awayFlag:"🇨🇼",venue:"Philadelphia"},
-  {id:"F5",group:"F",huDate:"2026-06-26",huTime:"01:00",home:"Japán",homeFlag:"🇯🇵",away:"Szerbia",awayFlag:"🇷🇸",venue:"Houston"},
-  {id:"F6",group:"F",huDate:"2026-06-26",huTime:"01:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Hollandia",awayFlag:"🇳🇱",venue:"Los Angeles"},
-  {id:"A5",group:"A",huDate:"2026-06-26",huTime:"03:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Monterrey"},
-  {id:"A6",group:"A",huDate:"2026-06-26",huTime:"03:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Csehország",awayFlag:"🇨🇿",venue:"Mexico City"},
-  {id:"H5",group:"H",huDate:"2026-06-26",huTime:"04:00",home:"Spanyolország",homeFlag:"🇪🇸",away:"Uruguay",awayFlag:"🇺🇾",venue:"Kansas City"},
-  {id:"H6",group:"H",huDate:"2026-06-26",huTime:"04:00",home:"Szaúd-Arábia",homeFlag:"🇸🇦",away:"Zöld-foki-sz.",awayFlag:"🇨🇻",venue:"Boston"},
-  {id:"G5",group:"G",huDate:"2026-06-26",huTime:"22:00",home:"Irán",homeFlag:"🇮🇷",away:"Belgium",awayFlag:"🇧🇪",venue:"New York/NJ"},
-  {id:"G6",group:"G",huDate:"2026-06-26",huTime:"22:00",home:"Új-Zéland",homeFlag:"🇳🇿",away:"Egyiptom",awayFlag:"🇪🇬",venue:"Toronto"},
-  {id:"K5",group:"K",huDate:"2026-06-27",huTime:"00:00",home:"Portugália",homeFlag:"🇵🇹",away:"Üzbegisztán",awayFlag:"🇺🇿",venue:"Boston"},
-  {id:"K6",group:"K",huDate:"2026-06-27",huTime:"00:00",home:"Kolumbia",homeFlag:"🇨🇴",away:"Playoff 1",awayFlag:"🌍",venue:"Atlanta"},
-  {id:"I5",group:"I",huDate:"2026-06-27",huTime:"02:00",home:"Franciaország",homeFlag:"🇫🇷",away:"Irak",awayFlag:"🇮🇶",venue:"Los Angeles"},
-  {id:"I6",group:"I",huDate:"2026-06-27",huTime:"02:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Norvégia",awayFlag:"🇳🇴",venue:"Miami"},
-  {id:"D5",group:"D",huDate:"2026-06-27",huTime:"04:00",home:"USA",homeFlag:"🇺🇸",away:"Törökország",awayFlag:"🇹🇷",venue:"TBD"},
-  {id:"D6",group:"D",huDate:"2026-06-27",huTime:"04:00",home:"Ausztrália",homeFlag:"🇦🇺",away:"Paraguay",awayFlag:"🇵🇾",venue:"San Francisco"},
-  {id:"J5",group:"J",huDate:"2026-06-28",huTime:"04:00",home:"Argentína",homeFlag:"🇦🇷",away:"Jordánia",awayFlag:"🇯🇴",venue:"Dallas"},
-  {id:"J6",group:"J",huDate:"2026-06-28",huTime:"04:00",home:"Ausztria",homeFlag:"🇦🇹",away:"Algéria",awayFlag:"🇩🇿",venue:"Seattle"},
-  {id:"L5",group:"L",huDate:"2026-06-28",huTime:"00:00",home:"Anglia",homeFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",away:"Panama",awayFlag:"🇵🇦",venue:"Seattle"},
-  {id:"L6",group:"L",huDate:"2026-06-28",huTime:"00:00",home:"Ghána",homeFlag:"🇬🇭",away:"Horvátország",awayFlag:"🇭🇷",venue:"Vancouver"},
+  {id:"L1",group:"L",huDate:"2026-06-17",huTime:"22:00",home:"Anglia",homeFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",away:"Horvátország",awayFlag:"🇭🇷",venue:"Dallas"},
+  {id:"K1",group:"K",huDate:"2026-06-17",huTime:"19:00",home:"Portugália",homeFlag:"🇵🇹",away:"Kongói DK",awayFlag:"🇨🇩",venue:"Houston"},
+  {id:"K2",group:"K",huDate:"2026-06-18",huTime:"04:00",home:"Üzbegisztán",homeFlag:"🇺🇿",away:"Kolumbia",awayFlag:"🇨🇴",venue:"Guadalajara"},
+  {id:"A3",group:"A",huDate:"2026-06-18",huTime:"18:00",home:"Csehország",homeFlag:"🇨🇿",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Atlanta"},
+  {id:"B3",group:"B",huDate:"2026-06-18",huTime:"21:00",home:"Svájc",homeFlag:"🇨🇭",away:"Bosznia-Hercegovina",awayFlag:"🇧🇦",venue:"Los Angeles"},
+  {id:"B4",group:"B",huDate:"2026-06-19",huTime:"00:00",home:"Kanada",homeFlag:"🇨🇦",away:"Katar",awayFlag:"🇶🇦",venue:"Vancouver"},
+  {id:"L2",group:"L",huDate:"2026-06-18",huTime:"01:00",home:"Ghána",homeFlag:"🇬🇭",away:"Panama",awayFlag:"🇵🇦",venue:"Kansas City"},
+  {id:"D3",group:"D",huDate:"2026-06-19",huTime:"21:00",home:"Egyesült Államok",homeFlag:"🇺🇸",away:"Ausztrália",awayFlag:"🇦🇺",venue:"Seattle"},
+  {id:"C3",group:"C",huDate:"2026-06-20",huTime:"00:00",home:"Skócia",homeFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",away:"Marokkó",awayFlag:"🇲🇦",venue:"Boston"},
+  {id:"A4",group:"A",huDate:"2026-06-19",huTime:"03:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Korea",awayFlag:"🇰🇷",venue:"Guadalajara"},
+  {id:"H3",group:"H",huDate:"2026-06-21",huTime:"18:00",home:"Spanyolország",homeFlag:"🇪🇸",away:"Szaúd-Arábia",awayFlag:"🇸🇦",venue:"Dallas"},
+  {id:"E3",group:"E",huDate:"2026-06-20",huTime:"22:00",home:"Németország",homeFlag:"🇩🇪",away:"Elefántcsontpart",awayFlag:"🇨🇮",venue:"Toronto"},
+  {id:"G3",group:"G",huDate:"2026-06-21",huTime:"21:00",home:"Belgium",homeFlag:"🇧🇪",away:"Irán",awayFlag:"🇮🇷",venue:"Guadalajara"},
+  {id:"F3",group:"F",huDate:"2026-06-20",huTime:"19:00",home:"Hollandia",homeFlag:"🇳🇱",away:"Svédország",awayFlag:"🇸🇪",venue:"Atlanta"},
+  {id:"C4",group:"C",huDate:"2026-06-20",huTime:"03:00",home:"Brazília",homeFlag:"🇧🇷",away:"Haiti",awayFlag:"🇭🇹",venue:"Philadelphia"},
+  {id:"F4",group:"F",huDate:"2026-06-21",huTime:"06:00",home:"Tunézia",homeFlag:"🇹🇳",away:"Japán",awayFlag:"🇯🇵",venue:"Kansas City"},
+  {id:"D4",group:"D",huDate:"2026-06-20",huTime:"06:00",home:"Törökország",homeFlag:"🇹🇷",away:"Paraguay",awayFlag:"🇵🇾",venue:"San Francisco"},
+  {id:"G4",group:"G",huDate:"2026-06-22",huTime:"03:00",home:"Új-Zéland",homeFlag:"🇳🇿",away:"Egyiptom",awayFlag:"🇪🇬",venue:"Vancouver"},
+  {id:"H4",group:"H",huDate:"2026-06-22",huTime:"00:00",home:"Uruguay",homeFlag:"🇺🇾",away:"Zöld-foki-szigetek",awayFlag:"🇨🇻",venue:"Philadelphia"},
+  {id:"I3",group:"I",huDate:"2026-06-22",huTime:"23:00",home:"Franciaország",homeFlag:"🇫🇷",away:"Irak",awayFlag:"🇮🇶",venue:"Seattle"},
+  {id:"E4",group:"E",huDate:"2026-06-21",huTime:"02:00",home:"Ecuador",homeFlag:"🇪🇨",away:"Curaçao",awayFlag:"🇨🇼",venue:"Kansas City"},
+  {id:"J3",group:"J",huDate:"2026-06-22",huTime:"19:00",home:"Argentína",homeFlag:"🇦🇷",away:"Ausztria",awayFlag:"🇦🇹",venue:"Houston"},
+  {id:"J4",group:"J",huDate:"2026-06-23",huTime:"05:00",home:"Jordánia",homeFlag:"🇯🇴",away:"Algéria",awayFlag:"🇩🇿",venue:"Philadelphia"},
+  {id:"K3",group:"K",huDate:"2026-06-23",huTime:"19:00",home:"Portugália",homeFlag:"🇵🇹",away:"Üzbegisztán",awayFlag:"🇺🇿",venue:"Miami"},
+  {id:"L3",group:"L",huDate:"2026-06-23",huTime:"22:00",home:"Anglia",homeFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",away:"Ghána",awayFlag:"🇬🇭",venue:"New York/NJ"},
+  {id:"I4",group:"I",huDate:"2026-06-23",huTime:"02:00",home:"Norvégia",homeFlag:"🇳🇴",away:"Szenegál",awayFlag:"🇸🇳",venue:"Atlanta"},
+  {id:"K4",group:"K",huDate:"2026-06-24",huTime:"04:00",home:"Kolumbia",homeFlag:"🇨🇴",away:"Kongói DK",awayFlag:"🇨🇩",venue:"Toronto"},
+  {id:"L4",group:"L",huDate:"2026-06-24",huTime:"01:00",home:"Panama",homeFlag:"🇵🇦",away:"Horvátország",awayFlag:"🇭🇷",venue:"Los Angeles"},
+  {id:"B5",group:"B",huDate:"2026-06-24",huTime:"21:00",home:"Svájc",homeFlag:"🇨🇭",away:"Kanada",awayFlag:"🇨🇦",venue:"Vancouver"},
+  {id:"B6",group:"B",huDate:"2026-06-24",huTime:"21:00",home:"Bosznia-Hercegovina",homeFlag:"🇧🇦",away:"Katar",awayFlag:"🇶🇦",venue:"Seattle"},
+  {id:"C5",group:"C",huDate:"2026-06-25",huTime:"00:00",home:"Skócia",homeFlag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",away:"Brazília",awayFlag:"🇧🇷",venue:"Miami"},
+  {id:"C6",group:"C",huDate:"2026-06-25",huTime:"00:00",home:"Marokkó",homeFlag:"🇲🇦",away:"Haiti",awayFlag:"🇭🇹",venue:"Atlanta"},
+  {id:"E5",group:"E",huDate:"2026-06-25",huTime:"22:00",home:"Ecuador",homeFlag:"🇪🇨",away:"Németország",awayFlag:"🇩🇪",venue:"New York/NJ"},
+  {id:"E6",group:"E",huDate:"2026-06-25",huTime:"22:00",home:"Curaçao",homeFlag:"🇨🇼",away:"Elefántcsontpart",awayFlag:"🇨🇮",venue:"Philadelphia"},
+  {id:"F5",group:"F",huDate:"2026-06-26",huTime:"01:00",home:"Japán",homeFlag:"🇯🇵",away:"Svédország",awayFlag:"🇸🇪",venue:"Houston"},
+  {id:"F6",group:"F",huDate:"2026-06-26",huTime:"01:00",home:"Tunézia",homeFlag:"🇹🇳",away:"Hollandia",awayFlag:"🇳🇱",venue:"Los Angeles"},
+  {id:"A5",group:"A",huDate:"2026-06-25",huTime:"03:00",home:"Csehország",homeFlag:"🇨🇿",away:"Mexikó",awayFlag:"🇲🇽",venue:"Monterrey"},
+  {id:"A6",group:"A",huDate:"2026-06-25",huTime:"03:00",home:"Dél-Afrika",homeFlag:"🇿🇦",away:"Dél-Korea",awayFlag:"🇰🇷",venue:"Mexico City"},
+  {id:"H5",group:"H",huDate:"2026-06-27",huTime:"02:00",home:"Zöld-foki-szigetek",homeFlag:"🇨🇻",away:"Szaúd-Arábia",awayFlag:"🇸🇦",venue:"Kansas City"},
+  {id:"H6",group:"H",huDate:"2026-06-27",huTime:"02:00",home:"Uruguay",homeFlag:"🇺🇾",away:"Spanyolország",awayFlag:"🇪🇸",venue:"Boston"},
+  {id:"G5",group:"G",huDate:"2026-06-27",huTime:"05:00",home:"Egyiptom",homeFlag:"🇪🇬",away:"Irán",awayFlag:"🇮🇷",venue:"New York/NJ"},
+  {id:"G6",group:"G",huDate:"2026-06-27",huTime:"05:00",home:"Új-Zéland",homeFlag:"🇳🇿",away:"Belgium",awayFlag:"🇧🇪",venue:"Toronto"},
+  {id:"K5",group:"K",huDate:"2026-06-28",huTime:"01:30",home:"Kolumbia",homeFlag:"🇨🇴",away:"Portugália",awayFlag:"🇵🇹",venue:"Boston"},
+  {id:"K6",group:"K",huDate:"2026-06-28",huTime:"01:30",home:"Kongói DK",homeFlag:"🇨🇩",away:"Üzbegisztán",awayFlag:"🇺🇿",venue:"Atlanta"},
+  {id:"I5",group:"I",huDate:"2026-06-26",huTime:"21:00",home:"Norvégia",homeFlag:"🇳🇴",away:"Franciaország",awayFlag:"🇫🇷",venue:"Los Angeles"},
+  {id:"I6",group:"I",huDate:"2026-06-26",huTime:"21:00",home:"Szenegál",homeFlag:"🇸🇳",away:"Irak",awayFlag:"🇮🇶",venue:"Miami"},
+  {id:"D5",group:"D",huDate:"2026-06-26",huTime:"04:00",home:"Törökország",homeFlag:"🇹🇷",away:"Egyesült Államok",awayFlag:"🇺🇸",venue:"TBD"},
+  {id:"D6",group:"D",huDate:"2026-06-26",huTime:"04:00",home:"Paraguay",homeFlag:"🇵🇾",away:"Ausztrália",awayFlag:"🇦🇺",venue:"San Francisco"},
+  {id:"J5",group:"J",huDate:"2026-06-28",huTime:"04:00",home:"Algéria",homeFlag:"🇩🇿",away:"Ausztria",awayFlag:"🇦🇹",venue:"Dallas"},
+  {id:"J6",group:"J",huDate:"2026-06-28",huTime:"04:00",home:"Jordánia",homeFlag:"🇯🇴",away:"Argentína",awayFlag:"🇦🇷",venue:"Seattle"},
+  {id:"L5",group:"L",huDate:"2026-06-27",huTime:"23:00",home:"Panama",homeFlag:"🇵🇦",away:"Anglia",awayFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",venue:"Seattle"},
+  {id:"L6",group:"L",huDate:"2026-06-27",huTime:"23:00",home:"Horvátország",homeFlag:"🇭🇷",away:"Ghána",awayFlag:"🇬🇭",venue:"Vancouver"},
 ];
 
 // ===== IDŐ SEGÉDFÜGGVÉNYEK =====
@@ -984,8 +987,7 @@ function setStatus(s,msg) {
   if(t) t.textContent=msg;
 }
 
-loadFromLS();
-setStatus('online','Adatok betöltve');
+setStatus('online','Szinkronizálva');
 
 // ===== REGISTER =====
 // Ellenőrzi hogy a név már regisztrált-e -> "Belépés" módba vált
@@ -1034,7 +1036,7 @@ function register() {
   document.getElementById('regModal').style.display = 'none';
   renderAll();
   // Chat üdvözlő üzenet Firebase-re
-  fbPush('chat',{name:n,text:'csatlakozott a tippversenyre! ⚽',ts:Date.now(),sys:true}).then(function(){pollChat();});
+  pollChat(); // Chat frissítés regisztráció után (nincs rendszerüzenet)
   showToast('🎉 Üdv, ' + n + '!');
 }
 
@@ -1068,7 +1070,7 @@ async function submitTip(mid,tip) {
   const existingScore = getTipScore(existing);
   // Megőrizzük a pontos eredményt ha már be volt írva
   const newTip = existingScore ? {o:tip, h:existingScore.h, a:existingScore.a} : {o:tip};
-  allTips[mid][fbSafeName(currentUser)]=newTip; renderAll();
+  allTips[mid][fbSafeName(currentUser)]=newTip; renderStats(); renderUserBar();
   try { await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip); showToast(tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!'); }
   catch(e){showToast('❌ Mentési hiba!');}
 }
@@ -1087,12 +1089,12 @@ async function submitScore(mid) {
   const outcome = hN>aN?'1':hN===aN?'X':'2';
   if(!allTips[mid]) allTips[mid]={};
   const newTip={o:outcome,h:hN,a:aN};
-  allTips[mid][fbSafeName(currentUser)]=newTip; renderAll();
+  allTips[mid][fbSafeName(currentUser)]=newTip; renderStats(); renderUserBar();
   try {
     await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
     showToast('🎯 Pontos: '+hN+':'+aN+' – 3 pontért!');
     var btn=document.getElementById('sbtn_'+mid);
-    if(btn){btn.classList.add('saved');btn.textContent='✓';setTimeout(function(){btn.classList.remove('saved');btn.textContent='+3pt';},2000);}
+    if(btn){btn.classList.add('saved');btn.textContent='✓ Mentve';}
   } catch(e){showToast('❌ Mentési hiba!');}
 }
 
@@ -1121,15 +1123,17 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
     var aVal = myScore ? String(myScore.a) : '';
     var oc = 'submitScore(' + JSON.stringify(mid) + ')';
     var btnCls = 'score-save-btn' + (myScore ? ' saved' : '');
-    var btnTxt = myScore ? '✓' : '+3pt';
+    var btnTxt = myScore ? '✓ Mentve' : 'Mentés';
     return '<div class="score-row">'
-      + '<span class="score-row-label">+3 pont:</span>'
+      + '<span class="score-row-label">+3:</span>'
       + '<div class="score-inputs-wrap">'
       + '<input type="number" min="0" max="20" id="sh_tip_' + mid + '" placeholder="–"'
-      + ' value="' + hVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
+      + ' value="' + hVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis
+      + ' oninput="document.getElementById(\'sbtn_'+mid+'\')\.classList.remove(\'saved\');">'
       + '<span class="score-sep">:</span>'
       + '<input type="number" min="0" max="20" id="sa_tip_' + mid + '" placeholder="–"'
-      + ' value="' + aVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
+      + ' value="' + aVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis
+      + ' oninput="document.getElementById(\'sbtn_'+mid+'\')\.classList.remove(\'saved\');">'
       + '</div>'
       + '<button class="' + btnCls + '" id="sbtn_' + mid + '" onclick="' + oc + '"' + dis + '>'
       + btnTxt + '</button>'
@@ -1205,12 +1209,14 @@ function buildTippTable() {
             if(isExact){ bg='rgba(34,197,94,0.2)'; col='#4ade80'; }
             else if(isHit){ bg='rgba(34,197,94,0.1)'; col='#86efac'; }
 
-            rows += '<td style="text-align:center;padding:8px 6px;">';
-            rows += '<div style="display:inline-block;background:'+bg+';border-radius:6px;padding:4px 8px;">';
+            rows += '<td style="text-align:center;padding:6px 4px;vertical-align:middle;">';
+            rows += '<div style="display:inline-flex;flex-direction:column;align-items:center;background:'+bg+';border-radius:6px;padding:4px 8px;gap:1px;">';
             rows += '<span style="font-family:Oswald,sans-serif;font-weight:700;font-size:14px;color:'+col+';">'+o+'</span>';
-            if(h!==null && a!==null) rows += '<div style="font-size:10px;color:'+col+';opacity:0.8;">'+h+':'+a+'</div>';
-            if(isExact)  rows += '<div style="font-size:9px;color:#4ade80;">🎯+3</div>';
-            else if(isHit) rows += '<div style="font-size:9px;color:#86efac;">+1</div>';
+            if(h!==null && a!==null) {
+              rows += '<span style="font-family:Oswald,sans-serif;font-size:11px;font-weight:600;color:'+col+';opacity:0.9;white-space:nowrap;">'+h+':'+a+'</span>';
+            }
+            if(isExact)  rows += '<span style="font-size:9px;color:#4ade80;line-height:1;">🎯</span>';
+            else if(isHit) rows += '<span style="font-size:9px;color:#86efac;line-height:1;">+1</span>';
             rows += '</div></td>';
           });
 
@@ -1244,7 +1250,10 @@ function buildTippTable() {
 }
 
 function renderAll() {
-  try { renderMatches(); } catch(e){}
+  // Ha score input fókuszban van, nem rajzoljuk újra a meccs kártyákat
+  var fa = document.activeElement;
+  var skipCards = fa && fa.classList && fa.classList.contains('score-num-input');
+  if(!skipCards) { try { renderMatches(); } catch(e){} }
   try { renderStats(); } catch(e){}
   try { renderUserBar(); } catch(e){}
   try { if(activeTab==='ranglista') renderLeaderboard(); } catch(e){}
@@ -1255,11 +1264,11 @@ function renderAll() {
 
 function renderMatches() {
   const container=document.getElementById('matchesContainer');
-  // Dátumok egyedi listája
-  const dates=[...new Set(ALL_MATCHES.map(m=>m.huDate))];
+  // Dátumok egyedi listája, rendezve
+  const dates=[...new Set(ALL_MATCHES.map(m=>m.huDate))].sort();
   let html='';
   dates.forEach(date=>{
-    const dayMatches=ALL_MATCHES.filter(m=>m.huDate===date);
+    const dayMatches=ALL_MATCHES.filter(m=>m.huDate===date).sort((a,b)=>a.huTime.localeCompare(b.huTime));
     const d=new Date(date+'T12:00:00');
     const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
     const dayCount=dayMatches.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
@@ -1518,14 +1527,48 @@ function renderChatFromLS(msgs) {
   if(box){ var ab=box.scrollHeight-box.scrollTop-box.clientHeight<60; box.innerHTML=buildChatHtml(msgs); if(ab||msgs.length<=3)box.scrollTop=box.scrollHeight; }
   var dbox = document.getElementById('drawerMessages');
   if(dbox){ var ab2=dbox.scrollHeight-dbox.scrollTop-dbox.clientHeight<60; dbox.innerHTML=buildChatHtml(msgs); if(ab2||msgs.length<=3)dbox.scrollTop=dbox.scrollHeight; }
+  renderParticipants(msgs);
+}
+
+function renderParticipants(msgs) {
+  // Online: utolsó 5 percben küldött üzenetet
+  var cutoff = Date.now() - 5*60*1000;
+  var onlineNames = new Set((msgs||[]).filter(function(m){return !m.sys && m.ts>cutoff;}).map(function(m){return m.name;}));
+
+  // Összes résztvevő allTips-ből
+  var allNames = [];
+  Object.keys(allTips).forEach(function(mid){
+    Object.keys(allTips[mid]).forEach(function(u){
+      if(allNames.indexOf(u)<0) allNames.push(u);
+    });
+  });
+  allNames.sort();
+
+  var html = '';
+  allNames.forEach(function(u) {
+    var isOnline = onlineNames.has(u);
+    var isMe = u === fbSafeName(currentUser);
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:8px;'+(isMe?'background:rgba(245,197,24,0.07);':'')+'">';
+    html += '<span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:'+(isOnline?'#22c55e':'rgba(255,255,255,0.2)')+';box-shadow:'+(isOnline?'0 0 6px #22c55e':'none')+';"></span>';
+    html += '<span style="font-family:Oswald,sans-serif;font-size:13px;color:'+(isMe?'var(--gold)':'rgba(240,244,240,0.75)')+';letter-spacing:0.3px;">'+(isMe?'⚽ ':'')+u+'</span>';
+    if(isOnline) html += '<span style="font-size:9px;color:#22c55e;letter-spacing:0.5px;margin-left:auto;">online</span>';
+    html += '</div>';
+  });
+  if(!html) html = '<div style="text-align:center;padding:12px;font-size:12px;color:rgba(240,244,240,0.3);">Még nincs tippelő</div>';
+
+  var p1 = document.getElementById('participantsList');
+  var p2 = document.getElementById('participantsListDrawer');
+  if(p1) p1.innerHTML = html;
+  if(p2) p2.innerHTML = html;
 }
 
 function buildChatHtml(msgs) {
-  if(!msgs.length) return '<div class="chat-msg system">Légy az első kommentelő! ⚽</div>';
-  return msgs.slice(-40).map(function(m){
+  // Csak valódi szöveges üzenetek (sys=false)
+  var textMsgs = msgs.filter(function(m){ return !m.sys; });
+  if(!textMsgs.length) return '<div class="chat-msg system">Légy az első kommentelő! ⚽</div>';
+  return textMsgs.slice(-40).map(function(m){
     var isMe=m.name===currentUser;
     var time=new Date(m.ts).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
-    if(m.sys) return '<div class="chat-msg system">🔔 <b>'+m.name+'</b> '+m.text+'</div>';
     return '<div class="chat-msg"><div class="msg-bubble'+(isMe?' own':'')+'"><div class="msg-name'+(isMe?' own-name':'')+'">'+m.name+'</div><div class="msg-text">'+escHtml(m.text)+'</div><div class="msg-time">'+time+'</div></div></div>';
   }).join('');
 }
@@ -1552,7 +1595,7 @@ function buildChatHtml(msgs) {
 
 // ===== HAVI TÁMOGATÁS GYŰJTŐMÉTER =====
 const SUPPORT_GOAL = 6500;
-const SUP_DB = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/support';
+// Support a tipp2026 alá kerül (DB_URL + '/support')
 
 function getMonthKey() {
   var now = new Date();
@@ -1562,8 +1605,7 @@ function getMonthKey() {
 async function loadSupportAmount() {
   try {
     var key = getMonthKey();
-    var r = await fetch(SUP_DB + '/' + key + '.json');
-    var data = await r.json();
+    var data = await fbGet('support/' + key);
     var amount = (data && data.amount) ? data.amount : 0;
     updateSupportMeters(amount);
   } catch(e) {
@@ -1600,17 +1642,10 @@ function updateSupportMeters(amount) {
 async function addSupportAmount(ft) {
   try {
     var key = getMonthKey();
-    // Először lekérjük a jelenlegit
-    var r = await fetch(SUP_DB + '/' + key + '.json');
-    var data = await r.json();
+    var data = await fbGet('support/' + key).catch(function(){return null;});
     var current = (data && data.amount) ? data.amount : 0;
     var newAmount = current + ft;
-    // Mentés
-    await fetch(SUP_DB + '/' + key + '.json', {
-      method: 'PUT',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({amount: newAmount, updated: new Date().toISOString()})
-    });
+    await fbSet('support/' + key, {amount: newAmount, updated: new Date().toISOString()});
     updateSupportMeters(newAmount);
     return newAmount;
   } catch(e) {
@@ -1644,10 +1679,17 @@ function closeOnboard() {
 <div class="chat-drawer" id="chatDrawer">
   <div class="drawer-handle" onclick="closeChat()"></div>
   <button class="drawer-close" onclick="closeChat()">✕</button>
-  <div class="chat-header" style="padding:12px 16px;border-bottom:1px solid rgba(245,197,24,0.12);display:flex;align-items:center;gap:10px;flex-shrink:0;margin-top:8px;">
+  <div style="padding:12px 16px 8px;border-bottom:1px solid rgba(245,197,24,0.12);margin-top:8px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span>👥</span>
+      <span style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;color:var(--gold);">RÉSZTVEVŐK</span>
+      <span class="online-count" id="onlineCount2" style="margin-left:auto;"></span>
+    </div>
+    <div id="participantsListDrawer" style="max-height:130px;overflow-y:auto;"></div>
+  </div>
+  <div style="padding:6px 16px 4px;display:flex;align-items:center;gap:8px;">
     <span>💬</span>
-    <span style="font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:1.5px;color:var(--gold);">ÉLŐ KOMMENT</span>
-    <span class="online-count" id="onlineCount2">0 aktív</span>
+    <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(245,197,24,0.7);">ÉLŐ KOMMENT</span>
   </div>
   <div class="drawer-chat-inner">
     <div class="chat-messages" id="drawerMessages"></div>
