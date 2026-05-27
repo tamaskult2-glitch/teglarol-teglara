@@ -1070,26 +1070,7 @@ function showTab(t) {
   ['meccsek','tippek','ranglista','admin'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['meccsek','tippek','ranglista','admin'][i]===t));
   if(t==='ranglista') renderLeaderboard();
-  if(t==='tippek') {
-    var w = document.getElementById('tippTableWrap');
-    if(w) w.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.45);font-size:13px;">⏳ Betöltés...</div>';
-    Promise.all([
-      fbGet('tips').catch(function(){return null;}),
-      fbGet('results').catch(function(){return null;}),
-      fbGet('scores').catch(function(){return null;})
-    ]).then(function(res) {
-      if(res[0]) {
-        allTips = {};
-        Object.keys(res[0]).forEach(function(mid) {
-          allTips[mid] = {};
-          Object.keys(res[0][mid]).forEach(function(k) { allTips[mid][k] = res[0][mid][k]; });
-        });
-      }
-      if(res[1]) allResults = res[1];
-      if(res[2]) allScores = res[2];
-      renderTippTable();
-    }).catch(function(){ renderTippTable(); });
-  }
+  if(t==='tippek') { renderTippTable(); }
   if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
 }
 
@@ -1197,10 +1178,8 @@ function renderTippTable() {
   var wrap = document.getElementById('tippTableWrap');
   if(!wrap) return;
 
-  // Ha nincs adat, indítsunk poll-t
   if(!allTips || Object.keys(allTips).length === 0) {
-    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.45);font-size:13px;">⏳ Betöltés...</div>';
-    safePollData();
+    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.4);font-size:13px;font-family:Oswald,sans-serif;letter-spacing:1px;">Még nincs tipp leadva ⏳</div>';
     return;
   }
 
