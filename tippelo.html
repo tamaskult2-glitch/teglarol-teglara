@@ -49,31 +49,45 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 
 /* Desktop nagy font */
 @media(min-width:901px){
-  .match-card { font-size: 14px; }
-  .time-tag { font-size: 14px !important; }
+  .match-card { font-size: 18px; }
+  .time-tag { font-size: 22px !important; font-weight:700 !important; }
+  .grp-tag { font-size: 14px !important; padding: 2px 10px !important; }
+  .match-meta { padding: 10px 16px !important; gap: 10px !important; }
   .team-blk .tf { font-size: 36px !important; }
   .team-blk .tn { font-size: 32px !important; font-weight:700 !important; }
-  .tip-btn .tl { font-size: 14px !important; }
-  .tip-btn .tc { font-size: 9px !important; }
-  .tip-btn { padding: 8px 4px !important; }
-  .match-teams-row { margin-bottom: 8px !important; }
-  .score-num-input { font-size: 18px !important; width: 44px !important; height: 40px !important; }
-  .score-save-btn { font-size: 12px !important; height: 40px !important; padding: 0 14px !important; }
-  .date-header h2 { font-size: 18px !important; }
-  .stat-num { font-size: 30px !important; }
-  .nav-tab { font-size: 14px !important; padding: 10px 22px !important; }
-  .header-badge { font-size: 16px !important; letter-spacing: 3px !important; }
-  /* Chat 1.5x nagyobb */
-  .chat-header h3 { font-size: 19px !important; }
-  .chat-header { padding: 14px 18px !important; }
-  .msg-bubble { font-size: 15px !important; }
-  .msg-name { font-size: 13px !important; }
-  .msg-time { font-size: 12px !important; }
-  .chat-input { font-size: 15px !important; padding: 10px 14px !important; }
-  #participantsList { font-size: 15px !important; }
-  #participantsList div { padding: 7px 14px !important; }
-  #participantsList span { font-size: 15px !important; }
-  .online-count { font-size: 13px !important; }
+  .team-blk .tn-sub { font-size: 13px !important; }
+  .vs-block { font-size: 18px !important; letter-spacing: 5px !important; }
+  .sc-block { font-size: 36px !important; }
+  .tip-btn .tl { font-size: 22px !important; }
+  .tip-btn .tc { font-size: 13px !important; }
+  .tip-btn { padding: 14px 6px !important; }
+  .match-teams-row { margin-bottom: 14px !important; }
+  .score-row-label { font-size: 16px !important; }
+  .score-num-input { font-size: 26px !important; width: 58px !important; height: 54px !important; }
+  .score-save-btn { font-size: 16px !important; height: 54px !important; padding: 0 22px !important; }
+  .score-sep { font-size: 26px !important; }
+  .pts-badge { font-size: 14px !important; padding: 3px 10px !important; }
+  .date-header h2 { font-size: 24px !important; }
+  .date-badge { font-size: 14px !important; padding: 3px 12px !important; }
+  .tn-sub { font-size: 16px !important; }
+  .match-meta { font-size: 18px !important; }
+  .match-meta span { font-size: 18px !important; }
+  .match-meta button { font-size: 16px !important; padding: 3px 14px !important; }
+  .stat-num { font-size: 36px !important; }
+  .stat-label { font-size: 13px !important; }
+  .nav-tab { font-size: 16px !important; padding: 12px 26px !important; }
+  .header-badge { font-size: 18px !important; letter-spacing: 3px !important; }
+  .user-bar { font-size: 16px !important; padding: 12px 18px !important; }
+  /* Chat 2x nagyobb */
+  .chat-header h3 { font-size: 22px !important; }
+  .chat-header { padding: 16px 20px !important; }
+  .msg-bubble { font-size: 16px !important; }
+  .msg-name { font-size: 14px !important; }
+  .msg-time { font-size: 13px !important; }
+  .chat-input { font-size: 16px !important; padding: 12px 16px !important; }
+  #participantsList div { padding: 8px 16px !important; }
+  #participantsList span { font-size: 16px !important; }
+  .online-count { font-size: 14px !important; }
 }
 
 @media(max-width:900px){
@@ -224,6 +238,65 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .date-badge{background:rgba(245,197,24,0.12);color:var(--gold);font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;padding:2px 10px;border-radius:20px;}
 
 /* MATCH CARD */
+
+/* ===== LINEUP POPUP ===== */
+.lineup-popup-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.75);
+  z-index:100;display:flex;align-items:center;justify-content:center;
+  padding:16px;animation:fadeIn 0.2s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.lineup-popup{
+  background:linear-gradient(160deg,#0d2010,#0a1c0c);
+  border:1px solid rgba(245,197,24,0.3);border-radius:18px;
+  max-width:480px;width:100%;padding:24px;
+  position:relative;animation:mIn 0.25s ease-out;
+}
+.lineup-popup-close{
+  position:absolute;top:12px;right:14px;
+  background:rgba(255,255,255,0.08);border:none;
+  color:rgba(240,244,240,0.6);font-size:16px;
+  width:28px;height:28px;border-radius:50%;cursor:pointer;
+}
+.lineup-popup-title{
+  font-family:'Oswald',sans-serif;font-size:13px;
+  color:rgba(245,197,24,0.6);letter-spacing:1.5px;
+  text-align:center;margin-bottom:14px;text-transform:uppercase;
+}
+.lineup-teams{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.lineup-team-name{
+  font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;
+  color:var(--gold);margin-bottom:10px;text-align:center;
+  border-bottom:1px solid rgba(245,197,24,0.2);padding-bottom:6px;
+}
+.lineup-player{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 8px;border-radius:7px;
+  font-family:'Oswald',sans-serif;font-size:13px;
+  color:rgba(240,244,240,0.85);letter-spacing:0.3px;
+}
+.lineup-player:hover{background:rgba(255,255,255,0.05);}
+.lineup-player-num{
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(245,197,24,0.15);
+  font-size:10px;font-weight:700;color:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.lineup-no-data{
+  text-align:center;padding:20px;
+  color:rgba(240,244,240,0.35);font-size:13px;
+  grid-column:1/-1;
+}
+@media(min-width:901px){
+  .lineup-popup { max-width:640px !important; padding:32px !important; }
+  .lineup-popup-title { font-size:18px !important; margin-bottom:20px !important; }
+  .lineup-team-name { font-size:24px !important; padding-bottom:10px !important; margin-bottom:14px !important; }
+  .lineup-player { font-size:20px !important; padding:8px 12px !important; gap:12px !important; }
+  .lineup-player-num { width:30px !important; height:30px !important; font-size:14px !important; }
+  .lineup-no-data { font-size:18px !important; }
+  .lineup-teams { gap:24px !important; }
+}
 /* ===== MATCH CARD ===== */
 .match-card{
   background:var(--card);border:1px solid var(--card-border);
@@ -838,7 +911,7 @@ const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
 
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
-  {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat"},
+  {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat",homeLineup:["Fercsik","Hermán","Temesi","Lesznik","Berkes"],awayLineup:["Huszár","Kult","Lakatos","Török","Toma"]},
   {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Mexico City"},
   {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Kanada",homeFlag:"🇨🇦",away:"Bosznia-Hercegovina",awayFlag:"🇧🇦",venue:"Toronto"},
   {id:"A2",group:"A",huDate:"2026-06-12",huTime:"04:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Csehország",awayFlag:"🇨🇿",venue:"Guadalajara"},
@@ -1285,6 +1358,40 @@ function buildTippTable() {
   }).catch(function(){ wrap.innerHTML='<p style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);">Hiba :(</p>'; });
 }
 
+
+// ===== LINEUP POPUP =====
+function closeLineup(){var el=document.getElementById('lineupPopupOverlay');if(el)el.remove();}
+function showLineup(mid) {
+  var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+  if(!m) return;
+  closeLineup();
+  var homeList = m.homeLineup||[];
+  var awayList = m.awayLineup||[];
+  var homeHtml = homeList.map(function(p,i){
+    return '<div class="lineup-player"><span class="lineup-player-num">'+(i+1)+'</span>'+p+'</div>';
+  }).join('');
+  var awayHtml = awayList.map(function(p,i){
+    return '<div class="lineup-player"><span class="lineup-player-num">'+(i+1)+'</span>'+p+'</div>';
+  }).join('');
+  var noData = !homeList.length && !awayList.length;
+  var inner = noData
+    ? '<div class="lineup-no-data">Még nincs bejelentett kezdőcsapat</div>'
+    : '<div class="lineup-teams">'
+      + '<div><div class="lineup-team-name">'+(m.homeFlag||'')+' '+(m.homeLabel||m.home)+'</div>'+homeHtml+'</div>'
+      + '<div><div class="lineup-team-name">'+(m.awayFlag||'')+' '+(m.awayLabel||m.away)+'</div>'+awayHtml+'</div>'
+      + '</div>';
+  var div = document.createElement('div');
+  div.className = 'lineup-popup-overlay';
+  div.id = 'lineupPopupOverlay';
+  div.onclick = function(e){if(e.target===div)closeLineup();};
+  div.innerHTML = '<div class="lineup-popup">'
+    + '<button class="lineup-popup-close" onclick="closeLineup()">✕</button>'
+    + '<div class="lineup-popup-title">⚽ Kezdőcsapatok · '+m.huTime+'</div>'
+    + inner + '</div>';
+  document.body.appendChild(div);
+}
+
+
 function renderAll() {
   // Ha score input fókuszban van, nem rajzoljuk újra a meccs kártyákat
   var fa = document.activeElement;
@@ -1335,6 +1442,7 @@ function renderMatches() {
           <span class="time-tag">${m.huTime}</span>
           <span class="grp-tag">${/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport'}</span>
           <span style="margin-left:auto;color:rgba(240,244,240,0.25);">${m.venue}</span>
+          ${(m.homeLineup&&m.homeLineup.length)||kickoffLocked?'<button onclick="showLineup(\''+m.id+'\')" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:var(--gold);border-radius:6px;padding:1px 8px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;letter-spacing:0.5px;">⚽ kezdők</button>':''}
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
         </div>
@@ -1578,7 +1686,13 @@ function renderParticipants(msgs) {
       if(allNames.indexOf(u)<0) allNames.push(u);
     });
   });
-  allNames.sort();
+  // Online-ok előre, azon belül ABC
+  allNames.sort(function(a,b){
+    var aOn = onlineNames.has(a) ? 0 : 1;
+    var bOn = onlineNames.has(b) ? 0 : 1;
+    if(aOn !== bOn) return aOn - bOn;
+    return a.localeCompare(b);
+  });
 
   var html = '';
   allNames.forEach(function(u) {
