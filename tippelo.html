@@ -608,13 +608,13 @@ footer a:hover{color:var(--gold);}
       </div>
 
       <div class="ob-step">
-        <div class="ob-step-icon">💾</div>
+        <div class="ob-step-icon">☁️</div>
         <div class="ob-step-body">
           <div class="ob-step-title">Adatok tárolása</div>
           <div class="ob-step-desc">
-            A tippek a <b>böngésződben</b> tárolódnak (localStorage).<br>
-            Ha törölöd a böngésző adatait, a tippjeid elvesznek.<br>
-            Más eszközről is tippelhetsz — ugyanazzal a névvel és jelszóval.
+            A tippek <b>szerveren tárolódnak</b> — bármely eszközről láthatók.<br>
+            Más telefonról, géprőlis ugyanúgy tippelhetsz — elég a <b>neved és jelszavad</b>.<br>
+            Csak a jelszavadat tárolja a böngésző — jegyezd meg, nem lehet visszaállítani!
           </div>
         </div>
       </div>
@@ -1170,6 +1170,12 @@ function renderAll() {
   try { if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); } catch(e){}
 }
 
+// Tippek tab: azonnal renderelj (ne várd a pollData-t)
+function initTippTab() {
+  var wrap = document.getElementById('tippTableWrap');
+  if(wrap && wrap.innerHTML.includes('spinner')) renderTippTable();
+}
+
 function renderTippTable() {
   const wrap = document.getElementById('tippTableWrap');
   if(!wrap) return;
@@ -1188,7 +1194,7 @@ function renderTippTable() {
   });
 
   if(!users.length) {
-    wrap.innerHTML = '<div class="ldg" style="padding:30px;">Még senki nem tippelt ⏳</div>';
+    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;letter-spacing:1px;font-size:13px;">Még senki nem tippelt ⏳<br><span style="font-size:11px;opacity:0.6;display:block;margin-top:8px;">Tippek leadása után frissül</span></div>';
     return;
   }
 
