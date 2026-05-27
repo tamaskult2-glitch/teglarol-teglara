@@ -1180,7 +1180,30 @@ function renderTippTable() {
   var wrap = document.getElementById('tippTableWrap');
   if(!wrap) return;
 
-  // Felhasználók összegyűjtése az allTips-ből
+  // Ha nincs adat, indítsunk poll-t
+  if(!allTips || Object.keys(allTips).length === 0) {
+    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.45);font-size:13px;">⏳ Betöltés...</div>';
+    safePollData();
+    return;
+  }
+
+  // Tippelt meccsek (ahol van legalább egy tipp)
+  var todayHU = getBudapestNow().slice(0,10);
+  var matches = ALL_MATCHES.filter(function(m) {
+    if(tippFilter === 'today') return m.huDate === todayHU;
+    if(tippFilter === 'tipped') {
+      var mt = allTips[m.id];
+      return mt && Object.keys(mt).some(function(u){ return getTipOutcome(mt[u]); });
+    }
+    return true;
+  });
+
+  if(!matches.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);font-size:13px;">Nincs tippelt meccs ⏳</div>';
+    return;
+  }
+
+  // Felhasználók listája
   var users = [];
   Object.keys(allTips).forEach(function(mid) {
     Object.keys(allTips[mid]).forEach(function(u) {
@@ -1189,74 +1212,45 @@ function renderTippTable() {
   });
   users.sort();
 
-  if(!users.length) {
-    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:13px;letter-spacing:1px;">Még senki nem tippelt ⏳</div>';
-    return;
-  }
-
-  // Meccsek ahol van legalább 1 tipp (tippelt szűrő)
-  var todayHU = getBudapestNow().slice(0,10);
-  var matches = ALL_MATCHES.filter(function(m) {
-    if(tippFilter === 'today') return m.huDate === todayHU;
-    if(tippFilter === 'tipped') {
-      var mt = allTips[m.id];
-      if(!mt) return false;
-      return Object.keys(mt).some(function(u){ return getTipOutcome(mt[u]); });
-    }
-    return true;
-  });
-
-  if(!matches.length) {
-    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:13px;">Nincs tippelt meccs ⏳</div>';
-    return;
-  }
-
-  // Táblázat építés
-  var html = '<table class="tipp-table"><thead><tr><th class="match-col">Meccs</th>';
-  users.forEach(function(u) {
-    var isMe = (u === fbSafeName(currentUser));
-    var cnt = ALL_MATCHES.filter(function(m){ return allTips[m.id] && getTipOutcome(allTips[m.id][u]); }).length;
-    html += '<th class="user-col" style="' + (isMe ? 'color:var(--gold);' : '') + '">'
-      + (isMe ? '⚽ ' : '') + u
-      + '<div style="font-size:9px;opacity:0.4;margin-top:2px;">' + cnt + ' tipp</div></th>';
-  });
-  html += '</tr></thead><tbody>';
-
+  // Kártyás megjelenítés
+  var html = '';
   matches.forEach(function(m) {
     var result = allResults[m.id] || null;
     var realScore = allScores[m.id] || null;
-    var dateStr = m.huDate.slice(5).replace('-', '.') + '. ' + m.huTime;
-
-    html += '<tr><td class="match-cell">'
-      + '<div class="match-cell-home">' + m.homeFlag + ' ' + m.home + ' – ' + m.away + ' ' + m.awayFlag + '</div>'
-      + '<div class="match-cell-time">' + dateStr + '</div>'
-      + (realScore ? '<div class="match-cell-score">' + realScore + '</div>' : '')
-      + '</td>';
-
+    html += '<div style="background:rgba(10,28,12,0.85);border:1px solid rgba(245,197,24,0.18);border-radius:12px;padding:12px 14px;margin-bottom:10px;">';
+    // Meccs fejléc
+    html += '<div style="font-family:Oswald,sans-serif;font-size:13px;color:rgba(240,244,240,0.7);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">';
+    html += '<span>' + m.homeFlag + ' ' + m.home + ' – ' + m.away + ' ' + m.awayFlag + '</span>';
+    html += '<span style="font-size:11px;color:rgba(240,244,240,0.35);">' + m.huDate.slice(5).replace('-','.') + '. ' + m.huTime + '</span>';
+    html += '</div>';
+    if(realScore) {
+      html += '<div style="font-family:Oswald,sans-serif;font-size:18px;font-weight:700;color:var(--gold);text-align:center;margin-bottom:8px;">' + realScore + '</div>';
+    }
+    // Tippek soronként
+    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
     users.forEach(function(u) {
       var tip = allTips[m.id] ? allTips[m.id][u] : null;
       var outcome = getTipOutcome(tip);
       var score = getTipScore(tip);
-
-      if(!outcome) {
-        html += '<td style="text-align:center;color:rgba(255,255,255,0.12);">–</td>';
-        return;
-      }
-
-      var isExact = score && realScore && (score.h + ':' + score.a === realScore);
+      if(!outcome) return;
+      var isExact = score && realScore && (score.h+':'+score.a === realScore);
       var isHit = result && outcome === result;
-      var cls = 'tc-' + outcome.toLowerCase();
-      if(isExact) cls += ' exact';
-      else if(isHit) cls += ' hit';
-
-      var scoreStr = score ? '<span class="tc-score">' + score.h + ':' + score.a + (isExact ? ' 🎯' : '') + '</span>' : '';
-      html += '<td style="text-align:center;vertical-align:middle;"><span class="' + cls + '">' + outcome + scoreStr + '</span></td>';
+      var color = outcome==='1'?'#3b82f6':outcome==='X'?'#6b7280':'#ef4444';
+      if(isExact) color='#22c55e';
+      else if(isHit) color='#4ade80';
+      var label = outcome==='1'?'Hazai':outcome==='X'?'Döntetlen':'Vendég';
+      var pts = isExact?'+3🎯':isHit?'+1':'';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 10px;">';
+      html += '<span style="font-family:Oswald,sans-serif;font-size:13px;color:rgba(240,244,240,0.8);">' + u + '</span>';
+      html += '<span style="font-family:Oswald,sans-serif;font-size:13px;font-weight:700;color:'+color+';">';
+      html += outcome + (score?' ('+score.h+':'+score.a+')':'') + ' ' + label;
+      if(pts) html += ' <span style="color:#fbbf24;font-size:11px;">'+pts+'</span>';
+      html += '</span>';
+      html += '</div>';
     });
-
-    html += '</tr>';
+    html += '</div></div>';
   });
 
-  html += '</tbody></table>';
   wrap.innerHTML = html;
 }
 
