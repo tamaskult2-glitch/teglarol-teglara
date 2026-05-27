@@ -768,9 +768,9 @@ footer a:hover{color:var(--gold);}
     <div class="section-header" style="margin-top:16px;"><h2>📋 Tippek áttekintése</h2></div>
     <div class="tipp-filter">
       <span class="tipp-filter-label">Szűrő:</span>
-      <button class="filter-btn active" onclick="setTippFilter('all',this)">Összes</button>
+      <button class="filter-btn" onclick="setTippFilter('all',this)">Összes</button>
       <button class="filter-btn" onclick="setTippFilter('today',this)">Mai meccsek</button>
-      <button class="filter-btn" onclick="setTippFilter('tipped',this)">Tippelt</button>
+      <button class="filter-btn active" onclick="setTippFilter('tipped',this)">Tippelt</button>
     </div>
     <div class="tipp-table-wrap" id="tippTableWrap"></div>
     <div class="legend">
@@ -1057,7 +1057,7 @@ document.getElementById('pwInput').addEventListener('keydown', function(e){ if(e
 if(currentUser) document.getElementById('regModal').style.display='none';
 
 // ===== TABS =====
-let tippFilter='all';
+let tippFilter='tipped';
 function setTippFilter(f,btn){
   tippFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
@@ -1194,6 +1194,10 @@ function renderTippTable() {
 
   if(!users.length) {
     wrap.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;letter-spacing:1px;font-size:13px;">Még senki nem tippelt ⏳<br><span style="font-size:11px;opacity:0.6;display:block;margin-top:8px;">Tippek leadása után frissül</span></div>';
+    return;
+  }
+  if(!matches.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:13px;">Még nincs tippelt meccs ebben a szűrőben</div>';
     return;
   }
 
