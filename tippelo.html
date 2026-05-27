@@ -370,6 +370,80 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 
 
 
+
+/* ===== ONBOARDING MODAL ===== */
+.onboard-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.92);
+  backdrop-filter:blur(8px);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+}
+.onboard-box{
+  background:linear-gradient(160deg,#0d2010 0%,#0a1c0c 100%);
+  border:1px solid rgba(245,197,24,0.3);border-radius:20px;
+  max-width:400px;width:100%;max-height:88vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:mIn 0.3s ease-out;
+}
+.onboard-header{
+  padding:24px 24px 0;text-align:center;flex-shrink:0;
+}
+.onboard-header .ob-icon{font-size:44px;margin-bottom:8px;}
+.onboard-header h2{
+  font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;
+  color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;
+}
+.onboard-header p{font-size:12px;color:rgba(240,244,240,0.4);letter-spacing:1px;}
+
+/* Lépések */
+.onboard-steps{
+  flex:1;overflow-y:auto;padding:20px 24px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.onboard-steps::-webkit-scrollbar{width:3px;}
+.onboard-steps::-webkit-scrollbar-thumb{background:rgba(245,197,24,0.2);border-radius:2px;}
+
+.ob-step{
+  display:flex;gap:12px;align-items:flex-start;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:12px 14px;
+}
+.ob-step-icon{
+  font-size:22px;flex-shrink:0;
+  width:40px;height:40px;
+  background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.2);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+}
+.ob-step-body{}
+.ob-step-title{
+  font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;
+  color:var(--gold);letter-spacing:0.5px;margin-bottom:4px;
+}
+.ob-step-desc{font-size:12px;color:rgba(240,244,240,0.6);line-height:1.6;}
+.ob-step-desc b{color:rgba(240,244,240,0.9);}
+
+/* Pontozás táblázat */
+.ob-score-table{
+  width:100%;border-collapse:collapse;margin-top:6px;font-size:11px;
+}
+.ob-score-table td{padding:4px 8px;border-radius:4px;}
+.ob-score-table tr:nth-child(odd) td{background:rgba(255,255,255,0.04);}
+.ob-score-table .pts{font-family:'Oswald',sans-serif;font-weight:700;color:var(--gold);text-align:right;}
+
+.onboard-footer{
+  padding:16px 24px 20px;flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,0.07);
+  display:flex;flex-direction:column;gap:8px;align-items:center;
+}
+.ob-start-btn{
+  width:100%;padding:13px;
+  background:var(--gold);color:#0a1c0c;
+  border:none;border-radius:10px;
+  font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;
+  letter-spacing:2px;cursor:pointer;transition:background 0.2s;
+}
+.ob-start-btn:hover{background:var(--gold-dark);}
+.ob-skip{font-size:11px;color:rgba(240,244,240,0.3);cursor:pointer;text-decoration:underline;}
+.ob-skip:hover{color:rgba(240,244,240,0.5);}
 footer{position:relative;z-index:1;text-align:center;padding:18px;font-size:11px;color:rgba(240,244,240,0.22);letter-spacing:1px;border-top:1px solid rgba(245,197,24,0.07);}
 footer a{color:rgba(245,197,24,0.45);text-decoration:none;}
 footer a:hover{color:var(--gold);}
@@ -415,7 +489,7 @@ footer a:hover{color:var(--gold);}
 .tc-2{background:rgba(239,68,68,0.18);color:#fca5a5;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;border-radius:6px;padding:3px 7px;display:inline-block;}
 .tc-1.hit,.tc-x.hit,.tc-2.hit{box-shadow:0 0 0 1.5px var(--correct);}
 .tc-1.exact,.tc-x.exact,.tc-2.exact{background:rgba(34,197,94,0.2);color:#4ade80;box-shadow:0 0 0 1.5px var(--correct);}
-.tc-score{font-size:9px;display:block;opacity:0.7;margin-top:1px;}
+.tc-score{font-size:10px;display:block;color:rgba(255,255,255,0.7);margin-top:2px;font-weight:600;letter-spacing:0.5px;}
 
 /* Filter sor */
 .tipp-filter{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
@@ -434,13 +508,125 @@ footer a:hover{color:var(--gold);}
 <div class="modal-overlay" id="regModal">
   <div class="modal-box">
     <div class="mi">⚽</div>
-    <h2>CSATLAKOZZ!</h2>
-    <p>Add meg a nevedet a tippeléshez.<br>Mindenki látja egymás tippjeit – ki a legjobb jós?</p>
-    <input type="text" id="nameInput" placeholder="NEVED (pl. Kovács P.)" maxlength="20" autocomplete="off">
-    <button onclick="register()">BELÉPEK A JÁTÉKBA →</button>
+    <h2 id="regTitle">REGISZTRÁCIÓ</h2>
+    <p id="regSubtitle">Válassz nevet és jelszót.<br>Legközelebb ugyanezzel léphetsz be.</p>
+    <input type="text" id="nameInput" placeholder="NEVED (pl. Kovács Péter)" maxlength="20" autocomplete="off"
+      oninput="checkExistingUser()">
+    <input type="password" id="pwInput" placeholder="JELSZÓ" maxlength="30" autocomplete="new-password"
+      onkeydown="if(event.key==='Enter')register()">
+    <div id="regMsg" style="font-size:12px;color:rgba(240,244,240,0.45);margin-bottom:8px;min-height:18px;"></div>
+    <button onclick="register()" id="regBtn">BELÉPEK →</button>
+    <div style="margin-top:12px;font-size:11px;color:rgba(240,244,240,0.3);">
+      Ha már van fiókod, add meg a neved és jelszavad.
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
+<!-- ONBOARDING MODAL -->
+<div class="onboard-overlay" id="onboardModal">
+  <div class="onboard-box">
+    <div class="onboard-header">
+      <div class="ob-icon">🏆</div>
+      <h2>FIFA 2026 Tippverseny</h2>
+      <p>KOLLÉGA TIPPVERSENY · HASZNÁLATI ÚTMUTATÓ</p>
+    </div>
+
+    <div class="onboard-steps">
+
+      <div class="ob-step">
+        <div class="ob-step-icon">👤</div>
+        <div class="ob-step-body">
+          <div class="ob-step-title">Regisztráció / Belépés</div>
+          <div class="ob-step-desc">
+            Először adj meg egy <b>nevet</b> és egy <b>jelszót</b> — ez lesz a fiókod.<br>
+            Legközelebb ugyanezzel léphetsz be bármely eszközről.<br>
+            <b>Fontos:</b> jegyezd meg a jelszavad, nem lehet visszaállítani!
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-step">
+        <div class="ob-step-icon">1️⃣</div>
+        <div class="ob-step-body">
+          <div class="ob-step-title">Meccs tippelése</div>
+          <div class="ob-step-desc">
+            Minden meccshez nyomd meg az <b>1</b> (hazai győzelem), <b>X</b> (döntetlen) vagy <b>2</b> (vendég győzelem) gombot.<br>
+            A tipp azonnal mentődik. A meccs kezdetéig bármikor megváltoztatható.
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-step">
+        <div class="ob-step-icon">🎯</div>
+        <div class="ob-step-body">
+          <div class="ob-step-title">Pontos eredmény (+3 pont)</div>
+          <div class="ob-step-desc">
+            A <b>+3 pont</b> mezőbe beírhatsz pontos góleredményt is (pl. <b>2:1</b>).<br>
+            Írd be mindkét számot, majd nyomd meg a <b>+3pt</b> gombot.<br>
+            Módosításhoz egyszerűen írd át és mentsd újra — a kickoffig bármikor.
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-step">
+        <div class="ob-step-icon">📊</div>
+        <div class="ob-step-body">
+          <div class="ob-step-title">Pontozás</div>
+          <div class="ob-step-desc">
+            <table class="ob-score-table">
+              <tr><td>✅ Helyes kimenetel (1/X/2)</td><td class="pts">+1 pont</td></tr>
+              <tr><td>🎯 Pontos góleredmény</td><td class="pts">+3 pont</td></tr>
+              <tr><td>❌ Téves tipp</td><td class="pts">0 pont</td></tr>
+            </table>
+            A pontos eredmény <b>felváltja</b> az 1 pontos tippet — ha eltalálod, +3 jár (nem +1+3).
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-step">
+        <div class="ob-step-icon">⏰</div>
+        <div class="ob-step-body">
+          <div class="ob-step-title">Zárási idő</div>
+          <div class="ob-step-desc">
+            Minden meccs a <b>kickoff időpontjában</b> zárul — utána nem lehet tippelni.<br>
+            A lezárt meccsek kártyáján <b>⏰ ZÁRVA</b> felirat jelenik meg.
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-step">
+        <div class="ob-step-icon">📋</div>
+        <div class="ob-step-body">
+          <div class="ob-step-title">Tippek, Ranglista, Chat</div>
+          <div class="ob-step-desc">
+            <b>📋 Tippek</b> — látod ki mire mit tippelt egy táblázatban.<br>
+            <b>🏅 Ranglista</b> — pontszám szerint rendezve, ki áll az élen.<br>
+            <b>💬 Chat</b> — kommentelheted az aktuális meccseket (jobb alsó 💬 gomb).
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-step">
+        <div class="ob-step-icon">💾</div>
+        <div class="ob-step-body">
+          <div class="ob-step-title">Adatok tárolása</div>
+          <div class="ob-step-desc">
+            A tippek a <b>böngésződben</b> tárolódnak (localStorage).<br>
+            Ha törölöd a böngésző adatait, a tippjeid elvesznek.<br>
+            Más eszközről is tippelhetsz — ugyanazzal a névvel és jelszóval.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="onboard-footer">
+      <button class="ob-start-btn" onclick="closeOnboard()">ÉRTEM, KEZDJÜK! ⚽</button>
+      <span class="ob-skip" onclick="closeOnboard()">Ne mutasd újra</span>
+    </div>
+  </div>
+</div>
 
 <!-- TÁMOGATÁS MODAL -->
 <div id="supportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);z-index:150;align-items:center;justify-content:center;padding:20px;">
@@ -515,7 +701,10 @@ footer a:hover{color:var(--gold);}
   <h1>FIFA World Cup 2026</h1>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <span class="header-badge">KOLLÉGA TIPPVERSENY</span>
-  <div style="margin-top:14px;">
+  <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;">
+    <button onclick="document.getElementById('onboardModal').style.display='flex'"
+      style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"
+      title="Használati útmutató">?</button>
     <button onclick="document.getElementById('supportModal').style.display='flex';initSupportQR&&initSupportQR()"
       style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#CE2939,#a01020);color:white;border:none;border-radius:12px;padding:8px 16px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 14px rgba(0,0,0,0.35);transition:transform 0.2s;"
       onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
@@ -626,12 +815,13 @@ footer a:hover{color:var(--gold);}
 const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
 const ADMIN_PW = 'tipp2026';
 const POLL_MS = 8000;
-const CHAT_POLL_MS = 5000;
-const MAX_CHAT = 60; // max üzenet tárolva
+// localStorage kulcsok (csak session + jelszavak)
+const LS_USERS   = 'tipp2026_users';   // {safeName: hashedPw}
+const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
 
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
-  {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"20:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Real Madrid",awayFlag:"👑",venue:"Söptei Estadio",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat"},
+  {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat"},
   {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Dél-Afrika",homeFlag:"🇿🇦",away:"Mexikó",awayFlag:"🇲🇽",venue:"Mexico City"},
   {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Bosznia-Hercegovina",homeFlag:"🇧🇦",away:"Kanada",awayFlag:"🇨🇦",venue:"Toronto"},
   {id:"A2",group:"A",huDate:"2026-06-13",huTime:"04:00",home:"Csehország",homeFlag:"🇨🇿",away:"Dél-Korea",awayFlag:"🇰🇷",venue:"Guadalajara"},
@@ -733,34 +923,33 @@ function fbSafeName(name) {
 }
 
 // ===== STATE =====
-let currentUser = localStorage.getItem('tipp2026_user') || null;
-let allTips={}, allResults={}, allScores={}, allChat={};
+let currentUser = localStorage.getItem(LS_SESSION) || null;
+let allTips={}, allResults={}, allScores={};
 let isAdminUnlocked=false, activeTab='meccsek';
-let lastChatCount=0;
 
 // ===== FIREBASE REST =====
-const fbGet = async p => { const r=await fetch(`${DB_URL}/${p}.json`); if(!r.ok) throw new Error(r.status); return r.json(); };
-const fbSet = async (p,v) => { 
-  const r=await fetch(`${DB_URL}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});
-  if(!r.ok) {
-    var errText = '';
-    try { errText = await r.text(); } catch(x){}
-    throw new Error(r.status + ': ' + errText.slice(0,100));
-  }
-  return r.json();
-};
-const fbDel = async p => fetch(`${DB_URL}/${p}.json`,{method:'DELETE'});
-const fbPush = async (p,v) => { const r=await fetch(`${DB_URL}/${p}.json`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return r.json(); };
+// ===== Firebase REST API =====
+const fbGet = async p => { const r=await fetch(DB_URL+'/'+p+'.json'); if(!r.ok) throw new Error(r.status); return r.json(); };
+const fbSet = async (p,v) => { const r=await fetch(DB_URL+'/'+p+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); if(!r.ok) throw new Error(r.status); return r.json(); };
+const fbDel = async p => fetch(DB_URL+'/'+p+'.json',{method:'DELETE'});
+const fbPush = async (p,v) => { const r=await fetch(DB_URL+'/'+p+'.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return r.json(); };
 
+// ===== localStorage (csak jelszavak + session) =====
+function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)||'null'); } catch(e){return null;} }
+function lsSet(key,val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+function simpleHash(str) {
+  var h=0; for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;} return h.toString(36);
+}
+function getUsers()  { return lsGet(LS_USERS)||{}; }
+function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
     const [tips,results,scores] = await Promise.all([
-      fbGet('tips').catch(()=>null),
-      fbGet('results').catch(()=>null),
-      fbGet('scores').catch(()=>null),
+      fbGet('tips').catch(function(){return null;}),
+      fbGet('results').catch(function(){return null;}),
+      fbGet('scores').catch(function(){return null;}),
     ]);
-    // Tips kulcsok normalizálása (fbSafeName alapján)
     var rawTips=tips||{};
     allTips={};
     Object.keys(rawTips).forEach(function(mid){
@@ -772,43 +961,101 @@ async function pollData() {
     allResults=results||{}; allScores=scores||{};
     setStatus('online','Szinkronizálva');
     renderAll();
-  } catch(e) { setStatus('err','Kapcsolati hiba'); }
+  } catch(e) {
+    setStatus('err','Kapcsolati hiba');
+    renderAll(); // rendereljük a lokális állapotot is
+  }
 }
 
 async function pollChat() {
   try {
-    const chat = await fbGet('chat').catch(()=>null);
-    allChat = chat || {};
-    const msgs = Object.entries(allChat).sort((a,b)=>a[1].ts-b[1].ts);
-    if(msgs.length !== lastChatCount) { lastChatCount=msgs.length; renderChat(msgs); }
-    // update online count (users who sent msg in last 5 min)
-    const cutoff = Date.now() - 5*60*1000;
-    const active = new Set(msgs.filter(([,m])=>m.ts>cutoff).map(([,m])=>m.name));
-    document.getElementById('onlineCount').textContent = active.size + ' aktív';
-  } catch(e) {}
+    const data = await fbGet('chat').catch(()=>null);
+    if(!data) return;
+    const msgs = Object.values(data).sort((a,b)=>a.ts-b.ts);
+    renderChatFromLS(msgs);
+    const cutoff=Date.now()-5*60*1000;
+    const active=new Set(msgs.filter(function(m){return m.ts>cutoff&&!m.sys;}).map(function(m){return m.name;}));
+    var oc=document.getElementById('onlineCount'); if(oc) oc.textContent=active.size+' aktív';
+    var oc2=document.getElementById('onlineCount2'); if(oc2) oc2.textContent=active.size+' aktív';
+  } catch(e){}
 }
 
 function setStatus(s,msg) {
-  const d=document.getElementById('sdot'), t=document.getElementById('statusText');
-  d.className='sdot '+(s==='online'?'online':s==='loading'?'loading':'');
-  t.textContent=msg;
+  var d=document.getElementById('sdot'), t=document.getElementById('statusText');
+  if(d) d.className='sdot '+(s==='online'?'online':s==='err'?'':'loading');
+  if(t) t.textContent=msg;
 }
 
-pollData(); pollChat();
-setInterval(pollData, POLL_MS);
-setInterval(pollChat, CHAT_POLL_MS);
+// Firebase hívások biztonságos indítása
+function safePollData() { pollData().catch(function(){}); }
+function safePollChat() { pollChat().catch(function(){}); }
+
+safePollData();
+safePollChat();
+setInterval(safePollData, POLL_MS);
+setInterval(safePollChat, 5000);
+function setStatus(s,msg) {
+  var d=document.getElementById('sdot'), t=document.getElementById('statusText');
+  if(d) d.className='sdot '+(s==='online'?'online':'');
+  if(t) t.textContent=msg;
+}
+
+loadFromLS();
+setStatus('online','Adatok betöltve');
 
 // ===== REGISTER =====
-function register() {
-  const n=document.getElementById('nameInput').value.trim().toUpperCase();
-  if(!n||n.length<2){showToast('⚠️ Legalább 2 karakter!');return;}
-  currentUser=n; localStorage.setItem('tipp2026_user',n);
-  document.getElementById('regModal').style.display='none';
-  renderAll();
-  fbPush('chat',{name:currentUser,text:'csatlakozott a tippversenyre! ⚽',ts:Date.now(),sys:true});
-  showToast('🎉 Üdv, '+n+'!');
+// Ellenőrzi hogy a név már regisztrált-e -> "Belépés" módba vált
+function checkExistingUser() {
+  var n = document.getElementById('nameInput').value.trim().toUpperCase();
+  var users = getUsers();
+  var title = document.getElementById('regTitle');
+  var subtitle = document.getElementById('regSubtitle');
+  var btn = document.getElementById('regBtn');
+  var msg = document.getElementById('regMsg');
+  if(n.length >= 2 && users[n]) {
+    if(title) title.textContent = 'BELÉPÉS';
+    if(subtitle) subtitle.textContent = 'Üdv vissza! Add meg a jelszavad.';
+    if(btn) btn.textContent = 'BELÉPEK →';
+    if(msg) msg.textContent = '✓ Ismert felhasználó';
+  } else if(n.length >= 2) {
+    if(title) title.textContent = 'REGISZTRÁCIÓ';
+    if(subtitle) subtitle.textContent = 'Új fiók – válassz jelszót.';
+    if(btn) btn.textContent = 'FIÓK LÉTREHOZÁSA →';
+    if(msg) msg.textContent = '';
+  }
 }
-document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')register();});
+
+function register() {
+  var n = document.getElementById('nameInput').value.trim().toUpperCase();
+  var pw = document.getElementById('pwInput').value.trim();
+  var msg = document.getElementById('regMsg');
+  if(!n || n.length < 2) { showToast('⚠️ Legalább 2 karakteres név kell!'); return; }
+  if(!pw || pw.length < 3) { showToast('⚠️ Legalább 3 karakteres jelszó kell!'); return; }
+  var users = getUsers();
+  var hashed = simpleHash(pw);
+  if(users[n]) {
+    // Belépés
+    if(users[n] !== hashed) {
+      if(msg) msg.textContent = '❌ Hibás jelszó!';
+      msg.style.color = '#ef4444';
+      showToast('❌ Hibás jelszó!'); return;
+    }
+  } else {
+    // Regisztráció
+    users[n] = hashed;
+    saveUsers(users);
+  }
+  currentUser = n;
+  localStorage.setItem(LS_SESSION, n);
+  document.getElementById('regModal').style.display = 'none';
+  renderAll();
+  // Chat üdvözlő üzenet Firebase-re
+  fbPush('chat',{name:n,text:'csatlakozott a tippversenyre! ⚽',ts:Date.now(),sys:true}).then(function(){pollChat();});
+  showToast('🎉 Üdv, ' + n + '!');
+}
+
+document.getElementById('nameInput').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('pwInput').focus(); });
+document.getElementById('pwInput').addEventListener('keydown', function(e){ if(e.key==='Enter') register(); });
 if(currentUser) document.getElementById('regModal').style.display='none';
 
 // ===== TABS =====
@@ -846,7 +1093,7 @@ async function submitTip(mid,tip) {
   const newTip = existingScore ? {o:tip, h:existingScore.h, a:existingScore.a} : {o:tip};
   allTips[mid][fbSafeName(currentUser)]=newTip; renderAll();
   try { await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip); showToast(tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!'); }
-  catch(e){showToast('❌ ' + (e.message||'Mentési hiba'));}
+  catch(e){showToast('❌ Mentési hiba!');}
 }
 
 async function submitScore(mid) {
@@ -866,11 +1113,10 @@ async function submitScore(mid) {
   allTips[mid][fbSafeName(currentUser)]=newTip; renderAll();
   try {
     await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
-    showToast(`🎯 Pontos: ${hN}:${aN} – 3 pontért játszol!`);
-    // Gomb visszajelzés
-    const btn=document.getElementById('sbtn_'+mid);
-    if(btn){btn.classList.add('saved');btn.textContent='✓ MENTVE';setTimeout(()=>{btn.classList.remove('saved');btn.textContent='TIPPELEK';},2000);}
-  } catch(e){showToast('❌ ' + (e.message||'Mentési hiba'));}
+    showToast('🎯 Pontos: '+hN+':'+aN+' – 3 pontért!');
+    var btn=document.getElementById('sbtn_'+mid);
+    if(btn){btn.classList.add('saved');btn.textContent='✓';setTimeout(function(){btn.classList.remove('saved');btn.textContent='+3pt';},2000);}
+  } catch(e){showToast('❌ Mentési hiba!');}
 }
 
 // ===== SCORE ROW BUILDER (kompakt, a match-center-en belül) =====
@@ -915,7 +1161,14 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
 }
 
 // ===== RENDER MATCHES (dátum szerint csoportosítva) =====
-function renderAll() { renderMatches(); renderStats(); renderUserBar(); if(activeTab==='ranglista') renderLeaderboard(); if(activeTab==='tippek') renderTippTable(); if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); }
+function renderAll() {
+  try { renderMatches(); } catch(e){}
+  try { renderStats(); } catch(e){}
+  try { renderUserBar(); } catch(e){}
+  try { if(activeTab==='ranglista') renderLeaderboard(); } catch(e){}
+  try { if(activeTab==='tippek') renderTippTable(); } catch(e){}
+  try { if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); } catch(e){}
+}
 
 function renderTippTable() {
   const wrap = document.getElementById('tippTableWrap');
@@ -944,8 +1197,16 @@ function renderTippTable() {
     + '<th class="match-col">Meccs</th>';
   users.forEach(u => {
     const isMe = u === currentUser;
+    var userTipCount = ALL_MATCHES.filter(function(m){ return allTips[m.id] && getTipOutcome(allTips[m.id][fbSafeName(u)]); }).length;
+    var userExactCount = ALL_MATCHES.filter(function(m){
+      var t=allTips[m.id]&&allTips[m.id][fbSafeName(u)]; var s=getTipScore(t); var rs=allScores[m.id];
+      return s&&rs&&s.h+':'+s.a===rs;
+    }).length;
     html += '<th class="user-col" style="' + (isMe?'color:var(--gold);':'') + '">'
-      + (isMe?'⚽ ':'') + u + '</th>';
+      + (isMe?'⚽ ':'') + u
+      + '<div style="font-size:9px;font-weight:400;opacity:0.45;margin-top:2px;letter-spacing:0;">'
+      + userTipCount + ' tipp' + (userExactCount>0?' · '+userExactCount+' 🎯':'')
+      + '</div></th>';
   });
   html += '</tr></thead><tbody>';
 
@@ -979,8 +1240,10 @@ function renderTippTable() {
       if(isExact) cls += ' exact';
       else if(isHit) cls += ' hit';
 
-      const scoreStr = score ? '<span class="tc-score">' + score.h + ':' + score.a + '</span>' : '';
-      html += '<td><span class="' + cls + '">' + outcome + scoreStr + '</span></td>';
+      const scoreStr = score
+        ? '<span class="tc-score">' + score.h + ':' + score.a + (isExact ? ' 🎯' : '') + '</span>'
+        : '';
+      html += '<td style="vertical-align:middle;"><span class="' + cls + '">' + outcome + scoreStr + '</span></td>';
     });
 
     html += '</tr>';
@@ -1104,7 +1367,7 @@ function renderUserBar() {
   c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
 }
 
-function changeName(){localStorage.removeItem('tipp2026_user');currentUser=null;document.getElementById('regModal').style.display='flex';document.getElementById('nameInput').value='';renderAll();}
+function changeName(){localStorage.removeItem(LS_SESSION);currentUser=null;document.getElementById('regModal').style.display='flex';document.getElementById('nameInput').value='';document.getElementById('pwInput').value='';checkExistingUser();renderAll();}
 
 // ===== LEADERBOARD =====
 function renderLeaderboard() {
@@ -1143,39 +1406,6 @@ function renderLeaderboard() {
 }
 
 // ===== CHAT =====
-function buildMsgHtml(msgs) {
-  if(!msgs.length) return '<div class="chat-msg system">Légy az első kommentelő! ⚽</div>';
-  const show=msgs.slice(-40);
-  return show.map(([key,m])=>{
-    const isMe=m.name===currentUser;
-    const time=new Date(m.ts).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
-    if(m.sys) return `<div class="chat-msg system">🔔 <b>${m.name}</b> ${m.text}</div>`;
-    return `<div class="chat-msg"><div class="msg-bubble${isMe?' own':''}"><div class="msg-name${isMe?' own-name':''}">${m.name}</div><div class="msg-text">${escHtml(m.text)}</div><div class="msg-time">${time}</div></div></div>`;
-  }).join('');
-}
-
-function renderChat(msgs) {
-  // Desktop chat box
-  const box=document.getElementById('chatMessages');
-  if(box){const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;box.innerHTML=buildMsgHtml(msgs);if(atBottom||msgs.length<=5)box.scrollTop=box.scrollHeight;}
-  // Mobil drawer
-  const dbox=document.getElementById('drawerMessages');
-  if(dbox){const atBottom2=dbox.scrollHeight-dbox.scrollTop-dbox.clientHeight<60;dbox.innerHTML=buildMsgHtml(msgs);if(atBottom2||msgs.length<=5)dbox.scrollTop=dbox.scrollHeight;}
-  // Online count sync
-  const oc2=document.getElementById('onlineCount2');
-  if(oc2)oc2.textContent=document.getElementById('onlineCount')?.textContent||'';
-  // FAB badge: új üzenet jelzés ha drawer zárva
-  const drawer=document.getElementById('chatDrawer');
-  if(drawer&&!drawer.classList.contains('open')&&msgs.length>lastRenderedCount){
-    const badge=document.getElementById('fabBadge');
-    const diff=msgs.length-lastRenderedCount;
-    if(diff>0){badge.textContent=diff>9?'9+':diff;badge.classList.add('show');}
-  }
-  lastRenderedCount=msgs.length;
-}
-
-let lastRenderedCount=0;
-
 function openChat(){
   document.getElementById('chatDrawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
@@ -1194,29 +1424,25 @@ function closeChat(){
 }
 
 async function sendChatDrawer(){
-  const input=document.getElementById('drawerInput');
-  const text=input.value.trim();
+  var input=document.getElementById('drawerInput');
+  var text=input.value.trim();
   if(!text)return;
   if(!currentUser){document.getElementById('regModal').style.display='flex';closeChat();return;}
   input.value='';
-  try{await fbPush('chat',{name:currentUser,text,ts:Date.now()});await pollChat();}
+  try{await fbPush('chat',{name:currentUser,text:text,ts:Date.now()});await pollChat();}
   catch(e){showToast('❌ Küldési hiba!');}
 }
 
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 async function sendChat() {
-  const input=document.getElementById('chatInput');
-  const text=input.value.trim();
+  var input=document.getElementById('chatInput');
+  var text=input.value.trim();
   if(!text) return;
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
   input.value='';
-  document.getElementById('chatSendBtn').disabled=true;
-  try {
-    await fbPush('chat',{name:currentUser,text,ts:Date.now()});
-    await pollChat();
-  } catch(e){showToast('❌ Küldési hiba!');}
-  setTimeout(()=>document.getElementById('chatSendBtn').disabled=false,800);
+  try{await fbPush('chat',{name:currentUser,text:text,ts:Date.now()});await pollChat();}
+  catch(e){showToast('❌ Küldési hiba!');}
 }
 
 // ===== ADMIN =====
@@ -1252,9 +1478,31 @@ function renderAdminMatches() {
   c.innerHTML=html;
 }
 
-async function setResult(mid,tip){try{await fbSet(`results/${mid}`,tip);showToast('✅ '+tip+' rögzítve');await pollData();}catch(e){showToast('❌ Hiba!');}}
-async function clearRes(mid){try{await fbDel(`results/${mid}`);showToast('🗑️ Törölve');await pollData();}catch(e){}}
-async function saveScore(mid){const h=document.getElementById('sh_'+mid)?.value;const a=document.getElementById('sa_'+mid)?.value;if(h!==''&&a!==''){try{await fbSet(`scores/${mid}`,`${h}:${a}`);showToast('⚽ '+h+':'+a);await pollData();}catch(e){showToast('❌ Hiba!');}}}
+async function setResult(mid,tip){
+  try{await fbSet('results/'+mid,tip);showToast('✅ '+tip+' rögzítve');await pollData();renderAdminMatches();}
+  catch(e){showToast('❌ Hiba!');}
+}
+async function clearRes(mid){
+  try{await fbDel('results/'+mid);showToast('🗑️ Törölve');await pollData();renderAdminMatches();}
+  catch(e){}
+}
+async function saveScore(mid){
+  var h=document.getElementById('sh_'+mid)?.value;
+  var a=document.getElementById('sa_'+mid)?.value;
+  if(h!==''&&h!==undefined&&a!==''&&a!==undefined){
+    try{await fbSet('scores/'+mid,h+':'+a);showToast('⚽ '+h+':'+a);await pollData();renderAdminMatches();}
+    catch(e){showToast('❌ Hiba!');}
+  }
+}
+
+// Global hiba elnyelő - ne álljon meg az oldal
+window.addEventListener('unhandledrejection', function(e) {
+  e.preventDefault(); // Safari ne logoljon script error-t
+});
+window.addEventListener('error', function(e) {
+  // Csak külső script hibákat nyeljük el (Firebase CDN)
+  if(e.filename && e.filename !== window.location.href) e.preventDefault();
+});
 
 // ===== TOAST =====
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
@@ -1262,6 +1510,25 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // Init
 renderAll();
 
+
+// ===== CHAT LOCALSTORAGE =====
+function renderChatFromLS(msgs) {
+  if(!msgs) msgs = [];
+  var box = document.getElementById('chatMessages');
+  if(box){ var ab=box.scrollHeight-box.scrollTop-box.clientHeight<60; box.innerHTML=buildChatHtml(msgs); if(ab||msgs.length<=3)box.scrollTop=box.scrollHeight; }
+  var dbox = document.getElementById('drawerMessages');
+  if(dbox){ var ab2=dbox.scrollHeight-dbox.scrollTop-dbox.clientHeight<60; dbox.innerHTML=buildChatHtml(msgs); if(ab2||msgs.length<=3)dbox.scrollTop=dbox.scrollHeight; }
+}
+
+function buildChatHtml(msgs) {
+  if(!msgs.length) return '<div class="chat-msg system">Légy az első kommentelő! ⚽</div>';
+  return msgs.slice(-40).map(function(m){
+    var isMe=m.name===currentUser;
+    var time=new Date(m.ts).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
+    if(m.sys) return '<div class="chat-msg system">🔔 <b>'+m.name+'</b> '+m.text+'</div>';
+    return '<div class="chat-msg"><div class="msg-bubble'+(isMe?' own':'')+'"><div class="msg-name'+(isMe?' own-name':'')+'">'+m.name+'</div><div class="msg-text">'+escHtml(m.text)+'</div><div class="msg-time">'+time+'</div></div></div>';
+  }).join('');
+}
 
 // QR kód a támogatás modalhoz
 (function() {
@@ -1355,9 +1622,23 @@ async function addSupportAmount(ft) {
 loadSupportAmount();
 // Modalok megnyitásakor is frissítjük (az initSupportQR-ba hookoljuk)
 var _origInitQR = window.initSupportQR;
-window.initSupportQR = function() { if(_origInitQR) _origInitQR(); loadSupportAmount(); };
+window.initSupportQR = function() { if(_origInitQR) _origInitQR(); loadSupportAmount(); renderChatFromLS([]); };
 var _origInitQRIdx = window.initSupportQRIdx;
 window.initSupportQRIdx = function() { if(_origInitQRIdx) _origInitQRIdx(); loadSupportAmount(); };
+
+// ===== ONBOARDING =====
+function closeOnboard() {
+  document.getElementById('onboardModal').style.display = 'none';
+  localStorage.setItem('tipp2026_onboard_done', '1');
+}
+// Csak első látogatáskor mutatja
+(function() {
+  var done = localStorage.getItem('tipp2026_onboard_done');
+  if(done) {
+    document.getElementById('onboardModal').style.display = 'none';
+  }
+  // Ha regisztrációs modal is nyílik, onboard után mutassuk
+})();
 </script>
 
 <!-- MOBIL CHAT DRAWER -->
