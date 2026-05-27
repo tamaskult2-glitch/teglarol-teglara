@@ -1070,7 +1070,23 @@ function showTab(t) {
   ['meccsek','tippek','ranglista','admin'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['meccsek','tippek','ranglista','admin'][i]===t));
   if(t==='ranglista') renderLeaderboard();
-  if(t==='tippek') renderTippTable();
+  if(t==='tippek') {
+    // Frissítés Firebase-ből, majd render
+    fbGet('tips').then(function(tips) {
+      if(tips) {
+        allTips = {};
+        Object.keys(tips).forEach(function(mid) {
+          allTips[mid] = {};
+          Object.keys(tips[mid]).forEach(function(key) {
+            allTips[mid][key] = tips[mid][key];
+          });
+        });
+      }
+      renderTippTable();
+    }).catch(function() {
+      renderTippTable(); // offline: amit tudunk mutassuk
+    });
+  }
   if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
 }
 
@@ -1164,7 +1180,7 @@ function renderAll() {
   try { renderStats(); } catch(e){}
   try { renderUserBar(); } catch(e){}
   try { if(activeTab==='ranglista') renderLeaderboard(); } catch(e){}
-  try { if(activeTab==='tippek') renderTippTable(); } catch(e){}
+  try { if(activeTab==='tippek') renderTippTable(); } catch(e){ console.log('tippTable err',e); }
   try { if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); } catch(e){}
 }
 
