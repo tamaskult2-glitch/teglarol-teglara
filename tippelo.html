@@ -1175,84 +1175,80 @@ function initTippTab() {
 }
 
 function renderTippTable() {
-  const wrap = document.getElementById('tippTableWrap');
+  var wrap = document.getElementById('tippTableWrap');
   if(!wrap) return;
 
-  // Összes user összegyűjtése
-  const users = [];
-  Object.values(allTips).forEach(mt => Object.keys(mt).forEach(u => { if(!users.includes(u)) users.push(u); }));
+  // Felhasználók összegyűjtése az allTips-ből
+  var users = [];
+  Object.keys(allTips).forEach(function(mid) {
+    Object.keys(allTips[mid]).forEach(function(u) {
+      if(users.indexOf(u) === -1) users.push(u);
+    });
+  });
   users.sort();
-  console.log('renderTippTable: users=', users, 'allTips keys=', Object.keys(allTips));
 
-  // Meccsek szűrése
-  const todayHU = getBudapestNow().slice(0,10);
-  let matches = ALL_MATCHES.filter(m => {
+  if(!users.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:13px;letter-spacing:1px;">Még senki nem tippelt ⏳</div>';
+    return;
+  }
+
+  // Meccsek ahol van legalább 1 tipp (tippelt szűrő)
+  var todayHU = getBudapestNow().slice(0,10);
+  var matches = ALL_MATCHES.filter(function(m) {
     if(tippFilter === 'today') return m.huDate === todayHU;
-    if(tippFilter === 'tipped') return Object.values(allTips[m.id]||{}).some(t=>getTipOutcome(t));
+    if(tippFilter === 'tipped') {
+      var mt = allTips[m.id];
+      if(!mt) return false;
+      return Object.keys(mt).some(function(u){ return getTipOutcome(mt[u]); });
+    }
     return true;
   });
 
-  if(!users.length) {
-    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;letter-spacing:1px;font-size:13px;">Még senki nem tippelt ⏳<br><span style="font-size:11px;opacity:0.6;display:block;margin-top:8px;">Tippek leadása után frissül</span></div>';
-    return;
-  }
   if(!matches.length) {
-    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:13px;">Még nincs tippelt meccs ebben a szűrőben</div>';
+    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:13px;">Nincs tippelt meccs ⏳</div>';
     return;
   }
 
-  // Fejléc
-  let html = '<table class="tipp-table"><thead><tr>'
-    + '<th class="match-col">Meccs</th>';
-  users.forEach(u => {
-    const isMe = u === currentUser;
-    var userTipCount = ALL_MATCHES.filter(function(m){ return allTips[m.id] && getTipOutcome(allTips[m.id][fbSafeName(u)]); }).length;
-    var userExactCount = ALL_MATCHES.filter(function(m){
-      var t=allTips[m.id]&&allTips[m.id][fbSafeName(u)]; var s=getTipScore(t); var rs=allScores[m.id];
-      return s&&rs&&s.h+':'+s.a===rs;
-    }).length;
-    html += '<th class="user-col" style="' + (isMe?'color:var(--gold);':'') + '">'
-      + (isMe?'⚽ ':'') + u
-      + '<div style="font-size:9px;font-weight:400;opacity:0.45;margin-top:2px;letter-spacing:0;">'
-      + userTipCount + ' tipp' + (userExactCount>0?' · '+userExactCount+' 🎯':'')
-      + '</div></th>';
+  // Táblázat építés
+  var html = '<table class="tipp-table"><thead><tr><th class="match-col">Meccs</th>';
+  users.forEach(function(u) {
+    var isMe = (u === fbSafeName(currentUser));
+    var cnt = ALL_MATCHES.filter(function(m){ return allTips[m.id] && getTipOutcome(allTips[m.id][u]); }).length;
+    html += '<th class="user-col" style="' + (isMe ? 'color:var(--gold);' : '') + '">'
+      + (isMe ? '⚽ ' : '') + u
+      + '<div style="font-size:9px;opacity:0.4;margin-top:2px;">' + cnt + ' tipp</div></th>';
   });
   html += '</tr></thead><tbody>';
 
-  // Sorok
-  matches.forEach(m => {
-    const result = allResults[m.id] || null;
-    const realScore = allScores[m.id] || null;
+  matches.forEach(function(m) {
+    var result = allResults[m.id] || null;
+    var realScore = allScores[m.id] || null;
+    var dateStr = m.huDate.slice(5).replace('-', '.') + '. ' + m.huTime;
 
-    html += '<tr>';
-    // Meccs cella
-    html += '<td class="match-cell">'
+    html += '<tr><td class="match-cell">'
       + '<div class="match-cell-home">' + m.homeFlag + ' ' + m.home + ' – ' + m.away + ' ' + m.awayFlag + '</div>'
-      + '<div class="match-cell-time">' + m.huDate.slice(5).replace('-','.') + '. ' + m.huTime + '</div>'
+      + '<div class="match-cell-time">' + dateStr + '</div>'
       + (realScore ? '<div class="match-cell-score">' + realScore + '</div>' : '')
       + '</td>';
 
-    // Tipp cellák
-    users.forEach(u => {
-      const tip = allTips[m.id] ? allTips[m.id][u] : null;
-      const outcome = getTipOutcome(tip);
-      const score = getTipScore(tip);
+    users.forEach(function(u) {
+      var tip = allTips[m.id] ? allTips[m.id][u] : null;
+      var outcome = getTipOutcome(tip);
+      var score = getTipScore(tip);
 
       if(!outcome) {
-        html += '<td><span class="tc-empty">–</span></td>';
+        html += '<td style="text-align:center;color:rgba(255,255,255,0.12);">–</td>';
         return;
       }
 
-      const isExact = score && realScore && score.h + ':' + score.a === realScore;
-      const isHit = result && outcome === result;
-      let cls = 'tc-' + outcome.toLowerCase();
+      var isExact = score && realScore && (score.h + ':' + score.a === realScore);
+      var isHit = result && outcome === result;
+      var cls = 'tc-' + outcome.toLowerCase();
       if(isExact) cls += ' exact';
       else if(isHit) cls += ' hit';
 
-      const scoreStr = score
-        ? '<span class="tc-score">' + score.h + ':' + score.a + (isExact ? ' 🎯' : '') + '</span>'
-        : '';
-      html += '<td style="vertical-align:middle;"><span class="' + cls + '">' + outcome + scoreStr + '</span></td>';
+      var scoreStr = score ? '<span class="tc-score">' + score.h + ':' + score.a + (isExact ? ' 🎯' : '') + '</span>' : '';
+      html += '<td style="text-align:center;vertical-align:middle;"><span class="' + cls + '">' + outcome + scoreStr + '</span></td>';
     });
 
     html += '</tr>';
@@ -1261,6 +1257,7 @@ function renderTippTable() {
   html += '</tbody></table>';
   wrap.innerHTML = html;
 }
+
 
 function renderMatches() {
   const container=document.getElementById('matchesContainer');
