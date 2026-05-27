@@ -1070,7 +1070,13 @@ function showTab(t) {
   ['meccsek','tippek','ranglista','admin'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['meccsek','tippek','ranglista','admin'][i]===t));
   if(t==='ranglista') renderLeaderboard();
-  if(t==='tippek') { renderTippTable(); }
+  if(t==='tippek') {
+    renderTippTable();
+    // Azonnali frissítés ha allTips üres
+    if(!allTips || Object.keys(allTips).length === 0) {
+      safePollData().then(function(){ renderTippTable(); }).catch(function(){});
+    }
+  }
   if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
 }
 
@@ -1166,12 +1172,6 @@ function renderAll() {
   try { if(activeTab==='ranglista') renderLeaderboard(); } catch(e){}
   try { if(activeTab==='tippek') renderTippTable(); } catch(e){ console.log('tippTable err',e); }
   try { if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); } catch(e){}
-}
-
-// Tippek tab: azonnal renderelj (ne várd a pollData-t)
-function initTippTab() {
-  var wrap = document.getElementById('tippTableWrap');
-  if(wrap && wrap.innerHTML.includes('spinner')) renderTippTable();
 }
 
 function renderTippTable() {
