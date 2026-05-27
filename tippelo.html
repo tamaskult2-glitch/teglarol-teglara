@@ -1182,6 +1182,7 @@ function renderTippTable() {
   const users = [];
   Object.values(allTips).forEach(mt => Object.keys(mt).forEach(u => { if(!users.includes(u)) users.push(u); }));
   users.sort();
+  console.log('renderTippTable: users=', users, 'allTips keys=', Object.keys(allTips));
 
   // Meccsek szűrése
   const todayHU = getBudapestNow().slice(0,10);
