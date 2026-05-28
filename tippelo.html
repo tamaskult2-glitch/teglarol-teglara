@@ -1192,6 +1192,14 @@ async function submitScoreValues(mid, h, a) {
   var newTip={o:outcome,h:hN,a:aN};
   allTips[mid][fbSafeName(currentUser)]=newTip;
   showToast('🎯 Mentve: '+hN+':'+aN);
+  // Gomb visszajelzés közvetlenül a DOM-ban (renderAll nélkül)
+  var btn2=document.getElementById('sbtn_'+mid);
+  if(btn2){btn2.classList.add('saved');btn2.textContent='✓ Mentve';}
+  // Input mezők megtartása és kitöltve jelölése
+  var hEl2=document.getElementById('sh_tip_'+mid);
+  var aEl2=document.getElementById('sa_tip_'+mid);
+  if(hEl2){hEl2.classList.add('filled');hEl2.value=hN;}
+  if(aEl2){aEl2.classList.add('filled');aEl2.value=aN;}
   renderStats(); renderUserBar();
   try {
     await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
@@ -1402,7 +1410,9 @@ function showLineup(mid) {
 function renderAll() {
   // Ha score input fókuszban van, nem rajzoljuk újra a meccs kártyákat
   var fa = document.activeElement;
-  var skipCards = fa && fa.classList && fa.classList.contains('score-num-input');
+  var hasFilledInput = document.querySelector('.score-num-input.filled');
+  var skipCards = (fa && fa.classList && fa.classList.contains('score-num-input')) || 
+                  (hasFilledInput && hasFilledInput.value !== '');
   if(!skipCards) { try { renderMatches(); } catch(e){} }
   try { renderStats(); } catch(e){}
   try { renderUserBar(); } catch(e){}
