@@ -1198,6 +1198,58 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
 body.dark .calc-input-group input { background:rgba(36,40,59,0.8); }
 body.dark .card::before { background-image: url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.12)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.12)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); }
 body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg width='220' height='140' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='15' y='45' fill='rgba(192,24,58,0.10)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='15' y='100' fill='rgba(192,24,58,0.10)' font-size='12' font-weight='700' transform='rotate(-15 110 70)' letter-spacing='0.6'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E"); }
+/* Havi támogatás mérő */
+.sup-meter-wrap {
+  margin: 14px 0 16px;
+  background: #f0ebe6;
+  border: 1px solid rgba(192,24,58,0.12,197,24,0.15);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.sup-meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.sup-meter-label {
+  font-size: 10px;
+  color: #888;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.sup-meter-amount {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #c0183a;
+}
+.sup-meter-amount span {
+  font-size: 11px;
+  color: #999;
+}
+.sup-meter-bar-bg {
+  height: 8px;
+  background: #ddd3cb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sup-meter-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #c0183a, #f5c518);
+  transition: width 0.6s ease;
+  min-width: 4px;
+}
+.sup-meter-bar.full {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+.sup-meter-sub {
+  font-size: 10px;
+  color: #aaa;
+  margin-top: 5px;
+  text-align: right;
+}
 </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -1413,10 +1465,9 @@ window.addEventListener('unhandledrejection', function(e) {
   </button>
   
   <!-- Támogató gomb -->
-  <button id="supportHeaderBtn" class="story-btn" style="padding:8px 10px; flex-direction:column; gap:2px; background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!">
+  <button id="supportHeaderBtn" class="story-btn" style="padding:8px 10px; flex-direction:column; gap:2px; background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!" onclick="var m=document.getElementById('supportModalMain');if(m){m.style.display='flex';}if(typeof loadSupportAmountMain==='function')loadSupportAmountMain();if(typeof initSupportQRMain==='function')initSupportQRMain();">
    <span style="font-size:14px;">❤️</span>
    <span style="font-size:10px; font-weight:700; line-height:1.1;" class="support-btn-label">Támogass!</span>
-   <span style="font-size:9px; font-weight:700; color:#FFE066; line-height:1.1; letter-spacing:0.3px;">FELMÉRÉS</span>
   </button>
 
   <!-- Dark mode toggle -->
@@ -2349,23 +2400,7 @@ var safeStorage = (function() {
 
 
  <!-- ========= FELMÉRÉS WIDGET ========= -->
- <div id="surveyWidget" style="max-width:800px;margin:0 auto 24px;background:var(--bg-card);border-radius:16px;padding:24px 28px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
-  <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:6px;">🤔 Gyors kérdés – segíts nekünk!</div>
-  <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:18px;">Az oldal napi frissítéséhez havi <strong style="color:var(--text-main);">6 500 Ft</strong> szükséges. Támogatnád az oldalt önkéntes adománnyal?</div>
-  
-  <div id="surveyButtons" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
-   <button onclick="submitSurvey(this,'250')" class="survey-opt-btn" style="padding:14px 8px;border:1.5px solid var(--border-subtle);border-radius:12px;background:var(--bg-card);color:var(--text-main);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;line-height:1.4;">☕ Igen<br><span style="font-size:12px;font-weight:400;color:var(--text-muted);">~250 Ft/hó</span></button>
-   <button onclick="submitSurvey(this,'500')" class="survey-opt-btn" style="padding:14px 8px;border:1.5px solid var(--border-subtle);border-radius:12px;background:var(--bg-card);color:var(--text-main);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;line-height:1.4;">💪 Igen<br><span style="font-size:12px;font-weight:400;color:var(--text-muted);">~500 Ft/hó</span></button>
-   <button onclick="submitSurvey(this,'more')" class="survey-opt-btn" style="padding:14px 8px;border:1.5px solid var(--border-subtle);border-radius:12px;background:var(--bg-card);color:var(--text-main);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;line-height:1.4;">🙌 Igen<br><span style="font-size:12px;font-weight:400;color:var(--text-muted);">Többet is</span></button>
-  </div>
-  <button onclick="submitSurvey(this,'no')" style="width:100%;padding:10px;border:1px solid var(--border-subtle);border-radius:10px;background:transparent;color:var(--text-muted);font-size:13px;cursor:pointer;">Nem tudok most támogatni</button>
-
-  <div id="surveyResult" style="display:none;margin-top:16px;padding:14px;background:var(--bg-secondary);border-radius:10px;">
-   <div style="font-size:14px;font-weight:600;color:var(--text-main);margin-bottom:10px;">📊 Eddigi válaszok:</div>
-   <div id="surveyBars"></div>
-   <div style="font-size:12px;color:var(--text-muted);margin-top:10px;text-align:center;" id="surveyTotal"></div>
-  </div>
- </div>
+ 
 
  <script>
 (function() {
@@ -7287,7 +7322,115 @@ currentNo   = excelData.filter(r => r["Változás"] === "ígéret").length;
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
+
+// ===== SUPPORT FŐOLDAL =====
+async function loadSupportAmountMain() {
+  try {
+    var now=new Date(),key=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    var r=await fetch('https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026/support/'+key+'.json');
+    var data=await r.json(),amount=(data&&data.amount)?data.amount:0;
+    var pct=Math.min(100,Math.round(amount/6500*100));
+    var ae=document.getElementById('supAmtMain'),be=document.getElementById('supBarMain'),se=document.getElementById('supSubMain');
+    if(ae)ae.textContent=amount+' Ft';
+    if(be)be.style.width=pct+'%';
+    if(se)se.textContent=amount===0?'Légy az első támogató! 💪':'máj. összesített · köszönjük! 🙏';
+  }catch(e){}
+}
+async function addSupportAmountMain(ft) {
+  try {
+    var now=new Date(),key=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    var r=await fetch('https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026/support/'+key+'.json');
+    var data=await r.json(),current=(data&&data.amount)?data.amount:0,newAmt=current+ft;
+    await fetch('https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026/support/'+key+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:newAmt,updated:new Date().toISOString()})});
+    loadSupportAmountMain();return newAmt;
+  }catch(e){return null;}
+}
+(function(){
+  var qrDoneM=false;
+  window.initSupportQRMain=function(){
+    var el=document.getElementById('sup-qr-main');
+    if(!el||el.children.length>0)return;
+    function mk(){new QRCode(el,{text:'https://revolut.me/tamsd0pex',width:130,height:130,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
+    if(typeof QRCode!=='undefined'){mk();}else if(!qrDoneM){qrDoneM=true;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';s.onload=mk;document.head.appendChild(s);}
+    loadSupportAmountMain();
+  };
+  // Admin gombok
+  window._supMainClicks=0;
+  document.addEventListener('click',function(e){
+    if(e.target&&e.target.id==='supLogoMain'){
+      window._supMainClicks=(window._supMainClicks||0)+1;
+      if(window._supMainClicks>=5){var a=document.getElementById('supAdminMain');if(a)a.style.display='block';window._supMainClicks=0;}
+    }
+  });
+})();
+
 </script>
 <div id="konfettiWrap" class="konfetti-wrap"></div>
+<!-- TÁMOGATÁS MODAL -->
+<div id="supportModalMain" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);z-index:150;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#f9f4f0;border:1px solid rgba(192,24,58,0.2);border-radius:20px;padding:32px 28px;max-width:360px;width:100%;text-align:center;animation:mIn 0.28s ease-out;position:relative;max-height:90vh;overflow-y:auto;color:var(--text,#1a1a2e);">
+    <button onclick="document.getElementById('supportModalMain').style.display='none'"
+      style="position:absolute;top:12px;right:14px;background:rgba(192,24,58,0.08);border:none;color:#c0183a;font-size:16px;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    <div style="font-size:40px;margin-bottom:10px;cursor:pointer;" id="supLogoMain" onclick="(function(){window._supClicks=(window._supClicks||0)+1;if(window._supClicks>=5){document.getElementById('supAdminMain').style.display='block';window._supClicks=0;}})()" title="">🧱</div>
+    <div style="font-family:'Oswald',sans-serif;font-size:20px;color:#c0183a;letter-spacing:2px;margin-bottom:8px;">TÁMOGASD A PROJEKTET!</div>
+    <div style="font-size:13px;color:#666;line-height:1.7;margin-bottom:20px;">
+      Ez az oldal a <a href="https://teglarol-teglara.hu" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">teglarol-teglara.hu</a> projekt részeként jött létre.<br>
+      Fenntartása havi Claude Pro előfizetést igényel.
+    </div>
+    <!-- Összegek -->
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;padding:7px 18px;border-radius:30px;border:1.5px solid rgba(192,24,58,0.3);background:transparent;color:#c0183a;text-decoration:none;transition:all 0.2s;">250 Ft</a>
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;padding:7px 18px;border-radius:30px;border:1.5px solid #c0183a;background:rgba(192,24,58,0.1);color:#c0183a;text-decoration:none;font-weight:700;">500 Ft</a>
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;padding:7px 18px;border-radius:30px;border:1.5px solid rgba(192,24,58,0.3);background:transparent;color:#c0183a;text-decoration:none;">Több ☕</a>
+    </div>
+    <!-- Revolut gomb -->
+    <a href="https://revolut.me/tamsd0pex" target="_blank"
+      style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #c0183a;border-radius:12px;padding:11px 22px;color:#c0183a;font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-decoration:none;margin-bottom:16px;width:100%;justify-content:center;box-sizing:border-box;">
+      💳 &nbsp;Revolut link → revolut.me/tamsd0pex
+    </a>
+    <!-- Havi gyűjtőméter -->
+    <div class="sup-meter-wrap" id="supMeterTipp">
+      <div class="sup-meter-header">
+        <span class="sup-meter-label">🎯 Havi cél: 6 500 Ft</span>
+        <span class="sup-meter-amount"><span id="supAmtMain">–</span> <span>/ 6 500 Ft</span></span>
+      </div>
+      <div class="sup-meter-bar-bg">
+        <div class="sup-meter-bar" id="supBarMain" style="width:0%"></div>
+      </div>
+      <div class="sup-meter-sub" id="supSubMain">Töltés...</div>
+    </div>
+    <!-- Elválasztó -->
+    <div style="display:flex;align-items:center;gap:8px;margin:12px 0;color:rgba(240,244,240,0.2);font-size:11px;letter-spacing:1px;">
+      <div style="flex:1;height:1px;background:rgba(245,197,24,0.12);"></div>
+      Nem Revolutos? Banki utalás:
+      <div style="flex:1;height:1px;background:rgba(245,197,24,0.12);"></div>
+    </div>
+    <!-- IBAN -->
+    <div style="background:#f0ebe6;border:1px solid rgba(192,24,58,0.12);border-radius:10px;padding:12px 16px;margin-bottom:8px;">
+      <div style="font-size:10px;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">IBAN (Revolut)</div>
+      <div style="font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;color:var(--gold);letter-spacing:1.5px;word-break:break-all;">LT60 3250 0126 4002 3496</div>
+      <div style="font-size:10px;color:#999;margin-top:4px;">BIC: REVOLT21</div>
+      <button onclick="navigator.clipboard.writeText('LT6032500126400234960');showToast('📋 IBAN másolva!')"
+        style="margin-top:8px;background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:rgba(240,244,240,0.6);border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:0.5px;">
+        📋 Másolás
+      </button>
+    </div>
+    <!-- Admin: összeg hozzáadás -->
+    <div id="supAdminMain" style="display:none;margin-bottom:12px;">
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;letter-spacing:0.5px;">Admin: összeg rögzítése</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+        <button onclick="addSupportAmount(250).then(a=>a&&showToast('✅ +250 Ft rögzítve! Összesen: '+a+' Ft'))" style="background:rgba(192,24,58,0.08);border:1px solid rgba(192,24,58,0.25);color:#c0183a;border-radius:8px;padding:6px 14px;font-family:'Oswald',sans-serif;font-size:13px;cursor:pointer;">+250 Ft</button>
+        <button onclick="addSupportAmount(500).then(a=>a&&showToast('✅ +500 Ft rögzítve! Összesen: '+a+' Ft'))" style="background:rgba(192,24,58,0.08);border:1px solid rgba(192,24,58,0.25);color:#c0183a;border-radius:8px;padding:6px 14px;font-family:'Oswald',sans-serif;font-size:13px;cursor:pointer;">+500 Ft</button>
+        <button onclick="(function(){var v=prompt('Egyéni összeg (Ft):');if(v&&!isNaN(v))addSupportAmount(parseInt(v)).then(function(a){if(a)showToast('✅ +'+v+' Ft rögzítve!');});})()" style="background:rgba(192,24,58,0.08);border:1px solid rgba(192,24,58,0.25);color:#c0183a;border-radius:8px;padding:6px 14px;font-family:'Oswald',sans-serif;font-size:13px;cursor:pointer;">+Egyéni</button>
+      </div>
+    </div>
+    <!-- QR -->
+    <div style="margin-top:16px;">
+      <div id="sup-qr-main" style="display:inline-block;border-radius:10px;border:3px solid var(--gold);padding:6px;background:white;"></div>
+      <div style="font-size:9px;color:#bbb;letter-spacing:1px;text-transform:uppercase;margin-top:6px;">revolut.me/tamsd0pex</div>
+    </div>
+    <div style="font-size:11px;color:#aaa;margin-top:16px;line-height:1.5;">Köszönjük! 🙏 Minden forint segít.</div>
+  </div>
+</div>
 </body>
 </html>
