@@ -1307,8 +1307,10 @@ function buildTippTable() {
         ALL_MATCHES.forEach(function(m) {
           var mt = t[m.id];
           if(!mt) return;
-          var hasTip = Object.keys(mt).some(function(u){ var tip=mt[u]; return tip && (typeof tip==='object' ? tip.o : tip); });
-          if(!hasTip) return;
+          var hasTip = mt && Object.keys(mt).some(function(u){ var tip=mt[u]; return tip && (typeof tip==='object' ? tip.o : tip); });
+          // TEST1 és BL2026 mindig látszik
+          var alwaysShow = (m.id === 'TEST1' || m.id === 'BL2026');
+          if(!hasTip && !alwaysShow) return;
 
           var result = r[m.id] || '';
           var score  = s[m.id] || '';
