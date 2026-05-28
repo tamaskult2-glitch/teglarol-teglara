@@ -1318,7 +1318,7 @@ function buildTippTable() {
 
           rows += '<tr style="border-bottom:1px solid rgba(255,255,255,0.06);">';
           // Meccs cella
-          rows += '<td style="padding:8px 10px;white-space:nowrap;">'
+          rows += '<td style="padding:8px 10px;white-space:nowrap;position:sticky;left:0;z-index:1;background:rgba(10,28,12,0.97);min-width:160px;">'
             + '<div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.85);">'
             + m.homeFlag+' '+m.home+'</div>'
             + '<div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.85);">'
@@ -1363,8 +1363,8 @@ function buildTippTable() {
         }
 
         // Fejléc
-        var header = '<tr style="background:rgba(0,0,0,0.4);">'
-          + '<th style="padding:8px 10px;text-align:left;font-family:Oswald,sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;white-space:nowrap;">MECCS</th>';
+        var header = '<tr style="background:rgba(10,25,12,0.98);">'
+          + '<th style="padding:8px 10px;text-align:left;font-family:Oswald,sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;white-space:nowrap;position:sticky;left:0;top:0;z-index:3;background:rgba(10,25,12,0.98);min-width:160px;">MECCS</th>';
         users.forEach(function(u) {
           var me = (u === fbSafeName(currentUser));
           header += '<th style="padding:8px 8px;text-align:center;font-family:Oswald,sans-serif;font-size:11px;'
@@ -1373,10 +1373,11 @@ function buildTippTable() {
         });
         header += '</tr>';
 
-        wrap.innerHTML = '<table style="width:100%;border-collapse:collapse;min-width:300px;">'
+        wrap.innerHTML = '<div style="overflow:auto;max-height:70vh;border-radius:10px;border:1px solid rgba(245,197,24,0.15);">'
+          + '<table style="width:100%;border-collapse:collapse;min-width:300px;">'
           + '<thead>'+header+'</thead>'
           + '<tbody>'+rows+'</tbody>'
-          + '</table>';
+          + '</table></div>';
 
       }).catch(function(){ wrap.innerHTML='<p style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);">Hiba :(</p>'; });
     }).catch(function(){ wrap.innerHTML='<p style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);">Hiba :(</p>'; });
