@@ -1016,6 +1016,7 @@ function fbSafeName(name) {
 let currentUser = localStorage.getItem(LS_SESSION) || null;
 let allTips={}, allResults={}, allScores={};
 let isAdminUnlocked=false, activeTab='meccsek';
+let _scoreSaving=false; // renderMatches blokk amíg score mentés folyamatban
 
 // ===== FIREBASE REST =====
 // ===== Firebase REST API =====
@@ -1191,11 +1192,11 @@ async function submitScoreValues(mid, h, a) {
   if(!allTips[mid]) allTips[mid]={};
   var newTip={o:outcome,h:hN,a:aN};
   allTips[mid][fbSafeName(currentUser)]=newTip;
-  showToast('🎯 Mentve: '+hN+':'+aN);
-  // Gomb visszajelzés közvetlenül a DOM-ban (renderAll nélkül)
+  // Lock: renderMatches ne fusson amíg mentünk
+  _scoreSaving = true;
+  // Azonnali UI visszajelzés
   var btn2=document.getElementById('sbtn_'+mid);
   if(btn2){btn2.classList.add('saved');btn2.textContent='✓ Mentve';}
-  // Input mezők megtartása és kitöltve jelölése
   var hEl2=document.getElementById('sh_tip_'+mid);
   var aEl2=document.getElementById('sa_tip_'+mid);
   if(hEl2){hEl2.classList.add('filled');hEl2.value=hN;}
@@ -1203,8 +1204,14 @@ async function submitScoreValues(mid, h, a) {
   renderStats(); renderUserBar();
   try {
     await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
+    showToast('🎯 Mentve: '+hN+':'+aN);
   } catch(e){
     showToast('❌ Mentési hiba!');
+  } finally {
+    // Tippek táblázat frissítése ha aktív
+    if(activeTab==='tippek') { try { buildTippTable(); } catch(e){} }
+    // 3 másodperc után feloldjuk
+    setTimeout(function(){ _scoreSaving=false; }, 3000);
   }
 }
 
@@ -1409,11 +1416,7 @@ function showLineup(mid) {
 
 function renderAll() {
   // Ha score input fókuszban van, nem rajzoljuk újra a meccs kártyákat
-  var fa = document.activeElement;
-  var hasFilledInput = document.querySelector('.score-num-input.filled');
-  var skipCards = (fa && fa.classList && fa.classList.contains('score-num-input')) || 
-                  (hasFilledInput && hasFilledInput.value !== '');
-  if(!skipCards) { try { renderMatches(); } catch(e){} }
+  if(!_scoreSaving) { try { renderMatches(); } catch(e){} }
   try { renderStats(); } catch(e){}
   try { renderUserBar(); } catch(e){}
   try { if(activeTab==='ranglista') renderLeaderboard(); } catch(e){}
