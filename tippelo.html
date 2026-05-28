@@ -1367,7 +1367,7 @@ function buildTippTable() {
           + '<th style="padding:8px 10px;text-align:left;font-family:Oswald,sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;white-space:nowrap;position:sticky;left:0;top:0;z-index:3;background:rgba(10,25,12,0.98);min-width:160px;">MECCS</th>';
         users.forEach(function(u) {
           var me = (u === fbSafeName(currentUser));
-          header += '<th style="padding:8px 8px;text-align:center;font-family:Oswald,sans-serif;font-size:11px;'
+          header += '<th style="padding:8px 8px;text-align:center;font-family:Oswald,sans-serif;font-size:11px;position:sticky;top:0;z-index:2;background:rgba(10,25,12,0.98);'
             +(me?'color:var(--gold);':'color:rgba(240,244,240,0.5);')+'letter-spacing:0.5px;white-space:nowrap;">'
             +(me?'⚽ ':'')+u+'</th>';
         });
