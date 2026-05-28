@@ -1178,33 +1178,42 @@ async function submitTip(mid,tip) {
   catch(e){showToast('❌ Mentési hiba!');}
 }
 
-async function submitScore(mid) {
+// submitScoreValues: az értékek már ki vannak olvasva a DOM-ból
+async function submitScoreValues(mid, h, a) {
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
   var m=ALL_MATCHES.find(function(x){return x.id===mid;});
   if(m&&isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
   if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
-  var hEl=document.getElementById('sh_tip_'+mid);
-  var aEl=document.getElementById('sa_tip_'+mid);
-  if(!hEl||!aEl){showToast('⚠️ Nem találom az input mezőt!');return;}
-  var h=hEl.value, a=aEl.value;
-  if(h===''||a===''){showToast('⚠️ Írd be mindkét számot!');return;}
+  if(h===''||h===undefined||h===null||a===''||a===undefined||a===null){showToast('⚠️ Írd be mindkét számot!');return;}
   var hN=parseInt(h), aN=parseInt(a);
   if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){showToast('⚠️ Érvénytelen szám (0-20)!');return;}
-  var outcome = hN>aN?'1':hN===aN?'X':'2';
+  var outcome=hN>aN?'1':hN===aN?'X':'2';
   if(!allTips[mid]) allTips[mid]={};
   var newTip={o:outcome,h:hN,a:aN};
   allTips[mid][fbSafeName(currentUser)]=newTip;
-  // Gomb azonnali visszajelzés
-  var btn=document.getElementById('sbtn_'+mid);
-  if(btn){btn.classList.add('saved');btn.textContent='✓ Mentve';}
+  showToast('🎯 Mentve: '+hN+':'+aN);
   renderStats(); renderUserBar();
   try {
     await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
-    showToast('🎯 Mentve: '+hN+':'+aN);
   } catch(e){
-    showToast('❌ Hiba: '+(e.message||e));
-    if(btn){btn.classList.remove('saved');btn.textContent='Mentés';}
+    showToast('❌ Mentési hiba!');
   }
+}
+
+async function submitScore(mid) {
+  var hEl=document.getElementById('sh_tip_'+mid);
+  var aEl=document.getElementById('sa_tip_'+mid);
+  if(!hEl||!aEl){showToast('⚠️ Nem találom az input mezőt!');return;}
+  await submitScoreValues(mid, hEl.value, aEl.value);
+}
+
+// saveScore: globális, Safari-safe wrapper - onclick hívja
+function saveTipScore(mid) {
+  var hEl=document.getElementById('sh_tip_'+mid);
+  var aEl=document.getElementById('sa_tip_'+mid);
+  var hv = hEl ? hEl.value : '';
+  var av = aEl ? aEl.value : '';
+  submitScoreValues(mid, hv, av);
 }
 
 // ===== SCORE ROW BUILDER (kompakt, a match-center-en belül) =====
@@ -1230,19 +1239,17 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
     // Tippelési mód: kompakt sor
     var hVal = myScore ? String(myScore.h) : '';
     var aVal = myScore ? String(myScore.a) : '';
-    var oc = 'submitScore(' + JSON.stringify(mid) + ')';
+    var oc = 'saveTipScore(' + JSON.stringify(mid) + ')';
     var btnCls = 'score-save-btn' + (myScore ? ' saved' : '');
     var btnTxt = myScore ? '✓ Mentve' : 'Mentés';
     return '<div class="score-row">'
       + '<span class="score-row-label">+3:</span>'
       + '<div class="score-inputs-wrap">'
       + '<input type="number" min="0" max="20" id="sh_tip_' + mid + '" placeholder="–"'
-      + ' value="' + hVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis
-      + ' oninput="document.getElementById(\'sbtn_'+mid+'\')\.classList.remove(\'saved\');">'
+      + ' value="' + hVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
       + '<span class="score-sep">:</span>'
       + '<input type="number" min="0" max="20" id="sa_tip_' + mid + '" placeholder="–"'
-      + ' value="' + aVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis
-      + ' oninput="document.getElementById(\'sbtn_'+mid+'\')\.classList.remove(\'saved\');">'
+      + ' value="' + aVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
       + '</div>'
       + '<button class="' + btnCls + '" id="sbtn_' + mid + '" onclick="' + oc + '"' + dis + '>'
       + btnTxt + '</button>'
