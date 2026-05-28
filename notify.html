@@ -161,16 +161,15 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 4 tégla frissítve (2026. máj. 25.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 4 tégla frissítve (2026. máj. 28.)
 
 📊 Mai frissítések:
-• 🚫 Vendégmunkás-stop: döntés máj.26. kormányülésen várható – VOSZ, WHC: vállalatok 71%-a nem tud azonnali magyar pótlást
-• 🇪🇺 Uniós források: EB delegáció Budapesten – Von der Leyennel megállapodás remélt
-• 💼 Miniszterelnöki fizetés: máj.24 RTL interjúban Magyar Péter megerősítette a 2,5 M Ft-os szintet
+• 🚫 Vendégmunkás-stop: jún.1-től moratórium lép életbe (máj.27 kormányszóvivői tájékoztató)
+• 🇪🇺 Uniós források: Magyar Péter máj.29-én tárgyal Von der Leyennel
+• 💰 SZJA csökkentés: 2027-től 9%-ra minimálbéren (Kármán András bejelentés)
+• 💼 Miniszterelnöki fizetés: máj.27 megerősítve, 2,5 M Ft/hó
 
-📅 Következő: máj. 26. kormányülés – vendégmunkás döntés várható
-
-📊 Ver. 3.2 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
+📊 Ver. 3.3 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -206,26 +205,30 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 4 tégla frissítve (2026. máj. 25.)
+    dbInput.value = `🧱 4 tégla frissítve (2026. máj. 28.)
 
 📊 Mai frissítések:
-• 🚫 Vendégmunkás-stop: döntés máj.26. kormányülésen várható – VOSZ, WHC: vállalatok 71%-a nem tud azonnali magyar pótlást
-• 🇪🇺 Uniós források: EB delegáció Budapesten – Von der Leyennel megállapodás remélt
-• 💼 Miniszterelnöki fizetés: máj.24 RTL interjúban Magyar Péter megerősítette a 2,5 M Ft-os szintet
+• 🚫 Vendégmunkás-stop: jún.1-től moratórium lép életbe (máj.27 kormányszóvivői tájékoztató)
+• 🇪🇺 Uniós források: Magyar Péter máj.29-én tárgyal Von der Leyennel
+• 💰 SZJA csökkentés: 2027-től 9%-ra minimálbéren (Kármán András bejelentés)
+• 💼 Miniszterelnöki fizetés: máj.27 megerősítve, 2,5 M Ft/hó
 
-📅 Következő: máj. 26. kormányülés – vendégmunkás döntés várható
-
-📊 Ver. 3.2 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
+📊 Ver. 3.3 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 ÚJ: Pénztárcaindex oldal elindult!
+    dbInput.value = `🧱 4 tégla frissítve (2026. máj. 28.)
 
-Egy tipikus 4 fős család havonta 79 000 Ft-ot takaríthatna meg a TISZA ígéretek szerint.
-20+ termék nyomon követve: üzemanyag, rezsi, élelmiszer, gyógyszer.
+📊 Mai frissítések:
+• 🚫 Vendégmunkás-stop: jún.1-től moratórium lép életbe (máj.27 kormányszóvivői tájékoztató)
+• 🇪🇺 Uniós források: Magyar Péter máj.29-én tárgyal Von der Leyennel
+• 💰 SZJA csökkentés: 2027-től 9%-ra minimálbéren (Kármán András bejelentés)
+• 💼 Miniszterelnöki fizetés: máj.27 megerősítve, 2,5 M Ft/hó
 
-👉 teglarol-teglara.hu/penztarca.html`;
+📊 Ver. 3.3 – 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret
+
+🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pénztárcaindex launch üzenet';
   } else {
     dbInput.value = '';

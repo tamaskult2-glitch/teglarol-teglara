@@ -2848,7 +2848,7 @@ var safeStorage = (function() {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#e8405a"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 3.2 <span class="story-tl-date">2026.05.25</span></div>
+      <div class="story-tl-ver">Ver. 3.3 <span class="story-tl-date">2026-05-28</span></div>
       <div class="story-tl-desc">🔄 4 tégla frissítve: vendégmunkás-stop (máj.26. kormányülés döntés várható, vállalati ellenállás közeggette), uniós források (EB delegáció Budapesten máj.25 héten, Von der Leyennel megállapodás remélt), miniszterelnöki fizetés (máj.24 RTL interjú megerősítés), miniszterelnöki mandátum korlátozás (Melléthei-Barna hivatkozás eltávolítva, TISZA-frakció benyújtva). 📊 103 tégla | 3 megvalósult | 73 bejelentve | 27 ígéret.</div>
      </div>
     </div>
@@ -2988,7 +2988,7 @@ var safeStorage = (function() {
 function _dAgo(ds) {
   if (!ds) return '';
   const d = Math.floor((new Date() - new Date(ds)) / 86400000);
-  return d === 0 ? '<span style="color:#e8405a;font-weight:700;">Ma</span>' : d === 1 ? '1 napja' : d + '\u00a0napja';
+  return d === 0 ? '<span style="color:#e8405a;font-weight:700;">Ma</span>' : d === 1 ? '46 napja' : d + '\u00a0napja';
 }
 
 function getStatus(valtozas) {
@@ -4313,11 +4313,12 @@ const excelData = [
   "Kategória": "Biztonságpolitika",
   "TiSZa ígéret": "Nem engednek be Európán kívüli vendégmunkásokat",
   "FiDeSZ állapot": "jelenleg engednek",
-  "Volt előrelépést jelentő bejelentés?": "igen – 2026. jún. 1-től jogszabályban tiltják; Kapitány István gazdasági miniszter megerősítette (máj.4)",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kapitány István gazdasági miniszter (2026-05-12 meghallgatás): megerősítette, hogy jún.1-től felfüggesztik a vendégmunkások behozatalát; Kormányszóvivői sajtótájékoztató (2026-05-27): \"Június 1-től jelzésértékű moratórium lép életbe a harmadik országbeli munkavállalók foglalkoztatására. A cél a magyar munkaerő előnyben részesítése.\" Szakmai egyeztetés a végleges szabályozás előtt várható.",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-04",
+  "Frissítés": "2026-05-28",
   "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Forrás": "https://www.portfolio.hu/gazdasag/20260527/itt-vannak-a-tisza-kormany-legujabb-dontesei-839298"
  },
  {
   "Kategória": "Biztonságpolitika",
@@ -4543,21 +4544,23 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Uniós források felszabadítása",
   "FiDeSZ állapot": "8000 Mrd Ft befagyasztva",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter (máj.18, Brüsszel): tárgyalások folyamatban, aug.31. határidő a 10,4 Mrd€ RRF lehívására; Magyar Péter: \"Megfeszített munkával, augusztus végéig minden kérdést le lehet zárni\"; máj.20–21: Lengyelország–Ausztria körút, Tusk-tárgyalás, bécsi delegáció vonattal; máj.25 héten: EB magas szintű delegáció Budapesten – Von der Leyennel megállapodás remélt; Antonio Costával is tárgyalt Magyar Péter",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kormányszóvivői sajtótájékoztató (2026-05-27): Magyar Péter pénteken (2026-05-29) tárgyal Ursula von der Leyen bizottsági elnökkel. Az EU-s források felszabadítása és a jogállamisági feltételrendszer teljesítése kiemelt prioritás az új kormánynál.",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-25",
+  "Frissítés": "2026-05-28",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260520/tisza-kormany-uj-nemzetkozi-szovetsegest-szerzett-magyar-peter-fontos-bejelentesek-erkeznek-837898",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Forrás": "https://www.portfolio.hu/gazdasag/20260527/tisza-kormany-visszavonjak-a-diplomatautleveleket-nyilvanosak-lesznek-a-korhazi-fertozesek-839176"
  },
  {
   "Kategória": "Gazdaság és adórendszer",
   "TiSZa ígéret": "SZJA csökkentése 9%-ra a mediánbér alatt + KATA visszaállítása",
   "FiDeSZ állapot": "SZJA kulcs: 15% flat rate; KATA 2022-ben erősen beszűkítve (bevételi határ 18 M Ft/év, B2B korlátozás); kisvállalkozók adminisztrációs terhe magas; különadók rendszere torzítja a versenyt",
-  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter (máj.12, bizottsági meghallgatás, 9 igen – 2 tartózkodás): a bruttó mediánbér (~600 000 Ft/hó, KSH 2026) alatt keresőknél az SZJA effektív kulcsa 9%-ra csökken adójóváírással; példa: minimálbéren (322 800 Ft/hó) kb. 20 000 Ft/hó nettó béremelés; az SZJA-változás 2027. januártól lép életbe (idén nem fér bele a büdzsé keretébe – máj.12 doorstep); KATA visszaállítása: közel 400 000 potenciális érintett, a jogosulti kör az eredeti szélességre bővül, részletszabályok később; különadók fokozatos kivezetése; ÁFA csökkentés bizonyos termékeknél már 2026-ban elképzelhető; EURÓ bevezetés célja 2030; pótköltségvetés: nyár végén az Országgyűlés elé terjesztik",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kármán András pénzügyminiszter (2026-05-12 meghallgatás): \"A személyi jövedelemadót csökkentjük, de ezt csak 2027-től léptetjük érvénybe.\" A 15%-os névleges kulcs megmarad, de adójóváírással minimálbéren 9%-ra csökken az effektív teher, mediánbér alatt mindenki kevesebbet fizet. Niveus: ~300-310 mrd Ft/év bevételkiesés a költségvetésnek.",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-16",
+  "Frissítés": "2026-05-28",
   "Forrás link": "https://www.economx.hu/magyar-gazdasag/2026/05/12/9-szazalekos-szja-a-kata-visszater-zero-tolerancia-korrupcio-karman-andras-tisza-kormany-gazdasagi-program/",
-  "Prioritás": "magas"
+  "Prioritás": "magas",
+  "Forrás": "https://piacesprofit.hu/cikkek/gazdasag/a-tisza-kormany-csokkenti-az-alacsonyabb-berekhez-tartozo-szemely-jovedelemadot.html"
  },
  {
   "Kategória": "Gazdaság és adórendszer",
@@ -4863,11 +4866,12 @@ const excelData = [
   "Kategória": "Közigazgatás",
   "TiSZa ígéret": "Miniszterelnöki fizetés csökkentése 2,5 millió forintra",
   "FiDeSZ állapot": "miniszterelnöki fizetés magasabb (pontos adat nem publikus)",
-  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter 2,5 millió Ft/hó miniszterelnöki fizetést bejelentett; többi miniszter fizetése arányos; máj.24 RTL interjú: megerősítette a kormányzati fizetéscsökkentést, a miniszterek bruttó bére a miniszterelnöki 2,5 M Ft-hoz igazodik",
+  "Volt előrelépést jelentő bejelentés?": "igen – Magyar Péter miniszterelnök (2026-05-24 RTL interjú): megerősítette, hogy csökkentik a miniszterelnök, miniszterek és államtitkárok fizetését. Kormányszóvivői sajtótájékoztató (2026-05-27): a fizetéscsökkentés a kabinet egyik első intézkedése. Pontos összeg: 2,5 M Ft/hó a miniszterelnöki fizetés.",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-25",
+  "Frissítés": "2026-05-28",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260524/tisza-kormany-ujabb-kulcsemberek-nevei-szivaroghattak-ki-reagalt-a-fidesz-magyar-peter-allitasaira-838840",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Forrás": "https://www.portfolio.hu/gazdasag/20260527/tisza-kormany-visszavonjak-a-diplomatautleveleket-nyilvanosak-lesznek-a-korhazi-fertozesek-839176"
  },
  {
   "Kategória": "Gazdaság",
@@ -5033,11 +5037,12 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Vendégmunkás-stop 2026. június 1-től",
   "FiDeSZ állapot": "tömeges vendégmunkás-foglalkoztatás engedélyezett",
-  "Volt előrelépést jelentő bejelentés?": "igen – Köböl Anita kormányszóvivő (máj.19, sajtótájékoztató): \"a kormány várhatóan jövő heti ülésén dönt a vendégmunkás-behozatal korlátozásáról\"; Magyar Péter felkérte a gazdasági és szociális minisztert rövid határidővel egyeztetni az érintett tárcákkal; máj.23: vállalati érdekképviseletek (VOSZ, WHC Csoport) komoly ellenállást fejeztek ki – 71% szerint elképzelhetetlen a vendégmunkások azonnali felváltása; a döntés a máj.26. kormányülésen várható; a jún.1-i határidő tartása körüli bizonytalanság fennáll",
+  "Volt előrelépést jelentő bejelentés?": "igen – Kapitány István gazdasági miniszter (2026-05-12 meghallgatás): megerősítette, hogy jún.1-től felfüggesztik a vendégmunkások behozatalát; Kormányszóvivői sajtótájékoztató (2026-05-27): \"Június 1-től jelzésértékű moratórium lép életbe a harmadik országbeli munkavállalók foglalkoztatására. A cél a magyar munkaerő előnyben részesítése.\" Szakmai egyeztetés a végleges szabályozás előtt várható.",
   "Változás": "bejelentve",
-  "Frissítés": "2026-05-25",
+  "Frissítés": "2026-05-28",
   "Forrás link": "https://www.economx.hu/magyar-gazdasag/2026/05/23/vendegmunkas-mentonjobs-munkaero-magyar-peter-tisza-part/",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Forrás": "https://www.portfolio.hu/gazdasag/20260527/itt-vannak-a-tisza-kormany-legujabb-dontesei-839298"
  },
  {
   "Kategória": "Igazságszolgáltatás",
