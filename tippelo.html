@@ -297,6 +297,120 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
   .lineup-no-data { font-size:18px !important; }
   .lineup-teams { gap:24px !important; }
 }
+
+
+
+/* ===== GYŐZTES BANNER ===== */
+.winner-banner {
+  display:none;
+  background:linear-gradient(135deg,#0d2010 0%,#1a4a1e 50%,#0d2010 100%);
+  border:2px solid var(--gold);
+  border-radius:16px;
+  padding:20px 24px;
+  margin:0 0 20px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  animation:winnerPulse 2s ease-in-out infinite;
+}
+@keyframes winnerPulse {
+  0%,100% { box-shadow:0 0 20px rgba(245,197,24,0.3), 0 0 40px rgba(245,197,24,0.1); }
+  50% { box-shadow:0 0 30px rgba(245,197,24,0.6), 0 0 60px rgba(245,197,24,0.2); }
+}
+.winner-banner.show { display:block; }
+.winner-stars {
+  font-size:28px;
+  letter-spacing:4px;
+  margin-bottom:8px;
+  animation:starSpin 3s linear infinite;
+  display:inline-block;
+}
+@keyframes starSpin {
+  0%,100% { transform:scale(1); }
+  50% { transform:scale(1.15); }
+}
+.winner-label {
+  font-family:'Oswald',sans-serif;
+  font-size:12px;
+  color:rgba(245,197,24,0.6);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.winner-name {
+  font-family:'Oswald',sans-serif;
+  font-size:32px;
+  font-weight:700;
+  color:var(--gold);
+  letter-spacing:2px;
+  text-shadow:0 0 20px rgba(245,197,24,0.5);
+  margin-bottom:4px;
+}
+.winner-title {
+  font-family:'Oswald',sans-serif;
+  font-size:14px;
+  color:rgba(240,244,240,0.6);
+  letter-spacing:1px;
+}
+.winner-score {
+  display:inline-block;
+  margin-top:10px;
+  background:rgba(245,197,24,0.1);
+  border:1px solid rgba(245,197,24,0.3);
+  border-radius:20px;
+  padding:4px 16px;
+  font-family:'Oswald',sans-serif;
+  font-size:13px;
+  color:var(--gold);
+  letter-spacing:1px;
+}
+.confetti-piece {
+  position:absolute;
+  width:8px;height:8px;
+  border-radius:2px;
+  animation:confettiFall 3s linear infinite;
+  opacity:0;
+}
+@keyframes confettiFall {
+  0% { transform:translateY(-20px) rotate(0deg); opacity:1; }
+  100% { transform:translateY(120px) rotate(720deg); opacity:0; }
+}
+
+/* ===== BL POLL ===== */
+.bl-poll {
+  background:linear-gradient(135deg,rgba(10,28,14,0.9),rgba(5,15,8,0.95));
+  border:1.5px solid rgba(245,197,24,0.25);
+  border-radius:14px;padding:18px 16px;margin:0 0 16px;
+}
+.bl-poll-title {
+  font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;
+  color:var(--gold);letter-spacing:1.5px;margin-bottom:4px;text-align:center;
+}
+.bl-poll-sub {
+  font-size:11px;color:rgba(240,244,240,0.4);text-align:center;
+  margin-bottom:14px;letter-spacing:0.5px;
+}
+.bl-poll-options {
+  display:flex;gap:8px;margin-bottom:12px;
+}
+.bl-poll-btn {
+  flex:1;padding:10px 6px;border-radius:9px;border:1.5px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.04);cursor:pointer;transition:all 0.2s;
+  font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;
+  color:rgba(240,244,240,0.7);letter-spacing:0.5px;text-align:center;
+}
+.bl-poll-btn:hover { border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.08);color:var(--gold); }
+.bl-poll-btn.voted { border-color:var(--gold);background:rgba(245,197,24,0.12);color:var(--gold); }
+.bl-poll-btn.voted-other { opacity:0.5; }
+.bl-poll-bar-wrap { margin-bottom:6px; }
+.bl-poll-bar-row {
+  display:flex;align-items:center;gap:8px;margin-bottom:5px;
+}
+.bl-poll-bar-label { font-family:'Oswald',sans-serif;font-size:11px;color:rgba(240,244,240,0.6);width:70px;flex-shrink:0; }
+.bl-poll-bar-bg { flex:1;height:7px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden; }
+.bl-poll-bar-fill { height:100%;border-radius:4px;background:var(--gold);transition:width 0.5s ease; }
+.bl-poll-bar-pct { font-family:'Oswald',sans-serif;font-size:11px;color:var(--gold);width:32px;text-align:right;flex-shrink:0; }
+.bl-poll-total { font-size:10px;color:rgba(240,244,240,0.25);text-align:center;margin-top:4px; }
 /* ===== MATCH CARD ===== */
 .match-card{
   background:var(--card);border:1px solid var(--card-border);
@@ -547,6 +661,70 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .ob-start-btn:hover{background:var(--gold-dark);}
 .ob-skip{font-size:11px;color:rgba(240,244,240,0.3);cursor:pointer;text-decoration:underline;}
 .ob-skip:hover{color:rgba(240,244,240,0.5);}
+
+/* ===== NYEREMÉNY KALKULÁTOR ===== */
+.prize-modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.88);
+  backdrop-filter:blur(8px);z-index:150;
+  display:none;align-items:center;justify-content:center;padding:16px;
+}
+.prize-modal-overlay.open{display:flex;}
+.prize-modal{
+  background:linear-gradient(160deg,#0d2010,#0a1c0c);
+  border:1px solid rgba(245,197,24,0.35);border-radius:20px;
+  padding:28px 24px;max-width:380px;width:100%;
+  position:relative;animation:mIn 0.25s ease-out;
+}
+.prize-modal h3{
+  font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;
+  color:var(--gold);letter-spacing:2px;text-align:center;margin-bottom:6px;
+}
+.prize-subtitle{
+  font-size:12px;color:rgba(240,244,240,0.4);
+  text-align:center;margin-bottom:20px;letter-spacing:0.5px;
+}
+.prize-input-row{
+  display:flex;gap:10px;align-items:center;margin-bottom:20px;
+}
+.prize-input-row label{
+  font-family:'Oswald',sans-serif;font-size:13px;
+  color:rgba(240,244,240,0.6);white-space:nowrap;
+}
+.prize-bank-input{
+  flex:1;padding:10px 14px;border-radius:8px;
+  border:1.5px solid rgba(245,197,24,0.3);
+  background:rgba(255,255,255,0.05);color:white;
+  font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;
+  text-align:right;
+}
+.prize-bank-input:focus{outline:none;border-color:var(--gold);}
+.prize-results{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.prize-row{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,0.04);border-radius:10px;
+  padding:12px 16px;border:1px solid rgba(255,255,255,0.07);
+}
+.prize-medal{font-size:24px;flex-shrink:0;}
+.prize-rank-info{flex:1;}
+.prize-rank-name{
+  font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;
+  color:rgba(240,244,240,0.9);letter-spacing:0.3px;
+}
+.prize-rank-sub{
+  font-size:11px;color:rgba(240,244,240,0.35);margin-top:2px;
+}
+.prize-amount{
+  font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;
+  color:var(--gold);text-align:right;white-space:nowrap;
+}
+.prize-pct{
+  font-size:10px;color:rgba(245,197,24,0.5);
+  text-align:right;margin-top:1px;
+}
+.prize-note{
+  font-size:11px;color:rgba(240,244,240,0.3);
+  text-align:center;line-height:1.5;
+}
 footer{position:relative;z-index:1;text-align:center;padding:18px;font-size:11px;color:rgba(240,244,240,0.22);letter-spacing:1px;border-top:1px solid rgba(245,197,24,0.07);}
 footer a{color:rgba(245,197,24,0.45);text-decoration:none;}
 footer a:hover{color:var(--gold);}
@@ -624,6 +802,15 @@ footer a:hover{color:var(--gold);}
     </div>
   </div>
 </div>
+
+<!-- NYEREMÉNY KALKULÁTOR MODAL -->
+    
+    
+    </div>
+    
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ONBOARDING MODAL -->
@@ -804,7 +991,10 @@ footer a:hover{color:var(--gold);}
   <h1>FIFA World Cup 2026</h1>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <span class="header-badge">GÓLSZAGLÓ BAJNOKSÁG</span>
-  <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;">
+  <div style="margin-top:10px;">
+    
+  </div>
+  <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;">
     <button onclick="document.getElementById('onboardModal').style.display='flex'"
       style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"
       title="Használati útmutató">?</button>
@@ -910,7 +1100,7 @@ footer a:hover{color:var(--gold);}
 <script>
 // ===== CONFIG =====
 const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
-const ADMIN_PW = 'titi2026';
+const ADMIN_PW = 'tipp2026';
 const POLL_MS = 8000;
 // localStorage kulcsok (csak session + jelszavak)
 const LS_USERS   = 'tipp2026_users';   // {safeName: hashedPw}
@@ -1465,6 +1655,8 @@ function renderAll() {
   try { if(activeTab==='ranglista') renderLeaderboard(); } catch(e){}
   try { if(activeTab==='tippek') buildTippTable(); } catch(e){}
   try { if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); } catch(e){}
+  try { checkBLWinner(); } catch(e){}
+  try { initBLPoll(); } catch(e){}
 }
 
 
@@ -1912,6 +2104,131 @@ function closeOnboard() {
   }
   // Ha regisztrációs modal is nyílik, onboard után mutassuk
 })();
+
+
+
+// ===== GYŐZTES BANNER =====
+function checkBLWinner() {
+  var result = allResults['BL2026'];
+  if(!result) return; // Még nincs eredmény
+
+  var mt = allTips['BL2026'] || {};
+  var realScore = allScores['BL2026'] || null;
+
+  // Gyűjtjük a helyes tippelőket
+  var exact = [];   // pontos eredményt eltalálták
+  var correct = []; // kimenetet eltalálták
+
+  Object.keys(mt).forEach(function(u) {
+    var tip = mt[u];
+    var o = getTipOutcome(tip);
+    var s = getTipScore(tip);
+    if(!o) return;
+    var isExact = s && realScore && (s.h+':'+s.a === realScore);
+    var isHit = o === result;
+    if(isExact) exact.push({name:u, score:s.h+':'+s.a});
+    else if(isHit) correct.push({name:u});
+  });
+
+  var banner = document.getElementById('winnerBanner');
+  var nameEl = document.getElementById('winnerName');
+  var scoreEl = document.getElementById('winnerScore');
+  if(!banner) return;
+
+  if(exact.length > 0) {
+    // Pontos találat van
+    var w = exact[0];
+    banner.classList.add('show');
+    nameEl.textContent = w.name;
+    scoreEl.textContent = '🎯 Pontos eredmény: ' + w.score + (exact.length>1?' és még '+(exact.length-1)+' fő':'');
+  } else if(correct.length > 0) {
+    // Csak kimenetel
+    banner.classList.add('show');
+    nameEl.textContent = correct.length === 1 ? correct[0].name : correct.map(function(x){return x.name;}).join(' & ');
+    scoreEl.textContent = '✅ Helyes tipp: ' + result + (correct.length>1?' · '+correct.length+' nyertes':'');
+  } else {
+    banner.classList.remove('show');
+  }
+
+  // Konfetti
+  if(banner.classList.contains('show') && !banner.querySelector('.confetti-piece')) {
+    var colors = ['#f5c518','#c8102e','#22c55e','#3b82f6','#ffffff'];
+    for(var i=0;i<12;i++){
+      var p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.cssText = 'left:'+Math.random()*100+'%;background:'+colors[i%5]+';animation-delay:'+Math.random()*3+'s;animation-duration:'+(2+Math.random()*2)+'s;';
+      banner.appendChild(p);
+    }
+  }
+}
+
+// ===== BL POLL =====
+var _pollVoted = localStorage.getItem('blpoll2026_vote') || null;
+
+function initBLPoll() {
+  // Csak amíg nincs eredmény
+  if(allResults['BL2026']) {
+    document.getElementById('blPoll').style.display='none';
+    return;
+  }
+  // Kickoff előtt mutatjuk
+  if(isKickoffPassed('2026-05-30','18:00')) {
+    document.getElementById('blPoll').style.display='none';
+    return;
+  }
+  document.getElementById('blPoll').style.display='block';
+  loadPollResults();
+  // Ha már szavazott, gombokat letiltjuk
+  if(_pollVoted) {
+    showPollVoted(_pollVoted);
+  }
+}
+
+function loadPollResults() {
+  fbGet('blpoll').then(function(data) {
+    if(!data) return;
+    var psg = (data.PSG||0), draw = (data.Draw||0), arsenal = (data.Arsenal||0);
+    updatePollBars(psg, draw, arsenal);
+  }).catch(function(){});
+}
+
+function updatePollBars(psg, draw, arsenal) {
+  var total = psg + draw + arsenal;
+  if(total === 0) return;
+  document.getElementById('pollBars').style.display='block';
+  document.getElementById('barPSG').style.width=Math.round(psg/total*100)+'%';
+  document.getElementById('barDraw').style.width=Math.round(draw/total*100)+'%';
+  document.getElementById('barArsenal').style.width=Math.round(arsenal/total*100)+'%';
+  document.getElementById('pctPSG').textContent=Math.round(psg/total*100)+'%';
+  document.getElementById('pctDraw').textContent=Math.round(draw/total*100)+'%';
+  document.getElementById('pctArsenal').textContent=Math.round(arsenal/total*100)+'%';
+  document.getElementById('pollTotal').textContent=total+' szavazat';
+}
+
+function showPollVoted(choice) {
+  ['PSG','Draw','Arsenal'].forEach(function(opt) {
+    var btn = document.getElementById('pollBtn'+opt);
+    if(btn) btn.className = 'bl-poll-btn ' + (opt===choice ? 'voted' : 'voted-other');
+  });
+  document.getElementById('pollBars').style.display='block';
+}
+
+async function castPollVote(choice) {
+  if(_pollVoted) { showToast('Már szavaztál: '+_pollVoted); return; }
+  if(!currentUser) { document.getElementById('regModal').style.display='flex'; return; }
+  try {
+    var data = await fbGet('blpoll').catch(function(){return {};});
+    var current = (data && data[choice]) ? data[choice] : 0;
+    await fbSet('blpoll/'+choice, current+1);
+    _pollVoted = choice;
+    localStorage.setItem('blpoll2026_vote', choice);
+    showPollVoted(choice);
+    loadPollResults();
+    showToast('🗳️ Szavazat leadva: '+choice+'!');
+  } catch(e) {
+    showToast('❌ Szavazat mentési hiba');
+  }
+}
 </script>
 
 <!-- MOBIL CHAT DRAWER -->
