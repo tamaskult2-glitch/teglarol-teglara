@@ -1033,6 +1033,32 @@ footer a:hover{color:var(--gold);}
           <div class="stat-item"><div class="stat-num" id="stCorrect">0</div><div class="stat-label">Pontjaim</div></div>
           <div class="stat-item"><div class="stat-num" id="stAcc">–</div><div class="stat-label">Pontosság</div></div>
         </div>
+        <!-- GYŐZTES BANNER -->
+        <div class="winner-banner" id="winnerBanner">
+          <div class="winner-stars">🏆⭐🏆</div>
+          <div class="winner-label">🎉 BL Tippverseny Győztese 🎉</div>
+          <div class="winner-name" id="winnerName">–</div>
+          <div class="winner-title">Bajnokok Ligája Döntő · 2026</div>
+          <div class="winner-score" id="winnerScore"></div>
+        </div>
+
+        <!-- BL DÖNTŐ SZAVAZÁS -->
+        <div class="bl-poll" id="blPoll">
+          <div class="bl-poll-title">⭐ Ki nyeri a BL Döntőt? ⭐</div>
+          <div class="bl-poll-sub">PSG vs Arsenal · 2026. május 30., szombat 18:00<br>Puskás Aréna, Budapest · Szavazz te is!</div>
+          <div class="bl-poll-options">
+            <button class="bl-poll-btn" id="pollBtnPSG" onclick="castPollVote('PSG')">🔵🔴<br>PSG</button>
+            <button class="bl-poll-btn" id="pollBtnDraw" onclick="castPollVote('Draw')">🤝<br>Döntetlen</button>
+            <button class="bl-poll-btn" id="pollBtnArsenal" onclick="castPollVote('Arsenal')">🔴⚪<br>Arsenal</button>
+          </div>
+          <div class="bl-poll-bar-wrap" id="pollBars" style="display:none;">
+            <div class="bl-poll-bar-row"><span class="bl-poll-bar-label">🔵🔴 PSG</span><div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barPSG" style="width:0%"></div></div><span class="bl-poll-bar-pct" id="pctPSG">0%</span></div>
+            <div class="bl-poll-bar-row"><span class="bl-poll-bar-label">🤝 Döntetlen</span><div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barDraw" style="width:0%;background:#6b7280;"></div></div><span class="bl-poll-bar-pct" id="pctDraw">0%</span></div>
+            <div class="bl-poll-bar-row"><span class="bl-poll-bar-label">🔴⚪ Arsenal</span><div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barArsenal" style="width:0%;background:#ef4444;"></div></div><span class="bl-poll-bar-pct" id="pctArsenal">0%</span></div>
+          </div>
+          <div class="bl-poll-total" id="pollTotal"></div>
+        </div>
+
         <div id="matchesContainer"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
       </div>
 
@@ -2165,23 +2191,28 @@ function checkBLWinner() {
 // ===== BL POLL =====
 var _pollVoted = localStorage.getItem('blpoll2026_vote') || null;
 
+// Azonnal fut betöltéskor
+document.addEventListener('DOMContentLoaded', function(){
+  // Szavazott-e már?
+  if(_pollVoted) showPollVoted(_pollVoted);
+  // Firebase-ből eredmények
+  fbGet('blpoll').then(function(data){
+    if(!data) return;
+    updatePollBars(data.PSG||0, data.Draw||0, data.Arsenal||0);
+  }).catch(function(){});
+});
+
 function initBLPoll() {
-  // Csak amíg nincs eredmény
-  if(allResults['BL2026']) {
-    document.getElementById('blPoll').style.display='none';
+  var poll = document.getElementById('blPoll');
+  if(!poll) return;
+  // Elrejtjük ha már van eredmény vagy zárva
+  if(allResults['BL2026'] || isKickoffPassed('2026-05-30','18:00')) {
+    poll.style.display='none';
     return;
   }
-  // Kickoff előtt mutatjuk
-  if(isKickoffPassed('2026-05-30','18:00')) {
-    document.getElementById('blPoll').style.display='none';
-    return;
-  }
-  document.getElementById('blPoll').style.display='block';
+  poll.style.display='block';
   loadPollResults();
-  // Ha már szavazott, gombokat letiltjuk
-  if(_pollVoted) {
-    showPollVoted(_pollVoted);
-  }
+  if(_pollVoted) showPollVoted(_pollVoted);
 }
 
 function loadPollResults() {
