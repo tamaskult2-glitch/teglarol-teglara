@@ -1042,21 +1042,28 @@ footer a:hover{color:var(--gold);}
           <div class="winner-score" id="winnerScore"></div>
         </div>
 
-        <!-- BL DÖNTŐ SZAVAZÁS -->
+        <!-- BL DÖNTŐ TIPP ÖSSZESÍTŐ -->
         <div class="bl-poll" id="blPoll">
-          <div class="bl-poll-title">⭐ Ki nyeri a BL Döntőt? ⭐</div>
-          <div class="bl-poll-sub">PSG vs Arsenal · 2026. május 30., szombat 18:00<br>Puskás Aréna, Budapest · Szavazz te is!</div>
-          <div class="bl-poll-options">
-            <button class="bl-poll-btn" id="pollBtnPSG" onclick="castPollVote('PSG')">🔵🔴<br>PSG</button>
-            <button class="bl-poll-btn" id="pollBtnDraw" onclick="castPollVote('Draw')">🤝<br>Döntetlen</button>
-            <button class="bl-poll-btn" id="pollBtnArsenal" onclick="castPollVote('Arsenal')">🔴⚪<br>Arsenal</button>
+          <div class="bl-poll-title">⭐ Mit tippel a csapat? ⭐</div>
+          <div class="bl-poll-sub">PSG vs Arsenal · máj. 30. 18:00 · Puskás Aréna<br>A leadott tippek alapján</div>
+          <div class="bl-poll-bar-wrap" id="pollBars">
+            <div class="bl-poll-bar-row">
+              <span class="bl-poll-bar-label">🔵🔴 PSG</span>
+              <div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barPSG" style="width:0%"></div></div>
+              <span class="bl-poll-bar-pct" id="pctPSG">–</span>
+            </div>
+            <div class="bl-poll-bar-row">
+              <span class="bl-poll-bar-label">🤝 Döntetlen</span>
+              <div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barDraw" style="width:0%;background:#6b7280;"></div></div>
+              <span class="bl-poll-bar-pct" id="pctDraw">–</span>
+            </div>
+            <div class="bl-poll-bar-row">
+              <span class="bl-poll-bar-label">🔴⚪ Arsenal</span>
+              <div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barArsenal" style="width:0%;background:#ef4444;"></div></div>
+              <span class="bl-poll-bar-pct" id="pctArsenal">–</span>
+            </div>
           </div>
-          <div class="bl-poll-bar-wrap" id="pollBars" style="display:none;">
-            <div class="bl-poll-bar-row"><span class="bl-poll-bar-label">🔵🔴 PSG</span><div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barPSG" style="width:0%"></div></div><span class="bl-poll-bar-pct" id="pctPSG">0%</span></div>
-            <div class="bl-poll-bar-row"><span class="bl-poll-bar-label">🤝 Döntetlen</span><div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barDraw" style="width:0%;background:#6b7280;"></div></div><span class="bl-poll-bar-pct" id="pctDraw">0%</span></div>
-            <div class="bl-poll-bar-row"><span class="bl-poll-bar-label">🔴⚪ Arsenal</span><div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barArsenal" style="width:0%;background:#ef4444;"></div></div><span class="bl-poll-bar-pct" id="pctArsenal">0%</span></div>
-          </div>
-          <div class="bl-poll-total" id="pollTotal"></div>
+          <div class="bl-poll-total" id="pollTotal">Tippek betöltése...</div>
         </div>
 
         <div id="matchesContainer"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
@@ -1696,7 +1703,15 @@ function renderMatches() {
     const d=new Date(date+'T12:00:00');
     const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
     const dayCount=dayMatches.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
-    html+=`<div class="date-header"><h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span></div>`;
+    var isTestDay = (date === '2026-05-27');
+    var colKey = 'dc_'+date;
+    var collapsed = isTestDay && sessionStorage.getItem(colKey) !== 'open';
+    var gId = 'dg_'+date.replace(/-/g,'');
+    html+=`<div class="date-header" style="cursor:pointer;" onclick="toggleDayGroup('${gId}','${colKey}')">
+      <h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span>
+      <span style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">${collapsed?'+':'−'}</span>
+    </div>`;
+    html+=`<div id="${gId}" style="${collapsed?'display:none':''}">`;
     dayMatches.forEach(m=>{
       const result=allResults[m.id]||null;
       const score=allScores[m.id]||null;
@@ -1765,6 +1780,7 @@ function renderMatches() {
         </div>
       </div>`;
     });
+    html += '</div>'; // nap wrapper vége
   });
   container.innerHTML=html;
 }
@@ -2189,77 +2205,46 @@ function checkBLWinner() {
 }
 
 // ===== BL POLL =====
-var _pollVoted = localStorage.getItem('blpoll2026_vote') || null;
 
-// Azonnal fut betöltéskor
-document.addEventListener('DOMContentLoaded', function(){
-  // Szavazott-e már?
-  if(_pollVoted) showPollVoted(_pollVoted);
-  // Firebase-ből eredmények
-  fbGet('blpoll').then(function(data){
-    if(!data) return;
-    updatePollBars(data.PSG||0, data.Draw||0, data.Arsenal||0);
-  }).catch(function(){});
-});
-
+// ===== BL POLL =====
 function initBLPoll() {
   var poll = document.getElementById('blPoll');
   if(!poll) return;
-  // Elrejtjük ha már van eredmény vagy zárva
-  if(allResults['BL2026'] || isKickoffPassed('2026-05-30','18:00')) {
-    poll.style.display='none';
+  if(allResults['BL2026']) { poll.style.display='none'; return; }
+  poll.style.display='block';
+  var tips = allTips['BL2026'] || {};
+  var c1=0, cX=0, c2=0, total=0;
+  Object.keys(tips).forEach(function(u) {
+    var o = getTipOutcome(tips[u]);
+    if(o==='1'){c1++;total++;}
+    else if(o==='X'){cX++;total++;}
+    else if(o==='2'){c2++;total++;}
+  });
+  if(total===0){
+    document.getElementById('pollTotal').textContent='Még nincs BL tipp leadva';
     return;
   }
-  poll.style.display='block';
-  loadPollResults();
-  if(_pollVoted) showPollVoted(_pollVoted);
+  document.getElementById('barPSG').style.width=Math.round(c1/total*100)+'%';
+  document.getElementById('barDraw').style.width=Math.round(cX/total*100)+'%';
+  document.getElementById('barArsenal').style.width=Math.round(c2/total*100)+'%';
+  document.getElementById('pctPSG').textContent=Math.round(c1/total*100)+'%';
+  document.getElementById('pctDraw').textContent=Math.round(cX/total*100)+'%';
+  document.getElementById('pctArsenal').textContent=Math.round(c2/total*100)+'%';
+  document.getElementById('pollTotal').textContent=total+' tipp alapján';
 }
 
-function loadPollResults() {
-  fbGet('blpoll').then(function(data) {
-    if(!data) return;
-    var psg = (data.PSG||0), draw = (data.Draw||0), arsenal = (data.Arsenal||0);
-    updatePollBars(psg, draw, arsenal);
-  }).catch(function(){});
+
+// Nap-csoport collapse/expand
+function toggleDayGroup(groupId, storageKey) {
+  var el = document.getElementById(groupId);
+  var btn = document.getElementById('toggle_'+groupId);
+  if(!el) return;
+  var isNowHidden = el.style.display === 'none';
+  el.style.display = isNowHidden ? 'block' : 'none';
+  if(btn) btn.textContent = isNowHidden ? '−' : '+';
+  sessionStorage.setItem(storageKey, isNowHidden ? 'open' : 'closed');
 }
 
-function updatePollBars(psg, draw, arsenal) {
-  var total = psg + draw + arsenal;
-  if(total === 0) return;
-  document.getElementById('pollBars').style.display='block';
-  document.getElementById('barPSG').style.width=Math.round(psg/total*100)+'%';
-  document.getElementById('barDraw').style.width=Math.round(draw/total*100)+'%';
-  document.getElementById('barArsenal').style.width=Math.round(arsenal/total*100)+'%';
-  document.getElementById('pctPSG').textContent=Math.round(psg/total*100)+'%';
-  document.getElementById('pctDraw').textContent=Math.round(draw/total*100)+'%';
-  document.getElementById('pctArsenal').textContent=Math.round(arsenal/total*100)+'%';
-  document.getElementById('pollTotal').textContent=total+' szavazat';
-}
-
-function showPollVoted(choice) {
-  ['PSG','Draw','Arsenal'].forEach(function(opt) {
-    var btn = document.getElementById('pollBtn'+opt);
-    if(btn) btn.className = 'bl-poll-btn ' + (opt===choice ? 'voted' : 'voted-other');
-  });
-  document.getElementById('pollBars').style.display='block';
-}
-
-async function castPollVote(choice) {
-  if(_pollVoted) { showToast('Már szavaztál: '+_pollVoted); return; }
-  if(!currentUser) { document.getElementById('regModal').style.display='flex'; return; }
-  try {
-    var data = await fbGet('blpoll').catch(function(){return {};});
-    var current = (data && data[choice]) ? data[choice] : 0;
-    await fbSet('blpoll/'+choice, current+1);
-    _pollVoted = choice;
-    localStorage.setItem('blpoll2026_vote', choice);
-    showPollVoted(choice);
-    loadPollResults();
-    showToast('🗳️ Szavazat leadva: '+choice+'!');
-  } catch(e) {
-    showToast('❌ Szavazat mentési hiba');
-  }
-}
 </script>
 
 <!-- MOBIL CHAT DRAWER -->
