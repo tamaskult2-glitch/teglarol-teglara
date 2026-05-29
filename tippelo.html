@@ -891,6 +891,13 @@ footer a:hover{color:var(--gold);}
       </div>
     </div>
     <div class="admin-content" id="adminContent">
+    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;">
+      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);margin-bottom:8px;letter-spacing:0.5px;">⚠️ FELHASZNÁLÓ TÖRLÉSE</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="delUserInput" type="text" placeholder="Felhasználónév (pl. KT)" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+        <button onclick="deleteUser()" style="padding:7px 14px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;">Törlés</button>
+      </div>
+    </div>
       <div class="section-header" style="margin-top:16px;"><h2>⚙️ Eredmény rögzítés</h2></div>
       <div id="adminMatchList"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
     </div>
@@ -912,7 +919,7 @@ const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
   {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat",homeLineup:["Fercsik","Hermán","Temesi","Lesznik","Berkes"],awayLineup:["Huszár","Kult","Lakatos","Török","Toma"]},
-  {id:"BL2026",group:"🏆",huDate:"2026-05-30",huTime:"18:00",home:"PSG",homeFlag:"🇫🇷",away:"Arsenal",awayFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",venue:"Puskás Aréna, Budapest",title:"🏆 Bajnokok Ligája Döntő"},
+  {id:"BL2026",group:"⭐BL",huDate:"2026-05-30",huTime:"18:00",home:"PSG",homeFlag:"🔵🔴",away:"Arsenal",awayFlag:"🔴⚪",venue:"Puskás Aréna, Budapest",title:"🏆 Bajnokok Ligája Döntő 2026"},
   {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Mexico City"},
   {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Kanada",homeFlag:"🇨🇦",away:"Bosznia-Hercegovina",awayFlag:"🇧🇦",venue:"Toronto"},
   {id:"A2",group:"A",huDate:"2026-06-12",huTime:"04:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Csehország",awayFlag:"🇨🇿",venue:"Guadalajara"},
@@ -1180,56 +1187,61 @@ async function submitTip(mid,tip) {
   catch(e){showToast('❌ Mentési hiba!');}
 }
 
-// submitScoreValues: az értékek már ki vannak olvasva a DOM-ból
-async function submitScoreValues(mid, h, a) {
+// ===== SCORE MENTÉS - egyetlen belépési pont =====
+function handleScoreSave(btn) {
+  // Az input értékeket KÖZVETLENÜL a gomb szomszédjából olvassuk
+  var mid = btn.getAttribute('data-mid');
+  if(!mid) return;
+  
+  // Inputok keresése a DOM-ban
+  var scoreRow = btn.closest ? btn.closest('.score-row') : btn.parentNode;
+  var hEl = scoreRow ? scoreRow.querySelector('#sh_tip_'+mid) : document.getElementById('sh_tip_'+mid);
+  var aEl = scoreRow ? scoreRow.querySelector('#sa_tip_'+mid) : document.getElementById('sa_tip_'+mid);
+  
+  var hVal = hEl ? hEl.value : '';
+  var aVal = aEl ? aEl.value : '';
+
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
-  var m=ALL_MATCHES.find(function(x){return x.id===mid;});
-  if(m&&isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
+  var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+  if(m && isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
   if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
-  if(h===''||h===undefined||h===null||a===''||a===undefined||a===null){showToast('⚠️ Írd be mindkét számot!');return;}
-  var hN=parseInt(h), aN=parseInt(a);
-  if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){showToast('⚠️ Érvénytelen szám (0-20)!');return;}
-  var outcome=hN>aN?'1':hN===aN?'X':'2';
+  if(hVal===''||aVal===''){showToast('⚠️ Írd be mindkét számot!');return;}
+  
+  var hN = parseInt(hVal), aN = parseInt(aVal);
+  if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){showToast('⚠️ 0-20 közötti szám!');return;}
+  
+  var outcome = hN>aN?'1':hN===aN?'X':'2';
   if(!allTips[mid]) allTips[mid]={};
-  var newTip={o:outcome,h:hN,a:aN};
-  allTips[mid][fbSafeName(currentUser)]=newTip;
-  // Lock: renderMatches ne fusson amíg mentünk
+  
+  // Megőrizzük a meglévő tippet (1/X/2) és hozzáadjuk a score-t
+  var existing = allTips[mid][fbSafeName(currentUser)] || {};
+  var existingOutcome = getTipOutcome(existing);
+  var newTip = {o: existingOutcome||outcome, h:hN, a:aN};
+  allTips[mid][fbSafeName(currentUser)] = newTip;
+
+  // AZONNALI UI visszajelzés - Firebase ELŐTT
+  btn.classList.add('saved');
+  btn.textContent = '✓ Mentve';
+  if(hEl){hEl.classList.add('filled');hEl.value=hN;}
+  if(aEl){aEl.classList.add('filled');aEl.value=aN;}
+  
+  // Toast megjelenítés
+  showToast('🎯 ' + hN + ':' + aN + ' elmentve!');
+  
+  // Lock: renderMatches ne törölje a kártyát
   _scoreSaving = true;
-  // Azonnali UI visszajelzés
-  var btn2=document.getElementById('sbtn_'+mid);
-  if(btn2){btn2.classList.add('saved');btn2.textContent='✓ Mentve';}
-  var hEl2=document.getElementById('sh_tip_'+mid);
-  var aEl2=document.getElementById('sa_tip_'+mid);
-  if(hEl2){hEl2.classList.add('filled');hEl2.value=hN;}
-  if(aEl2){aEl2.classList.add('filled');aEl2.value=aN;}
+  
   renderStats(); renderUserBar();
-  try {
-    await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
-    showToast('🎯 Mentve: '+hN+':'+aN);
-  } catch(e){
-    showToast('❌ Mentési hiba!');
-  } finally {
-    // Tippek táblázat frissítése ha aktív
-    if(activeTab==='tippek') { try { buildTippTable(); } catch(e){} }
-    // 3 másodperc után feloldjuk
-    setTimeout(function(){ _scoreSaving=false; }, 3000);
-  }
-}
-
-async function submitScore(mid) {
-  var hEl=document.getElementById('sh_tip_'+mid);
-  var aEl=document.getElementById('sa_tip_'+mid);
-  if(!hEl||!aEl){showToast('⚠️ Nem találom az input mezőt!');return;}
-  await submitScoreValues(mid, hEl.value, aEl.value);
-}
-
-// saveScore: globális, Safari-safe wrapper - onclick hívja
-function saveTipScore(mid) {
-  var hEl=document.getElementById('sh_tip_'+mid);
-  var aEl=document.getElementById('sa_tip_'+mid);
-  var hv = hEl ? hEl.value : '';
-  var av = aEl ? aEl.value : '';
-  submitScoreValues(mid, hv, av);
+  
+  // Firebase mentés async (nem várjuk meg - UI már frissítve)
+  setTimeout(function(){ _scoreSaving=false; }, 3000);
+  fbSet('tips/'+mid+'/'+fbSafeName(currentUser), newTip)
+    .then(function(){
+      if(activeTab==='tippek') buildTippTable();
+    })
+    .catch(function(){
+      // Helyi allTips már frissítve, Firebase nélkül is működik
+    });
 }
 
 // ===== SCORE ROW BUILDER (kompakt, a match-center-en belül) =====
@@ -1255,7 +1267,7 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
     // Tippelési mód: kompakt sor
     var hVal = myScore ? String(myScore.h) : '';
     var aVal = myScore ? String(myScore.a) : '';
-    var oc = 'saveTipScore(' + JSON.stringify(mid) + ')';
+    // Az onclick-et egy data-mid attribútummal oldjuk meg - nincs escape probléma
     var btnCls = 'score-save-btn' + (myScore ? ' saved' : '');
     var btnTxt = myScore ? '✓ Mentve' : 'Mentés';
     return '<div class="score-row">'
@@ -1267,7 +1279,7 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
       + '<input type="number" min="0" max="20" id="sa_tip_' + mid + '" placeholder="–"'
       + ' value="' + aVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
       + '</div>'
-      + '<button class="' + btnCls + '" id="sbtn_' + mid + '" onclick="' + oc + '"' + dis + '>'
+      + '<button class="' + btnCls + '" id="sbtn_' + mid + '" data-mid="' + mid + '" onclick="handleScoreSave(this)"' + dis + '>'
       + btnTxt + '</button>'
       + '</div>';
   }
@@ -1280,11 +1292,26 @@ function buildTippTable() {
   var wrap = document.getElementById('tippTableWrap');
   if(!wrap) return;
 
-  // Friss adat Firebase-ből
+  // Friss adat Firebase-ből ÉS lokális allTips (fallback)
   fbGet('tips').then(function(tips) {
     fbGet('results').then(function(results) {
       fbGet('scores').then(function(scores) {
+        // Firebase adat + lokális allTips merge (lokális prioritás)
         var t = tips || {};
+        // allTips-ből friss adatot belerakjuk (handleScoreSave után azonnali)
+        Object.keys(allTips).forEach(function(mid) {
+          if(!t[mid]) t[mid] = {};
+          Object.keys(allTips[mid]).forEach(function(u) {
+            var local = allTips[mid][u];
+            var remote = t[mid][u];
+            // Ha a lokális újabb (van score, a Firebase-en nincs) -> lokális nyer
+            if(local && typeof local==='object' && local.h!==undefined) {
+              t[mid][u] = local;
+            } else if(!t[mid][u]) {
+              t[mid][u] = local;
+            }
+          });
+        });
         var r = results || {};
         var s = scores || {};
 
@@ -1418,6 +1445,18 @@ function showLineup(mid) {
 }
 
 
+
+// Klub cimerek SVG-ként
+function getTeamBadge(flag, name) {
+  if(name === 'PSG') {
+    return '<span style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#003087;border:2px solid #c8102e;font-family:Arial;font-size:8px;font-weight:bold;color:white;flex-shrink:0;">PSG</span>';
+  }
+  if(name === 'Arsenal') {
+    return '<span style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:4px;background:#ef0107;font-family:Arial;font-size:7px;font-weight:bold;color:white;flex-shrink:0;">AFC</span>';
+  }
+  return '<span class="tf">'+flag+'</span>';
+}
+
 function renderAll() {
   // Ha score input fókuszban van, nem rajzoljuk újra a meccs kártyákat
   if(!_scoreSaving) { try { renderMatches(); } catch(e){} }
@@ -1464,7 +1503,7 @@ function renderMatches() {
       html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}">
         <div class="match-meta">
           <span class="time-tag">${m.huTime}</span>
-          <span class="grp-tag">${/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport'}</span>
+          <span class="grp-tag" style="${m.id==='BL2026'?'background:rgba(201,162,39,0.2);color:#c9a227;border:1px solid rgba(201,162,39,0.4);font-size:10px;':''}">${m.id==='BL2026'?'🏆 BL Döntő':(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>
           <span style="margin-left:auto;color:rgba(240,244,240,0.25);">${m.venue}</span>
           ${(m.homeLineup&&m.homeLineup.length)||kickoffLocked?'<button onclick="showLineup(\''+m.id+'\')" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:var(--gold);border-radius:6px;padding:1px 8px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;letter-spacing:0.5px;">⚽ kezdők</button>':''}
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
@@ -1474,7 +1513,7 @@ function renderMatches() {
         <div class="match-body">
           <div class="match-teams-row">
             <div class="team-blk">
-              <span class="tf">${m.homeFlag}</span>
+              ${getTeamBadge(m.homeFlag, m.home)}
               <div class="tn-wrap">
                 <span class="tn">${m.home}</span>
                 ${m.homeLabel?'<span class="tn-sub">'+m.homeLabel+'</span>':''}
@@ -1483,7 +1522,7 @@ function renderMatches() {
             <span class="vs-block">VS</span>
             <span class="sc-block">${score||'?–?'}</span>
             <div class="team-blk away-blk">
-              <span class="tf">${m.awayFlag}</span>
+              ${getTeamBadge(m.awayFlag, m.away)}
               <div class="tn-wrap">
                 <span class="tn">${m.away}</span>
                 ${m.awayLabel?'<span class="tn-sub">'+m.awayLabel+'</span>':''}
@@ -1663,6 +1702,33 @@ async function clearRes(mid){
   try{await fbDel('results/'+mid);showToast('🗑️ Törölve');await pollData();renderAdminMatches();}
   catch(e){}
 }
+async function deleteUser(){
+  var name = document.getElementById('delUserInput').value.trim().toUpperCase();
+  if(!name){showToast('⚠️ Add meg a nevet!');return;}
+  var safeName = fbSafeName(name);
+  if(!confirm('Biztosan törlöd ' + name + ' összes tippjét?')) return;
+  try {
+    // Összes meccsből töröljük
+    var tips = await fbGet('tips').catch(function(){return null;});
+    if(!tips){showToast('❌ Nem sikerült lekérni a tippeket');return;}
+    var deletePromises = [];
+    Object.keys(tips).forEach(function(mid){
+      if(tips[mid][safeName]!==undefined){
+        deletePromises.push(fbDel('tips/'+mid+'/'+safeName));
+        // allTips-ből is
+        if(allTips[mid]) delete allTips[mid][safeName];
+      }
+    });
+    await Promise.all(deletePromises);
+    showToast('✅ ' + name + ' törölve (' + deletePromises.length + ' meccs)');
+    document.getElementById('delUserInput').value = '';
+    await pollData();
+    renderAdminMatches();
+  } catch(e){
+    showToast('❌ Hiba: '+(e.message||e));
+  }
+}
+
 async function saveScore(mid){
   var h=document.getElementById('sh_'+mid)?.value;
   var a=document.getElementById('sa_'+mid)?.value;
