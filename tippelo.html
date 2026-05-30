@@ -558,8 +558,8 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 /* LEADERBOARD */
 #tab-ranglista{display:none;}
 .lb-list{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
-.lb-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:12px 16px;transition:transform 0.12s;}
-.lb-row:hover{transform:translateX(3px);}
+.lb-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:12px 16px;transition:box-shadow 0.12s;}
+@media(hover:hover){.lb-row:hover{box-shadow:2px 0 0 0 var(--gold) inset;}}
 .lb-rank{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:rgba(240,244,240,0.18);width:30px;flex-shrink:0;text-align:center;}
 .lb-row.r1 .lb-rank{color:var(--gold);}
 .lb-row.r2 .lb-rank{color:#adb5bd;}
@@ -770,7 +770,7 @@ footer a:hover{color:var(--gold);}
 
 /* ===== TIPPEK TÁBLÁZAT ===== */
 #tab-tippek{display:none;}
-.tipp-table-wrap{overflow-x:auto;margin-top:4px;border-radius:var(--radius);border:1px solid var(--card-border);}
+.tipp-table-wrap{overflow-x:auto;margin-top:4px;border-radius:var(--radius);border:1px solid var(--card-border);overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;max-height:70vh;overflow-y:auto;}
 .tipp-table-wrap::-webkit-scrollbar{height:4px;}
 .tipp-table-wrap::-webkit-scrollbar-track{background:transparent;}
 .tipp-table-wrap::-webkit-scrollbar-thumb{background:rgba(245,197,24,0.25);border-radius:2px;}
@@ -906,9 +906,24 @@ footer a:hover{color:var(--gold);}
             <table class="ob-score-table">
               <tr><td>✅ Helyes kimenetel (1/X/2)</td><td class="pts">+1 pont</td></tr>
               <tr><td>🎯 Pontos góleredmény</td><td class="pts">+3 pont</td></tr>
+              <tr><td>⚡ Helyes hosszabbítás kimenetel</td><td class="pts">+1 pont</td></tr>
+              <tr><td>🥅 Helyes 11-es győztes</td><td class="pts">+1 pont</td></tr>
               <tr><td>❌ Téves tipp</td><td class="pts">0 pont</td></tr>
             </table>
             A pontos eredmény <b>felváltja</b> az 1 pontos tippet — ha eltalálod, +3 jár (nem +1+3).
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-step">
+        <div class="ob-step-icon">⚡</div>
+        <div class="ob-step-body">
+          <div class="ob-step-title">Hosszabbítás &amp; 11-esek (BL Döntő)</div>
+          <div class="ob-step-desc">
+            A BL Döntőn (és más kiesési meccseken) ha <b>X-et tippelsz</b> a 90 percre, megjelenik a <b>⚡ HOSSZABBÍTÁS</b> sor — itt is tippelhetsz 1/X/2-re.<br>
+            Ha ott is <b>X-et tippelsz</b>, megjelenik a <b>🥅 11-ESEK</b> sor (1 vagy 2 — nincs döntetlen).<br>
+            Helyes hosszabbítás-tipp: <b>+1 pont</b> · Helyes 11-es-tipp: <b>+1 pont</b>.<br>
+            <b>Fontos:</b> ha visszaváltasz 1-re vagy 2-re a 90 percnél, a hosszabbítás és 11-es tipped törlődik.
           </div>
         </div>
       </div>
@@ -1240,7 +1255,7 @@ footer a:hover{color:var(--gold);}
 <script>
 // ===== CONFIG =====
 const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
-const ADMIN_PW = 'tipp2026';
+const ADMIN_PW = 'titi2026';
 const POLL_MS = 8000;
 // localStorage kulcsok (csak session + jelszavak)
 const LS_USERS   = 'tipp2026_users';   // {safeName: hashedPw}
@@ -1552,7 +1567,9 @@ async function submitTip(mid,tip,phase) {
     newTip.pen = tip;
   }
 
-  allTips[mid][fbSafeName(currentUser)]=newTip; renderStats(); renderUserBar();
+  allTips[mid][fbSafeName(currentUser)]=newTip;
+  if(!_scoreSaving) try{renderMatches();}catch(e){}
+  renderStats(); renderUserBar();
   try {
     await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
     var toastMsg = phase==='o' ? (tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!')
@@ -1677,8 +1694,8 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
   var etResult  = allEtResults[m.id]  || null;
   var penResult = allPenResults[m.id] || null;
 
-  var showEt  = (myOut === 'X') || (regResult === 'X') || !!myEt || !!etResult;
-  var showPen = (myEt  === 'X') || (etResult === 'X') || !!myPen || !!penResult;
+  var showEt  = (myOut === 'X') || (regResult === 'X') || !!etResult;
+  var showPen = (myEt  === 'X') || (etResult === 'X') || !!penResult;
 
   if(!showEt && !showPen) return '';
 
@@ -1823,6 +1840,7 @@ function buildTippTable() {
 
           // Tipp cellák felhasználónként
           users.forEach(function(u) {
+            var isMe = (u === fbSafeName(currentUser));
             var tip = mt[u];
             var o = tip && typeof tip==='object' ? tip.o : tip;
             var h = (tip && typeof tip==='object' && tip.h !== undefined) ? tip.h : null;
@@ -1834,6 +1852,15 @@ function buildTippTable() {
 
             if(!o) { rows += '<td style="text-align:center;padding:8px 6px;color:rgba(255,255,255,0.15);">–</td>'; return; }
 
+            // Ha nincs még eredmény ÉS nem a saját tippem → elrejtjük
+            if(!result && !isMe) {
+              rows += '<td style="text-align:center;padding:6px 4px;vertical-align:middle;">'
+                + '<div style="display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;width:32px;height:32px;">'
+                + '<span style="font-size:14px;filter:blur(0);color:rgba(255,255,255,0.2);">?</span>'
+                + '</div></td>';
+              return;
+            }
+
             var isExact = h!==null && a!==null && score && (h+':'+a===score);
             var isHit   = result && o===result && !isExact;
             var bg = o==='1'?'rgba(59,130,246,0.2)':o==='X'?'rgba(107,114,128,0.2)':'rgba(239,68,68,0.2)';
@@ -1841,7 +1868,6 @@ function buildTippTable() {
             if(isExact){ bg='rgba(34,197,94,0.2)'; col='#4ade80'; }
             else if(isHit){ bg='rgba(34,197,94,0.1)'; col='#86efac'; }
 
-            // ET / Pen badge színek (találat vs nem találat)
             var etCol  = et  ? (etRes  ? (et===etRes   ? '#4ade80' : 'rgba(252,165,165,0.7)') : 'rgba(245,197,24,0.7)') : null;
             var penCol = pen ? (penRes ? (pen===penRes ? '#4ade80' : 'rgba(252,165,165,0.7)') : 'rgba(245,197,24,0.7)') : null;
 
@@ -1878,11 +1904,11 @@ function buildTippTable() {
         });
         header += '</tr>';
 
-        wrap.innerHTML = '<div style="overflow:auto;max-height:70vh;border-radius:10px;border:1px solid rgba(245,197,24,0.15);">'
-          + '<table style="width:100%;border-collapse:collapse;min-width:300px;">'
+        wrap.className = 'tipp-table-wrap';
+        wrap.innerHTML = '<table class="tipp-table">'
           + '<thead>'+header+'</thead>'
           + '<tbody>'+rows+'</tbody>'
-          + '</table></div>';
+          + '</table>';
 
       }).catch(function(){ wrap.innerHTML='<p style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);">Hiba :(</p>'; });
     }).catch(function(){ wrap.innerHTML='<p style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);">Hiba :(</p>'; });
