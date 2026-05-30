@@ -31,6 +31,33 @@ header{position:relative;overflow:hidden;text-align:center;padding:32px 20px 24p
 .trophy-svg{width:60px;height:auto;display:block;margin:0 auto 6px;
   filter:drop-shadow(0 3px 11px rgba(245,197,24,0.45));animation:trophyFloat 4s ease-in-out infinite;}
 @keyframes trophyFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.035)}}
+/* MATCHDAY BANNER */
+.matchday-banner{display:none;align-items:center;gap:12px;margin:0 0 14px;padding:12px 14px;
+  border-radius:14px;border:1px solid rgba(245,197,24,0.35);
+  background:linear-gradient(135deg,rgba(245,197,24,0.16),rgba(206,41,57,0.12));
+  box-shadow:0 4px 18px rgba(0,0,0,0.3);position:relative;overflow:hidden;}
+.matchday-banner.show{display:flex;animation:mdSlide 0.5s ease;}
+@keyframes mdSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.matchday-banner::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 12% 30%,rgba(245,197,24,0.18),transparent 55%);pointer-events:none;}
+.md-emoji{font-size:30px;line-height:1;flex-shrink:0;animation:mdPulse 1.6s ease-in-out infinite;position:relative;}
+@keyframes mdPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.md-text{flex:1;min-width:0;position:relative;}
+.md-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;
+  text-transform:uppercase;color:var(--gold);line-height:1.15;}
+.md-sub{font-size:12px;color:rgba(240,244,240,0.7);margin-top:2px;line-height:1.2;}
+.md-btn{flex-shrink:0;position:relative;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;
+  letter-spacing:0.8px;text-transform:uppercase;color:#0a1c0c;background:var(--gold);
+  border:none;border-radius:11px;padding:9px 15px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  box-shadow:0 3px 10px rgba(245,197,24,0.35);transition:transform 0.15s,box-shadow 0.15s;white-space:nowrap;}
+.md-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(245,197,24,0.5);}
+.md-btn:active{transform:translateY(0);}
+.md-close{position:absolute;top:6px;right:8px;background:none;border:none;color:rgba(240,244,240,0.4);
+  font-size:14px;cursor:pointer;line-height:1;padding:2px;z-index:2;}
+.md-close:hover{color:var(--gold);}
+@keyframes mcFlash{0%,100%{box-shadow:0 0 0 0 rgba(245,197,24,0)}
+  30%{box-shadow:0 0 0 3px rgba(245,197,24,0.65)}}
+.match-card.md-highlight{animation:mcFlash 1.6s ease;}
 header h1{font-family:'Oswald',sans-serif;font-size:clamp(24px,5vw,40px);font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);text-shadow:0 0 28px rgba(245,197,24,0.3);line-height:1.1;}
 header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacing:1px;}
 .header-badge{display:inline-block;margin-top:10px;background:var(--gold);color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;padding:3px 12px;border-radius:20px;}
@@ -545,6 +572,8 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 
 /* ADMIN */
 #tab-admin{display:none;}
+/* PRO BADGE */
+.pro-badge{display:inline-block;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.8px;padding:1px 5px;border-radius:4px;margin-left:5px;vertical-align:middle;line-height:1.6;flex-shrink:0;}
 .admin-lock{text-align:center;padding:50px 20px;}
 .admin-lock h3{font-family:'Oswald',sans-serif;font-size:20px;color:var(--gold);margin-bottom:14px;}
 .ai-row{display:flex;gap:8px;justify-content:center;margin-top:10px;}
@@ -829,7 +858,7 @@ footer a:hover{color:var(--gold);}
     <div class="onboard-header">
       <div class="ob-icon">🏆</div>
       <h2>FIFA 2026 Tippverseny</h2>
-      <p>"GÓLSZAGLÓ BAJNOKSÁG" · HASZNÁLATI ÚTMUTATÓ</p>
+      <p>GÓLSZAGLÓ BAJNOKSÁG · HASZNÁLATI ÚTMUTATÓ</p>
     </div>
 
     <div class="onboard-steps">
@@ -937,7 +966,7 @@ footer a:hover{color:var(--gold);}
     <div style="font-family:'Oswald',sans-serif;font-size:20px;color:var(--gold);letter-spacing:2px;margin-bottom:8px;">TÁMOGASD A PROJEKTET!</div>
     <div style="font-size:13px;color:rgba(240,244,240,0.55);line-height:1.7;margin-bottom:20px;">
       Ez az oldal a <a href="https://teglarol-teglara.hu" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">teglarol-teglara.hu</a> projekt részeként jött létre.<br>
-      Fenntartása havi Claude Pro előfizetést igényel, a napi frissítések, meccs eredmények, pontozás naprakészen tartásához. 
+      Fenntartása havi Claude Pro előfizetést igényel.
     </div>
     <!-- Összegek -->
     <div style="display:flex;justify-content:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
@@ -1042,7 +1071,7 @@ footer a:hover{color:var(--gold);}
   </svg>
   <h1>FIFA World Cup 2026</h1>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
-  <span class="header-badge">"GÓLSZAGLÓ BAJNOKSÁG"</span>
+  <span class="header-badge">GÓLSZAGLÓ BAJNOKSÁG</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -1119,6 +1148,16 @@ footer a:hover{color:var(--gold);}
           <div class="bl-poll-total" id="pollTotal">Tippek betöltése...</div>
         </div>
 
+        <div class="matchday-banner" id="matchdayBanner">
+          <button class="md-close" onclick="dismissMatchday()" title="Bezárás">✕</button>
+          <div class="md-emoji" id="mdEmoji">🔥</div>
+          <div class="md-text">
+            <div class="md-title" id="mdTitle">Ma meccsnap!</div>
+            <div class="md-sub" id="mdSub"></div>
+          </div>
+          <button class="md-btn" id="mdBtn" onclick="jumpToNextUntipped()">⚡ Szavazz!</button>
+        </div>
+
         <div id="matchesContainer"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
       </div>
 
@@ -1167,6 +1206,21 @@ footer a:hover{color:var(--gold);}
       </div>
     </div>
     <div class="admin-content" id="adminContent">
+    <!-- PRO TÁMOGATÓK -->
+    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(206,41,57,0.08);border:1px solid rgba(206,41,57,0.25);border-radius:10px;">
+      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">⭐ PRO TÁMOGATÓK</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <input id="proAddInput" type="text" placeholder="Felhasználónév (pl. KULT)"
+          onkeydown="if(event.key==='Enter')addProUser()"
+          style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(206,41,57,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+        <button onclick="addProUser()"
+          style="padding:7px 14px;background:rgba(206,41,57,0.25);border:1px solid rgba(206,41,57,0.5);color:#f87171;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">
+          ＋ PRO
+        </button>
+      </div>
+      <div id="proAdminList"></div>
+    </div>
+    <!-- FELHASZNÁLÓ TÖRLÉSE -->
     <div style="margin-bottom:16px;padding:12px 14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;">
       <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);margin-bottom:8px;letter-spacing:0.5px;">⚠️ FELHASZNÁLÓ TÖRLÉSE</div>
       <div style="display:flex;gap:8px;align-items:center;">
@@ -1186,7 +1240,7 @@ footer a:hover{color:var(--gold);}
 <script>
 // ===== CONFIG =====
 const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
-const ADMIN_PW = 'titi2026';
+const ADMIN_PW = 'tipp2026';
 const POLL_MS = 8000;
 // localStorage kulcsok (csak session + jelszavak)
 const LS_USERS   = 'tipp2026_users';   // {safeName: hashedPw}
@@ -1286,6 +1340,11 @@ function isKickoffPassed(huDate, huTime) {
   return now >= kickoff;
 }
 
+// Mai dátum magyar idő szerint: "YYYY-MM-DD"
+function getBudapestToday() {
+  return getBudapestNow().slice(0, 10);
+}
+
 // Firebase path-safe névkonverzió (tiltott: . $ # [ ] / és %)
 function fbSafeName(name) {
   if(!name) return '';
@@ -1299,6 +1358,7 @@ function fbSafeName(name) {
 // ===== STATE =====
 let currentUser = localStorage.getItem(LS_SESSION) || null;
 let allTips={}, allResults={}, allScores={}, allEtResults={}, allPenResults={};
+let allProUsers=[];  // fbSafeNames listája (Firebase: tipp2026/proUsers)
 let isAdminUnlocked=false, activeTab='meccsek';
 let _scoreSaving=false; // renderMatches blokk amíg score mentés folyamatban
 
@@ -1320,12 +1380,13 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores,etRes,penRes] = await Promise.all([
+    const [tips,results,scores,etRes,penRes,proUsersRaw] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
       fbGet('etResults').catch(function(){return null;}),
       fbGet('penResults').catch(function(){return null;}),
+      fbGet('proUsers').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -1337,6 +1398,10 @@ async function pollData() {
     });
     allResults=results||{}; allScores=scores||{};
     allEtResults=etRes||{}; allPenResults=penRes||{};
+    // proUsers: Firebase array vagy object → flat string tömb
+    if(Array.isArray(proUsersRaw)) allProUsers=proUsersRaw.filter(Boolean);
+    else if(proUsersRaw && typeof proUsersRaw==='object') allProUsers=Object.values(proUsersRaw).filter(Boolean);
+    else allProUsers=[];
     setStatus('online','Szinkronizálva');
     renderAll();
   } catch(e) {
@@ -1444,6 +1509,7 @@ function showTab(t) {
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
   if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
+  try { renderMatchdayBanner(); } catch(e){}
 }
 
 // ===== TIP SUBMIT =====
@@ -1805,9 +1871,10 @@ function buildTippTable() {
           + '<th style="padding:8px 10px;text-align:left;font-family:Oswald,sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;white-space:nowrap;position:sticky;left:0;top:0;z-index:3;background:rgba(10,25,12,0.98);min-width:160px;">MECCS</th>';
         users.forEach(function(u) {
           var me = (u === fbSafeName(currentUser));
+          var pro = isProUser(u);
           header += '<th style="padding:8px 8px;text-align:center;font-family:Oswald,sans-serif;font-size:11px;position:sticky;top:0;z-index:2;background:rgba(10,25,12,0.98);'
             +(me?'color:var(--gold);':'color:rgba(240,244,240,0.5);')+'letter-spacing:0.5px;white-space:nowrap;">'
-            +(me?'⚽ ':'')+u+'</th>';
+            +(me?'⚽ ':'')+u+(pro?proTag():'')+'</th>';
         });
         header += '</tr>';
 
@@ -1822,6 +1889,100 @@ function buildTippTable() {
   }).catch(function(){ wrap.innerHTML='<p style="text-align:center;padding:30px;color:rgba(240,244,240,0.4);">Hiba :(</p>'; });
 }
 
+
+// ===== MATCHDAY BANNER =====
+// Mai meccsek + tippelési állapot kiszámítása
+function getMatchdayInfo() {
+  var today = getBudapestToday();
+  var todays = ALL_MATCHES.filter(function(m){ return m.huDate === today; });
+  // Akciózható = még nem kezdődött el ÉS nincs eredménye
+  var actionable = todays.filter(function(m){
+    return !isKickoffPassed(m.huDate, m.huTime) && !allResults[m.id];
+  });
+  var untipped = actionable.filter(function(m){
+    var tip = currentUser && allTips[m.id] ? allTips[m.id][fbSafeName(currentUser)] : null;
+    return !getTipOutcome(tip);
+  });
+  return { today: today, todays: todays, actionable: actionable, untipped: untipped };
+}
+
+function renderMatchdayBanner() {
+  var banner = document.getElementById('matchdayBanner');
+  if(!banner) return;
+  // Csak a Meccsek fülön és ha nincs eldobva ebben a sessionben
+  if(activeTab !== 'meccsek' || sessionStorage.getItem('mdDismissed') === getBudapestToday()) {
+    banner.classList.remove('show'); return;
+  }
+  var info = getMatchdayInfo();
+  if(info.todays.length === 0) { banner.classList.remove('show'); return; }
+
+  var emojiEl = document.getElementById('mdEmoji');
+  var titleEl = document.getElementById('mdTitle');
+  var subEl   = document.getElementById('mdSub');
+  var btnEl   = document.getElementById('mdBtn');
+  var n = info.todays.length;
+
+  if(!currentUser) {
+    emojiEl.textContent = '🔥';
+    titleEl.textContent = 'Ma ' + n + ' meccs!';
+    subEl.textContent = 'Regisztrálj és tippelj a mai meccsekre!';
+    btnEl.style.display = '';
+    btnEl.innerHTML = '⚡ Tippelek!';
+  } else if(info.untipped.length > 0) {
+    emojiEl.textContent = '🔥';
+    titleEl.textContent = 'Ma ' + n + ' meccs!';
+    subEl.textContent = 'Még ' + info.untipped.length + ' meccsre nem tippeltél – ne maradj le!';
+    btnEl.style.display = '';
+    btnEl.innerHTML = '⚡ Szavazz!';
+  } else if(info.actionable.length > 0) {
+    // Minden nyitott mai meccsre tippelt
+    emojiEl.textContent = '✅';
+    titleEl.textContent = 'Minden tipp leadva!';
+    subEl.textContent = 'A mai ' + n + ' meccsre megvan a tipped. Hajrá! 🎉';
+    btnEl.style.display = 'none';
+  } else {
+    // Van ma meccs, de a tippelési idő mindre lejárt
+    emojiEl.textContent = '⚽';
+    titleEl.textContent = 'Ma ' + n + ' meccs zajlik';
+    subEl.textContent = 'A tippelési idő lejárt – nézd az eredményeket élőben!';
+    btnEl.style.display = 'none';
+  }
+  banner.classList.add('show');
+}
+
+// Ugrás a nap első még nem tippelt meccséhez
+function jumpToNextUntipped() {
+  if(!currentUser) {
+    document.getElementById('regModal').style.display = 'flex';
+    return;
+  }
+  var info = getMatchdayInfo();
+  var target = info.untipped[0] || info.actionable[0] || info.todays[0];
+  if(!target) return;
+
+  // Ha a nap csoportja össze van csukva, nyissuk ki
+  var gId = 'dg_' + target.huDate.replace(/-/g, '');
+  var grp = document.getElementById(gId);
+  if(grp && grp.style.display === 'none') {
+    grp.style.display = '';
+    sessionStorage.setItem('dc_' + target.huDate, 'open');
+  }
+
+  var card = document.getElementById('mc_' + target.id);
+  if(card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.remove('md-highlight');
+    void card.offsetWidth; // reflow, hogy az animáció újrainduljon
+    card.classList.add('md-highlight');
+    setTimeout(function(){ card.classList.remove('md-highlight'); }, 1700);
+  }
+}
+
+function dismissMatchday() {
+  sessionStorage.setItem('mdDismissed', getBudapestToday());
+  var b = document.getElementById('matchdayBanner');
+  if(b) b.classList.remove('show');
+}
 
 // ===== LINEUP POPUP =====
 function closeLineup(){var el=document.getElementById('lineupPopupOverlay');if(el)el.remove();}
@@ -1878,6 +2039,7 @@ function renderAll() {
   try { if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); } catch(e){}
   try { checkBLWinner(); } catch(e){}
   try { initBLPoll(); } catch(e){}
+  try { renderMatchdayBanner(); } catch(e){}
 }
 
 
@@ -1921,7 +2083,7 @@ function renderMatches() {
 
 
       const cardLocked = result || kickoffLocked;
-      html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}">
+      html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}" id="mc_${m.id}">
         <div class="match-meta">
           <span class="time-tag">${m.huTime}</span>
           <span class="grp-tag" style="${m.id==='BL2026'?'background:rgba(201,162,39,0.2);color:#c9a227;border:1px solid rgba(201,162,39,0.4);font-size:10px;':''}">${m.id==='BL2026'?'🏆 BL Döntő':(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>
@@ -2015,7 +2177,8 @@ function renderUserBar() {
   const c=document.getElementById('userBarContainer');
   if(!currentUser){c.innerHTML='';return;}
   const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
-  c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
+  const mePro = isProUser(fbSafeName(currentUser));
+  c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}${mePro?proTag():''}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
 }
 
 function changeName(){localStorage.removeItem(LS_SESSION);currentUser=null;document.getElementById('regModal').style.display='flex';document.getElementById('nameInput').value='';document.getElementById('pwInput').value='';checkExistingUser();renderAll();}
@@ -2062,7 +2225,7 @@ function renderLeaderboard() {
   sc.sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.tot-a.tot);
   const med=['🥇','🥈','🥉'];
   let html='<div class="lb-list">';
-  sc.forEach((s,i)=>{const me=s.u===currentUser;html+=`<div class="lb-row r${Math.min(i+1,3)}" style="${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div><div class="lb-sub">${s.tot} tipp · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${s.pend} várja</div></div></div>`;});
+  sc.forEach((s,i)=>{const me=s.u===currentUser;const pro=isProUser(s.u);html+=`<div class="lb-row r${Math.min(i+1,3)}" style="${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${pro?proTag():''}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div><div class="lb-sub">${s.tot} tipp · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${s.pend} várja</div></div></div>`;});
   html+='</div>';
   if(!Object.keys(allResults).length) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ Eredmények után látható a pontszám</div>';
   c.innerHTML=html;
@@ -2109,9 +2272,67 @@ async function sendChat() {
 }
 
 // ===== ADMIN =====
-function checkAdmin(){if(document.getElementById('adminPwInput').value===ADMIN_PW){isAdminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').classList.add('visible');renderAdminMatches();}else showToast('❌ Hibás jelszó!');}
+function checkAdmin(){if(document.getElementById('adminPwInput').value===ADMIN_PW){isAdminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').classList.add('visible');renderAdminMatches();renderProAdmin();}else showToast('❌ Hibás jelszó!');}
+
+// ===== PRO USERS =====
+function isProUser(safeName){ return allProUsers.indexOf(safeName) >= 0; }
+function proTag(){ return '<span class="pro-badge">PRO</span>'; }
+
+function renderProAdmin() {
+  var c = document.getElementById('proAdminList');
+  if(!c) return;
+  if(!allProUsers.length){
+    c.innerHTML = '<div style="font-size:12px;color:rgba(240,244,240,0.3);padding:8px 0;">Még nincs PRO támogató</div>';
+    return;
+  }
+  c.innerHTML = allProUsers.map(function(u){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'
+      + '<span class="pro-badge" style="font-size:10px;padding:2px 7px;">PRO</span>'
+      + '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);flex:1;">'+escHtml(u)+'</span>'
+      + '<button onclick="removeProUser(\''+escHtml(u).replace(/'/g,"\\'")+'\')" '
+        + 'style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;'
+        + 'border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:Oswald,sans-serif;">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+async function addProUser() {
+  var input = document.getElementById('proAddInput');
+  var raw = (input.value||'').trim();
+  if(!raw) return;
+  var safe = fbSafeName(raw);
+  if(!safe){ showToast('❌ Érvénytelen név!'); return; }
+  if(allProUsers.indexOf(safe) >= 0){ showToast('⚠️ Már PRO felhasználó!'); return; }
+  allProUsers.push(safe);
+  input.value = '';
+  try {
+    await fbSet('proUsers', allProUsers);
+    showToast('⭐ ' + safe + ' → PRO');
+    renderProAdmin();
+  } catch(e) {
+    allProUsers.pop();
+    showToast('❌ Firebase hiba!');
+    renderProAdmin();
+  }
+}
+
+async function removeProUser(safeName) {
+  var idx = allProUsers.indexOf(safeName);
+  if(idx < 0) return;
+  allProUsers.splice(idx, 1);
+  renderProAdmin();
+  try {
+    await fbSet('proUsers', allProUsers.length ? allProUsers : null);
+    showToast('🗑️ ' + safeName + ' PRO eltávolítva');
+    renderAll();
+  } catch(e) {
+    showToast('❌ Firebase hiba!');
+    await pollData();
+  }
+}
 
 function renderAdminMatches() {
+  try { renderProAdmin(); } catch(e){}
   const c=document.getElementById('adminMatchList');
   const dates=[...new Set(ALL_MATCHES.map(m=>m.huDate))];
   let html='';
@@ -2293,6 +2514,7 @@ function renderParticipants(msgs) {
     html += '<div style="display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:8px;'+(isMe?'background:rgba(245,197,24,0.07);':'')+'">';
     html += '<span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:'+(isOnline?'#22c55e':'rgba(255,255,255,0.2)')+';box-shadow:'+(isOnline?'0 0 6px #22c55e':'none')+';"></span>';
     html += '<span style="font-family:Oswald,sans-serif;font-size:13px;color:'+(isMe?'var(--gold)':'rgba(240,244,240,0.75)')+';letter-spacing:0.3px;">'+(isMe?'⚽ ':'')+u+'</span>';
+    if(isProUser(u)) html += proTag();
     if(isOnline) html += '<span style="font-size:9px;color:#22c55e;letter-spacing:0.5px;margin-left:auto;">online</span>';
     html += '</div>';
   });
@@ -2311,7 +2533,8 @@ function buildChatHtml(msgs) {
   return textMsgs.slice(-40).map(function(m){
     var isMe=m.name===currentUser;
     var time=new Date(m.ts).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
-    return '<div class="chat-msg"><div class="msg-bubble'+(isMe?' own':'')+'"><div class="msg-name'+(isMe?' own-name':'')+'">'+m.name+'</div><div class="msg-text">'+escHtml(m.text)+'</div><div class="msg-time">'+time+'</div></div></div>';
+    var namePro = isProUser(fbSafeName(m.name)) ? proTag() : '';
+    return '<div class="chat-msg"><div class="msg-bubble'+(isMe?' own':'')+'"><div class="msg-name'+(isMe?' own-name':'')+'">'+m.name+namePro+'</div><div class="msg-text">'+escHtml(m.text)+'</div><div class="msg-time">'+time+'</div></div></div>';
   }).join('');
 }
 
