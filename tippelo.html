@@ -839,6 +839,22 @@ footer a:hover{color:var(--gold);}
     <div style="margin-top:12px;font-size:11px;color:rgba(240,244,240,0.3);">
       Ha már van fiókod, add meg a neved és jelszavad.
     </div>
+    <!-- Admin fiók visszaállítás -->
+    <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.07);padding-top:12px;">
+      <span onclick="document.getElementById('adminRecoveryPanel').style.display=document.getElementById('adminRecoveryPanel').style.display==='none'?'block':'none'"
+        style="font-size:11px;color:rgba(240,244,240,0.25);cursor:pointer;letter-spacing:0.5px;">🔑 Elfelejtett fiók / Admin visszaállítás</span>
+      <div id="adminRecoveryPanel" style="display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(245,197,24,0.2);border-radius:10px;">
+        <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;letter-spacing:0.5px;">Admin azonosítás szükséges</div>
+        <input type="password" id="recoveryAdminPw" placeholder="Admin jelszó (titi2026)"
+          style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.25);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:8px;"
+          onkeydown="if(event.key==='Enter')runAccountRecovery()">
+        <button onclick="runAccountRecovery()"
+          style="width:100%;padding:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.35);color:var(--gold);border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;">
+          🔄 KULT FIÓK VISSZAÁLLÍTÁSA
+        </button>
+        <div id="recoveryMsg" style="font-size:11px;margin-top:6px;min-height:16px;text-align:center;"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1523,17 +1539,6 @@ function register() {
 
 document.getElementById('nameInput').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('pwInput').focus(); });
 document.getElementById('pwInput').addEventListener('keydown', function(e){ if(e.key==='Enter') register(); });
-// KULT fiók helyreállítás (egyszer fut, ha nincs KULT a localStorage-ban)
-(function(){
-  try {
-    var users = JSON.parse(localStorage.getItem('tipp2026_users')||'{}');
-    if(!users['KULT']) {
-      users['KULT'] = '24b3p'; // simpleHash('tipp')
-      localStorage.setItem('tipp2026_users', JSON.stringify(users));
-    }
-  } catch(e){}
-})();
-
 if(currentUser) document.getElementById('regModal').style.display='none';
 checkAutoAdmin();
 updateAdminTabLabel();
@@ -2352,6 +2357,32 @@ async function sendChat() {
 
 // ===== ADMIN =====
 function checkAdmin(){if(document.getElementById('adminPwInput').value===ADMIN_PW){isAdminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').classList.add('visible');renderAdminMatches();renderProAdmin();}else showToast('❌ Hibás jelszó!');}
+
+function runAccountRecovery() {
+  var pw = (document.getElementById('recoveryAdminPw').value||'').trim();
+  var msg = document.getElementById('recoveryMsg');
+  if(pw !== ADMIN_PW) {
+    msg.textContent = '❌ Hibás admin jelszó!';
+    msg.style.color = '#ef4444';
+    return;
+  }
+  try {
+    var users = JSON.parse(localStorage.getItem(LS_USERS)||'{}');
+    // Töröljük a KULT fiókot (ha van), és újra létrehozzuk tipp jelszóval
+    users['KULT'] = simpleHash('tipp');
+    localStorage.setItem(LS_USERS, JSON.stringify(users));
+    msg.textContent = '✅ KULT fiók visszaállítva! Lépj be: KULT / tipp';
+    msg.style.color = '#22c55e';
+    // Prefill a bejelentkezési mezőkbe
+    document.getElementById('nameInput').value = 'KULT';
+    document.getElementById('pwInput').value = 'tipp';
+    document.getElementById('adminRecoveryPanel').style.display = 'none';
+    setTimeout(function(){ checkExistingUser(); }, 100);
+  } catch(e) {
+    msg.textContent = '❌ Hiba: ' + e.message;
+    msg.style.color = '#ef4444';
+  }
+}
 
 // ===== PRO USERS =====
 function isProUser(safeName){ return allProUsers.indexOf(safeName) >= 0; }
