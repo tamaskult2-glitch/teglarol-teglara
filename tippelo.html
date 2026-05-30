@@ -18,9 +18,19 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--pitch);color:var(--
 body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,255,255,0.022) 60px,rgba(255,255,255,0.022) 120px);pointer-events:none;z-index:0;}
 
 /* HEADER */
-header{position:relative;text-align:center;padding:32px 20px 24px;z-index:1;border-bottom:1px solid rgba(245,197,24,0.12);background:linear-gradient(180deg,rgba(0,0,0,0.45) 0%,transparent 100%);}
+header{position:relative;overflow:hidden;text-align:center;padding:32px 20px 24px;z-index:1;border-bottom:1px solid rgba(245,197,24,0.12);background:linear-gradient(180deg,rgba(0,0,0,0.45) 0%,transparent 100%);}
 .trophy-icon{font-size:46px;margin-bottom:6px;filter:drop-shadow(0 0 14px var(--gold));animation:pulse 3s ease-in-out infinite;}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+/* Bajnokok fala – dekoratív háttér */
+.wc-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  -webkit-mask-image:radial-gradient(ellipse 62% 72% at 50% 44%,transparent 38%,#000 92%);
+  mask-image:radial-gradient(ellipse 62% 72% at 50% 44%,transparent 38%,#000 92%);}
+.wc-bg span{position:absolute;font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
+  letter-spacing:1px;color:rgba(245,197,24,0.14);white-space:nowrap;user-select:none;}
+.header-content{position:relative;z-index:2;}
+.trophy-svg{width:60px;height:auto;display:block;margin:0 auto 6px;
+  filter:drop-shadow(0 3px 11px rgba(245,197,24,0.45));animation:trophyFloat 4s ease-in-out infinite;}
+@keyframes trophyFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.035)}}
 header h1{font-family:'Oswald',sans-serif;font-size:clamp(24px,5vw,40px);font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);text-shadow:0 0 28px rgba(245,197,24,0.3);line-height:1.1;}
 header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacing:1px;}
 .header-badge{display:inline-block;margin-top:10px;background:var(--gold);color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;padding:3px 12px;border-radius:20px;}
@@ -819,7 +829,7 @@ footer a:hover{color:var(--gold);}
     <div class="onboard-header">
       <div class="ob-icon">🏆</div>
       <h2>FIFA 2026 Tippverseny</h2>
-      <p>"GÓLSZAGLÓ" BAJNOKSÁG · HASZNÁLATI ÚTMUTATÓ</p>
+      <p>GÓLSZAGLÓ BAJNOKSÁG · HASZNÁLATI ÚTMUTATÓ</p>
     </div>
 
     <div class="onboard-steps">
@@ -927,7 +937,7 @@ footer a:hover{color:var(--gold);}
     <div style="font-family:'Oswald',sans-serif;font-size:20px;color:var(--gold);letter-spacing:2px;margin-bottom:8px;">TÁMOGASD A PROJEKTET!</div>
     <div style="font-size:13px;color:rgba(240,244,240,0.55);line-height:1.7;margin-bottom:20px;">
       Ez az oldal a <a href="https://teglarol-teglara.hu" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;">teglarol-teglara.hu</a> projekt részeként jött létre.<br>
-      Fenntartása havi Claude Pro előfizetést igényel, a napi automatikus eredmény frissítésekhez. 
+      Fenntartása havi Claude Pro előfizetést igényel.
     </div>
     <!-- Összegek -->
     <div style="display:flex;justify-content:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
@@ -987,10 +997,52 @@ footer a:hover{color:var(--gold);}
 
 <!-- HEADER -->
 <header>
-  <div class="trophy-icon">🏆</div>
+  <div class="wc-bg" aria-hidden="true">
+    <span style="top:7%;left:4%;font-size:12px;">URUGUAY 1930</span>
+    <span style="top:5%;left:34%;font-size:11px;opacity:0.8;">PELÉ</span>
+    <span style="top:8%;right:5%;font-size:13px;">BRASIL 1970</span>
+    <span style="top:21%;left:2%;font-size:11px;">ITALIA 1934</span>
+    <span style="top:19%;right:3%;font-size:12px;">DEUTSCHLAND 1974</span>
+    <span style="top:37%;left:3%;font-size:14px;transform:rotate(-7deg);">PUSKÁS</span>
+    <span style="top:35%;right:2%;font-size:13px;transform:rotate(5deg);">MARADONA</span>
+    <span style="top:52%;left:2%;font-size:12px;">ARGENTINA 1986</span>
+    <span style="top:50%;right:3%;font-size:11px;opacity:0.85;">CRUYFF</span>
+    <span style="top:64%;left:5%;font-size:11px;">FRANCE 1998</span>
+    <span style="top:63%;right:4%;font-size:12px;">ESPAÑA 2010</span>
+    <span style="top:76%;left:3%;font-size:12px;">ARGENTINA 2022</span>
+    <span style="top:78%;right:5%;font-size:11px;">GERMANY 2014</span>
+    <span style="top:88%;left:14%;font-size:11px;opacity:0.9;">NEW YORK</span>
+    <span style="top:90%;left:42%;font-size:11px;">CIUDAD DE MÉXICO</span>
+    <span style="top:88%;right:13%;font-size:11px;opacity:0.9;">TORONTO</span>
+    <span style="top:30%;left:30%;font-size:10px;opacity:0.7;">MESSI</span>
+    <span style="top:73%;right:30%;font-size:10px;opacity:0.7;">ZIDANE</span>
+  </div>
+  <div class="header-content">
+  <svg class="trophy-svg" viewBox="0 0 120 144" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aranykupa">
+    <defs>
+      <linearGradient id="gMain" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fff6c2"/><stop offset="30%" stop-color="#f5c518"/>
+        <stop offset="70%" stop-color="#d4a017"/><stop offset="100%" stop-color="#9a7407"/>
+      </linearGradient>
+      <linearGradient id="gEdge" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#8a6a05"/><stop offset="22%" stop-color="#f5c518"/>
+        <stop offset="50%" stop-color="#fff6c2"/><stop offset="78%" stop-color="#f5c518"/>
+        <stop offset="100%" stop-color="#8a6a05"/>
+      </linearGradient>
+    </defs>
+    <path d="M34 42 C12 42 12 72 39 76" fill="none" stroke="url(#gMain)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M86 42 C108 42 108 72 81 76" fill="none" stroke="url(#gMain)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M28 32 H92 V38 H28 Z" fill="url(#gEdge)"/>
+    <path d="M30 38 H90 L83 76 C83 92 72 100 60 100 C48 100 37 92 37 76 Z" fill="url(#gMain)"/>
+    <path d="M53 100 H67 L65 114 H55 Z" fill="url(#gMain)"/>
+    <path d="M44 114 H76 V122 H44 Z" fill="url(#gEdge)"/>
+    <path d="M36 122 H84 L80 138 H40 Z" fill="url(#gMain)"/>
+    <path d="M60 52 l3.6 7.4 8.1 1 -5.9 5.6 1.4 8.1 -7.2 -3.9 -7.2 3.9 1.4 -8.1 -5.9 -5.6 8.1 -1 z" fill="#8a6a05" opacity="0.5"/>
+    <path d="M43 40 q-4 28 8 48" fill="none" stroke="#fff" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+  </svg>
   <h1>FIFA World Cup 2026</h1>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
-  <span class="header-badge">"GÓLSZAGLÓ" BAJNOKSÁG</span>
+  <span class="header-badge">GÓLSZAGLÓ BAJNOKSÁG</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -1004,6 +1056,7 @@ footer a:hover{color:var(--gold);}
       <span style="font-size:16px;">❤️</span>
       <span>Támogass!</span>
     </button>
+  </div>
   </div>
 </header>
 
@@ -1133,7 +1186,7 @@ footer a:hover{color:var(--gold);}
 <script>
 // ===== CONFIG =====
 const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
-const ADMIN_PW = 'titi2026';
+const ADMIN_PW = 'tipp2026';
 const POLL_MS = 8000;
 // localStorage kulcsok (csak session + jelszavak)
 const LS_USERS   = 'tipp2026_users';   // {safeName: hashedPw}
@@ -1142,7 +1195,7 @@ const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
   {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat",homeLineup:["Fercsik","Hermán","Temesi","Lesznik","Berkes"],awayLineup:["Huszár","Kult","Lakatos","Török","Toma"]},
-  {id:"BL2026",group:"⭐BL",huDate:"2026-05-30",huTime:"18:00",home:"PSG",homeFlag:"🔵🔴",away:"Arsenal",awayFlag:"🔴⚪",venue:"Puskás Aréna, Budapest",title:"🏆 Bajnokok Ligája Döntő 2026"},
+  {id:"BL2026",group:"⭐BL",huDate:"2026-05-30",huTime:"18:00",home:"PSG",homeFlag:"🔵🔴",away:"Arsenal",awayFlag:"🔴⚪",venue:"Puskás Aréna, Budapest",title:"🏆 Bajnokok Ligája Döntő 2026",knockout:true},
   {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Mexico City"},
   {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Kanada",homeFlag:"🇨🇦",away:"Bosznia-Hercegovina",awayFlag:"🇧🇦",venue:"Toronto"},
   {id:"A2",group:"A",huDate:"2026-06-12",huTime:"04:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Csehország",awayFlag:"🇨🇿",venue:"Guadalajara"},
@@ -1245,7 +1298,7 @@ function fbSafeName(name) {
 
 // ===== STATE =====
 let currentUser = localStorage.getItem(LS_SESSION) || null;
-let allTips={}, allResults={}, allScores={};
+let allTips={}, allResults={}, allScores={}, allEtResults={}, allPenResults={};
 let isAdminUnlocked=false, activeTab='meccsek';
 let _scoreSaving=false; // renderMatches blokk amíg score mentés folyamatban
 
@@ -1267,10 +1320,12 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores] = await Promise.all([
+    const [tips,results,scores,etRes,penRes] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
+      fbGet('etResults').catch(function(){return null;}),
+      fbGet('penResults').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -1281,6 +1336,7 @@ async function pollData() {
       });
     });
     allResults=results||{}; allScores=scores||{};
+    allEtResults=etRes||{}; allPenResults=penRes||{};
     setStatus('online','Szinkronizálva');
     renderAll();
   } catch(e) {
@@ -1394,19 +1450,50 @@ function showTab(t) {
 // tip getter – back-compat (régi: string, új: object)
 function getTipOutcome(t){ return t && typeof t==='object' ? t.o : t; }
 function getTipScore(t){ return t && typeof t==='object' && t.h!==undefined ? {h:t.h,a:t.a} : null; }
+function getTipEt(t){ return t && typeof t==='object' && t.et ? t.et : null; }
+function getTipPen(t){ return t && typeof t==='object' && t.pen ? t.pen : null; }
+function isKnockoutMatch(m){ return !!(m && m.knockout); }
 
-async function submitTip(mid,tip) {
+async function submitTip(mid,tip,phase) {
+  phase = phase || 'o'; // 'o' = rendes játékidő, 'et' = hosszabbítás, 'pen' = 11-esek
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
   const m=ALL_MATCHES.find(x=>x.id===mid);
   if(m&&isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
-  if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
+  if(allResults[mid] && phase==='o'){showToast('⛔ Már ismert az eredmény!');return;}
+  if(allEtResults[mid] && phase==='et'){showToast('⛔ Hosszabbítás eredménye már ismert!');return;}
+  if(allPenResults[mid] && phase==='pen'){showToast('⛔ 11-es eredmény már ismert!');return;}
   if(!allTips[mid]) allTips[mid]={};
   const existing = allTips[mid][fbSafeName(currentUser)];
   const existingScore = getTipScore(existing);
-  // Megőrizzük a pontos eredményt ha már be volt írva
-  const newTip = existingScore ? {o:tip, h:existingScore.h, a:existingScore.a} : {o:tip};
+  const existingEt = getTipEt(existing);
+  const existingPen = getTipPen(existing);
+  const existingOut = getTipOutcome(existing);
+
+  // Új tipp objektum: megőrizzük a többi mezőt
+  let newTip = existingScore ? {o: existingOut, h:existingScore.h, a:existingScore.a} : (existingOut ? {o: existingOut} : {});
+  if(existingEt) newTip.et = existingEt;
+  if(existingPen) newTip.pen = existingPen;
+
+  if(phase==='o') {
+    newTip.o = tip;
+    // Ha 90 perces tipp már nem X, töröljük az ET-t és pen-t
+    if(tip !== 'X') { delete newTip.et; delete newTip.pen; }
+  } else if(phase==='et') {
+    newTip.et = tip;
+    // Ha az ET tipp már nem X, töröljük a pen-t
+    if(tip !== 'X') { delete newTip.pen; }
+  } else if(phase==='pen') {
+    newTip.pen = tip;
+  }
+
   allTips[mid][fbSafeName(currentUser)]=newTip; renderStats(); renderUserBar();
-  try { await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip); showToast(tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!'); }
+  try {
+    await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
+    var toastMsg = phase==='o' ? (tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!')
+                 : phase==='et' ? ('⚡ Hosszabbítás: '+tip)
+                 : ('🥅 11-es: '+tip);
+    showToast(toastMsg);
+  }
   catch(e){showToast('❌ Mentési hiba!');}
 }
 
@@ -1436,10 +1523,14 @@ function handleScoreSave(btn) {
   var outcome = hN>aN?'1':hN===aN?'X':'2';
   if(!allTips[mid]) allTips[mid]={};
   
-  // Megőrizzük a meglévő tippet (1/X/2) és hozzáadjuk a score-t
+  // Megőrizzük a meglévő tippet (1/X/2) és hozzáadjuk a score-t, valamint az ET/pen-t is
   var existing = allTips[mid][fbSafeName(currentUser)] || {};
   var existingOutcome = getTipOutcome(existing);
+  var existingEt = getTipEt(existing);
+  var existingPen = getTipPen(existing);
   var newTip = {o: existingOutcome||outcome, h:hN, a:aN};
+  if(existingEt) newTip.et = existingEt;
+  if(existingPen) newTip.pen = existingPen;
   allTips[mid][fbSafeName(currentUser)] = newTip;
 
   // AZONNALI UI visszajelzés - Firebase ELŐTT
@@ -1508,6 +1599,89 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
   }
 }
 
+// ===== KNOCKOUT (hosszabbítás + 11-esek) sor építő =====
+function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
+  // Csak akkor mutatjuk a hosszabbítás sort, ha:
+  //  - A felhasználó X-et tippelt a 90 percre, VAGY
+  //  - Admin már X-et rögzített a 90 percre, VAGY
+  //  - Van már bevitt ET tipp/ET eredmény
+  var myOut = getTipOutcome(myTip);
+  var myEt  = getTipEt(myTip);
+  var myPen = getTipPen(myTip);
+  var etResult  = allEtResults[m.id]  || null;
+  var penResult = allPenResults[m.id] || null;
+
+  var showEt  = (myOut === 'X') || (regResult === 'X') || !!myEt || !!etResult;
+  var showPen = (myEt  === 'X') || (etResult === 'X') || !!myPen || !!penResult;
+
+  if(!showEt && !showPen) return '';
+
+  // Hosszabbítás gombok class buildere
+  function etCls(val) {
+    var base = 'tip-btn ' + (val==='1'?'hb':val==='X'?'db':'ab');
+    if(myEt === val) {
+      if(etResult && etResult === val) base += ' correct';
+      else if(etResult && etResult !== val) base += ' sel wrong-sel';
+      else base += ' sel';
+    } else if(etResult === val) base += ' cr-result';
+    return base;
+  }
+  // 11-es gombok class buildere (csak 1 és 2)
+  function penCls(val) {
+    var base = 'tip-btn ' + (val==='1'?'hb':'ab');
+    if(myPen === val) {
+      if(penResult && penResult === val) base += ' correct';
+      else if(penResult && penResult !== val) base += ' sel wrong-sel';
+      else base += ' sel';
+    } else if(penResult === val) base += ' cr-result';
+    return base;
+  }
+
+  // ET tippek számolása (az adott meccsen)
+  var tips = allTips[m.id] || {};
+  var etCnt = {'1':0,'X':0,'2':0};
+  var penCnt = {'1':0,'2':0};
+  Object.values(tips).forEach(function(t){
+    var e = getTipEt(t); if(e && etCnt[e]!==undefined) etCnt[e]++;
+    var p = getTipPen(t); if(p && penCnt[p]!==undefined) penCnt[p]++;
+  });
+
+  var disEt  = (etResult || kickoffLocked) ? ' disabled' : '';
+  var disPen = (penResult || kickoffLocked) ? ' disabled' : '';
+
+  var html = '';
+  if(showEt) {
+    html += '<div style="margin-top:8px;padding:6px 8px 4px;border-top:1px dashed rgba(245,197,24,0.18);">'
+      + '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.6);letter-spacing:1.2px;margin-bottom:4px;text-align:center;">⚡ HOSSZABBÍTÁS</div>'
+      + '<div class="tip-buttons">'
+      + '<button class="'+etCls('1')+'" onclick="submitTip(\''+m.id+'\',\'1\',\'et\')"'+disEt+'>'
+      +   '<span class="tl">1</span><span class="tc">'+(etCnt['1']>0?(etCnt['1']+'×'):'')+'</span>'
+      + '</button>'
+      + '<button class="'+etCls('X')+'" onclick="submitTip(\''+m.id+'\',\'X\',\'et\')"'+disEt+'>'
+      +   '<span class="tl">X</span><span class="tc">'+(etCnt['X']>0?(etCnt['X']+'×'):'')+'</span>'
+      + '</button>'
+      + '<button class="'+etCls('2')+'" onclick="submitTip(\''+m.id+'\',\'2\',\'et\')"'+disEt+'>'
+      +   '<span class="tl">2</span><span class="tc">'+(etCnt['2']>0?(etCnt['2']+'×'):'')+'</span>'
+      + '</button>'
+      + '</div>'
+      + '</div>';
+  }
+  if(showPen) {
+    html += '<div style="margin-top:6px;padding:6px 8px 4px;border-top:1px dashed rgba(245,197,24,0.18);">'
+      + '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.6);letter-spacing:1.2px;margin-bottom:4px;text-align:center;">🥅 11-ESEK</div>'
+      + '<div class="tip-buttons" style="grid-template-columns:1fr 1fr;">'
+      + '<button class="'+penCls('1')+'" onclick="submitTip(\''+m.id+'\',\'1\',\'pen\')"'+disPen+'>'
+      +   '<span class="tl">1</span><span class="tc">'+(penCnt['1']>0?(penCnt['1']+'×'):'')+'</span>'
+      + '</button>'
+      + '<button class="'+penCls('2')+'" onclick="submitTip(\''+m.id+'\',\'2\',\'pen\')"'+disPen+'>'
+      +   '<span class="tl">2</span><span class="tc">'+(penCnt['2']>0?(penCnt['2']+'×'):'')+'</span>'
+      + '</button>'
+      + '</div>'
+      + '</div>';
+  }
+  return html;
+}
+
 // ===== RENDER MATCHES (dátum szerint csoportosítva) =====
 
 // ===== TIPPEK TÁBLÁZAT =====
@@ -1564,6 +1738,8 @@ function buildTippTable() {
 
           var result = r[m.id] || '';
           var score  = s[m.id] || '';
+          var etRes  = allEtResults[m.id]  || '';
+          var penRes = allPenResults[m.id] || '';
           var dateStr = m.huDate.slice(5).replace('-','.') + '. ' + m.huTime;
 
           rows += '<tr style="border-bottom:1px solid rgba(255,255,255,0.06);">';
@@ -1575,6 +1751,8 @@ function buildTippTable() {
             + m.awayFlag+' '+m.away+'</div>'
             + '<div style="font-size:10px;color:rgba(240,244,240,0.35);margin-top:2px;">'+dateStr+'</div>'
             + (score ? '<div style="font-family:Oswald,sans-serif;font-weight:700;color:var(--gold);font-size:13px;">'+score+'</div>' : '')
+            + (etRes ? '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.7);">⚡ h.u.: '+etRes+'</div>' : '')
+            + (penRes ? '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.7);">🥅 11-es: '+penRes+'</div>' : '')
             + '</td>';
 
           // Tipp cellák felhasználónként
@@ -1583,6 +1761,10 @@ function buildTippTable() {
             var o = tip && typeof tip==='object' ? tip.o : tip;
             var h = (tip && typeof tip==='object' && tip.h !== undefined) ? tip.h : null;
             var a = (tip && typeof tip==='object' && tip.a !== undefined) ? tip.a : null;
+            var et = (tip && typeof tip==='object' && tip.et) ? tip.et : null;
+            var pen= (tip && typeof tip==='object' && tip.pen) ? tip.pen : null;
+            var etRes  = allEtResults[m.id]  || null;
+            var penRes = allPenResults[m.id] || null;
 
             if(!o) { rows += '<td style="text-align:center;padding:8px 6px;color:rgba(255,255,255,0.15);">–</td>'; return; }
 
@@ -1593,12 +1775,18 @@ function buildTippTable() {
             if(isExact){ bg='rgba(34,197,94,0.2)'; col='#4ade80'; }
             else if(isHit){ bg='rgba(34,197,94,0.1)'; col='#86efac'; }
 
+            // ET / Pen badge színek (találat vs nem találat)
+            var etCol  = et  ? (etRes  ? (et===etRes   ? '#4ade80' : 'rgba(252,165,165,0.7)') : 'rgba(245,197,24,0.7)') : null;
+            var penCol = pen ? (penRes ? (pen===penRes ? '#4ade80' : 'rgba(252,165,165,0.7)') : 'rgba(245,197,24,0.7)') : null;
+
             rows += '<td style="text-align:center;padding:6px 4px;vertical-align:middle;">';
             rows += '<div style="display:inline-flex;flex-direction:column;align-items:center;background:'+bg+';border-radius:6px;padding:4px 8px;gap:1px;">';
             rows += '<span style="font-family:Oswald,sans-serif;font-weight:700;font-size:14px;color:'+col+';">'+o+'</span>';
             if(h!==null && a!==null) {
               rows += '<span style="font-family:Oswald,sans-serif;font-size:11px;font-weight:600;color:'+col+';opacity:0.9;white-space:nowrap;">'+h+':'+a+'</span>';
             }
+            if(et)  rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+etCol+';line-height:1;letter-spacing:0.5px;">⚡'+et+(etRes&&et===etRes?' +1':'')+'</span>';
+            if(pen) rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+penCol+';line-height:1;letter-spacing:0.5px;">🥅'+pen+(penRes&&pen===penRes?' +1':'')+'</span>';
             if(isExact)  rows += '<span style="font-size:9px;color:#4ade80;line-height:1;">🎯</span>';
             else if(isHit) rows += '<span style="font-size:9px;color:#86efac;line-height:1;">+1</span>';
             rows += '</div></td>';
@@ -1777,6 +1965,7 @@ function renderMatches() {
             </button>
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}
+          ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
         </div>
       </div>`;
     });
@@ -1792,6 +1981,8 @@ function renderStats() {
     const tip=allTips[m.id]?.[fbSafeName(currentUser)];
     const res=allResults[m.id];
     const sc=allScores[m.id];
+    const etRes = allEtResults[m.id];
+    const penRes = allPenResults[m.id];
     if(tip&&getTipOutcome(tip)){
       tipped++;
       if(res){
@@ -1801,6 +1992,16 @@ function renderStats() {
         if(outcome===res){
           if(tipSc&&sc&&tipSc.h+':'+tipSc.a===sc) pts+=3;
           else pts+=1;
+        }
+        // Bónusz: hosszabbítás kimenetel (csak ha tényleg volt hosszabbítás)
+        if(etRes){
+          const etTip = getTipEt(tip);
+          if(etTip && etTip === etRes) pts+=1;
+        }
+        // Bónusz: 11-es győztes (csak ha tényleg voltak 11-esek)
+        if(penRes){
+          const penTip = getTipPen(tip);
+          if(penTip && penTip === penRes) pts+=1;
         }
       }
     }
@@ -1832,6 +2033,8 @@ function renderLeaderboard() {
       const tip=allTips[m.id]?.[u];
       const res=allResults[m.id];
       const realSc=allScores[m.id];
+      const etRes = allEtResults[m.id];
+      const penRes = allPenResults[m.id];
       const outcome=getTipOutcome(tip);
       if(outcome){
         tot++;
@@ -1840,6 +2043,16 @@ function renderLeaderboard() {
             const tipSc=getTipScore(tip);
             if(tipSc&&realSc&&tipSc.h+':'+tipSc.a===realSc){pts+=3;exact++;}
             else pts+=1;
+          }
+          // Bónusz: hosszabbítás kimenetel
+          if(etRes){
+            const etTip = getTipEt(tip);
+            if(etTip && etTip === etRes) pts+=1;
+          }
+          // Bónusz: 11-es győztes
+          if(penRes){
+            const penTip = getTipPen(tip);
+            if(penTip && penTip === penRes) pts+=1;
           }
         } else pend++;
       }
@@ -1909,7 +2122,14 @@ function renderAdminMatches() {
     dms.forEach(m=>{
       const res=allResults[m.id]||null;
       const score=allScores[m.id]||'';const[sh,sa]=score?score.split(':'):['',''];
-      html+=`<div class="rc"><div class="rc-t">${m.huTime} ${m.homeFlag} ${m.home} – ${m.away} ${m.awayFlag}</div>
+      const etRes  = allEtResults[m.id]  || null;
+      const penRes = allPenResults[m.id] || null;
+      const isKO = isKnockoutMatch(m);
+      // Csak akkor mutatjuk az ET sort, ha 90 perc döntetlen
+      const showEt  = isKO && res === 'X';
+      // Csak akkor mutatjuk a Pen sort, ha hosszabbítás is döntetlen
+      const showPen = isKO && res === 'X' && etRes === 'X';
+      html+=`<div class="rc"><div class="rc-t">${m.huTime} ${m.homeFlag} ${m.home} – ${m.away} ${m.awayFlag}${isKO?' <span style="color:var(--gold);font-size:10px;">🏆 knockout</span>':''}</div>
         <div class="rc-btns">
           <button class="rb s1${res==='1'?' a1':''}" onclick="setResult('${m.id}','1')">1</button>
           <button class="rb sx${res==='X'?' ax':''}" onclick="setResult('${m.id}','X')">X</button>
@@ -1922,6 +2142,23 @@ function renderAdminMatches() {
           <input type="number" min="0" max="20" value="${sa}" placeholder="V" id="sa_${m.id}">
           <button class="btn-gold" style="padding:5px 10px;font-size:11px;" onclick="saveScore('${m.id}')">✓</button>
         </div>
+        ${showEt?`<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(245,197,24,0.2);">
+          <div style="font-size:10px;color:rgba(245,197,24,0.7);font-family:Oswald,sans-serif;letter-spacing:1px;margin-bottom:3px;">⚡ HOSSZABBÍTÁS UTÁNI ÁLLÁS</div>
+          <div class="rc-btns">
+            <button class="rb s1${etRes==='1'?' a1':''}" onclick="setEtResult('${m.id}','1')">1</button>
+            <button class="rb sx${etRes==='X'?' ax':''}" onclick="setEtResult('${m.id}','X')">X</button>
+            <button class="rb s2${etRes==='2'?' a2':''}" onclick="setEtResult('${m.id}','2')">2</button>
+            ${etRes?`<button class="rb" style="border-color:#ef4444;font-size:10px;" onclick="clearEtRes('${m.id}')">✕</button>`:''}
+          </div>
+        </div>`:''}
+        ${showPen?`<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(245,197,24,0.2);">
+          <div style="font-size:10px;color:rgba(245,197,24,0.7);font-family:Oswald,sans-serif;letter-spacing:1px;margin-bottom:3px;">🥅 11-ES GYŐZTES</div>
+          <div class="rc-btns">
+            <button class="rb s1${penRes==='1'?' a1':''}" onclick="setPenResult('${m.id}','1')">1</button>
+            <button class="rb s2${penRes==='2'?' a2':''}" onclick="setPenResult('${m.id}','2')">2</button>
+            ${penRes?`<button class="rb" style="border-color:#ef4444;font-size:10px;" onclick="clearPenRes('${m.id}')">✕</button>`:''}
+          </div>
+        </div>`:''}
       </div>`;
     });
   });
@@ -1933,7 +2170,38 @@ async function setResult(mid,tip){
   catch(e){showToast('❌ Hiba!');}
 }
 async function clearRes(mid){
-  try{await fbDel('results/'+mid);showToast('🗑️ Törölve');await pollData();renderAdminMatches();}
+  try{
+    await fbDel('results/'+mid);
+    // Knockout meccsnél töröljük az ET és Pen eredményeket is, mert már nincs értelmük
+    var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+    if(m && isKnockoutMatch(m)) {
+      await fbDel('etResults/'+mid).catch(function(){});
+      await fbDel('penResults/'+mid).catch(function(){});
+    }
+    showToast('🗑️ Törölve');await pollData();renderAdminMatches();
+  } catch(e){}
+}
+async function setEtResult(mid,tip){
+  try{await fbSet('etResults/'+mid,tip);showToast('⚡ Hosszabbítás: '+tip);
+    // Ha az ET eredmény nem X, akkor a pen eredmény értelmetlen → töröljük
+    if(tip !== 'X') { await fbDel('penResults/'+mid).catch(function(){}); }
+    await pollData();renderAdminMatches();}
+  catch(e){showToast('❌ Hiba!');}
+}
+async function clearEtRes(mid){
+  try{
+    await fbDel('etResults/'+mid);
+    // Ha töröljük az ET-t, a pen is törlődik
+    await fbDel('penResults/'+mid).catch(function(){});
+    showToast('🗑️ Hosszabbítás törölve');await pollData();renderAdminMatches();
+  } catch(e){}
+}
+async function setPenResult(mid,tip){
+  try{await fbSet('penResults/'+mid,tip);showToast('🥅 11-es győztes: '+tip);await pollData();renderAdminMatches();}
+  catch(e){showToast('❌ Hiba!');}
+}
+async function clearPenRes(mid){
+  try{await fbDel('penResults/'+mid);showToast('🗑️ 11-es törölve');await pollData();renderAdminMatches();}
   catch(e){}
 }
 async function deleteUser(){
