@@ -1360,6 +1360,12 @@ footer a:hover{color:var(--gold);}
       </div>
     </div>
     <div class="admin-content" id="adminContent">
+    <!-- FELHASZNÁLÓK -->
+    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;">
+      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">👥 REGISZTRÁLT FELHASZNÁLÓK</div>
+      <div id="adminUserList"><div style="font-size:12px;color:rgba(240,244,240,0.3);">Betöltés...</div></div>
+    </div>
+
     <!-- PRO TÁMOGATÓK -->
     <div style="margin-bottom:16px;padding:12px 14px;background:rgba(206,41,57,0.08);border:1px solid rgba(206,41,57,0.25);border-radius:10px;">
       <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">⭐ PRO TÁMOGATÓK</div>
@@ -1784,8 +1790,10 @@ function register() {
   document.getElementById('regModal').style.display = 'none';
   checkAutoAdmin();
   renderAll();
-  // Chat üdvözlő üzenet Firebase-re
-  pollChat(); // Chat frissítés regisztráció után (nincs rendszerüzenet)
+  // Firebase-be menti a felhasználót (regisztrált, de még nem feltétlenül tippelt)
+  var safe = fbSafeName(n);
+  fbSet('users/'+safe, {name: n, joined: getBudapestToday()}).catch(function(){});
+  pollChat();
   showToast('🎉 Üdv, ' + n + '!');
 }
 
@@ -2840,7 +2848,84 @@ async function removeVipUser(safeName) {
   }
 }
 
+// ===== ADMIN FELHASZNÁLÓK =====
+let allRegisteredUsers = {}; // Firebase: tipp2026/users
+
+async function loadAdminUsers() {
+  try {
+    var data = await fbGet('users');
+    allRegisteredUsers = data || {};
+  } catch(e) { allRegisteredUsers = {}; }
+  renderAdminUsers();
+}
+
+function renderAdminUsers() {
+  var c = document.getElementById('adminUserList');
+  if(!c) return;
+  
+  // Összegyűjtjük az összes ismert usert: Firebase users + allTips-ből
+  var known = {};
+  // 1. Firebase-ben regisztráltak
+  Object.entries(allRegisteredUsers).forEach(function(e){
+    known[e[0]] = e[1] || {};
+  });
+  // 2. allTips-ből ismert userek (akik tippeltek de nincs Firebase user bejegyzésük)
+  Object.keys(allTips).forEach(function(mid){
+    if(!allTips[mid]) return;
+    Object.keys(allTips[mid]).forEach(function(safe){
+      if(!known[safe]) known[safe] = {};
+    });
+  });
+
+  var entries = Object.entries(known);
+  if(!entries.length){ c.innerHTML='<div style="font-size:12px;color:rgba(240,244,240,0.3);">Még nincs regisztrált user</div>'; return; }
+
+  // Rendezés: előbb tippeltek, ABC
+  entries.sort(function(a,b){
+    var aTipped = Object.keys(allTips).some(function(mid){ return allTips[mid] && allTips[mid][a[0]]; });
+    var bTipped = Object.keys(allTips).some(function(mid){ return allTips[mid] && allTips[mid][b[0]]; });
+    if(aTipped && !bTipped) return -1;
+    if(!aTipped && bTipped) return 1;
+    return a[0].localeCompare(b[0]);
+  });
+
+  var total = entries.length;
+  var tippedCount = entries.filter(function(e){
+    return Object.keys(allTips).some(function(mid){ return allTips[mid] && allTips[mid][e[0]]; });
+  }).length;
+
+  c.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;">'+total+' regisztrált · '+tippedCount+' tippelt már</div>'
+    + entries.map(function(e){
+    var safe = e[0];
+    var info = e[1];
+    var name = (info && info.name) ? info.name : safe;
+    var tippedMids = Object.keys(allTips).filter(function(mid){ return allTips[mid] && allTips[mid][safe]; });
+    var tipped = tippedMids.length > 0;
+    var tipCount = tippedMids.length;
+
+    // Regisztrálás dátuma: Firebase joined, vagy ha nincs → az összes tipp közül a legkorábbi meccs dátuma
+    var joined = (info && info.joined) ? info.joined : null;
+    if(!joined && tipped) {
+      // Legkorábbi meccs dátuma ahol van tippje
+      var matchDates = tippedMids.map(function(mid){
+        var m = ALL_MATCHES.find(function(x){ return x.id===mid; });
+        return m ? m.huDate : null;
+      }).filter(Boolean).sort();
+      if(matchDates.length) joined = matchDates[0] + ' *';
+    }
+
+    return '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">'
+      +'<span style="font-size:13px;">'+(tipped?'✅':'⬜')+'</span>'
+      +'<span style="font-family:Oswald,sans-serif;font-size:13px;color:'+(tipped?'rgba(240,244,240,0.9)':'rgba(240,244,240,0.4)')+';flex:1;">'+escHtml(name)+userBadges(safe)+'</span>'
+      +'<span style="font-size:11px;color:rgba(240,244,240,0.3);">'+(tipped?tipCount+' tipp':'–')+'</span>'
+      +'<span style="font-size:10px;color:rgba(240,244,240,0.2);" title="* = első tipp dátuma">'+(joined||'?')+'</span>'
+      +'</div>';
+  }).join('')
+  + '<div style="font-size:10px;color:rgba(240,244,240,0.2);margin-top:6px;">* = első tipp dátuma (nincs Firebase regisztrációs adat)</div>';
+}
+
 function renderAdminMatches() {
+  try { loadAdminUsers(); } catch(e){}
   try { renderProAdmin(); } catch(e){}
   try { renderVipAdmin(); } catch(e){}
   try { renderCustomMatchAdmin(); } catch(e){}
