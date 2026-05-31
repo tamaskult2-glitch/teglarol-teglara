@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
+/* BELÉPÉSKORI FIGYELMEZTETÉS */
+.login-warn{display:none;background:linear-gradient(90deg,rgba(239,68,68,0.12),rgba(245,197,24,0.1));border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px 14px;margin:0 0 12px;font-family:'Oswald',sans-serif;font-size:13px;color:rgba(240,244,240,0.85);animation:warnSlide 0.4s ease;}
+.login-warn.show{display:flex;align-items:center;gap:10px;}
+@keyframes warnSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.login-warn-close{margin-left:auto;background:none;border:none;color:rgba(240,244,240,0.3);font-size:14px;cursor:pointer;padding:0 2px;flex-shrink:0;}
+
 :root {
   --pitch:#1a3a1f; --gold:#f5c518; --gold-dark:#c9a010;
   --white:#f0f4f0; --card:rgba(10,28,12,0.85); --card-border:rgba(245,197,24,0.18);
@@ -1263,6 +1269,13 @@ footer a:hover{color:var(--gold);}
           </div>
         </div>
 
+        <!-- BELÉPÉSKORI FIGYELMEZTETÉS -->
+        <div class="login-warn" id="loginWarn">
+          <span style="font-size:18px;flex-shrink:0;">⚠️</span>
+          <span id="loginWarnText"></span>
+          <button class="login-warn-close" onclick="document.getElementById('loginWarn').classList.remove('show')">✕</button>
+        </div>
+
         <div class="matchday-banner" id="matchdayBanner">
           <button class="md-close" onclick="dismissMatchday()" title="Bezárás">✕</button>
           <div class="md-emoji" id="mdEmoji">🔥</div>
@@ -1666,6 +1679,24 @@ function updateAdminTabLabel() {
       }
     }
   });
+}
+
+async function clearTip(mid) {
+  if(!currentUser) return;
+  if(allResults[mid]){ showToast('⛔ Már ismert az eredmény!'); return; }
+  var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+  if(m && isKickoffPassed(m.huDate, m.huTime)){ showToast('⛔ A mérkőzés már elkezdődött!'); return; }
+  var safe = fbSafeName(currentUser);
+  if(allTips[mid]) delete allTips[mid][safe];
+  if(!_scoreSaving) try{renderMatches();}catch(e){}
+  renderStats(); renderUserBar();
+  try {
+    await fbDel('tips/'+mid+'/'+safe);
+    showToast('🗑️ Tipp törölve');
+  } catch(e) {
+    showToast('❌ Hiba!');
+    await pollData();
+  }
 }
 
 function showTab(t) {
@@ -2243,6 +2274,7 @@ function renderAll() {
   try { checkBLWinner(); } catch(e){}
   try { renderMatchdayBanner(); } catch(e){}
   try { loadVbPoll(); } catch(e){}
+  try { renderLoginWarning(); } catch(e){}
 }
 
 
@@ -2329,6 +2361,7 @@ function renderMatches() {
               <span class="tl">2</span>
               <span class="tc">${cnt['2']>0?(cnt['2']+'×'):''}</span>
             </button>
+            ${myTip && !cardLocked ? `<button onclick="clearTip('${m.id}')" title="Tipp törlése" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;line-height:1;margin-left:2px;transition:all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='rgba(239,68,68,0.6)'">⌫</button>` : ''}
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
@@ -2914,6 +2947,31 @@ function checkBLWinner() {
   }
 }
 
+// Belépéskori figyelmeztetés: mai meccsekre nem tippelt
+function renderLoginWarning() {
+  var warn = document.getElementById('loginWarn');
+  var txt = document.getElementById('loginWarnText');
+  if(!warn || !txt || !currentUser) { if(warn) warn.classList.remove('show'); return; }
+
+  var today = getBudapestToday();
+  var now = getBudapestNow();
+  var safe = fbSafeName(currentUser);
+
+  var untipped = ALL_MATCHES.filter(function(m) {
+    if(m.huDate !== today) return false;
+    if(allResults[m.id]) return false;                          // már van eredmény
+    if((m.huDate + 'T' + m.huTime) <= now) return false;       // kickoff után
+    return !(allTips[m.id] && allTips[m.id][safe]);             // nincs tipp
+  });
+
+  if(untipped.length > 0) {
+    txt.textContent = 'Ma még ' + untipped.length + ' meccsre nem tippeltél – a kickoff előtt leadhatod!';
+    warn.classList.add('show');
+  } else {
+    warn.classList.remove('show');
+  }
+}
+
 // ===== VB SZUPERPOLL =====
 const VB_TEAMS = [
   {flag:"🇩🇿",name:"Algéria"},
@@ -3202,6 +3260,7 @@ function toggleDayGroup(groupId, storageKey) {
   💬
   <span class="chat-fab-badge" id="fabBadge">0</span>
 </button>
+
 
 </body>
 </html>
