@@ -654,6 +654,7 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 #tab-admin{display:none;}
 /* PRO BADGE */
 .pro-badge{display:inline-block;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.8px;padding:1px 5px;border-radius:4px;margin-left:5px;vertical-align:middle;line-height:1.6;flex-shrink:0;}
+.vip-badge{display:inline-block;background:#f5c518;color:#CE2939;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.8px;padding:1px 5px;border-radius:4px;margin-left:5px;vertical-align:middle;line-height:1.6;flex-shrink:0;}
 .admin-lock{text-align:center;padding:50px 20px;}
 .admin-lock h3{font-family:'Oswald',sans-serif;font-size:20px;color:var(--gold);margin-bottom:14px;}
 .ai-row{display:flex;gap:8px;justify-content:center;margin-top:10px;}
@@ -1368,6 +1369,20 @@ footer a:hover{color:var(--gold);}
       </div>
       <div id="proAdminList"></div>
     </div>
+    <!-- VIP TÁMOGATÓK -->
+    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.25);border-radius:10px;">
+      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">💛 VIP TÁMOGATÓK</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <input id="vipAddInput" type="text" placeholder="Felhasználónév (pl. KULT)"
+          onkeydown="if(event.key==='Enter')addVipUser()"
+          style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(245,197,24,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+        <button onclick="addVipUser()"
+          style="padding:7px 14px;background:rgba(245,197,24,0.18);border:1px solid rgba(245,197,24,0.4);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">
+          ＋ VIP
+        </button>
+      </div>
+      <div id="vipAdminList"></div>
+    </div>
     <!-- FELHASZNÁLÓ TÖRLÉSE -->
     <div style="margin-bottom:16px;padding:12px 14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;">
       <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);margin-bottom:8px;letter-spacing:0.5px;">⚠️ FELHASZNÁLÓ TÖRLÉSE</div>
@@ -1563,6 +1578,7 @@ function fbSafeName(name) {
 let currentUser = localStorage.getItem(LS_SESSION) || null;
 let allTips={}, allResults={}, allScores={}, allEtResults={}, allPenResults={};
 let allProUsers=[];  // fbSafeNames listája (Firebase: tipp2026/proUsers)
+let allVipUsers=[];  // fbSafeNames listája (Firebase: tipp2026/vipUsers)
 let isAdminUnlocked=false, activeTab='meccsek';
 let _scoreSaving=false; // renderMatches blokk amíg score mentés folyamatban
 
@@ -1584,13 +1600,14 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores,etRes,penRes,proUsersRaw] = await Promise.all([
+    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
       fbGet('etResults').catch(function(){return null;}),
       fbGet('penResults').catch(function(){return null;}),
       fbGet('proUsers').catch(function(){return null;}),
+      fbGet('vipUsers').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -1606,6 +1623,9 @@ async function pollData() {
     if(Array.isArray(proUsersRaw)) allProUsers=proUsersRaw.filter(Boolean);
     else if(proUsersRaw && typeof proUsersRaw==='object') allProUsers=Object.values(proUsersRaw).filter(Boolean);
     else allProUsers=[];
+    if(Array.isArray(vipUsersRaw)) allVipUsers=vipUsersRaw.filter(Boolean);
+    else if(vipUsersRaw && typeof vipUsersRaw==='object') allVipUsers=Object.values(vipUsersRaw).filter(Boolean);
+    else allVipUsers=[];
     setStatus('online','Szinkronizálva');
     renderAll();
   } catch(e) {
@@ -2151,11 +2171,10 @@ function buildTippTable() {
           + '<th style="padding:8px 10px;text-align:left;font-family:Oswald,sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;white-space:nowrap;position:sticky;left:0;top:0;z-index:3;background:rgba(10,25,12,0.98);min-width:160px;">MECCS</th>';
         users.forEach(function(u) {
           var me = (u === fbSafeName(currentUser));
-          var pro = isProUser(u);
           var adm = isHardcodeAdmin(u);
           header += '<th style="padding:8px 8px;text-align:center;font-family:Oswald,sans-serif;font-size:11px;position:sticky;top:0;z-index:2;background:rgba(10,25,12,0.98);'
             +(me?'color:var(--gold);':'color:rgba(240,244,240,0.5);')+'letter-spacing:0.5px;white-space:nowrap;">'
-            +(me?'⚽ ':'')+u+(adm?adminTag():'')+(pro?proTag():'')+'</th>';
+            +(me?'⚽ ':'')+u+userBadges(u)+'</th>';
         });
         header += '</tr>';
 
@@ -2490,9 +2509,8 @@ function renderUserBar() {
   const c=document.getElementById('userBarContainer');
   if(!currentUser){c.innerHTML='';return;}
   const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
-  const mePro = isProUser(fbSafeName(currentUser));
-  const meAdm = isHardcodeAdmin(currentUser);
-  c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}${meAdm?adminTag():''}${mePro?proTag():''}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
+  const meSafe = fbSafeName(currentUser);
+  c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}${userBadges(meSafe)}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
 }
 
 function changeName(){localStorage.removeItem(LS_SESSION);currentUser=null;document.getElementById('regModal').style.display='flex';document.getElementById('nameInput').value='';document.getElementById('pwInput').value='';checkExistingUser();renderAll();}
@@ -2539,7 +2557,7 @@ function renderLeaderboard() {
   sc.sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.tot-a.tot);
   const med=['🥇','🥈','🥉'];
   let html='<div class="lb-list">';
-  sc.forEach((s,i)=>{const me=s.u===currentUser;const pro=isProUser(s.u);const adm=isHardcodeAdmin(s.u);html+=`<div class="lb-row r${Math.min(i+1,3)}" style="${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${adm?adminTag():''}${pro?proTag():''}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div><div class="lb-sub">${s.tot} tipp · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${s.pend} várja</div></div></div>`;});
+  sc.forEach((s,i)=>{const me=s.u===currentUser;const adm=isHardcodeAdmin(s.u);html+=`<div class="lb-row r${Math.min(i+1,3)}" style="${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${userBadges(s.u)}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div><div class="lb-sub">${s.tot} tipp · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${s.pend} várja</div></div></div>`;});
   html+='</div>';
   if(!Object.keys(allResults).length) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ Eredmények után látható a pontszám</div>';
   c.innerHTML=html;
@@ -2620,8 +2638,18 @@ function runAccountRecovery() {
 
 // ===== PRO USERS =====
 function isProUser(safeName){ return allProUsers.indexOf(safeName) >= 0; }
+function isVipUser(safeName){ return allVipUsers.indexOf(safeName) >= 0; }
 function proTag(){ return '<span class="pro-badge">PRO</span>'; }
+function vipTag(){ return '<span class="vip-badge">VIP</span>'; }
 function adminTag(){ return '<span class="pro-badge" style="background:#c9a227;color:#0a1c0c;">👑</span>'; }
+
+function userBadges(safeName) {
+  var t = '';
+  if(isHardcodeAdmin(safeName)) t += adminTag();
+  if(isVipUser(safeName)) t += vipTag();
+  else if(isProUser(safeName)) t += proTag();
+  return t;
+}
 
 function renderProAdmin() {
   var c = document.getElementById('proAdminList');
@@ -2676,8 +2704,81 @@ async function removeProUser(safeName) {
   }
 }
 
+function renderProAdmin() {
+  var c = document.getElementById('proAdminList');
+  if(!c) return;
+  if(!allProUsers.length){
+    c.innerHTML = '<div style="font-size:12px;color:rgba(240,244,240,0.3);padding:8px 0;">Még nincs PRO támogató</div>';
+    return;
+  }
+  c.innerHTML = allProUsers.map(function(u){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'
+      + '<span class="pro-badge" style="font-size:10px;padding:2px 7px;">PRO</span>'
+      + '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);flex:1;">'+escHtml(u)+'</span>'
+      + '<button onclick="removeProUser(\''+escHtml(u).replace(/'/g,"\\'")+'\')" '
+        + 'style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;'
+        + 'border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:Oswald,sans-serif;">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+function renderVipAdmin() {
+  var c = document.getElementById('vipAdminList');
+  if(!c) return;
+  if(!allVipUsers.length){
+    c.innerHTML = '<div style="font-size:12px;color:rgba(240,244,240,0.3);padding:8px 0;">Még nincs VIP támogató</div>';
+    return;
+  }
+  c.innerHTML = allVipUsers.map(function(u){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'
+      + '<span class="vip-badge" style="font-size:10px;padding:2px 7px;">VIP</span>'
+      + '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);flex:1;">'+escHtml(u)+'</span>'
+      + '<button onclick="removeVipUser(\''+escHtml(u).replace(/'/g,"\\'")+'\')" '
+        + 'style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;'
+        + 'border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:Oswald,sans-serif;">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+async function addVipUser() {
+  var input = document.getElementById('vipAddInput');
+  var raw = (input.value||'').trim();
+  if(!raw) return;
+  var safe = fbSafeName(raw);
+  if(!safe){ showToast('❌ Érvénytelen név!'); return; }
+  if(allVipUsers.indexOf(safe) >= 0){ showToast('⚠️ Már VIP felhasználó!'); return; }
+  allVipUsers.push(safe);
+  input.value = '';
+  try {
+    await fbSet('vipUsers', allVipUsers);
+    showToast('💛 ' + safe + ' → VIP');
+    renderVipAdmin();
+    renderAll();
+  } catch(e) {
+    allVipUsers.pop();
+    showToast('❌ Firebase hiba!');
+    renderVipAdmin();
+  }
+}
+
+async function removeVipUser(safeName) {
+  var idx = allVipUsers.indexOf(safeName);
+  if(idx < 0) return;
+  allVipUsers.splice(idx, 1);
+  renderVipAdmin();
+  try {
+    await fbSet('vipUsers', allVipUsers.length ? allVipUsers : null);
+    showToast('🗑️ ' + safeName + ' VIP eltávolítva');
+    renderAll();
+  } catch(e) {
+    showToast('❌ Firebase hiba!');
+    await pollData();
+  }
+}
+
 function renderAdminMatches() {
   try { renderProAdmin(); } catch(e){}
+  try { renderVipAdmin(); } catch(e){}
   const c=document.getElementById('adminMatchList');
   const dates=[...new Set(ALL_MATCHES.map(m=>m.huDate))];
   let html='';
@@ -2910,8 +3011,7 @@ function renderParticipants(msgs) {
     html += '<div style="display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:8px;'+(isMe?'background:rgba(245,197,24,0.07);':'')+'">';
     html += '<span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:'+(isOnline?'#22c55e':'rgba(255,255,255,0.2)')+';box-shadow:'+(isOnline?'0 0 6px #22c55e':'none')+';"></span>';
     html += '<span style="font-family:Oswald,sans-serif;font-size:13px;color:'+(isMe?'var(--gold)':'rgba(240,244,240,0.75)')+';letter-spacing:0.3px;">'+(isMe?'⚽ ':'')+u+'</span>';
-    if(isHardcodeAdmin(u)) html += adminTag();
-    if(isProUser(u)) html += proTag();
+    html += userBadges(u);
     if(isOnline) html += '<span style="font-size:9px;color:#22c55e;letter-spacing:0.5px;margin-left:auto;">online</span>';
     html += '</div>';
   });
@@ -2930,9 +3030,8 @@ function buildChatHtml(msgs) {
   return textMsgs.slice(-40).map(function(m){
     var isMe=m.name===currentUser;
     var time=new Date(m.ts).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
-    var namePro = isProUser(fbSafeName(m.name)) ? proTag() : '';
-    var nameAdm = isHardcodeAdmin(m.name) ? adminTag() : '';
-    return '<div class="chat-msg"><div class="msg-bubble'+(isMe?' own':'')+'"><div class="msg-name'+(isMe?' own-name':'')+'">'+m.name+nameAdm+namePro+'</div><div class="msg-text">'+escHtml(m.text)+'</div><div class="msg-time">'+time+'</div></div></div>';
+    var nameBadge = userBadges(fbSafeName(m.name));
+    return '<div class="chat-msg"><div class="msg-bubble'+(isMe?' own':'')+'"><div class="msg-name'+(isMe?' own-name':'')+'">'+m.name+nameBadge+'</div><div class="msg-text">'+escHtml(m.text)+'</div><div class="msg-time">'+time+'</div></div></div>';
   }).join('');
 }
 
