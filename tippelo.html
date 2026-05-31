@@ -1203,7 +1203,7 @@ footer a:hover{color:var(--gold);}
 </div>
 
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="showTab('meccsek')">⚽ Meccsek</button>
+  <button class="nav-tab active" onclick="showTab('meccsek');setTimeout(jumpToNextUntipped,120)">⚽ Meccsek</button>
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')">🔐 Admin</button>
@@ -1224,28 +1224,6 @@ footer a:hover{color:var(--gold);}
           <div class="stat-item"><div class="stat-num" id="stAcc">–</div><div class="stat-label">Pontosság</div></div>
         </div>
         <!-- GYŐZTES BANNER - az orbitba került a fejlécbe -->
-
-        <!-- BL DÖNTŐ TIPP ÖSSZESÍTŐ -->
-          <div class="bl-poll-sub">PSG vs Arsenal · máj. 30. 18:00 · Puskás Aréna<br>A leadott tippek alapján</div>
-          <div class="bl-poll-bar-wrap" id="pollBars">
-            <div class="bl-poll-bar-row">
-              <span class="bl-poll-bar-label">🔵🔴 PSG</span>
-              <div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barPSG" style="width:0%"></div></div>
-              <span class="bl-poll-bar-pct" id="pctPSG">–</span>
-            </div>
-            <div class="bl-poll-bar-row">
-              <span class="bl-poll-bar-label">🤝 Döntetlen</span>
-              <div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barDraw" style="width:0%;background:#6b7280;"></div></div>
-              <span class="bl-poll-bar-pct" id="pctDraw">–</span>
-            </div>
-            <div class="bl-poll-bar-row">
-              <span class="bl-poll-bar-label">🔴⚪ Arsenal</span>
-              <div class="bl-poll-bar-bg"><div class="bl-poll-bar-fill" id="barArsenal" style="width:0%;background:#ef4444;"></div></div>
-              <span class="bl-poll-bar-pct" id="pctArsenal">–</span>
-            </div>
-          </div>
-          <div class="bl-poll-total" id="pollTotal">Tippek betöltése...</div>
-        </div>
 
         <!-- VB SZUPERPOLL -->
         <div class="vb-poll" id="vbPoll">
@@ -2006,9 +1984,7 @@ function buildTippTable() {
             + '<div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.85);">'
             + m.awayFlag+' '+m.away+'</div>'
             + '<div style="font-size:10px;color:rgba(240,244,240,0.35);margin-top:2px;">'+dateStr+'</div>'
-            + (score ? '<div style="font-family:Oswald,sans-serif;font-weight:700;color:var(--gold);font-size:13px;">'+score+'</div>' : '')
-            + (etRes ? '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.7);">⚡ h.u.: '+etRes+'</div>' : '')
-            + (penRes ? '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.7);">🥅 11-es: '+penRes+'</div>' : '')
+            + (result ? '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.4);letter-spacing:0.5px;">🔒 VÉGE</div>' : '')
             + '</td>';
 
           // Tipp cellák felhasználónként
@@ -2049,9 +2025,7 @@ function buildTippTable() {
             rows += '<td style="text-align:center;padding:6px 4px;vertical-align:middle;">';
             rows += '<div style="display:inline-flex;flex-direction:column;align-items:center;background:'+bg+';border-radius:6px;padding:4px 8px;gap:1px;">';
             rows += '<span style="font-family:Oswald,sans-serif;font-weight:700;font-size:14px;color:'+col+';">'+o+'</span>';
-            if(h!==null && a!==null) {
-              rows += '<span style="font-family:Oswald,sans-serif;font-size:11px;font-weight:600;color:'+col+';opacity:0.9;white-space:nowrap;">'+h+':'+a+'</span>';
-            }
+            // Góleredmény tipp mutatása (de nem a valódi eredmény)
             if(et)  rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+etCol+';line-height:1;letter-spacing:0.5px;">⚡'+et+(etRes&&et===etRes?' +1':'')+'</span>';
             if(pen) rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+penCol+';line-height:1;letter-spacing:0.5px;">🥅'+pen+(penRes&&pen===penRes?' +1':'')+'</span>';
             if(isExact)  rows += '<span style="font-size:9px;color:#4ade80;line-height:1;">🎯</span>';
@@ -2261,7 +2235,7 @@ function renderMatches() {
     var gId = 'dg_'+date.replace(/-/g,'');
     html+=`<div class="date-header" style="cursor:pointer;" onclick="toggleDayGroup('${gId}','${colKey}')">
       <h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span>
-      <span style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">${collapsed?'+':'−'}</span>
+      <span id="toggle_${gId}" style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">${collapsed?'+':'−'}</span>
     </div>`;
     html+=`<div id="${gId}" style="${collapsed?'display:none':''}">`;
     dayMatches.forEach(m=>{
@@ -3141,12 +3115,32 @@ function initBLPoll() {
 // Nap-csoport collapse/expand
 function toggleDayGroup(groupId, storageKey) {
   var el = document.getElementById(groupId);
-  var btn = document.getElementById('toggle_'+groupId);
   if(!el) return;
   var isNowHidden = el.style.display === 'none';
   el.style.display = isNowHidden ? 'block' : 'none';
+  var btn = document.getElementById('toggle_'+groupId);
   if(btn) btn.textContent = isNowHidden ? '−' : '+';
   sessionStorage.setItem(storageKey, isNowHidden ? 'open' : 'closed');
+
+  // Ha kinyitottuk → ugrás az első tippeletlen meccshez ebben a napban
+  if(isNowHidden) {
+    setTimeout(function() {
+      var cards = el.querySelectorAll('.match-card');
+      var target = null;
+      var safe = currentUser ? fbSafeName(currentUser) : null;
+      for(var i = 0; i < cards.length; i++) {
+        var card = cards[i];
+        var mid = card.id.replace('mc_','');
+        if(!mid) continue;
+        var isLocked = card.classList.contains('locked');
+        var hasTip = safe && allTips[mid] && allTips[mid][safe];
+        if(!isLocked && !hasTip) { target = card; break; }
+      }
+      // Ha minden tippelt/zárolt, ugrás az első kártyához
+      if(!target && cards.length) target = cards[0];
+      if(target) target.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 80);
+  }
 }
 
 </script>
