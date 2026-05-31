@@ -2731,10 +2731,10 @@ function renderAdminMatches() {
               <option value="X">X</option>
               <option value="2">2</option>
             </select>
-            <input type="number" id="atip_h_${m.id}" placeholder="H" min="0" max="20"
+            <input type="text" inputmode="numeric" id="atip_h_${m.id}" placeholder="H" 
               style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
             <span style="color:rgba(240,244,240,0.3);font-size:12px;">:</span>
-            <input type="number" id="atip_a_${m.id}" placeholder="V" min="0" max="20"
+            <input type="text" inputmode="numeric" id="atip_a_${m.id}" placeholder="V"
               style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
             <button onclick="adminSetTip('${m.id}')"
               style="padding:5px 10px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">✓ Ment</button>
@@ -2758,15 +2758,21 @@ async function adminSetTip(mid) {
   var tip = {o:o};
   var h = hInp ? hInp.value.trim() : '';
   var a = aInp ? aInp.value.trim() : '';
-  if(h !== '' && a !== '') { tip.h = parseInt(h); tip.a = parseInt(a); }
+  if(h !== '' && a !== '' && !isNaN(parseInt(h)) && !isNaN(parseInt(a))) {
+    tip.h = parseInt(h);
+    tip.a = parseInt(a);
+  }
   try {
+    // Közvetlen Firebase írás — NEM hívunk pollData/renderAll hogy ne renderelje újra a kártyát
     await fbSet('tips/'+mid+'/'+safe, tip);
     if(!allTips[mid]) allTips[mid]={};
     allTips[mid][safe] = tip;
-    showToast('✅ Tipp rögzítve: '+rawName+' → '+o+(h!==''&&a!==''?' ('+h+':'+a+')':''));
+    showToast('✅ '+rawName+' → '+o+(tip.h!==undefined?' ('+tip.h+':'+tip.a+')':''));
+    // Csak a mezőket ürítjük, nem renderelünk újra
     if(userInp) userInp.value='';
     if(hInp) hInp.value='';
     if(aInp) aInp.value='';
+    if(oInp) oInp.value='1';
   } catch(e){ showToast('❌ Firebase hiba!'); }
 }
 
