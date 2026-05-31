@@ -2001,13 +2001,13 @@ function buildTippTable() {
 
             if(!o) { rows += '<td style="text-align:center;padding:8px 6px;color:rgba(255,255,255,0.15);">–</td>'; return; }
 
-            // Ha nincs még eredmény ÉS nem a saját tippem → elrejtjük
-            // Kivétel: PRO felhasználó vagy hardcode admin (KULT) mindent lát
-            var canSeeAll = isProUser(fbSafeName(currentUser)) || isHardcodeAdmin(currentUser);
-            if(!result && !isMe && !canSeeAll) {
+            // Nem saját tipp → csak "tippelt" jelzés, nem mutatjuk a tényleges tippet
+            if(!isMe) {
               rows += '<td style="text-align:center;padding:6px 4px;vertical-align:middle;">'
-                + '<div style="display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;width:32px;height:32px;">'
-                + '<span style="font-size:14px;filter:blur(0);color:rgba(255,255,255,0.2);">?</span>'
+                + '<div style="display:inline-flex;align-items:center;justify-content:center;'
+                + 'background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);'
+                + 'border-radius:6px;width:32px;height:32px;">'
+                + '<span style="font-size:13px;">✓</span>'
                 + '</div></td>';
               return;
             }
@@ -2132,15 +2132,42 @@ function jumpToNextUntipped() {
     document.getElementById('regModal').style.display = 'flex';
     return;
   }
+  var safe = fbSafeName(currentUser);
+
+  // 1. próba: mai tippeletlen nyitott meccs
   var info = getMatchdayInfo();
   var target = info.untipped[0] || info.actionable[0] || info.todays[0];
+
+  // 2. próba: ha nincs mai meccs → legközelebbi jövőbeli tippeletlen
+  if(!target) {
+    var now = getBudapestNow();
+    target = ALL_MATCHES.find(function(m) {
+      if(m.id === 'TEST1' || m.id === 'BL2026') return false;
+      var kickoff = m.huDate + 'T' + m.huTime;
+      if(kickoff <= now) return false; // már elkezdődött
+      var hasTip = allTips[m.id] && allTips[m.id][safe];
+      return !hasTip;
+    });
+  }
+
+  // 3. próba: ha minden kitippelve → legközelebbi jövőbeli meccs
+  if(!target) {
+    var now2 = getBudapestNow();
+    target = ALL_MATCHES.find(function(m) {
+      if(m.id === 'TEST1' || m.id === 'BL2026') return false;
+      return (m.huDate + 'T' + m.huTime) > now2;
+    });
+  }
+
   if(!target) return;
 
-  // Ha a nap csoportja össze van csukva, nyissuk ki
+  // Nap kinyitása ha össze van csukva
   var gId = 'dg_' + target.huDate.replace(/-/g, '');
   var grp = document.getElementById(gId);
   if(grp && grp.style.display === 'none') {
     grp.style.display = '';
+    var btn = document.getElementById('toggle_' + gId);
+    if(btn) btn.textContent = '−';
     sessionStorage.setItem('dc_' + target.huDate, 'open');
   }
 
@@ -2148,7 +2175,7 @@ function jumpToNextUntipped() {
   if(card) {
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
     card.classList.remove('md-highlight');
-    void card.offsetWidth; // reflow, hogy az animáció újrainduljon
+    void card.offsetWidth;
     card.classList.add('md-highlight');
     setTimeout(function(){ card.classList.remove('md-highlight'); }, 1700);
   }
