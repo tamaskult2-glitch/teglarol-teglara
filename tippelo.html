@@ -2719,10 +2719,55 @@ function renderAdminMatches() {
             ${penRes?`<button class="rb" style="border-color:#ef4444;font-size:10px;" onclick="clearPenRes('${m.id}')">✕</button>`:''}
           </div>
         </div>`:''}
+        <!-- ADMIN TIPP RÖGZÍTÉS -->
+        <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.08);">
+          <div style="font-size:10px;color:rgba(240,244,240,0.35);font-family:Oswald,sans-serif;letter-spacing:1px;margin-bottom:5px;">👤 TIPP RÖGZÍTÉS (bármely user)</div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="atip_user_${m.id}" placeholder="Felhasználónév"
+              style="flex:1;min-width:80px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;">
+            <select id="atip_o_${m.id}"
+              style="padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(10,28,12,0.95);color:white;font-family:Oswald,sans-serif;font-size:12px;">
+              <option value="1">1</option>
+              <option value="X">X</option>
+              <option value="2">2</option>
+            </select>
+            <input type="number" id="atip_h_${m.id}" placeholder="H" min="0" max="20"
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+            <span style="color:rgba(240,244,240,0.3);font-size:12px;">:</span>
+            <input type="number" id="atip_a_${m.id}" placeholder="V" min="0" max="20"
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+            <button onclick="adminSetTip('${m.id}')"
+              style="padding:5px 10px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">✓ Ment</button>
+          </div>
+        </div>
       </div>`;
     });
   });
   c.innerHTML=html;
+}
+
+async function adminSetTip(mid) {
+  var userInp = document.getElementById('atip_user_'+mid);
+  var oInp    = document.getElementById('atip_o_'+mid);
+  var hInp    = document.getElementById('atip_h_'+mid);
+  var aInp    = document.getElementById('atip_a_'+mid);
+  var rawName = (userInp ? userInp.value : '').trim();
+  if(!rawName){ showToast('⚠️ Adj meg felhasználónevet!'); if(userInp) userInp.focus(); return; }
+  var safe = fbSafeName(rawName);
+  var o = oInp ? oInp.value : '1';
+  var tip = {o:o};
+  var h = hInp ? hInp.value.trim() : '';
+  var a = aInp ? aInp.value.trim() : '';
+  if(h !== '' && a !== '') { tip.h = parseInt(h); tip.a = parseInt(a); }
+  try {
+    await fbSet('tips/'+mid+'/'+safe, tip);
+    if(!allTips[mid]) allTips[mid]={};
+    allTips[mid][safe] = tip;
+    showToast('✅ Tipp rögzítve: '+rawName+' → '+o+(h!==''&&a!==''?' ('+h+':'+a+')':''));
+    if(userInp) userInp.value='';
+    if(hInp) hInp.value='';
+    if(aInp) aInp.value='';
+  } catch(e){ showToast('❌ Firebase hiba!'); }
 }
 
 async function setResult(mid,tip){
