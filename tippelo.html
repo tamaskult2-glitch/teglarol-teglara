@@ -1219,7 +1219,7 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')" id="navAdmin">🔐 Admin</button>
-  <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL</button>
+  <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
 </div>
 
 <div class="page-wrapper">
@@ -3345,6 +3345,12 @@ function oplStatusClass(s) {
   return s==='done'?'opl-status-done':s==='rejected'?'opl-status-rejected':'opl-status-open';
 }
 
+function oplUpdateBadge() {
+  var openCount = oplItems.filter(function(i){return i.status==='open';}).length;
+  var badge = document.getElementById('oplBadge');
+  if(badge){ badge.style.display = openCount>0?'':'none'; badge.textContent = openCount; }
+}
+
 function oplRender() {
   var list = document.getElementById('oplList');
   if(!list) return;
@@ -3374,6 +3380,7 @@ function oplRender() {
         : '')
       +'</div></div></div></div>';
   }).join('');
+  oplUpdateBadge();
 }
 
 function oplSetFilter(val, btn) {
