@@ -2485,6 +2485,8 @@ function renderStats() {
 }
 
 function renderUserBar() {
+  var fab = document.getElementById('chatFab');
+  if(fab) fab.style.display = currentUser ? 'flex' : 'none';
   const c=document.getElementById('userBarContainer');
   if(!currentUser){c.innerHTML='';return;}
   const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
@@ -2545,6 +2547,10 @@ function renderLeaderboard() {
 
 // ===== CHAT =====
 function openChat(){
+  if(!currentUser){
+    document.getElementById('regModal').style.display='flex';
+    return;
+  }
   document.getElementById('chatDrawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -3557,7 +3563,7 @@ function toggleDayGroup(groupId, storageKey) {
     </div>
   </div>
 </div>
-<button class="chat-fab" id="chatFab" onclick="openChat()" title="Élő komment">
+<button class="chat-fab" id="chatFab" onclick="openChat()" title="Élő komment" style="display:none">
   💬
   <span class="chat-fab-badge" id="fabBadge">0</span>
 </button>
