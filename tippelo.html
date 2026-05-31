@@ -1412,7 +1412,7 @@ footer a:hover{color:var(--gold);}
               style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;resize:vertical;"></textarea>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div>
+            <div id="oplUserRow">
               <div style="font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:4px;font-family:Oswald,sans-serif;letter-spacing:0.5px;">FELHASZNÁLÓ</div>
               <input type="text" id="oplInpUser" placeholder="pl. KULT"
                 style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
@@ -3328,6 +3328,10 @@ async function oplLoad() {
     try { await fbSet('opl', oplItems); } catch(e){}
   }
 
+  // Alapértelmezett szűrő: nyitott ha van, egyébként mind
+  var openCount = oplItems.filter(function(i){return i.status==='open';}).length;
+  oplFilter = openCount > 0 ? 'open' : 'all';
+
   oplRender();
 }
 
@@ -3354,6 +3358,12 @@ function oplUpdateBadge() {
 function oplRender() {
   var list = document.getElementById('oplList');
   if(!list) return;
+  // Szűrő gombok szinkronizálása
+  document.querySelectorAll('.opl-filter-btn').forEach(function(b){
+    var oc = b.getAttribute('onclick')||'';
+    var isActive = oc.indexOf("'"+oplFilter+"'") >= 0;
+    b.classList.toggle('active', isActive);
+  });
   var isAdmin = isAdminUnlocked || isHardcodeAdmin(currentUser);
   var filtered = oplFilter==='all' ? oplItems : oplItems.filter(function(i){return i.status===oplFilter;});
   if(!filtered.length) {
@@ -3392,12 +3402,15 @@ function oplSetFilter(val, btn) {
 
 function oplOpenAdd() {
   oplEditId = null;
+  var isAdmin = isAdminUnlocked || isHardcodeAdmin(currentUser);
   document.getElementById('oplModalTitle').textContent = 'ÚJ FEJLESZTÉSI PONT';
   document.getElementById('oplInpDesc').value = '';
   document.getElementById('oplInpUser').value = currentUser||'';
   document.getElementById('oplInpStatus').value = 'open';
-  var isAdmin = isAdminUnlocked || isHardcodeAdmin(currentUser);
+  // Nem admin: felhasználónév és státusz mezők rejtve/tiltva
   document.getElementById('oplInpStatus').disabled = !isAdmin;
+  var userRow = document.getElementById('oplUserRow');
+  if(userRow) userRow.style.display = isAdmin ? '' : 'none';
   document.getElementById('oplModal').style.display = 'flex';
 }
 
