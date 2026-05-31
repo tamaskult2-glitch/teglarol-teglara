@@ -31,6 +31,74 @@ header{position:relative;overflow:hidden;text-align:center;padding:32px 20px 24p
 .trophy-svg{width:60px;height:auto;display:block;margin:0 auto 6px;
   filter:drop-shadow(0 3px 11px rgba(245,197,24,0.45));animation:trophyFloat 4s ease-in-out infinite;}
 @keyframes trophyFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.035)}}
+
+/* KÖRÖZŐ GYŐZTES MOLINÓ */
+.winner-orbit-wrap {
+  display:none;
+  position:relative;
+  width:100%;
+  height:60px;
+  margin:6px auto 0;
+  pointer-events:none;
+}
+.winner-orbit-wrap.show { display:block; }
+.winner-orbit-item {
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:max-content;
+  transform-origin:0 0;
+  animation:orbitSpin 7s linear infinite;
+  white-space:nowrap;
+}
+.winner-orbit-item.rev {
+  animation-direction:reverse;
+  animation-duration:9s;
+}
+@keyframes orbitSpin {
+  from { transform:rotate(0deg) translateX(140px) rotate(0deg); }
+  to   { transform:rotate(360deg) translateX(140px) rotate(-360deg); }
+}
+.winner-orbit-pill {
+  background:linear-gradient(90deg,rgba(245,197,24,0.18),rgba(245,197,24,0.28));
+  border:1px solid rgba(245,197,24,0.5);
+  border-radius:20px;
+  padding:3px 10px;
+  font-family:'Oswald',sans-serif;
+  font-size:11px;
+  font-weight:700;
+  color:var(--gold);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  box-shadow:0 0 8px rgba(245,197,24,0.25);
+}
+/* VB SZUPERPOLL */
+.vb-poll{background:linear-gradient(135deg,rgba(10,28,12,0.9),rgba(18,45,22,0.9));border:1px solid rgba(245,197,24,0.2);border-radius:14px;padding:14px 14px 10px;margin:0 0 14px;}
+.vb-poll-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.vb-poll-icon{font-size:26px;line-height:1;}
+.vb-poll-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;}
+.vb-poll-sub{font-size:11px;color:rgba(240,244,240,0.4);margin-top:2px;}
+.vb-poll-section{border-top:1px solid rgba(245,197,24,0.1);padding-top:10px;}
+.vb-poll-qlabel{font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;color:rgba(245,197,24,0.8);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.vb-poll-team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;}
+.vb-team-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 4px;font-family:'Oswald',sans-serif;font-size:11px;color:rgba(240,244,240,0.7);cursor:pointer;text-align:center;transition:all 0.15s;line-height:1.3;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.vb-team-btn:active{transform:scale(0.96);}
+.vb-team-btn.selected{background:rgba(245,197,24,0.18);border-color:rgba(245,197,24,0.5);color:var(--gold);}
+.vb-team-btn .vb-flag{font-size:18px;}
+.vb-poll-my{font-size:11px;color:rgba(245,197,24,0.6);min-height:16px;margin-bottom:6px;font-family:'Oswald',sans-serif;}
+.vb-poll-results{display:flex;flex-direction:column;gap:4px;}
+.vb-result-row{display:flex;align-items:center;gap:6px;font-size:11px;}
+.vb-result-label{color:rgba(240,244,240,0.6);min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Oswald',sans-serif;}
+.vb-result-bar-bg{flex:1;height:6px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.vb-result-bar{height:6px;background:var(--gold);border-radius:3px;transition:width 0.4s ease;}
+.vb-result-cnt{color:rgba(240,244,240,0.4);font-size:10px;min-width:22px;text-align:right;}
+.vb-poll-scorer-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+/* VILLOGÓ SZAVAZÁS BADGE */
+.vote-pulse{display:inline-flex;align-items:center;gap:4px;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.8px;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle;animation:votePulse 1.4s ease-in-out infinite;}
+@keyframes votePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.65;transform:scale(0.94)}}
 /* MATCHDAY BANNER */
 .matchday-banner{display:none;align-items:center;gap:12px;margin:0 0 14px;padding:12px 14px;
   border-radius:14px;border:1px solid rgba(245,197,24,0.35);
@@ -1101,6 +1169,15 @@ footer a:hover{color:var(--gold);}
     <path d="M43 40 q-4 28 8 48" fill="none" stroke="#fff" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
   </svg>
   <h1>FIFA World Cup 2026</h1>
+  <!-- BL győztes köröző molinó -->
+  <div class="winner-orbit-wrap" id="winnerOrbit">
+    <div class="winner-orbit-item">
+      <div class="winner-orbit-pill">🏆 <span id="orbitName">–</span> · BL győztes tippelő 🎉</div>
+    </div>
+    <div class="winner-orbit-item rev">
+      <div class="winner-orbit-pill">⚽ 1:1 · PSG · 11-esek 🥅</div>
+    </div>
+  </div>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
   <div style="margin-top:10px;">
@@ -1146,18 +1223,9 @@ footer a:hover{color:var(--gold);}
           <div class="stat-item"><div class="stat-num" id="stCorrect">0</div><div class="stat-label">Pontjaim</div></div>
           <div class="stat-item"><div class="stat-num" id="stAcc">–</div><div class="stat-label">Pontosság</div></div>
         </div>
-        <!-- GYŐZTES BANNER -->
-        <div class="winner-banner" id="winnerBanner">
-          <div class="winner-stars">🏆⭐🏆</div>
-          <div class="winner-label">🎉 BL Tippverseny Győztese 🎉</div>
-          <div class="winner-name" id="winnerName">–</div>
-          <div class="winner-title">Bajnokok Ligája Döntő · 2026</div>
-          <div class="winner-score" id="winnerScore"></div>
-        </div>
+        <!-- GYŐZTES BANNER - az orbitba került a fejlécbe -->
 
         <!-- BL DÖNTŐ TIPP ÖSSZESÍTŐ -->
-        <div class="bl-poll" id="blPoll">
-          <div class="bl-poll-title">⭐ Mit tippel a csapat? ⭐</div>
           <div class="bl-poll-sub">PSG vs Arsenal · máj. 30. 18:00 · Puskás Aréna<br>A leadott tippek alapján</div>
           <div class="bl-poll-bar-wrap" id="pollBars">
             <div class="bl-poll-bar-row">
@@ -1179,6 +1247,44 @@ footer a:hover{color:var(--gold);}
           <div class="bl-poll-total" id="pollTotal">Tippek betöltése...</div>
         </div>
 
+        <!-- VB SZUPERPOLL -->
+        <div class="vb-poll" id="vbPoll">
+          <div class="vb-poll-header">
+            <span class="vb-poll-icon">🌍</span>
+            <div>
+              <div class="vb-poll-title">VB 2026 Előrejelzések</div>
+              <div class="vb-poll-sub">Szavazz — 1 szavazat tippelőnként</div>
+            </div>
+          </div>
+
+          <!-- Ki nyeri a VB-t? -->
+          <div class="vb-poll-section">
+            <div class="vb-poll-qlabel">🏆 Ki nyeri a VB-t? <span class="vote-pulse" id="pulseWinner">● SZAVAZZ</span></div>
+            <div class="vb-poll-team-grid" id="vbWinnerGrid">
+              <!-- JS tölti fel -->
+            </div>
+            <div class="vb-poll-my" id="vbWinnerMy"></div>
+            <div class="vb-poll-results" id="vbWinnerResults"></div>
+          </div>
+
+          <!-- Ki lesz a gólkirály? -->
+          <div class="vb-poll-section" style="margin-top:14px;">
+            <div class="vb-poll-qlabel">⚽ Ki lesz a gólkirály? <span class="vote-pulse" id="pulseScorer">● SZAVAZZ</span></div>
+            <div class="vb-poll-scorer-row">
+              <input type="text" id="vbScorerInput" placeholder="Futballista neve (pl. Mbappé)"
+                maxlength="40" autocomplete="off"
+                style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.2);color:white;font-family:'Oswald',sans-serif;font-size:13px;"
+                onkeydown="if(event.key==='Enter')submitVbScorer()">
+              <button onclick="submitVbScorer()"
+                style="padding:8px 14px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.35);color:var(--gold);border-radius:8px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">
+                ✓ Szavaz
+              </button>
+            </div>
+            <div class="vb-poll-my" id="vbScorerMy"></div>
+            <div class="vb-poll-results" id="vbScorerResults"></div>
+          </div>
+        </div>
+
         <div class="matchday-banner" id="matchdayBanner">
           <button class="md-close" onclick="dismissMatchday()" title="Bezárás">✕</button>
           <div class="md-emoji" id="mdEmoji">🔥</div>
@@ -1187,6 +1293,19 @@ footer a:hover{color:var(--gold);}
             <div class="md-sub" id="mdSub"></div>
           </div>
           <button class="md-btn" id="mdBtn" onclick="jumpToNextUntipped()">⚡ Szavazz!</button>
+        </div>
+
+        <!-- MECCS KERESŐ -->
+        <div style="position:relative;margin:0 0 10px;">
+          <input type="text" id="matchSearch"
+            placeholder="🔍 Csapat vagy csoport keresése..."
+            oninput="filterMatches()"
+            style="width:100%;box-sizing:border-box;padding:9px 36px 9px 12px;border-radius:10px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.25);color:rgba(240,244,240,0.9);font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.3px;outline:none;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='rgba(245,197,24,0.45)'"
+            onblur="this.style.borderColor='rgba(245,197,24,0.2)'">
+          <button onclick="document.getElementById('matchSearch').value='';filterMatches()"
+            id="matchSearchClear"
+            style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(240,244,240,0.4);font-size:16px;cursor:pointer;line-height:1;padding:2px 4px;">✕</button>
         </div>
 
         <div id="matchesContainer"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
@@ -2121,8 +2240,8 @@ function renderAll() {
   try { if(activeTab==='tippek') buildTippTable(); } catch(e){}
   try { if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); } catch(e){}
   try { checkBLWinner(); } catch(e){}
-  try { initBLPoll(); } catch(e){}
   try { renderMatchdayBanner(); } catch(e){}
+  try { loadVbPoll(); } catch(e){}
 }
 
 
@@ -2136,7 +2255,7 @@ function renderMatches() {
     const d=new Date(date+'T12:00:00');
     const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
     const dayCount=dayMatches.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
-    var isTestDay = (date === '2026-05-27');
+    var isTestDay = (date === '2026-05-27' || date === '2026-05-30');
     var colKey = 'dc_'+date;
     var collapsed = isTestDay && sessionStorage.getItem(colKey) !== 'open';
     var gId = 'dg_'+date.replace(/-/g,'');
@@ -2174,6 +2293,7 @@ function renderMatches() {
           ${(m.homeLineup&&m.homeLineup.length)||kickoffLocked?'<button onclick="showLineup(\''+m.id+'\')" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:var(--gold);border-radius:6px;padding:1px 8px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;letter-spacing:0.5px;">⚽ kezdők</button>':''}
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
+          ${result?'<span style="font-size:9px;color:rgba(245,197,24,0.6);background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>':''}
         </div>
         ${m.title?'<div style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.5);letter-spacing:1.5px;padding:6px 0 0;">'+m.title+'</div>':''}
         <div class="match-body">
@@ -2186,7 +2306,7 @@ function renderMatches() {
               </div>
             </div>
             <span class="vs-block">VS</span>
-            <span class="sc-block">${score||'?–?'}</span>
+            <span class="sc-block" style="visibility:hidden;display:block">–</span>
             <div class="team-blk away-blk">
               ${getTeamBadge(m.awayFlag, m.away)}
               <div class="tn-wrap">
@@ -2776,39 +2896,219 @@ function checkBLWinner() {
     else if(isHit) correct.push({name:u});
   });
 
-  var banner = document.getElementById('winnerBanner');
-  var nameEl = document.getElementById('winnerName');
-  var scoreEl = document.getElementById('winnerScore');
-  if(!banner) return;
+  var orbit = document.getElementById('winnerOrbit');
+  var orbitName = document.getElementById('orbitName');
 
   if(exact.length > 0) {
-    // Pontos találat van
     var w = exact[0];
-    banner.classList.add('show');
-    nameEl.textContent = w.name;
-    scoreEl.textContent = '🎯 Pontos eredmény: ' + w.score + (exact.length>1?' és még '+(exact.length-1)+' fő':'');
+    var label = exact.length > 1 ? w.name + ' +' + (exact.length-1) : w.name;
+    if(orbitName) orbitName.textContent = label;
+    if(orbit) orbit.classList.add('show');
   } else if(correct.length > 0) {
-    // Csak kimenetel
-    banner.classList.add('show');
-    nameEl.textContent = correct.length === 1 ? correct[0].name : correct.map(function(x){return x.name;}).join(' & ');
-    scoreEl.textContent = '✅ Helyes tipp: ' + result + (correct.length>1?' · '+correct.length+' nyertes':'');
+    var label2 = correct.length === 1 ? correct[0].name : correct.map(function(x){return x.name;}).join(' & ');
+    if(orbitName) orbitName.textContent = label2;
+    if(orbit) orbit.classList.add('show');
   } else {
-    banner.classList.remove('show');
-  }
-
-  // Konfetti
-  if(banner.classList.contains('show') && !banner.querySelector('.confetti-piece')) {
-    var colors = ['#f5c518','#c8102e','#22c55e','#3b82f6','#ffffff'];
-    for(var i=0;i<12;i++){
-      var p = document.createElement('div');
-      p.className = 'confetti-piece';
-      p.style.cssText = 'left:'+Math.random()*100+'%;background:'+colors[i%5]+';animation-delay:'+Math.random()*3+'s;animation-duration:'+(2+Math.random()*2)+'s;';
-      banner.appendChild(p);
-    }
+    if(orbit) orbit.classList.remove('show');
   }
 }
 
-// ===== BL POLL =====
+// ===== VB SZUPERPOLL =====
+const VB_TEAMS = [
+  {flag:"🇩🇿",name:"Algéria"},
+  {flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",name:"Anglia"},
+  {flag:"🇦🇷",name:"Argentína"},
+  {flag:"🇦🇹",name:"Ausztria"},
+  {flag:"🇦🇺",name:"Ausztrália"},
+  {flag:"🇧🇪",name:"Belgium"},
+  {flag:"🇧🇦",name:"Bosznia-Hercegovina"},
+  {flag:"🇧🇷",name:"Brazília"},
+  {flag:"🇨🇿",name:"Csehország"},
+  {flag:"🇨🇼",name:"Curaçao"},
+  {flag:"🇿🇦",name:"Dél-Afrika"},
+  {flag:"🇰🇷",name:"Dél-Korea"},
+  {flag:"🇪🇨",name:"Ecuador"},
+  {flag:"🇺🇸",name:"Egyesült Államok"},
+  {flag:"🇪🇬",name:"Egyiptom"},
+  {flag:"🇨🇮",name:"Elefántcsontpart"},
+  {flag:"🇫🇷",name:"Franciaország"},
+  {flag:"🇬🇭",name:"Ghána"},
+  {flag:"🇭🇹",name:"Haiti"},
+  {flag:"🇳🇱",name:"Hollandia"},
+  {flag:"🇭🇷",name:"Horvátország"},
+  {flag:"🇮🇶",name:"Irak"},
+  {flag:"🇮🇷",name:"Irán"},
+  {flag:"🇯🇵",name:"Japán"},
+  {flag:"🇯🇴",name:"Jordánia"},
+  {flag:"🇨🇦",name:"Kanada"},
+  {flag:"🇶🇦",name:"Katar"},
+  {flag:"🇨🇴",name:"Kolumbia"},
+  {flag:"🇨🇩",name:"Kongói DK"},
+  {flag:"🇲🇦",name:"Marokkó"},
+  {flag:"🇲🇽",name:"Mexikó"},
+  {flag:"🇳🇴",name:"Norvégia"},
+  {flag:"🇩🇪",name:"Németország"},
+  {flag:"🇵🇦",name:"Panama"},
+  {flag:"🇵🇾",name:"Paraguay"},
+  {flag:"🇵🇹",name:"Portugália"},
+  {flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",name:"Skócia"},
+  {flag:"🇪🇸",name:"Spanyolország"},
+  {flag:"🇨🇭",name:"Svájc"},
+  {flag:"🇸🇪",name:"Svédország"},
+  {flag:"🇸🇦",name:"Szaúd-Arábia"},
+  {flag:"🇸🇳",name:"Szenegál"},
+  {flag:"🇹🇳",name:"Tunézia"},
+  {flag:"🇹🇷",name:"Törökország"},
+  {flag:"🇺🇾",name:"Uruguay"},
+  {flag:"🇨🇻",name:"Zöld-foki-szigetek"},
+  {flag:"🇳🇿",name:"Új-Zéland"},
+  {flag:"🇺🇿",name:"Üzbegisztán"}
+];
+let vbPollData = {winner:{}, scorer:{}};
+
+async function loadVbPoll() {
+  try {
+    var d = await fbGet('vbPoll');
+    vbPollData = d || {winner:{},scorer:{}};
+    if(!vbPollData.winner) vbPollData.winner={};
+    if(!vbPollData.scorer) vbPollData.scorer={};
+  } catch(e) { vbPollData={winner:{},scorer:{}}; }
+  renderVbPoll();
+}
+
+function renderVbPoll() {
+  var grid = document.getElementById('vbWinnerGrid');
+  if(!grid) return;
+  var poll = document.getElementById('vbPoll');
+  var safe = currentUser ? fbSafeName(currentUser) : null;
+  var myWinner = safe ? (vbPollData.winner[safe]||null) : null;
+  var myScorer = safe ? (vbPollData.scorer[safe]||null) : null;
+
+  // Ha mindkét szavazat megvan → összecsuk
+  if(safe && myWinner && myScorer) {
+    if(poll) poll.style.display = 'none';
+    return;
+  }
+  if(poll) poll.style.display = '';
+
+  var locked = isVbPollLocked();
+
+  grid.innerHTML = VB_TEAMS.map(function(t){
+    var sel = myWinner === t.name ? ' selected' : '';
+    var dis = locked ? ' disabled style="opacity:0.4;cursor:default;"' : '';
+    return '<button class="vb-team-btn'+sel+'"'+(locked?'':" onclick=\"submitVbWinner('"+escHtml(t.name)+"')\"")+(locked?' disabled style="opacity:0.45;cursor:default;"':'')+' >'
+      +'<span class="vb-flag">'+t.flag+'</span>'
+      +'<span>'+t.name+'</span>'
+      +'</button>';
+  }).join('');
+  var myEl = document.getElementById('vbWinnerMy');
+  var pulseW = document.getElementById('pulseWinner');
+  var pulseS = document.getElementById('pulseScorer');
+  if(pulseW) pulseW.style.display = (!locked && !myWinner) ? '' : 'none';
+  if(pulseS) pulseS.style.display = (!locked && !myScorer) ? '' : 'none';
+  if(myEl) myEl.textContent = locked
+    ? (myWinner ? '🏆 '+myWinner+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult (jún. 11. 18:00)')
+    : (myWinner ? 'A te tipped: 🏆 '+myWinner : (safe?'Még nem szavaztál':''));
+  var counts = {};
+  Object.values(vbPollData.winner).forEach(function(v){ counts[v]=(counts[v]||0)+1; });
+  var sorted = Object.entries(counts).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+  var total = Object.values(counts).reduce(function(s,n){return s+n;},0);
+  var resEl = document.getElementById('vbWinnerResults');
+  if(resEl) resEl.innerHTML = sorted.map(function(e){
+    var pct = total ? Math.round(e[1]/total*100) : 0;
+    return '<div class="vb-result-row"><span class="vb-result-label">'+e[0]+'</span>'
+      +'<div class="vb-result-bar-bg"><div class="vb-result-bar" style="width:'+pct+'%"></div></div>'
+      +'<span class="vb-result-cnt">'+e[1]+'</span></div>';
+  }).join('') || '<span style="font-size:11px;color:rgba(240,244,240,0.25);">Még nincs szavazat</span>';
+  var scorerMyEl = document.getElementById('vbScorerMy');
+  if(scorerMyEl) scorerMyEl.textContent = locked
+    ? (myScorer ? '⚽ '+myScorer+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult')
+    : (myScorer ? 'A te tipped: ⚽ '+myScorer : (safe?'Még nem szavaztál':''));
+  var sc = {};
+  Object.values(vbPollData.scorer).forEach(function(v){ if(v){sc[v]=(sc[v]||0)+1;} });
+  var sortedSc = Object.entries(sc).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+  var totalSc = Object.values(sc).reduce(function(s,n){return s+n;},0);
+  var scResEl = document.getElementById('vbScorerResults');
+  if(scResEl) scResEl.innerHTML = sortedSc.map(function(e){
+    var pct = totalSc ? Math.round(e[1]/totalSc*100) : 0;
+    return '<div class="vb-result-row"><span class="vb-result-label">'+escHtml(e[0])+'</span>'
+      +'<div class="vb-result-bar-bg"><div class="vb-result-bar" style="width:'+pct+'%"></div></div>'
+      +'<span class="vb-result-cnt">'+e[1]+'</span></div>';
+  }).join('') || '<span style="font-size:11px;color:rgba(240,244,240,0.25);">Még nincs szavazat</span>';
+}
+
+// Első VB meccs kickoff alapján zárolás
+function isVbPollLocked() {
+  var firstVb = ALL_MATCHES.find(function(m){ return m.id !== 'BL2026' && m.id !== 'TEST1'; });
+  return firstVb ? isKickoffPassed(firstVb.huDate, firstVb.huTime) : false;
+}
+
+async function submitVbWinner(teamName) {
+  if(!currentUser){ showToast('⚠️ Előbb lépj be!'); return; }
+  if(isVbPollLocked()){ showToast('⏰ A szavazás lezárult!'); return; }
+  var safe = fbSafeName(currentUser);
+  vbPollData.winner[safe] = teamName;
+  renderVbPoll();
+  try { await fbSet('vbPoll/winner/'+safe, teamName); showToast('🏆 '+teamName+' mentve!'); }
+  catch(e){ showToast('❌ Firebase hiba!'); }
+}
+
+async function submitVbScorer() {
+  if(!currentUser){ showToast('⚠️ Előbb lépj be!'); return; }
+  if(isVbPollLocked()){ showToast('⏰ A szavazás lezárult!'); return; }
+  var inp = document.getElementById('vbScorerInput');
+  var val = (inp ? inp.value : '').trim();
+  if(!val){ showToast('⚠️ Írd be a nevet!'); return; }
+  var safe = fbSafeName(currentUser);
+  vbPollData.scorer[safe] = val;
+  renderVbPoll();
+  try { await fbSet('vbPoll/scorer/'+safe, val); showToast('⚽ '+val+' mentve!'); }
+  catch(e){ showToast('❌ Firebase hiba!'); }
+}
+
+// ===== MECCS KERESŐ =====
+function filterMatches() {
+  var q = (document.getElementById('matchSearch').value||'').trim().toLowerCase();
+  var clearBtn = document.getElementById('matchSearchClear');
+  if(clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+
+  var container = document.getElementById('matchesContainer');
+  if(!container) return;
+
+  if(!q) {
+    // Összes kártya és header visszaállítása
+    container.querySelectorAll('.match-card').forEach(function(c){ c.style.display=''; });
+    container.querySelectorAll('.date-header').forEach(function(h){ h.style.display=''; });
+    container.querySelectorAll('[id^="dg_"]').forEach(function(dg){
+      // Csak akkor nyissuk ki ha nem volt manuálisan összecsukva
+      // (a teszt napot meghagyjuk csukva)
+      if(dg.id === 'dg_20260527') return;
+      dg.style.display = '';
+    });
+    return;
+  }
+
+  // Minden dg_ div átfésülése
+  container.querySelectorAll('[id^="dg_"]').forEach(function(dg) {
+    var cards = dg.querySelectorAll('.match-card');
+    var anyVisible = false;
+    cards.forEach(function(card) {
+      var text = (card.textContent||'').toLowerCase();
+      var show = text.indexOf(q) >= 0;
+      card.style.display = show ? '' : 'none';
+      if(show) anyVisible = true;
+    });
+    // Nap láthatósága
+    dg.style.display = anyVisible ? '' : 'none';
+    if(anyVisible) dg.style.display = ''; // kinyit ha össze volt csukva
+
+    // Date-header: az előtte lévő testvér elem
+    var prev = dg.previousElementSibling;
+    if(prev && prev.classList.contains('date-header')) {
+      prev.style.display = anyVisible ? '' : 'none';
+    }
+  });
+}
 
 // ===== BL POLL =====
 function initBLPoll() {
