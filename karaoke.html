@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎵 Alé Alé Gólszagló – Karaoke</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Oswald', 'Impact', sans-serif;
+  background: #0a1c0c;
+  color: #f0f4f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+/* Pitch háttér */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 60px,
+    rgba(255,255,255,0.018) 60px, rgba(255,255,255,0.018) 120px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+header {
+  width: 100%;
+  text-align: center;
+  padding: 28px 20px 16px;
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid rgba(245,197,24,0.15);
+}
+.title {
+  font-size: clamp(22px, 6vw, 42px);
+  font-weight: 900;
+  color: #f5c518;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-shadow: 0 0 30px rgba(245,197,24,0.4);
+}
+.subtitle {
+  font-size: 13px;
+  color: rgba(240,244,240,0.4);
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+
+/* Player */
+.player-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  background: rgba(10,28,12,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(245,197,24,0.15);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f5c518;
+  color: #0a1c0c;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s, background 0.15s;
+  box-shadow: 0 3px 12px rgba(245,197,24,0.4);
+}
+.play-btn:hover { transform: scale(1.08); }
+.play-btn:active { transform: scale(0.95); }
+.progress-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.progress-bar-bg {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+.progress-bar-fill {
+  height: 4px;
+  background: #f5c518;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s linear;
+  pointer-events: none;
+}
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(240,244,240,0.35);
+  letter-spacing: 0.5px;
+}
+.vol-btn {
+  background: none;
+  border: none;
+  color: rgba(240,244,240,0.4);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+.vol-btn:hover { color: var(--gold, #f5c518); }
+
+/* Karaoke szöveg */
+.lyrics-container {
+  width: 100%;
+  max-width: 640px;
+  padding: 30px 20px 80px;
+  position: relative;
+  z-index: 1;
+}
+.lyric-block {
+  margin-bottom: 28px;
+}
+.lyric-label {
+  font-size: 10px;
+  color: rgba(245,197,24,0.4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.lyric-line {
+  font-size: clamp(16px, 4.5vw, 24px);
+  font-weight: 700;
+  line-height: 1.5;
+  color: rgba(240,244,240,0.3);
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.25s, background 0.25s, transform 0.25s;
+  cursor: default;
+  display: block;
+  margin: 2px 0;
+}
+.lyric-line.active {
+  color: #f5c518;
+  background: rgba(245,197,24,0.1);
+  transform: scale(1.02);
+  text-shadow: 0 0 20px rgba(245,197,24,0.5);
+}
+.lyric-line.past {
+  color: rgba(240,244,240,0.55);
+}
+/* Intro/chant sorok */
+.lyric-line.chant {
+  color: rgba(206,41,57,0.4);
+  font-size: clamp(18px, 5vw, 28px);
+  text-align: center;
+  letter-spacing: 3px;
+}
+.lyric-line.chant.active {
+  color: #CE2939;
+  background: rgba(206,41,57,0.12);
+  text-shadow: 0 0 20px rgba(206,41,57,0.5);
+}
+.lyric-line.chant.past {
+  color: rgba(206,41,57,0.5);
+}
+/* Bridge kiemelt */
+.lyric-line.bridge {
+  font-size: clamp(14px, 3.5vw, 18px);
+  color: rgba(240,244,240,0.25);
+}
+.lyric-line.bridge.active {
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+}
+
+/* Auto-scroll indikátor */
+.scroll-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(245,197,24,0.15);
+  border: 1px solid rgba(245,197,24,0.3);
+  color: #f5c518;
+  font-family: Oswald, sans-serif;
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  z-index: 20;
+  letter-spacing: 1px;
+  display: none;
+}
+.scroll-indicator.show { display: block; }
+
+/* Back link */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(240,244,240,0.35);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  padding: 8px 20px;
+  transition: color 0.2s;
+}
+.back-link:hover { color: #f5c518; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <a href="tippelo.html" class="back-link">← Vissza a tippelőre</a>
+  <div class="title">Alé Alé Gólszagló</div>
+  <div class="subtitle">„Gólszagló" Bajnokság · FIFA VB 2026</div>
+</header>
+
+<div class="player-bar">
+  <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg" id="progressBg" onclick="seekTo(event)">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="time-row">
+      <span id="timeNow">0:00</span>
+      <span id="timeTot">–:––</span>
+    </div>
+  </div>
+  <button class="vol-btn" id="volBtn" onclick="toggleMute()" title="Némítás">🔊</button>
+</div>
+
+<audio id="audio" src="https://cdn1.suno.ai/c05a9b6e-d2c6-4386-871c-6819737f3046.mp3" preload="auto"></audio>
+
+<div class="lyrics-container" id="lyricsContainer"></div>
+
+<div class="scroll-indicator" id="scrollIndicator" onclick="jumpToCurrent()">▼ Aktív sor</div>
+
+<script>
+// ============================================================
+// IDŐBÉLYEGEK (másodperc) – minden sor kezdete
+// Becsült értékek ~140 BPM La Copa de la Vida tempóhoz
+// ============================================================
+const LYRICS = [
+  // [idő, szöveg, osztály]
+  [0.0,  '[Intro]', 'label'],
+  [2.5,  'Alé alé alé!', 'chant'],
+  [5.0,  'Alé alé alé!', 'chant'],
+  [7.5,  'Gólszagló Bajnokság, ma mindenki nyerhet!', 'chant'],
+  [11.0, 'Alé alé alé!', 'chant'],
+
+  [14.0, '[Verse 1]', 'label'],
+  [16.0, 'Berci felkel reggel, már tudja mit tippel,', ''],
+  [20.0, 'Dávid meg a laptopján elemez egész éjjel,', ''],
+  [24.0, 'Fercsik azt mondja: kettő, ez már biztos nyerő,', ''],
+  [28.0, 'Huszár Marci kicsit hangos — de az X a kedvező!', ''],
+
+  [33.0, '[Pre-Chorus]', 'label'],
+  [35.0, 'Kovács Gábor számol, Kult az admin pultnál,', ''],
+  [39.0, 'Laci X-et tippel, mint mindig, minden fordulónál!', ''],
+  [43.0, 'Lesznik Tomi mondja: egy, a hazai nyeri,', ''],
+  [47.0, 'Levi és Papp Lajos egymással vitázik itt!', ''],
+
+  [52.0, '[Chorus]', 'label'],
+  [54.0, 'Alé alé alé!', 'chant'],
+  [56.5, 'Tippelj most, ez a mi játékunk ma!', ''],
+  [60.0, 'Alé alé alé!', 'chant'],
+  [62.5, 'Hetvenkét meccs — teglarol-teglara!', ''],
+  [66.0, 'Uno dos tres — add le most a tipped!', ''],
+  [69.5, 'Ez a nyár a miénk — senki meg ne ijedjen!', ''],
+  [73.5, 'Alé alé alé!', 'chant'],
+
+  [78.0, '[Verse 2]', 'label'],
+  [80.0, 'Robi mindig késve küldi el a tippjét,', ''],
+  [84.0, 'Szabó József V. fogad — és sosem a nyerőre,', ''],
+  [88.0, 'Szentgyörgyvölgyi Márton statisztikát nézget,', ''],
+  [92.0, 'Temesi Csabi mondja: srácok, ez nem kérdés!', ''],
+
+  [97.0, '[Pre-Chorus]', 'label'],
+  [99.0, 'Toma Dávid csendben mindig eltalálja,', ''],
+  [103.0,'Török Bence hangos — de a ranglista mást mutatja!', ''],
+  [107.0,'Zsófi az egyetlen lány — ő vezeti a táblát,', ''],
+  [111.0,'Mindenki tippeljen — ne hagyjátok a csatát!', ''],
+
+  [116.0,'[Chorus]', 'label'],
+  [118.0,'Alé alé alé!', 'chant'],
+  [120.5,'Tippelj most, ez a mi játékunk ma!', ''],
+  [124.0,'Alé alé alé!', 'chant'],
+  [126.5,'Hetvenkét meccs — teglarol-teglara!', ''],
+  [130.0,'Uno dos tres — add le most a tipped!', ''],
+  [133.5,'Ez a nyár a miénk — senki meg ne ijedjen!', ''],
+  [137.5,'Alé alé alé!', 'chant'],
+
+  [142.0,'[Bridge]', 'label'],
+  [144.0,'Berci! Dávid! Fercsik! Huszár!', 'bridge'],
+  [147.0,'Gábor, Kult — az admin a sztár!', 'bridge'],
+  [150.0,'Laci, Lesznik, Levi, Papp Lajos!', 'bridge'],
+  [153.0,'Robi, Szabó — minden tipp fontos!', 'bridge'],
+  [156.0,'Szentgyörgyvölgyi, Temesi, Toma!', 'bridge'],
+  [159.0,'Török Bence, Zsófi — ez a csapat, na!', 'bridge'],
+
+  [163.0,'[Final Chorus]', 'label'],
+  [165.0,'Alé alé alé!', 'chant'],
+  [167.5,'Tippelj most, ez a mi játékunk ma!', ''],
+  [171.0,'Alé alé alé!', 'chant'],
+  [173.5,'Hetvenkét meccs — teglarol-teglara!', ''],
+  [177.0,'Uno dos tres — add le most a tipped!', ''],
+  [180.5,'Ez a nyár a miénk — Gólszagló Bajnokság!', ''],
+  [184.5,'Alé alé alé!', 'chant'],
+  [187.5,'Alé alé alé!', 'chant'],
+
+  [192.0,'[Outro]', 'label'],
+  [194.0,'Gólszagló... Gólszagló...', ''],
+  [198.0,'Teglarol-teglara...', ''],
+];
+
+// ============================================================
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('playBtn');
+const progressFill = document.getElementById('progressFill');
+const timeNow = document.getElementById('timeNow');
+const timeTot = document.getElementById('timeTot');
+const container = document.getElementById('lyricsContainer');
+const scrollInd = document.getElementById('scrollIndicator');
+
+let autoScroll = true;
+let currentLineIdx = -1;
+
+// Sor elemek felépítése
+const lineEls = [];
+LYRICS.forEach(function(l, i) {
+  var text = l[1];
+  var cls = l[2];
+  if(cls === 'label') {
+    var div = document.createElement('div');
+    div.className = 'lyric-block';
+    var label = document.createElement('div');
+    label.className = 'lyric-label';
+    label.textContent = text;
+    div.appendChild(label);
+    // Következő nem-label sorokat ide gyűjtjük
+    container.appendChild(div);
+    lineEls.push({el: null, block: div, type: 'label'});
+  } else {
+    // Hozzáadjuk az utolsó blockhoz
+    var lastBlock = container.lastElementChild;
+    if(!lastBlock || !lastBlock.classList.contains('lyric-block')) {
+      lastBlock = document.createElement('div');
+      lastBlock.className = 'lyric-block';
+      container.appendChild(lastBlock);
+    }
+    var span = document.createElement('span');
+    span.className = 'lyric-line' + (cls ? ' '+cls : '');
+    span.textContent = text;
+    lastBlock.appendChild(span);
+    lineEls.push({el: span, type: 'line', cls: cls});
+  }
+});
+
+function fmt(s) {
+  var m = Math.floor(s/60);
+  var sec = Math.floor(s%60);
+  return m+':'+(sec<10?'0':'')+sec;
+}
+
+function togglePlay() {
+  if(audio.paused) {
+    audio.play();
+  } else {
+    audio.pause();
+  }
+}
+function toggleMute() {
+  audio.muted = !audio.muted;
+  document.getElementById('volBtn').textContent = audio.muted ? '🔇' : '🔊';
+}
+function seekTo(e) {
+  var bg = document.getElementById('progressBg');
+  var rect = bg.getBoundingClientRect();
+  var pct = (e.clientX - rect.left) / rect.width;
+  if(audio.duration) audio.currentTime = pct * audio.duration;
+}
+
+audio.addEventListener('play', function(){ playBtn.textContent = '⏸'; });
+audio.addEventListener('pause', function(){ playBtn.textContent = '▶'; });
+audio.addEventListener('loadedmetadata', function(){
+  timeTot.textContent = fmt(audio.duration);
+});
+
+audio.addEventListener('timeupdate', function() {
+  var t = audio.currentTime;
+  var dur = audio.duration || 1;
+  progressFill.style.width = (t/dur*100)+'%';
+  timeNow.textContent = fmt(t);
+  updateLyrics(t);
+});
+
+function updateLyrics(t) {
+  var newIdx = -1;
+  for(var i = LYRICS.length-1; i >= 0; i--) {
+    if(LYRICS[i][2] !== 'label' && t >= LYRICS[i][0]) {
+      newIdx = i;
+      break;
+    }
+  }
+  if(newIdx === currentLineIdx) return;
+  currentLineIdx = newIdx;
+
+  lineEls.forEach(function(l, i) {
+    if(!l.el) return;
+    l.el.classList.remove('active','past');
+    if(i === newIdx) {
+      l.el.classList.add('active');
+    } else if(LYRICS[i][0] < t) {
+      l.el.classList.add('past');
+    }
+  });
+
+  // Auto-scroll az aktív sorhoz
+  if(newIdx >= 0 && lineEls[newIdx] && lineEls[newIdx].el && autoScroll) {
+    lineEls[newIdx].el.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+// Ha a user görget, kikapcsoljuk az auto-scrollt és mutatjuk az "Aktív sor" gombot
+var scrollTimeout;
+window.addEventListener('scroll', function(){
+  clearTimeout(scrollTimeout);
+  autoScroll = false;
+  scrollInd.classList.add('show');
+  scrollTimeout = setTimeout(function(){
+    autoScroll = true;
+    scrollInd.classList.remove('show');
+  }, 4000);
+});
+
+function jumpToCurrent() {
+  autoScroll = true;
+  scrollInd.classList.remove('show');
+  if(currentLineIdx >= 0 && lineEls[currentLineIdx] && lineEls[currentLineIdx].el) {
+    lineEls[currentLineIdx].el.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+</script>
+</body>
+</html>
