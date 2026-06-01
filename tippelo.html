@@ -2580,18 +2580,16 @@ function renderUserBar() {
   if(musicBtn) musicBtn.style.display = canSeeMusic ? 'inline-flex' : 'none';
   if(karaokeBtn) karaokeBtn.style.display = canSeeMusic ? 'inline-flex' : 'none';
 
-  // VIP welcome: ha VIP és még nem látta ezt a sessionben
-  if(isVipUser(meSafe) && !sessionStorage.getItem('vipWelcomeSent_'+meSafe)) {
-    sessionStorage.setItem('vipWelcomeSent_'+meSafe, '1');
+  // VIP/Admin welcome: csak egyszer az életben (localStorage)
+  var isVipOrAdmin = isVipUser(meSafe) || isAdminUnlocked || isHardcodeAdmin(currentUser);
+  var welcomeKey = 'musicWelcome_'+meSafe;
+  if(isVipOrAdmin && !localStorage.getItem(welcomeKey)) {
+    localStorage.setItem(welcomeKey, '1');
     setTimeout(function(){
-      // Chat drawer megnyitása
       openChat();
-      // Rendszer üzenet a chat inputba
       var msg = 'Kedves VIP támogató, elsőként hallhatod a csoport dalát. Indítsd el a dalt vagy navigálj a karaoke ikonra hogy énekelhesd is szöveggel együtt. 🙏';
       var inp = document.getElementById('drawerInput') || document.getElementById('chatInput');
       if(inp){ inp.value = msg; inp.focus(); }
-      // Toast üzenet is
-      showToast('🎵 VIP köszöntő elküldve!');
     }, 800);
   }
 
