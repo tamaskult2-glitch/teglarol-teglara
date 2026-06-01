@@ -1163,9 +1163,9 @@ footer a:hover{color:var(--gold);}
       style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"
       title="Használati útmutató">?</button>
     <button id="musicBtn" onclick="toggleMusic()" title="Alé Alé Gólszagló 🎵"
-      style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;">🎵</button>
-    <a href="karaoke.html" target="_blank" title="Karaoke nézet"
-      style="background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);color:rgba(245,197,24,0.6);border-radius:50%;width:28px;height:28px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;transition:all 0.2s;">🎤</a>
+      style="display:none;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;align-items:center;justify-content:center;transition:all 0.2s;">🎵</button>
+    <a id="karaokeBtn" href="karaoke.html" target="_blank" title="Karaoke nézet"
+      style="display:none;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);color:rgba(245,197,24,0.6);border-radius:50%;width:28px;height:28px;font-size:13px;cursor:pointer;align-items:center;justify-content:center;text-decoration:none;transition:all 0.2s;">🎤</a>
     <audio id="bgMusic" src="https://cdn1.suno.ai/c05a9b6e-d2c6-4386-871c-6819737f3046.mp3" preload="none" loop></audio>
     <button onclick="document.getElementById('supportModal').style.display='flex';if(typeof loadSupportAmount==='function')loadSupportAmount();if(typeof initSupportQR==='function')initSupportQR();"
       style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#CE2939,#a01020);color:white;border:none;border-radius:12px;padding:8px 16px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 14px rgba(0,0,0,0.35);transition:transform 0.2s;"
@@ -2572,6 +2572,29 @@ function renderUserBar() {
   if(!currentUser){c.innerHTML='';return;}
   const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
   const meSafe = fbSafeName(currentUser);
+
+  // Zene gombok: csak admin és VIP látja
+  var canSeeMusic = isAdminUnlocked || isHardcodeAdmin(currentUser) || isVipUser(meSafe);
+  var musicBtn = document.getElementById('musicBtn');
+  var karaokeBtn = document.getElementById('karaokeBtn');
+  if(musicBtn) musicBtn.style.display = canSeeMusic ? 'inline-flex' : 'none';
+  if(karaokeBtn) karaokeBtn.style.display = canSeeMusic ? 'inline-flex' : 'none';
+
+  // VIP welcome: ha VIP és még nem látta ezt a sessionben
+  if(isVipUser(meSafe) && !sessionStorage.getItem('vipWelcomeSent_'+meSafe)) {
+    sessionStorage.setItem('vipWelcomeSent_'+meSafe, '1');
+    setTimeout(function(){
+      // Chat drawer megnyitása
+      openChat();
+      // Rendszer üzenet a chat inputba
+      var msg = 'Kedves VIP támogató, elsőként hallhatod a csoport dalát. Indítsd el a dalt vagy navigálj a karaoke ikonra hogy énekelhesd is szöveggel együtt. 🙏';
+      var inp = document.getElementById('drawerInput') || document.getElementById('chatInput');
+      if(inp){ inp.value = msg; inp.focus(); }
+      // Toast üzenet is
+      showToast('🎵 VIP köszöntő elküldve!');
+    }, 800);
+  }
+
   c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}${userBadges(meSafe)}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
 }
 
