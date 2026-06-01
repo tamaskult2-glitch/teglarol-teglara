@@ -47,6 +47,8 @@ header{position:relative;overflow:hidden;text-align:center;padding:32px 20px 24p
   to   { transform:rotate(360deg) translateX(140px) rotate(-360deg); }
 }
 
+@keyframes giftPulse{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.1) rotate(3deg)}}
+
 /* CUSTOM MECCS MODAL */
 .cm-label{font-size:10px;color:rgba(240,244,240,0.4);font-family:'Oswald',sans-serif;letter-spacing:0.5px;margin-bottom:3px;}
 .cm-inp{width:100%;box-sizing:border-box;padding:7px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:'Oswald',sans-serif;font-size:12px;}
@@ -1330,6 +1332,17 @@ footer a:hover{color:var(--gold);}
       <div id="adminUserList"><div style="font-size:12px;color:rgba(240,244,240,0.3);">Betöltés...</div></div>
     </div>
 
+    <!-- ZENE KÖZZÉTÉTEL -->
+    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.2);border-radius:10px;">
+      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">🎵 DAL KÖZZÉTÉTELE</div>
+      <div style="font-size:12px;color:rgba(240,244,240,0.45);margin-bottom:10px;">Ha engedélyezed, mindenki látja a 🎵 és 🎤 gombokat és megjelenik a welcome popup.</div>
+      <div id="musicPublicStatus" style="margin-bottom:8px;font-size:12px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="setMusicPublic(true)" style="padding:7px 14px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);color:#4ade80;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">✅ Mindenki látja</button>
+        <button onclick="setMusicPublic(false)" style="padding:7px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#ef4444;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔒 Csak VIP/Admin</button>
+      </div>
+    </div>
+
     <!-- PRO TÁMOGATÓK -->
     <div style="margin-bottom:16px;padding:12px 14px;background:rgba(206,41,57,0.08);border:1px solid rgba(206,41,57,0.25);border-radius:10px;">
       <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">⭐ PRO TÁMOGATÓK</div>
@@ -1611,6 +1624,7 @@ let currentUser = localStorage.getItem(LS_SESSION) || null;
 let allTips={}, allResults={}, allScores={}, allEtResults={}, allPenResults={};
 let allProUsers=[];  // fbSafeNames listája (Firebase: tipp2026/proUsers)
 let allVipUsers=[];  // fbSafeNames listája (Firebase: tipp2026/vipUsers)
+let musicPublic=false; // Firebase: tipp2026/musicPublic — mindenki látja a dalt
 let isAdminUnlocked=false, activeTab='meccsek';
 let _scoreSaving=false; // renderMatches blokk amíg score mentés folyamatban
 
@@ -1632,7 +1646,7 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw] = await Promise.all([
+    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
@@ -1641,6 +1655,7 @@ async function pollData() {
       fbGet('proUsers').catch(function(){return null;}),
       fbGet('vipUsers').catch(function(){return null;}),
       fbGet('customMatches').catch(function(){return null;}),
+      fbGet('musicPublic').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -1662,6 +1677,7 @@ async function pollData() {
     if(Array.isArray(customRaw)) custom=customRaw.filter(Boolean);
     else if(customRaw && typeof customRaw==='object') custom=Object.values(customRaw).filter(Boolean);
     mergeCustomMatches(custom);
+    musicPublic = !!musicPublicRaw;
     setStatus('online','Szinkronizálva');
     renderAll();
   } catch(e) {
@@ -1705,6 +1721,15 @@ function setStatus(s,msg) {
 setStatus('online','Szinkronizálva');
 
 // ===== ZENE =====
+function showMusicWelcome() {
+  var m = document.getElementById('musicWelcomeModal');
+  if(m) m.style.display = 'flex';
+}
+function closeMusicWelcome() {
+  var m = document.getElementById('musicWelcomeModal');
+  if(m) m.style.display = 'none';
+}
+
 function toggleMusic() {
   var audio = document.getElementById('bgMusic');
   var btn = document.getElementById('musicBtn');
@@ -2573,24 +2598,19 @@ function renderUserBar() {
   const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
   const meSafe = fbSafeName(currentUser);
 
-  // Zene gombok: csak admin és VIP látja
-  var canSeeMusic = isAdminUnlocked || isHardcodeAdmin(currentUser) || isVipUser(meSafe);
+  // Zene gombok: admin, VIP, vagy ha mindenki számára engedélyezve
+  var canSeeMusic = musicPublic || isAdminUnlocked || isHardcodeAdmin(currentUser) || isVipUser(meSafe);
   var musicBtn = document.getElementById('musicBtn');
   var karaokeBtn = document.getElementById('karaokeBtn');
   if(musicBtn) musicBtn.style.display = canSeeMusic ? 'inline-flex' : 'none';
   if(karaokeBtn) karaokeBtn.style.display = canSeeMusic ? 'inline-flex' : 'none';
 
-  // VIP/Admin welcome: csak egyszer az életben (localStorage)
-  var isVipOrAdmin = isVipUser(meSafe) || isAdminUnlocked || isHardcodeAdmin(currentUser);
+  // Welcome popup: admin, VIP, vagy ha musicPublic — csak egyszer (localStorage)
+  var isVipOrAdmin = musicPublic || isVipUser(meSafe) || isAdminUnlocked || isHardcodeAdmin(currentUser);
   var welcomeKey = 'musicWelcome_'+meSafe;
   if(isVipOrAdmin && !localStorage.getItem(welcomeKey)) {
     localStorage.setItem(welcomeKey, '1');
-    setTimeout(function(){
-      openChat();
-      var msg = 'Kedves VIP támogató, elsőként hallhatod a csoport dalát. Indítsd el a dalt vagy navigálj a karaoke ikonra hogy énekelhesd is szöveggel együtt. 🙏';
-      var inp = document.getElementById('drawerInput') || document.getElementById('chatInput');
-      if(inp){ inp.value = msg; inp.focus(); }
-    }, 800);
+    setTimeout(showMusicWelcome, 800);
   }
 
   c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}${userBadges(meSafe)}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
@@ -2935,7 +2955,26 @@ function renderAdminUsers() {
   + '<div style="font-size:10px;color:rgba(240,244,240,0.2);margin-top:6px;">* = első tipp dátuma (nincs Firebase regisztrációs adat)</div>';
 }
 
+async function setMusicPublic(val) {
+  try {
+    await fbSet('musicPublic', val ? true : null);
+    musicPublic = val;
+    showToast(val ? '🎵 Dal közzétéve mindenki számára!' : '🔒 Dal visszavonva (csak VIP/Admin)');
+    renderMusicPublicStatus();
+    renderAll();
+  } catch(e) { showToast('❌ Firebase hiba!'); }
+}
+
+function renderMusicPublicStatus() {
+  var el = document.getElementById('musicPublicStatus');
+  if(!el) return;
+  el.innerHTML = musicPublic
+    ? '<span style="color:#4ade80;">✅ Jelenleg: mindenki látja</span>'
+    : '<span style="color:rgba(239,68,68,0.7);">🔒 Jelenleg: csak VIP és Admin</span>';
+}
+
 function renderAdminMatches() {
+  try { renderMusicPublicStatus(); } catch(e){}
   try { loadAdminUsers(); } catch(e){}
   try { renderProAdmin(); } catch(e){}
   try { renderVipAdmin(); } catch(e){}
@@ -4195,6 +4234,26 @@ function toggleDayGroup(groupId, storageKey) {
       <button onclick="closeCustomMatchModal()" style="padding:8px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(240,244,240,0.6);border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;">Mégse</button>
       <button onclick="saveCustomMatch()" style="padding:8px 16px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.4);color:var(--gold);border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">💾 MENTÉS</button>
     </div>
+  </div>
+</div>
+<!-- VIP ZENE WELCOME POPUP -->
+<div id="musicWelcomeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:300;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeMusicWelcome()">
+  <div style="background:linear-gradient(160deg,#0f2a12,#163019);border:1px solid rgba(245,197,24,0.35);border-radius:20px;padding:32px 24px 28px;width:100%;max-width:360px;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <button onclick="closeMusicWelcome()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(240,244,240,0.35);font-size:20px;cursor:pointer;line-height:1;">✕</button>
+    <!-- Ajándék logo -->
+    <div style="font-size:52px;margin-bottom:8px;filter:drop-shadow(0 4px 12px rgba(245,197,24,0.4));animation:giftPulse 2s ease-in-out infinite;">🎁</div>
+    <div style="font-family:'Oswald',sans-serif;font-weight:900;font-size:16px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Meglepetés!</div>
+    <div style="font-family:'Oswald',sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:1px;margin-bottom:18px;">VIP TÁMOGATÓ ELŐNY</div>
+    <div style="font-size:14px;line-height:1.65;color:rgba(240,244,240,0.85);margin-bottom:22px;">
+      Kedves VIP támogató, elsőként hallhatod a csoport dalát.<br><br>
+      Indítsd el a <strong style="color:var(--gold);">🎵</strong> gombbal vagy navigálj a <strong style="color:var(--gold);">🎤</strong> karaoke ikonra, hogy énekelhesd is szöveggel együtt.
+      <span style="font-size:16px;">🙏</span>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="closeMusicWelcome();toggleMusic()" style="padding:10px 18px;background:var(--gold);color:#0a1c0c;border:none;border-radius:10px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;">🎵 Lejátszás</button>
+      <button onclick="closeMusicWelcome();window.open('karaoke.html','_blank')" style="padding:10px 18px;background:rgba(245,197,24,0.12);color:var(--gold);border:1px solid rgba(245,197,24,0.35);border-radius:10px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;">🎤 Karaoke</button>
+    </div>
+    <button onclick="closeMusicWelcome()" style="margin-top:14px;background:none;border:none;color:rgba(240,244,240,0.3);font-size:12px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:0.5px;">Bezárás</button>
   </div>
 </div>
 
