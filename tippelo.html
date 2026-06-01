@@ -39,48 +39,14 @@ header{position:relative;overflow:hidden;text-align:center;padding:32px 20px 24p
 @keyframes trophyFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.035)}}
 
 /* KÖRÖZŐ GYŐZTES MOLINÓ */
-.winner-orbit-wrap {
-  display:none;
-  position:relative;
-  width:100%;
-  height:60px;
-  margin:6px auto 0;
-  pointer-events:none;
-}
-.winner-orbit-wrap.show { display:block; }
-.winner-orbit-item {
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:max-content;
-  transform-origin:0 0;
-  animation:orbitSpin 7s linear infinite;
-  white-space:nowrap;
-}
-.winner-orbit-item.rev {
-  animation-direction:reverse;
-  animation-duration:9s;
-}
-@keyframes orbitSpin {
-  from { transform:rotate(0deg) translateX(140px) rotate(0deg); }
+
+
+
+
+
   to   { transform:rotate(360deg) translateX(140px) rotate(-360deg); }
 }
-.winner-orbit-pill {
-  background:linear-gradient(90deg,rgba(245,197,24,0.18),rgba(245,197,24,0.28));
-  border:1px solid rgba(245,197,24,0.5);
-  border-radius:20px;
-  padding:3px 10px;
-  font-family:'Oswald',sans-serif;
-  font-size:11px;
-  font-weight:700;
-  color:var(--gold);
-  letter-spacing:1px;
-  text-transform:uppercase;
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  box-shadow:0 0 8px rgba(245,197,24,0.25);
-}
+
 /* CUSTOM MECCS MODAL */
 .cm-label{font-size:10px;color:rgba(240,244,240,0.4);font-family:'Oswald',sans-serif;letter-spacing:0.5px;margin-bottom:3px;}
 .cm-inp{width:100%;box-sizing:border-box;padding:7px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:'Oswald',sans-serif;font-size:12px;}
@@ -1186,15 +1152,7 @@ footer a:hover{color:var(--gold);}
     <path d="M43 40 q-4 28 8 48" fill="none" stroke="#fff" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
   </svg>
   <h1>FIFA World Cup 2026</h1>
-  <!-- BL győztes köröző molinó -->
-  <div class="winner-orbit-wrap" id="winnerOrbit">
-    <div class="winner-orbit-item">
-      <div class="winner-orbit-pill">🏆 <span id="orbitName">–</span> · BL győztes tippelő 🎉</div>
-    </div>
-    <div class="winner-orbit-item rev">
-      <div class="winner-orbit-pill">⚽ 1:1 · PSG · 11-esek 🥅</div>
-    </div>
-  </div>
+</div>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
   <div style="margin-top:10px;">
@@ -1224,7 +1182,8 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')" id="navAdmin">🔐 Admin</button>
-  <button class="nav-tab" id="navEmob" onclick="showTab('emob')">🏭 E-mob Foci</button>
+  <button class="nav-tab" onclick="showTab('bl')">🏆 BL</button>
+  <button class="nav-tab" id="navEmob" onclick="showTab('emob')">🏭 E-mob</button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
 </div>
 
@@ -1414,6 +1373,11 @@ footer a:hover{color:var(--gold);}
       <div class="section-header" style="margin-top:16px;"><h2>⚙️ Eredmény rögzítés</h2></div>
       <div id="adminMatchList"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
     </div>
+  </div>
+
+  <!-- BL TAB -->
+  <div id="tab-bl" style="display:none;">
+    <div id="blMatchContainer"></div>
   </div>
 
   <!-- OPL TAB -->
@@ -1853,13 +1817,14 @@ async function clearTip(mid) {
 
 function showTab(t) {
   activeTab=t;
-  ['meccsek','tippek','ranglista','admin','opl','emob'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
+  ['meccsek','tippek','ranglista','admin','opl','emob','bl'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
   if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
   if(t==='opl') oplLoad();
   if(t==='emob') renderEmobTab();
+  if(t==='bl') renderBLTab();
   try { renderMatchdayBanner(); } catch(e){}
 }
 
@@ -2433,18 +2398,21 @@ function renderAll() {
   try { if(activeTab==='ranglista') renderLeaderboard(); } catch(e){}
   try { if(activeTab==='tippek') buildTippTable(); } catch(e){}
   try { if(activeTab==='admin'&&isAdminUnlocked) renderAdminMatches(); } catch(e){}
-  try { checkBLWinner(); } catch(e){}
   try { renderMatchdayBanner(); } catch(e){}
   try { loadVbPoll(); } catch(e){}
   try { renderLoginWarning(); } catch(e){}
+  if(activeTab==='bl') try { renderBLTab(); } catch(e){}
 }
 
 
 function renderMatches() {
   const container=document.getElementById('matchesContainer');
-  // E-mob meccsek (TEST1 + CM_ isEmob) nem jelennek meg a fő listában
+  // BL, E-mob (TEST1 + CM_ isEmob) nem jelennek meg a fő listában
   const mainMatches = ALL_MATCHES.filter(function(m){
-    return m.id !== 'TEST1' && !(m.isEmob) && !(m.id.startsWith('CM_') && (m.group==='🏭' || (m.title&&m.title.indexOf('E-mob')>=0)));
+    return m.id !== 'TEST1' && m.id !== 'BL2026'
+      && !(m.group === '⭐BL')
+      && !(m.isEmob)
+      && !(m.id.startsWith('CM_') && (m.group==='🏭' || (m.title&&m.title.indexOf('E-mob')>=0)));
   });
   const dates=[...new Set(mainMatches.map(m=>m.huDate))].sort();
   let html='';
@@ -3288,44 +3256,6 @@ function closeOnboard() {
 
 
 // ===== GYŐZTES BANNER =====
-function checkBLWinner() {
-  var result = allResults['BL2026'];
-  if(!result) return; // Még nincs eredmény
-
-  var mt = allTips['BL2026'] || {};
-  var realScore = allScores['BL2026'] || null;
-
-  // Gyűjtjük a helyes tippelőket
-  var exact = [];   // pontos eredményt eltalálták
-  var correct = []; // kimenetet eltalálták
-
-  Object.keys(mt).forEach(function(u) {
-    var tip = mt[u];
-    var o = getTipOutcome(tip);
-    var s = getTipScore(tip);
-    if(!o) return;
-    var isExact = s && realScore && (s.h+':'+s.a === realScore);
-    var isHit = o === result;
-    if(isExact) exact.push({name:u, score:s.h+':'+s.a});
-    else if(isHit) correct.push({name:u});
-  });
-
-  var orbit = document.getElementById('winnerOrbit');
-  var orbitName = document.getElementById('orbitName');
-
-  if(exact.length > 0) {
-    var w = exact[0];
-    var label = exact.length > 1 ? w.name + ' +' + (exact.length-1) : w.name;
-    if(orbitName) orbitName.textContent = label;
-    if(orbit) orbit.classList.add('show');
-  } else if(correct.length > 0) {
-    var label2 = correct.length === 1 ? correct[0].name : correct.map(function(x){return x.name;}).join(' & ');
-    if(orbitName) orbitName.textContent = label2;
-    if(orbit) orbit.classList.add('show');
-  } else {
-    if(orbit) orbit.classList.remove('show');
-  }
-}
 
 // Belépéskori figyelmeztetés: mai meccsekre nem tippelt
 function renderLoginWarning() {
@@ -3512,6 +3442,59 @@ async function saveEmobMatch() {
   document.getElementById('emobApplyBtn').style.display='none';
   renderEmobMatches();
   showToast('✅ E-mob meccs mentve!');
+}
+
+// ===== BL TAB =====
+function renderBLTab() {
+  var container = document.getElementById('blMatchContainer');
+  if(!container) return;
+  var blMatches = ALL_MATCHES.filter(function(m){ return m.group === '⭐BL' || m.id === 'BL2026'; });
+  if(!blMatches.length){
+    container.innerHTML = '<div style="text-align:center;padding:40px;font-family:Oswald,sans-serif;font-size:13px;color:rgba(240,244,240,0.3);">Nincs BL meccs</div>';
+    return;
+  }
+  var html = '<div class="section-header" style="margin-top:16px;"><h2>🏆 Bajnokok Ligája</h2></div>';
+  blMatches.forEach(function(m){
+    var result = allResults[m.id]||null;
+    var score = allScores[m.id]||null;
+    var myTip = currentUser && allTips[m.id] ? allTips[m.id][fbSafeName(currentUser)] : null;
+    var myOut = getTipOutcome(myTip);
+    var kickoffLocked = isKickoffPassed(m.huDate, m.huTime);
+    var cardLocked = result || kickoffLocked;
+    var tips = allTips[m.id]||{};
+    var cnt={'1':0,'X':0,'2':0};
+    Object.values(tips).forEach(function(t){ var o=getTipOutcome(t); if(o&&cnt[o]!==undefined) cnt[o]++; });
+    var total=cnt['1']+cnt['X']+cnt['2'];
+    function bc(v,cls){ var b='tip-btn '+cls; if(myOut===v){b+=result?(result===v?' correct':' sel wrong-sel'):' sel';}else if(result===v) b+=' cr-result'; return b; }
+    html += '<div class="match-card'+(result?' has-result':'')+(cardLocked?' locked':'')+'" id="mc_'+m.id+'">';
+    html += '<div class="match-meta"><span class="time-tag">'+m.huTime+'</span>';
+    html += '<span class="grp-tag" style="background:rgba(201,162,39,0.2);color:#c9a227;border:1px solid rgba(201,162,39,0.4);font-size:10px;">🏆 BL Döntő</span>';
+    html += '<span style="margin-left:auto;color:rgba(240,244,240,0.25);">'+(m.venue||'')+'</span>';
+    if((m.homeLineup&&m.homeLineup.length)||kickoffLocked) html += '<button onclick="showLineup(\''+m.id+'\')" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:var(--gold);border-radius:6px;padding:1px 8px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;letter-spacing:0.5px;">⚽ kezdők</button>';
+    if(total>0) html += '<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>';
+    if(kickoffLocked&&!result) html += '<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>';
+    if(result) html += '<span style="font-size:9px;color:rgba(245,197,24,0.6);background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>';
+    html += '</div>';
+    if(m.title) html += '<div style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.5);letter-spacing:1.5px;padding:6px 0 0;">'+escHtml(m.title)+'</div>';
+    html += '<div class="match-body"><div class="match-teams-row">';
+    html += '<div class="team-blk">'+getTeamBadge(m.homeFlag,m.home)+'<div class="tn-wrap"><span class="tn">'+escHtml(m.home)+'</span></div></div>';
+    html += '<span class="vs-block">VS</span><span class="sc-block" style="visibility:hidden">–</span>';
+    html += '<div class="team-blk away-blk">'+getTeamBadge(m.awayFlag,m.away)+'<div class="tn-wrap"><span class="tn">'+escHtml(m.away)+'</span></div></div></div>';
+    html += '<div class="tip-buttons">';
+    html += '<button class="'+bc('1','hb')+'" onclick="submitTip(\''+m.id+'\',\'1\')"><span class="tl">1</span><span class="tc">'+(cnt['1']>0?(cnt['1']+'×'):'')+'</span></button>';
+    html += '<button class="'+bc('X','db')+'" onclick="submitTip(\''+m.id+'\',\'X\')"><span class="tl">X</span><span class="tc">'+(cnt['X']>0?(cnt['X']+'×'):'')+'</span></button>';
+    html += '<button class="'+bc('2','ab')+'" onclick="submitTip(\''+m.id+'\',\'2\')"><span class="tl">2</span><span class="tc">'+(cnt['2']>0?(cnt['2']+'×'):'')+'</span></button>';
+    if(myTip && !cardLocked) html += '<button onclick="clearTip(\''+m.id+'\')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;">⌫</button>';
+    html += '</div>';
+    html += buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked);
+    html += isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : '';
+    html += '</div></div>';
+  });
+  // VB poll a BL tab alján
+  html += '<div id="blTabPoll" style="margin-top:14px;"></div>';
+  container.innerHTML = html;
+  // BL poll renderelése
+  try { initBLPoll(); } catch(e){}
 }
 
 // ===== VB SZUPERPOLL =====
