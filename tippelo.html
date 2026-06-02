@@ -1156,6 +1156,7 @@ footer a:hover{color:var(--gold);}
   <h1>FIFA World Cup 2026</h1>
 </div>
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
+  <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
   <div style="margin-top:10px;">
     
@@ -1721,10 +1722,52 @@ function setStatus(s,msg) {
 
 setStatus('online','Szinkronizálva');
 
+// ===== VB VISSZASZÁMLÁLÓ =====
+(function() {
+  var VB_START = new Date('2026-06-11T21:00:00+02:00'); // első meccs Budapest idő
+  var el = document.getElementById('vbCountdown');
+  if(!el) return;
+
+  function unit(n, label) {
+    return '<div style="display:flex;flex-direction:column;align-items:center;min-width:38px;">'
+      +'<span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:900;color:var(--gold);line-height:1;text-shadow:0 0 12px rgba(245,197,24,0.4);">'+String(n).padStart(2,'0')+'</span>'
+      +'<span style="font-family:Oswald,sans-serif;font-size:9px;color:rgba(245,197,24,0.5);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;">'+label+'</span>'
+      +'</div>';
+  }
+  function sep() {
+    return '<span style="font-family:Oswald,sans-serif;font-size:20px;color:rgba(245,197,24,0.35);font-weight:900;margin-bottom:10px;">:</span>';
+  }
+
+  function tick() {
+    var now = new Date();
+    var diff = VB_START - now;
+    if(diff <= 0) {
+      el.innerHTML = '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);letter-spacing:2px;">⚽ A VB ELKEZDŐDÖTT!</span>';
+      return;
+    }
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    el.innerHTML = unit(d,'nap') + sep() + unit(h,'óra') + sep() + unit(m,'perc') + sep() + unit(s,'mp');
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+
 // ===== ZENE =====
 function showMusicWelcome() {
   var m = document.getElementById('musicWelcomeModal');
-  if(m) m.style.display = 'flex';
+  if(!m) return;
+  var safe = currentUser ? fbSafeName(currentUser) : null;
+  var isVipOrAdmin = isVipUser(safe) || isAdminUnlocked || isHardcodeAdmin(currentUser);
+  var greeting = isVipOrAdmin
+    ? 'Kedves VIP támogató, elsőként hallhatod a csoport dalát.'
+    : 'Kedves Felhasználó, hallgasd meg a csoport dalát!';
+  var msgEl = document.getElementById('musicWelcomeMsg');
+  if(msgEl) msgEl.innerHTML = greeting + '<br><br>Indítsd el a <strong style="color:var(--gold);">🎵</strong> gombbal vagy navigálj a <strong style="color:var(--gold);">🎤</strong> karaoke ikonra, hogy énekelhesd is szöveggel együtt. <span style="font-size:16px;">🙏</span>';
+  m.style.display = 'flex';
 }
 function closeMusicWelcome() {
   var m = document.getElementById('musicWelcomeModal');
@@ -4256,7 +4299,7 @@ function toggleDayGroup(groupId, storageKey) {
     <div style="font-size:52px;margin-bottom:8px;filter:drop-shadow(0 4px 12px rgba(245,197,24,0.4));animation:giftPulse 2s ease-in-out infinite;">🎁</div>
     <div style="font-family:'Oswald',sans-serif;font-weight:900;font-size:16px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Meglepetés!</div>
     <div style="font-family:'Oswald',sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:1px;margin-bottom:18px;">VIP TÁMOGATÓ ELŐNY</div>
-    <div style="font-size:14px;line-height:1.65;color:rgba(240,244,240,0.85);margin-bottom:22px;">
+    <div id="musicWelcomeMsg" style="font-size:14px;line-height:1.65;color:rgba(240,244,240,0.85);margin-bottom:22px;">
       Kedves VIP támogató, elsőként hallhatod a csoport dalát.<br><br>
       Indítsd el a <strong style="color:var(--gold);">🎵</strong> gombbal vagy navigálj a <strong style="color:var(--gold);">🎤</strong> karaoke ikonra, hogy énekelhesd is szöveggel együtt.
       <span style="font-size:16px;">🙏</span>
