@@ -258,6 +258,31 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
   opacity:0;transition:opacity 0.2s;
 }
 .chat-fab-badge.show{opacity:1;}
+/* CHAT FAB PIROS PULZÁLÁS */
+.chat-fab.bet-pulse{
+  animation:betPulse 1.6s ease-in-out infinite;
+  box-shadow:0 4px 18px rgba(206,41,57,0.5);
+  border:2px solid #CE2939;
+}
+.chat-fab.bet-pulse::after{
+  content:'Tedd meg a téted!';
+  position:absolute;
+  bottom:110%;
+  left:50%;
+  transform:translateX(-50%);
+  white-space:nowrap;
+  font-family:'Oswald',sans-serif;
+  font-size:10px;
+  color:#CE2939;
+  background:rgba(206,41,57,0.15);
+  border:1px solid rgba(206,41,57,0.3);
+  padding:3px 10px;
+  border-radius:10px;
+  letter-spacing:0.8px;
+  font-weight:700;
+  pointer-events:none;
+}
+@keyframes betPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 
 .chat-drawer{
   display:none;
@@ -1295,6 +1320,8 @@ footer a:hover{color:var(--gold);}
             <span>💬</span>
             <h3>ÉLŐ KOMMENT</h3>
           </div>
+          <!-- TÉT SZAVAZÁS -->
+          <div id="betPollContainer" style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
           <div class="chat-messages" id="chatMessages"></div>
           <div class="chat-input-area">
             <input class="chat-input" id="chatInput" placeholder="Írd a kommented..." maxlength="200" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()">
@@ -1331,6 +1358,13 @@ footer a:hover{color:var(--gold);}
     <div style="margin-bottom:16px;padding:12px 14px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;">
       <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">👥 REGISZTRÁLT FELHASZNÁLÓK</div>
       <div id="adminUserList"><div style="font-size:12px;color:rgba(240,244,240,0.3);">Betöltés...</div></div>
+    </div>
+
+    <!-- NAPI ÖSSZEFOGLALÓ -->
+    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.18);border-radius:10px;">
+      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:6px;letter-spacing:1px;">📊 NAPI ÖSSZEFOGLALÓ</div>
+      <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;">Chatbe küldi az aznapi eredményeket, ranglistavezetőt és pontos tippelőket.</div>
+      <button onclick="sendDaySummary()" style="padding:7px 14px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📊 Összefoglaló küldése</button>
     </div>
 
     <!-- ZENE KÖZZÉTÉTEL -->
@@ -1689,9 +1723,18 @@ async function pollData() {
 }
 async function pollChat() {
   try {
-    const data = await fbGet('chat').catch(()=>null);
+    const [data, reactionsData] = await Promise.all([
+      fbGet('chat').catch(()=>null),
+      fbGet('chatReactions').catch(()=>null),
+    ]);
     if(!data) return;
     const msgs = Object.values(data).sort((a,b)=>a.ts-b.ts);
+    // Reakciók hozzáfűzése az üzenetekhez
+    var reactions = reactionsData || {};
+    msgs.forEach(function(m){
+      var key = m.ts + '_' + fbSafeName(m.name);
+      m.reactions = reactions[key] || {};
+    });
     renderChatFromLS(msgs);
     const cutoff=Date.now()-5*60*1000;
     const active=new Set(msgs.filter(function(m){return m.ts>cutoff&&!m.sys;}).map(function(m){return m.name;}));
@@ -1721,6 +1764,67 @@ function setStatus(s,msg) {
 }
 
 setStatus('online','Szinkronizálva');
+
+// ===== #2: TIPP ELOSZLÁS SÁV (kickoff után) =====
+function buildTipDistBar(cnt, total, result) {
+  var p1=Math.round(cnt['1']/total*100), pX=Math.round(cnt['X']/total*100), p2=Math.round(cnt['2']/total*100);
+  var c1=result==='1'?'#4ade80':'#3b82f6', cX=result==='X'?'#4ade80':'#6b7280', c2=result==='2'?'#4ade80':'#ef4444';
+  return '<div style="display:flex;gap:4px;align-items:center;margin-top:6px;height:16px;border-radius:4px;overflow:hidden;font-family:Oswald,sans-serif;font-size:10px;">'
+    +(p1>0?'<div style="flex:'+p1+';background:'+c1+';color:#0a1c0c;text-align:center;line-height:16px;font-weight:700;min-width:28px;">1 '+p1+'%</div>':'')
+    +(pX>0?'<div style="flex:'+pX+';background:'+cX+';color:#fff;text-align:center;line-height:16px;font-weight:700;min-width:28px;">X '+pX+'%</div>':'')
+    +(p2>0?'<div style="flex:'+p2+';background:'+c2+';color:#fff;text-align:center;line-height:16px;font-weight:700;min-width:28px;">2 '+p2+'%</div>':'')
+    +'</div>';
+}
+
+// ===== #4: STREAK SZÁMLÁLÓ =====
+function getUserStreak(safeName) {
+  // Legutolsó X egymás utáni helyes tipp
+  var matches = ALL_MATCHES.filter(function(m){ return allResults[m.id] && allTips[m.id] && allTips[m.id][safeName]; });
+  matches.sort(function(a,b){ return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime); }); // legújabb előre
+  var streak = 0;
+  for(var i=0; i<matches.length; i++){
+    var m = matches[i];
+    var tip = allTips[m.id][safeName];
+    var o = getTipOutcome(tip);
+    var res = allResults[m.id];
+    if(o === res) streak++;
+    else break;
+  }
+  return streak;
+}
+
+// ===== #3: MVP / BUKTA BADGE =====
+function getWeeklyMvpBukta() {
+  // Utolsó 7 nap meccseiből: legtöbb pontot szerzett = MVP, legkevesebbet = bukta
+  var now = getBudapestToday();
+  var d = new Date(now+'T12:00:00');
+  d.setDate(d.getDate()-7);
+  var weekAgo = d.toISOString().slice(0,10);
+  var weekMatches = ALL_MATCHES.filter(function(m){
+    return m.huDate >= weekAgo && m.huDate <= now && allResults[m.id];
+  });
+  if(!weekMatches.length) return {mvp:null,bukta:null};
+  var pts = {};
+  weekMatches.forEach(function(m){
+    var res = allResults[m.id];
+    var sc = allScores[m.id];
+    if(!allTips[m.id]) return;
+    Object.keys(allTips[m.id]).forEach(function(u){
+      if(!pts[u]) pts[u]=0;
+      var tip = allTips[m.id][u];
+      var o = getTipOutcome(tip);
+      if(o===res){
+        var ts = getTipScore(tip);
+        if(ts && sc && ts.h+':'+ts.a===sc) pts[u]+=3;
+        else pts[u]+=1;
+      }
+    });
+  });
+  var entries = Object.entries(pts);
+  if(!entries.length) return {mvp:null,bukta:null};
+  entries.sort(function(a,b){return b[1]-a[1];});
+  return {mvp:entries[0][0], mvpPts:entries[0][1], bukta:entries[entries.length-1][0], buktaPts:entries[entries.length-1][1]};
+}
 
 // ===== VB VISSZASZÁMLÁLÓ =====
 (function() {
@@ -2492,6 +2596,7 @@ function renderAll() {
   try { renderMatchdayBanner(); } catch(e){}
   try { loadVbPoll(); } catch(e){}
   try { renderLoginWarning(); } catch(e){}
+  try { loadBetPoll(); } catch(e){}
   if(activeTab==='bl') try { renderBLTab(); } catch(e){}
 }
 
@@ -2586,6 +2691,8 @@ function renderMatches() {
               <span class="tc">${cnt['2']>0?(cnt['2']+'×'):''}</span>
             </button>
             ${myTip && !cardLocked ? `<button onclick="clearTip('${m.id}')" title="Tipp törlése" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;line-height:1;margin-left:2px;transition:all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='rgba(239,68,68,0.6)'">⌫</button>` : ''}
+          </div>
+          ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
@@ -2709,7 +2816,8 @@ function renderLeaderboard() {
   sc.sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.tot-a.tot);
   const med=['🥇','🥈','🥉'];
   let html='<div class="lb-list">';
-  sc.forEach((s,i)=>{const me=s.u===currentUser;const adm=isHardcodeAdmin(s.u);html+=`<div class="lb-row r${Math.min(i+1,3)}" style="${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${userBadges(s.u)}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div><div class="lb-sub">${s.tot} tipp · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${s.pend} várja</div></div></div>`;});
+  var wb = getWeeklyMvpBukta();
+  sc.forEach((s,i)=>{const me=s.u===currentUser;const adm=isHardcodeAdmin(s.u);const streak=getUserStreak(s.u);const isMvp=wb.mvp===s.u;const isBukta=wb.bukta===s.u&&wb.bukta!==wb.mvp;html+=`<div class="lb-row r${Math.min(i+1,3)}" style="${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${userBadges(s.u)}${isMvp?' <span title="Heti MVP" style="font-size:12px;">⭐</span>':''}${isBukta?' <span title="Heti bukta" style="font-size:12px;">💀</span>':''}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div><div class="lb-sub">${s.tot} tipp · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${streak>=3?`<span style="color:#f97316">🔥 ${streak}</span> · `:''}${s.pend} várja</div></div></div>`;});
   html+='</div>';
   if(!Object.keys(allResults).length) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ Eredmények után látható a pontszám</div>';
   c.innerHTML=html;
@@ -3279,18 +3387,218 @@ function renderParticipants(msgs) {
 }
 
 function buildChatHtml(msgs) {
-  // Csak valódi szöveges üzenetek (sys=false)
   var textMsgs = msgs.filter(function(m){ return !m.sys; });
   if(!textMsgs.length) return '<div class="chat-msg system">Légy az első kommentelő! ⚽</div>';
-  return textMsgs.slice(-40).map(function(m){
+  return textMsgs.slice(-40).map(function(m, idx){
     var isMe=m.name===currentUser;
     var time=new Date(m.ts).toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
     var nameBadge = userBadges(fbSafeName(m.name));
-    return '<div class="chat-msg"><div class="msg-bubble'+(isMe?' own':'')+'"><div class="msg-name'+(isMe?' own-name':'')+'">'+m.name+nameBadge+'</div><div class="msg-text">'+escHtml(m.text)+'</div><div class="msg-time">'+time+'</div></div></div>';
+    var msgKey = m.ts + '_' + fbSafeName(m.name);
+    // Reakciók
+    var reactions = m.reactions || {};
+    var rHtml = '<div class="msg-reactions" data-key="'+escHtml(msgKey)+'">';
+    ['👍','😂','🔥'].forEach(function(emoji){
+      var users = reactions[emoji] || {};
+      var count = Object.keys(users).length;
+      var meSafe = currentUser ? fbSafeName(currentUser) : '';
+      var iReacted = users[meSafe];
+      rHtml += '<button onclick="toggleReaction(\''+escHtml(msgKey)+'\',\''+emoji+'\')" class="react-btn'+(iReacted?' reacted':'')+'" style="font-size:12px;padding:1px 6px;background:rgba(255,255,255,'+(iReacted?'0.12':'0.04')+');border:1px solid rgba(255,255,255,'+(iReacted?'0.2':'0.08')+');border-radius:10px;cursor:pointer;color:rgba(240,244,240,0.6);margin-right:3px;">'+emoji+(count>0?' <span style="font-size:10px;color:rgba(240,244,240,0.4);">'+count+'</span>':'')+'</button>';
+    });
+    rHtml += '</div>';
+    return '<div class="chat-msg"><div class="msg-bubble'+(isMe?' own':'')+'"><div class="msg-name'+(isMe?' own-name':'')+'">'+m.name+nameBadge+'</div><div class="msg-text">'+escHtml(m.text)+'</div><div style="display:flex;align-items:center;gap:6px;margin-top:3px;"><span class="msg-time">'+time+'</span>'+rHtml+'</div></div></div>';
   }).join('');
 }
 
-// QR kód a támogatás modalhoz
+// ===== #5: CHAT REAKCIÓK =====
+async function toggleReaction(msgKey, emoji) {
+  if(!currentUser){ showToast('⚠️ Előbb lépj be!'); return; }
+  var safe = fbSafeName(currentUser);
+  var path = 'chatReactions/'+msgKey+'/'+emoji+'/'+safe;
+  try {
+    var existing = await fbGet(path).catch(function(){return null;});
+    if(existing) {
+      await fbDel(path);
+    } else {
+      await fbSet(path, true);
+    }
+    await pollChat();
+  } catch(e){}
+}
+
+// ===== TÉT SZAVAZÁS =====
+let betPollData = {};
+let betPaidData = {};
+
+async function loadBetPoll() {
+  try {
+    var data = await fbGet('betPoll');
+    betPollData = data || {};
+    var paid = await fbGet('betPaid');
+    betPaidData = paid || {};
+  } catch(e) { betPollData = {}; betPaidData = {}; }
+  renderBetPoll();
+}
+
+function renderBetPoll() {
+  var el = document.getElementById('betPollContainer');
+  if(!el) return;
+  var opts = [500, 1000, 5000, 10000];
+  var counts = {};
+  opts.forEach(function(o){ counts[o] = 0; });
+  var total = 0;
+  Object.values(betPollData).forEach(function(v){
+    if(counts[v] !== undefined) { counts[v]++; total++; }
+  });
+  var meSafe = currentUser ? fbSafeName(currentUser) : null;
+  var myVote = meSafe ? betPollData[meSafe] : null;
+
+  var html = '<div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.6);letter-spacing:1px;margin-bottom:6px;">💰 ALAP TÉT / FŐ?</div>';
+  html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+  opts.forEach(function(amt){
+    var sel = myVote === amt;
+    var pct = total ? Math.round(counts[amt]/total*100) : 0;
+    html += '<button onclick="voteBet('+amt+')" style="flex:1;min-width:55px;padding:5px 4px;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;text-align:center;border:1px solid rgba(245,197,24,'+(sel?'0.5':'0.15')+');background:rgba(245,197,24,'+(sel?'0.18':'0.04')+');color:'+(sel?'var(--gold)':'rgba(240,244,240,0.5)')+';">'
+      +amt.toLocaleString('hu')+'<span style="font-size:9px;"> Ft</span>'
+      +(total>0?'<br><span style="font-size:9px;font-weight:400;color:rgba(240,244,240,0.3);">'+counts[amt]+' fő ('+pct+'%)</span>':'')
+      +'</button>';
+  });
+  html += '</div>';
+  if(total>0) {
+    var maxOpt = opts.reduce(function(a,b){ return counts[a]>=counts[b]?a:b; });
+    html += '<div style="font-size:10px;color:rgba(240,244,240,0.35);margin-top:5px;">📊 '+total+' szavazat · Favorit: <span style="color:var(--gold);font-weight:700;">'+maxOpt.toLocaleString('hu')+' Ft</span> ('+counts[maxOpt]+' fő)</div>';
+  }
+  if(myVote) {
+    html += '<div style="font-size:10px;color:rgba(245,197,24,0.5);margin-top:3px;">✓ Te szavaztál: '+myVote.toLocaleString('hu')+' Ft</div>';
+  }
+  // Felhívó szöveg
+  html += '<div style="font-size:11px;color:rgba(240,244,240,0.55);margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">💵 A tétet <strong style="color:var(--gold);">LESZNIK</strong>-nek kell megadni!</div>';
+
+  // Lesznik / Admin: fizetés nyilvántartás
+  var isLesznikOrAdmin = meSafe === 'LESZNIK' || isAdminUnlocked || isHardcodeAdmin(currentUser);
+  if(isLesznikOrAdmin && total > 0) {
+    html += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">';
+    html += '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(240,244,240,0.5);letter-spacing:1px;margin-bottom:4px;">📋 BEFIZETÉSEK</div>';
+    var voters = Object.entries(betPollData).filter(function(e){ return e[1] && opts.indexOf(e[1])>=0; });
+    voters.sort(function(a,b){ return a[0].localeCompare(b[0]); });
+    var paidCount = 0;
+    voters.forEach(function(e){
+      var u = e[0];
+      var amt = e[1];
+      var paid = betPaidData[u] || false;
+      if(paid) paidCount++;
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);">'
+        +'<button onclick="toggleBetPaid(\''+escHtml(u)+'\')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:0 2px;">'+(paid?'✅':'⬜')+'</button>'
+        +'<span style="font-family:Oswald,sans-serif;font-size:12px;color:'+(paid?'rgba(240,244,240,0.8)':'rgba(240,244,240,0.45)')+';flex:1;">'+escHtml(u)+userBadges(u)+'</span>'
+        +'<span style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);">'+amt.toLocaleString('hu')+' Ft</span>'
+        +'</div>';
+    });
+    html += '<div style="font-size:10px;color:rgba(34,197,94,0.6);margin-top:4px;">✅ '+paidCount+'/'+voters.length+' befizette</div>';
+    html += '</div>';
+  }
+
+  el.innerHTML = html;
+  var el2 = document.getElementById('betPollContainerDrawer');
+  if(el2) el2.innerHTML = html;
+
+  updateBetFabPulse(myVote);
+}
+
+async function toggleBetPaid(safeName) {
+  var meSafe = currentUser ? fbSafeName(currentUser) : null;
+  var isAllowed = meSafe === 'LESZNIK' || isAdminUnlocked || isHardcodeAdmin(currentUser);
+  if(!isAllowed) return;
+  var wasPaid = !!betPaidData[safeName];
+  betPaidData[safeName] = !wasPaid;
+  renderBetPoll();
+  try {
+    if(!wasPaid) {
+      await fbSet('betPaid/'+safeName, true);
+    } else {
+      await fbDel('betPaid/'+safeName);
+    }
+  } catch(e) { showToast('❌ Firebase hiba!'); }
+}
+
+function updateBetFabPulse(myVote) {
+  var fab = document.getElementById('chatFab');
+  if(!fab || !currentUser) return;
+  if(!myVote) {
+    fab.classList.add('bet-pulse');
+  } else {
+    fab.classList.remove('bet-pulse');
+  }
+}
+
+async function voteBet(amount) {
+  if(!currentUser){ showToast('⚠️ Előbb lépj be!'); return; }
+  var safe = fbSafeName(currentUser);
+  betPollData[safe] = amount;
+  renderBetPoll();
+  try {
+    await fbSet('betPoll/'+safe, amount);
+    showToast('💰 Szavazatod: '+amount.toLocaleString('hu')+' Ft');
+  } catch(e){ showToast('❌ Hiba!'); }
+}
+
+// ===== #1: AUTO-ÖSSZEFOGLALÓ (admin kiváltható) =====
+async function sendDaySummary() {
+  var today = getBudapestToday();
+  var todayMatches = ALL_MATCHES.filter(function(m){ return m.huDate === today && allResults[m.id]; });
+  if(!todayMatches.length){ showToast('⚠️ Ma nincs lezárt meccs!'); return; }
+
+  // Ranglista kiszámolás
+  var users = {};
+  Object.keys(allTips).forEach(function(mid) {
+    if(!allTips[mid]) return;
+    Object.keys(allTips[mid]).forEach(function(u) {
+      if(!users[u]) users[u] = {pts:0, exact:0, tot:0};
+    });
+  });
+  Object.keys(users).forEach(function(u) {
+    ALL_MATCHES.forEach(function(m) {
+      var res = allResults[m.id];
+      if(!res) return;
+      var tip = allTips[m.id] && allTips[m.id][u];
+      if(!tip) return;
+      users[u].tot++;
+      var o = getTipOutcome(tip);
+      if(o === res) {
+        var sc = getTipScore(tip);
+        var realSc = allScores[m.id];
+        if(sc && realSc && sc.h+':'+sc.a === realSc) { users[u].pts += 3; users[u].exact++; }
+        else users[u].pts += 1;
+      }
+    });
+  });
+  var sorted = Object.entries(users).sort(function(a,b){ return b[1].pts - a[1].pts; });
+  var leader = sorted.length ? sorted[0] : null;
+
+  // Mai pontos tippelők
+  var todayExact = [];
+  todayMatches.forEach(function(m) {
+    var realSc = allScores[m.id];
+    if(!allTips[m.id]) return;
+    Object.keys(allTips[m.id]).forEach(function(u) {
+      var tip = allTips[m.id][u];
+      var sc = getTipScore(tip);
+      if(sc && realSc && sc.h+':'+sc.a === realSc) todayExact.push(u);
+    });
+  });
+
+  var msg = '📊 Napi összefoglaló (' + today + ')\n'
+    + '⚽ ' + todayMatches.length + ' meccs zárult ma.\n'
+    + (leader ? '🏅 Élen: ' + leader[0] + ' (' + leader[1].pts + ' pont)\n' : '')
+    + (todayExact.length ? '🎯 Pontos tipp ma: ' + [...new Set(todayExact)].join(', ') + '\n' : '')
+    + 'Tippelj tovább! 💪';
+
+  try {
+    await fbPush('chat', {name: '⚽ Rendszer', text: msg, ts: Date.now()});
+    await pollChat();
+    showToast('📊 Összefoglaló elküldve!');
+  } catch(e) { showToast('❌ Hiba!'); }
+}
+
+// ===== QR kód a támogatás modalhoz
 (function() {
   var qrLoaded = false;
   window.initSupportQR = function() {
@@ -4208,6 +4516,8 @@ function toggleDayGroup(groupId, storageKey) {
     <span>💬</span>
     <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(245,197,24,0.7);">ÉLŐ KOMMENT</span>
   </div>
+  <!-- TÉT SZAVAZÁS (drawer) -->
+  <div id="betPollContainerDrawer" style="padding:6px 16px;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
   <div class="drawer-chat-inner">
     <div class="chat-messages" id="drawerMessages"></div>
     <div class="chat-input-area">
