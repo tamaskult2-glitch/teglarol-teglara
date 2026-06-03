@@ -2743,7 +2743,8 @@ function renderStats() {
 
 function renderUserBar() {
   var fab = document.getElementById('chatFab');
-  if(fab) fab.style.display = currentUser ? 'flex' : 'none';
+  var drawerOpen = document.getElementById('chatDrawer') && document.getElementById('chatDrawer').classList.contains('open');
+  if(fab) fab.style.display = (currentUser && !drawerOpen) ? 'flex' : 'none';
   const c=document.getElementById('userBarContainer');
   if(!currentUser){c.innerHTML='';return;}
   const t=ALL_MATCHES.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
@@ -4511,7 +4512,6 @@ function toggleDayGroup(groupId, storageKey) {
   <div style="padding:6px 16px 4px;margin-top:8px;display:flex;align-items:center;gap:8px;">
     <span>💬</span>
     <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(245,197,24,0.7);">ÉLŐ KOMMENT</span>
-    <span class="online-count" id="onlineCount2" style="margin-left:auto;"></span>
   </div>
   <!-- TÉT SZAVAZÁS (drawer) -->
   <div id="betPollContainerDrawer" style="padding:6px 16px;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
