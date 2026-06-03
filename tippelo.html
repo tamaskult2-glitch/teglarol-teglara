@@ -3138,6 +3138,10 @@ function renderMusicPublicStatus() {
 }
 
 function renderAdminMatches() {
+  // NE rendereljünk ha admin input fókuszban van (ne tüntesse el a beírt adatokat)
+  var activeEl = document.activeElement;
+  if(activeEl && activeEl.id && (activeEl.id.startsWith('atip_') || activeEl.id.startsWith('sh_') || activeEl.id.startsWith('sa_') || activeEl.id.startsWith('emob') || activeEl.id.startsWith('proAdd') || activeEl.id.startsWith('vipAdd'))) return;
+
   try { renderMusicPublicStatus(); } catch(e){}
   try { loadAdminUsers(); } catch(e){}
   try { renderProAdmin(); } catch(e){}
