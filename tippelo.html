@@ -4508,17 +4508,10 @@ function toggleDayGroup(groupId, storageKey) {
 <div class="chat-drawer" id="chatDrawer">
   <div class="drawer-handle" onclick="closeChat()"></div>
   <button class="drawer-close" onclick="closeChat()">✕</button>
-  <div style="padding:12px 16px 8px;border-bottom:1px solid rgba(245,197,24,0.12);margin-top:8px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-      <span>👥</span>
-      <span style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:1.5px;color:var(--gold);">RÉSZTVEVŐK</span>
-      <span class="online-count" id="onlineCount2" style="margin-left:auto;"></span>
-    </div>
-    <div id="participantsListDrawer" style="max-height:130px;overflow-y:auto;"></div>
-  </div>
-  <div style="padding:6px 16px 4px;display:flex;align-items:center;gap:8px;">
+  <div style="padding:6px 16px 4px;margin-top:8px;display:flex;align-items:center;gap:8px;">
     <span>💬</span>
     <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(245,197,24,0.7);">ÉLŐ KOMMENT</span>
+    <span class="online-count" id="onlineCount2" style="margin-left:auto;"></span>
   </div>
   <!-- TÉT SZAVAZÁS (drawer) -->
   <div id="betPollContainerDrawer" style="padding:6px 16px;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
