@@ -49,6 +49,13 @@ header{position:relative;overflow:hidden;text-align:center;padding:32px 20px 24p
 
 @keyframes giftPulse{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.1) rotate(3deg)}}
 
+/* ADMIN ÖSSZECSUKHATÓ SZEKCIÓK */
+.adm-collapse-hdr{cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;}
+.adm-collapse-hdr::after{content:'▶';margin-left:auto;font-size:11px;color:rgba(240,244,240,0.25);transition:transform 0.2s;}
+.adm-collapse-hdr.open::after{transform:rotate(90deg);color:rgba(245,197,24,0.5);}
+.adm-collapse-body{display:none;margin-top:10px;}
+.adm-collapse-body.open{display:block;}
+
 /* CUSTOM MECCS MODAL */
 .cm-label{font-size:10px;color:rgba(240,244,240,0.4);font-family:'Oswald',sans-serif;letter-spacing:0.5px;margin-bottom:3px;}
 .cm-inp{width:100%;box-sizing:border-box;padding:7px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:'Oswald',sans-serif;font-size:12px;}
@@ -1355,77 +1362,87 @@ footer a:hover{color:var(--gold);}
     </div>
     <div class="admin-content" id="adminContent">
     <!-- FELHASZNÁLÓK -->
-    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;">
-      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">👥 REGISZTRÁLT FELHASZNÁLÓK</div>
-      <div id="adminUserList"><div style="font-size:12px;color:rgba(240,244,240,0.3);">Betöltés...</div></div>
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">👥 REGISZTRÁLT FELHASZNÁLÓK</span></div>
+      <div class="adm-collapse-body"><div id="adminUserList"><div style="font-size:12px;color:rgba(240,244,240,0.3);">Betöltés...</div></div></div>
     </div>
 
     <!-- NAPI ÖSSZEFOGLALÓ -->
-    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.18);border-radius:10px;">
-      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:6px;letter-spacing:1px;">📊 NAPI ÖSSZEFOGLALÓ</div>
-      <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;">Chatbe küldi az aznapi eredményeket, ranglistavezetőt és pontos tippelőket.</div>
-      <button onclick="sendDaySummary()" style="padding:7px 14px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📊 Összefoglaló küldése</button>
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.18);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">📊 NAPI ÖSSZEFOGLALÓ</span></div>
+      <div class="adm-collapse-body">
+        <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;">Chatbe küldi az aznapi eredményeket, ranglistavezetőt és pontos tippelőket.</div>
+        <button onclick="sendDaySummary()" style="padding:7px 14px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📊 Összefoglaló küldése</button>
+      </div>
     </div>
 
     <!-- ZENE KÖZZÉTÉTEL -->
-    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.2);border-radius:10px;">
-      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">🎵 DAL KÖZZÉTÉTELE</div>
-      <div style="font-size:12px;color:rgba(240,244,240,0.45);margin-bottom:10px;">Ha engedélyezed, mindenki látja a 🎵 és 🎤 gombokat és megjelenik a welcome popup.</div>
-      <div id="musicPublicStatus" style="margin-bottom:8px;font-size:12px;"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button onclick="setMusicPublic(true)" style="padding:7px 14px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);color:#4ade80;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">✅ Mindenki látja</button>
-        <button onclick="setMusicPublic(false)" style="padding:7px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#ef4444;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔒 Csak VIP/Admin</button>
-        <button onclick="resetMusicWelcome()" style="padding:7px 14px;background:rgba(107,114,128,0.15);border:1px solid rgba(107,114,128,0.25);color:rgba(240,244,240,0.5);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;">🔄 Popup reset (saját)</button>
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.2);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">🎵 DAL KÖZZÉTÉTELE</span></div>
+      <div class="adm-collapse-body">
+        <div style="font-size:12px;color:rgba(240,244,240,0.45);margin-bottom:10px;">Ha engedélyezed, mindenki látja a 🎵 és 🎤 gombokat és megjelenik a welcome popup.</div>
+        <div id="musicPublicStatus" style="margin-bottom:8px;font-size:12px;"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="setMusicPublic(true)" style="padding:7px 14px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);color:#4ade80;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">✅ Mindenki látja</button>
+          <button onclick="setMusicPublic(false)" style="padding:7px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#ef4444;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔒 Csak VIP/Admin</button>
+          <button onclick="resetMusicWelcome()" style="padding:7px 14px;background:rgba(107,114,128,0.15);border:1px solid rgba(107,114,128,0.25);color:rgba(240,244,240,0.5);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;">🔄 Popup reset (saját)</button>
+        </div>
       </div>
     </div>
 
     <!-- PRO TÁMOGATÓK -->
-    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(206,41,57,0.08);border:1px solid rgba(206,41,57,0.25);border-radius:10px;">
-      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">⭐ PRO TÁMOGATÓK</div>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <input id="proAddInput" type="text" placeholder="Felhasználónév (pl. KULT)"
-          onkeydown="if(event.key==='Enter')addProUser()"
-          style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(206,41,57,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
-        <button onclick="addProUser()"
-          style="padding:7px 14px;background:rgba(206,41,57,0.25);border:1px solid rgba(206,41,57,0.5);color:#f87171;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">
-          ＋ PRO
-        </button>
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(206,41,57,0.08);border:1px solid rgba(206,41,57,0.25);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">⭐ PRO TÁMOGATÓK</span></div>
+      <div class="adm-collapse-body">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+          <input id="proAddInput" type="text" placeholder="Felhasználónév (pl. KULT)" onkeydown="if(event.key==='Enter')addProUser()" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(206,41,57,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+          <button onclick="addProUser()" style="padding:7px 14px;background:rgba(206,41,57,0.25);border:1px solid rgba(206,41,57,0.5);color:#f87171;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">＋ PRO</button>
+        </div>
+        <div id="proAdminList"></div>
       </div>
-      <div id="proAdminList"></div>
-    </div>
-    <!-- VIP TÁMOGATÓK -->
-    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.25);border-radius:10px;">
-      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);margin-bottom:10px;letter-spacing:1px;">💛 VIP TÁMOGATÓK</div>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <input id="vipAddInput" type="text" placeholder="Felhasználónév (pl. KULT)"
-          onkeydown="if(event.key==='Enter')addVipUser()"
-          style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(245,197,24,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
-        <button onclick="addVipUser()"
-          style="padding:7px 14px;background:rgba(245,197,24,0.18);border:1px solid rgba(245,197,24,0.4);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">
-          ＋ VIP
-        </button>
-      </div>
-      <div id="vipAdminList"></div>
-    </div>
-    <!-- FELHASZNÁLÓ TÖRLÉSE -->
-    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;">
-      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);margin-bottom:8px;letter-spacing:0.5px;">⚠️ FELHASZNÁLÓ TÖRLÉSE</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input id="delUserInput" type="text" placeholder="Felhasználónév (pl. KT)" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
-        <button onclick="deleteUser()" style="padding:7px 14px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;">Törlés</button>
-      </div>
-    </div>
-    <!-- EGYEDI MECCSEK -->
-    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:10px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">⚽ EGYEDI MECCSEK</div>
-        <button onclick="openCustomMatchModal(null)" style="padding:5px 12px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">+ ÚJ MECCS</button>
-      </div>
-      <div id="customMatchList"></div>
     </div>
 
-      <div class="section-header" style="margin-top:16px;"><h2>⚙️ Eredmény rögzítés</h2></div>
-      <div id="adminMatchList"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
+    <!-- VIP TÁMOGATÓK -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.25);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">💛 VIP TÁMOGATÓK</span></div>
+      <div class="adm-collapse-body">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+          <input id="vipAddInput" type="text" placeholder="Felhasználónév (pl. KULT)" onkeydown="if(event.key==='Enter')addVipUser()" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(245,197,24,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+          <button onclick="addVipUser()" style="padding:7px 14px;background:rgba(245,197,24,0.18);border:1px solid rgba(245,197,24,0.4);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">＋ VIP</button>
+        </div>
+        <div id="vipAdminList"></div>
+      </div>
+    </div>
+
+    <!-- FELHASZNÁLÓ TÖRLÉSE -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);letter-spacing:0.5px;">⚠️ FELHASZNÁLÓ TÖRLÉSE</span></div>
+      <div class="adm-collapse-body">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input id="delUserInput" type="text" placeholder="Felhasználónév (pl. KT)" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+          <button onclick="deleteUser()" style="padding:7px 14px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;">Törlés</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EGYEDI MECCSEK -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">⚽ EGYEDI MECCSEK</span></div>
+      <div class="adm-collapse-body">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+          <button onclick="openCustomMatchModal(null)" style="padding:5px 12px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">+ ÚJ MECCS</button>
+        </div>
+        <div id="customMatchList"></div>
+      </div>
+    </div>
+
+    <!-- EREDMÉNY RÖGZÍTÉS -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">⚙️ EREDMÉNY RÖGZÍTÉS</span></div>
+      <div class="adm-collapse-body">
+        <div id="adminMatchList"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -1776,11 +1793,22 @@ function buildTipDistBar(cnt, total, result) {
     +'</div>';
 }
 
+// ===== ADMIN SZEKCIÓK ÖSSZECSUKÁSA =====
+function toggleAdmSec(hdr) {
+  hdr.classList.toggle('open');
+  var body = hdr.nextElementSibling;
+  if(body) body.classList.toggle('open');
+}
+
+// ===== VB MECCS SZŰRŐ =====
+function isVbMatch(m) {
+  return m.id !== 'TEST1' && m.id !== 'BL2026' && !m.isEmob && m.group !== '🏭' && m.group !== '⭐BL';
+}
+
 // ===== #4: STREAK SZÁMLÁLÓ =====
 function getUserStreak(safeName) {
-  // Legutolsó X egymás utáni helyes tipp
-  var matches = ALL_MATCHES.filter(function(m){ return allResults[m.id] && allTips[m.id] && allTips[m.id][safeName]; });
-  matches.sort(function(a,b){ return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime); }); // legújabb előre
+  var matches = ALL_MATCHES.filter(function(m){ return isVbMatch(m) && allResults[m.id] && allTips[m.id] && allTips[m.id][safeName]; });
+  matches.sort(function(a,b){ return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime); });
   var streak = 0;
   for(var i=0; i<matches.length; i++){
     var m = matches[i];
@@ -1795,13 +1823,12 @@ function getUserStreak(safeName) {
 
 // ===== #3: MVP / BUKTA BADGE =====
 function getWeeklyMvpBukta() {
-  // Utolsó 7 nap meccseiből: legtöbb pontot szerzett = MVP, legkevesebbet = bukta
   var now = getBudapestToday();
   var d = new Date(now+'T12:00:00');
   d.setDate(d.getDate()-7);
   var weekAgo = d.toISOString().slice(0,10);
   var weekMatches = ALL_MATCHES.filter(function(m){
-    return m.huDate >= weekAgo && m.huDate <= now && allResults[m.id];
+    return isVbMatch(m) && m.huDate >= weekAgo && m.huDate <= now && allResults[m.id];
   });
   if(!weekMatches.length) return {mvp:null,bukta:null};
   var pts = {};
@@ -2706,13 +2733,12 @@ function renderMatches() {
 
 function renderStats() {
   if(!currentUser) return;
+  var vbMatches = ALL_MATCHES.filter(isVbMatch);
   let tipped=0,pts=0,resolved=0;
-  ALL_MATCHES.forEach(m=>{
+  vbMatches.forEach(m=>{
     const tip=allTips[m.id]?.[fbSafeName(currentUser)];
     const res=allResults[m.id];
     const sc=allScores[m.id];
-    const etRes = allEtResults[m.id];
-    const penRes = allPenResults[m.id];
     if(tip&&getTipOutcome(tip)){
       tipped++;
       if(res){
@@ -2723,20 +2749,17 @@ function renderStats() {
           if(tipSc&&sc&&tipSc.h+':'+tipSc.a===sc) pts+=3;
           else pts+=1;
         }
-        // Bónusz: hosszabbítás kimenetel (csak ha tényleg volt hosszabbítás)
-        if(etRes){
-          const etTip = getTipEt(tip);
-          if(etTip && etTip === etRes) pts+=1;
-        }
-        // Bónusz: 11-es győztes (csak ha tényleg voltak 11-esek)
-        if(penRes){
-          const penTip = getTipPen(tip);
-          if(penTip && penTip === penRes) pts+=1;
+        if(m.knockout) {
+          var etRes = allEtResults[m.id];
+          if(etRes){ var etTip = getTipEt(tip); if(etTip && etTip === etRes) pts+=1; }
+          var penRes = allPenResults[m.id];
+          if(penRes){ var penTip = getTipPen(tip); if(penTip && penTip === penRes) pts+=1; }
         }
       }
     }
   });
   document.getElementById('stTipped').textContent=tipped;
+  document.getElementById('stTotal').textContent=vbMatches.length;
   document.getElementById('stCorrect').textContent=pts;
   document.getElementById('stAcc').textContent=resolved>0?Math.round(pts/resolved*100)+'%':'–';
 }
@@ -2779,17 +2802,17 @@ function changeName(){localStorage.removeItem(LS_SESSION);currentUser=null;docum
 function renderLeaderboard() {
   const c=document.getElementById('lbContainer');
   const users=new Set();
-  Object.values(allTips).forEach(mt=>Object.keys(mt).forEach(u=>users.add(u)));
-  if(!users.size){c.innerHTML='<div class="ldg" style="padding:40px;">Még nincs tipp ⏳</div>';return;}
+  // Csak VB meccsek tippjeiből gyűjtünk usereket
+  var vbMatches = ALL_MATCHES.filter(isVbMatch);
+  vbMatches.forEach(function(m){ if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){users.add(u);}); });
+  if(!users.size){c.innerHTML='<div class="ldg" style="padding:40px;">Még nincs VB tipp ⏳</div>';return;}
   const sc=[];
   users.forEach(u=>{
     let pts=0,tot=0,pend=0,exact=0;
-    ALL_MATCHES.forEach(m=>{
+    vbMatches.forEach(m=>{
       const tip=allTips[m.id]?.[u];
       const res=allResults[m.id];
       const realSc=allScores[m.id];
-      const etRes = allEtResults[m.id];
-      const penRes = allPenResults[m.id];
       const outcome=getTipOutcome(tip);
       if(outcome){
         tot++;
@@ -2799,15 +2822,18 @@ function renderLeaderboard() {
             if(tipSc&&realSc&&tipSc.h+':'+tipSc.a===realSc){pts+=3;exact++;}
             else pts+=1;
           }
-          // Bónusz: hosszabbítás kimenetel
-          if(etRes){
-            const etTip = getTipEt(tip);
-            if(etTip && etTip === etRes) pts+=1;
-          }
-          // Bónusz: 11-es győztes
-          if(penRes){
-            const penTip = getTipPen(tip);
-            if(penTip && penTip === penRes) pts+=1;
+          // Kiesési (knockout) meccseknél bónusz ET/PEN
+          if(m.knockout) {
+            var etRes = allEtResults[m.id];
+            if(etRes){
+              var etTip = getTipEt(tip);
+              if(etTip && etTip === etRes) pts+=1;
+            }
+            var penRes = allPenResults[m.id];
+            if(penRes){
+              var penTip = getTipPen(tip);
+              if(penTip && penTip === penRes) pts+=1;
+            }
           }
         } else pend++;
       }
@@ -2820,7 +2846,7 @@ function renderLeaderboard() {
   var wb = getWeeklyMvpBukta();
   sc.forEach((s,i)=>{const me=s.u===currentUser;const adm=isHardcodeAdmin(s.u);const streak=getUserStreak(s.u);const isMvp=wb.mvp===s.u;const isBukta=wb.bukta===s.u&&wb.bukta!==wb.mvp;html+=`<div class="lb-row r${Math.min(i+1,3)}" style="${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${userBadges(s.u)}${isMvp?' <span title="Heti MVP" style="font-size:12px;">⭐</span>':''}${isBukta?' <span title="Heti bukta" style="font-size:12px;">💀</span>':''}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div><div class="lb-sub">${s.tot} tipp · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${streak>=3?`<span style="color:#f97316">🔥 ${streak}</span> · `:''}${s.pend} várja</div></div></div>`;});
   html+='</div>';
-  if(!Object.keys(allResults).length) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ Eredmények után látható a pontszám</div>';
+  if(!vbMatches.some(function(m){return allResults[m.id];})) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ A VB indulása után látható a pontszám (jún. 11.)</div>';
   c.innerHTML=html;
 }
 
@@ -3062,7 +3088,8 @@ function renderAdminUsers() {
   Object.keys(allTips).forEach(function(mid){
     if(!allTips[mid]) return;
     Object.keys(allTips[mid]).forEach(function(safe){
-      if(!known[safe]) known[safe] = {};
+      var normalized = safe.toUpperCase();
+      if(!known[normalized]) known[normalized] = {};
     });
   });
 
@@ -3071,8 +3098,8 @@ function renderAdminUsers() {
 
   // Rendezés: előbb tippeltek, ABC
   entries.sort(function(a,b){
-    var aTipped = Object.keys(allTips).some(function(mid){ return allTips[mid] && allTips[mid][a[0]]; });
-    var bTipped = Object.keys(allTips).some(function(mid){ return allTips[mid] && allTips[mid][b[0]]; });
+    var aTipped = Object.keys(allTips).some(function(mid){ return allTips[mid] && (allTips[mid][a[0]] || allTips[mid][a[0].toLowerCase()] || allTips[mid][a[0].toUpperCase()]); });
+    var bTipped = Object.keys(allTips).some(function(mid){ return allTips[mid] && (allTips[mid][b[0]] || allTips[mid][b[0].toLowerCase()] || allTips[mid][b[0].toUpperCase()]); });
     if(aTipped && !bTipped) return -1;
     if(!aTipped && bTipped) return 1;
     return a[0].localeCompare(b[0]);
@@ -3080,7 +3107,7 @@ function renderAdminUsers() {
 
   var total = entries.length;
   var tippedCount = entries.filter(function(e){
-    return Object.keys(allTips).some(function(mid){ return allTips[mid] && allTips[mid][e[0]]; });
+    return Object.keys(allTips).some(function(mid){ return allTips[mid] && (allTips[mid][e[0]] || allTips[mid][e[0].toLowerCase()] || allTips[mid][e[0].toUpperCase()]); });
   }).length;
 
   c.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;">'+total+' regisztrált · '+tippedCount+' tippelt már</div>'
@@ -3088,7 +3115,9 @@ function renderAdminUsers() {
     var safe = e[0];
     var info = e[1];
     var name = (info && info.name) ? info.name : safe;
-    var tippedMids = Object.keys(allTips).filter(function(mid){ return allTips[mid] && allTips[mid][safe]; });
+    var tippedMids = Object.keys(allTips).filter(function(mid){
+      return allTips[mid] && (allTips[mid][safe] || allTips[mid][safe.toLowerCase()] || allTips[mid][safe.toUpperCase()]);
+    });
     var tipped = tippedMids.length > 0;
     var tipCount = tippedMids.length;
 
