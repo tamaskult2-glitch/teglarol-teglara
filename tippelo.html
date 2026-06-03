@@ -177,10 +177,11 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
   /* Chat 2x nagyobb */
   .chat-header h3 { font-size: 22px !important; }
   .chat-header { padding: 16px 20px !important; }
-  .msg-bubble { font-size: 16px !important; }
-  .msg-name { font-size: 14px !important; }
+  .msg-bubble { padding: 12px 14px !important; }
+  .msg-text { font-size: 18px !important; line-height: 1.5 !important; }
+  .msg-name { font-size: 15px !important; }
   .msg-time { font-size: 13px !important; }
-  .chat-input { font-size: 16px !important; padding: 12px 16px !important; }
+  .chat-input { font-size: 18px !important; padding: 14px 18px !important; }
   #participantsList div { padding: 8px 16px !important; }
   #participantsList span { font-size: 16px !important; }
   .online-count { font-size: 14px !important; }
@@ -265,31 +266,7 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
   opacity:0;transition:opacity 0.2s;
 }
 .chat-fab-badge.show{opacity:1;}
-/* CHAT FAB PIROS PULZÁLÁS */
-.chat-fab.bet-pulse{
-  animation:betPulse 1.6s ease-in-out infinite;
-  box-shadow:0 4px 18px rgba(206,41,57,0.5);
-  border:2px solid #CE2939;
-}
-.chat-fab.bet-pulse::after{
-  content:'Tedd meg a téted!';
-  position:absolute;
-  bottom:110%;
-  left:50%;
-  transform:translateX(-50%);
-  white-space:nowrap;
-  font-family:'Oswald',sans-serif;
-  font-size:10px;
-  color:#CE2939;
-  background:rgba(206,41,57,0.15);
-  border:1px solid rgba(206,41,57,0.3);
-  padding:3px 10px;
-  border-radius:10px;
-  letter-spacing:0.8px;
-  font-weight:700;
-  pointer-events:none;
-}
-@keyframes betPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+50%{transform:scale(1.12)}}
 
 .chat-drawer{
   display:none;
@@ -303,7 +280,7 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
   transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);
   box-shadow:0 -8px 32px rgba(0,0,0,0.5);
 }
-.chat-drawer.open{transform:translateY(0);}
+.chat-drawer.open{transform:translateY(0);display:flex;}
 .drawer-handle{
   width:36px;height:4px;border-radius:2px;
   background:rgba(245,197,24,0.3);
@@ -629,8 +606,8 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .msg-bubble.own{background:rgba(245,197,24,0.1);border-color:rgba(245,197,24,0.2);}
 .msg-name{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;color:var(--gold);margin-bottom:3px;letter-spacing:0.5px;}
 .msg-name.own-name{color:var(--gold);}
-.msg-text{font-size:13px;color:rgba(240,244,240,0.9);line-height:1.4;word-break:break-word;}
-.msg-time{font-size:9px;color:rgba(240,244,240,0.25);margin-top:3px;}
+.msg-text{font-size:14px;color:rgba(240,244,240,0.95);line-height:1.5;word-break:break-word;}
+.msg-time{font-size:10px;color:rgba(240,244,240,0.35);margin-top:3px;}
 .chat-input-area{border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;flex-shrink:0;background:rgba(0,0,0,0.2);}
 .chat-input{flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:16px;font-family:'Source Sans 3',sans-serif;padding:8px 12px;transition:border-color 0.2s;}
 .chat-input:focus{outline:none;border-color:rgba(245,197,24,0.4);}
@@ -1224,6 +1201,7 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" onclick="showTab('admin')" id="navAdmin">🔐 Admin</button>
   <button class="nav-tab" onclick="showTab('bl')">🏆 BL</button>
   <button class="nav-tab" id="navEmob" onclick="showTab('emob')">🏭 E-mob</button>
+  <button class="nav-tab" id="navBet" onclick="showTab('bet')">💰 Tét <span id="betBadge" style="background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
 </div>
 
@@ -1328,7 +1306,6 @@ footer a:hover{color:var(--gold);}
             <h3>ÉLŐ KOMMENT</h3>
           </div>
           <!-- TÉT SZAVAZÁS -->
-          <div id="betPollContainer" style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
           <div class="chat-messages" id="chatMessages"></div>
           <div class="chat-input-area">
             <input class="chat-input" id="chatInput" placeholder="Írd a kommented..." maxlength="200" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()">
@@ -1449,6 +1426,13 @@ footer a:hover{color:var(--gold);}
   <!-- BL TAB -->
   <div id="tab-bl" style="display:none;">
     <div id="blMatchContainer"></div>
+  </div>
+
+  <!-- TÉT TAB -->
+  <div id="tab-bet" style="display:none;">
+    <div class="section-header" style="margin-top:16px;"><h2>💰 Alap tét szavazás</h2></div>
+    <div style="font-size:13px;color:rgba(240,244,240,0.55);margin-bottom:14px;">Szavazz mekkora legyen az alap tét fejenként! A tétet <strong style="color:var(--gold);">LESZNIK</strong>-nek kell megadni.</div>
+    <div id="betPollContainer"></div>
   </div>
 
   <!-- OPL TAB -->
@@ -2039,7 +2023,7 @@ async function clearTip(mid) {
 
 function showTab(t) {
   activeTab=t;
-  ['meccsek','tippek','ranglista','admin','opl','emob','bl'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
+  ['meccsek','tippek','ranglista','admin','opl','emob','bl','bet'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
@@ -2047,6 +2031,7 @@ function showTab(t) {
   if(t==='opl') oplLoad();
   if(t==='emob') renderEmobTab();
   if(t==='bl') renderBLTab();
+  if(t==='bet') loadBetPoll();
   try { renderMatchdayBanner(); } catch(e){}
 }
 
@@ -3535,10 +3520,25 @@ function renderBetPoll() {
   }
 
   el.innerHTML = html;
-  var el2 = document.getElementById('betPollContainerDrawer');
-  if(el2) el2.innerHTML = html;
+  // Nav gomb badge frissítése
+  updateBetBadge(total);
+}
 
-  updateBetFabPulse(myVote);
+function updateBetBadge(votedCount) {
+  var badge = document.getElementById('betBadge');
+  if(!badge) return;
+  // Összes regisztrált user
+  var allUsers = new Set();
+  Object.values(allTips).forEach(function(mt){ Object.keys(mt).forEach(function(u){ allUsers.add(u); }); });
+  Object.keys(allRegisteredUsers).forEach(function(u){ allUsers.add(u); });
+  var totalUsers = allUsers.size || 17;
+  var notVoted = totalUsers - (votedCount || 0);
+  if(notVoted > 0) {
+    badge.style.display = '';
+    badge.textContent = votedCount + '/' + totalUsers;
+  } else {
+    badge.style.display = 'none';
+  }
 }
 
 async function toggleBetPaid(safeName) {
@@ -3555,16 +3555,6 @@ async function toggleBetPaid(safeName) {
       await fbDel('betPaid/'+safeName);
     }
   } catch(e) { showToast('❌ Firebase hiba!'); }
-}
-
-function updateBetFabPulse(myVote) {
-  var fab = document.getElementById('chatFab');
-  if(!fab || !currentUser) return;
-  if(!myVote) {
-    fab.classList.add('bet-pulse');
-  } else {
-    fab.classList.remove('bet-pulse');
-  }
 }
 
 async function voteBet(amount) {
@@ -4546,8 +4536,6 @@ function toggleDayGroup(groupId, storageKey) {
     <span>💬</span>
     <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(245,197,24,0.7);">ÉLŐ KOMMENT</span>
   </div>
-  <!-- TÉT SZAVAZÁS (drawer) -->
-  <div id="betPollContainerDrawer" style="padding:6px 16px;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
   <div class="drawer-chat-inner">
     <div class="chat-messages" id="drawerMessages"></div>
     <div class="chat-input-area">
