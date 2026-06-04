@@ -302,7 +302,6 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 
 @media(max-width:900px){
   .chat-fab{display:flex;}
-  .chat-drawer{display:flex;}
   /* A drawer-ben külön chat panel */
   .drawer-chat-inner{
     flex:1;display:flex;flex-direction:column;overflow:hidden;
@@ -1293,7 +1292,7 @@ footer a:hover{color:var(--gold);}
       </div>
 
       <!-- JOBB OSZLOP: ÉLŐ KOMMENT -->
-      <div class="col-chat">
+      <div class="col-chat" style="display:none;">
         <div class="chat-panel" id="chatPanel">
           <div class="chat-header">
             <span>👥</span>
@@ -2025,6 +2024,9 @@ function showTab(t) {
   activeTab=t;
   ['meccsek','tippek','ranglista','admin','opl','emob','bl','bet'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
+  // Chat panel csak meccsek tabon ÉS desktopon (>900px) látszik
+  var colChat = document.querySelector('.col-chat');
+  if(colChat) colChat.style.display = (t==='meccsek' && window.innerWidth > 900) ? '' : 'none';
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
   if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
@@ -2841,20 +2843,36 @@ function openChat(){
     document.getElementById('regModal').style.display='flex';
     return;
   }
-  document.getElementById('chatDrawer').classList.add('open');
-  document.getElementById('drawerOverlay').classList.add('open');
+  var drawer = document.getElementById('chatDrawer');
+  var overlay = document.getElementById('drawerOverlay');
+  var fab = document.getElementById('chatFab');
+  if(overlay) overlay.classList.add('open');
+  if(fab) fab.style.display='none';
+  if(drawer) {
+    drawer.style.display='flex';
+    drawer.style.transform='translateY(100%)';
+    // Kis késleltetés hogy a display:flex renderelődjön, aztán animáljon
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        drawer.style.transform='translateY(0)';
+      });
+    });
+  }
   document.body.style.overflow='hidden';
-  document.getElementById('chatFab').style.display='none';
-  // Badge törlése
-  const b=document.getElementById('fabBadge');b.textContent='';b.classList.remove('show');
-  // Scroll to bottom
-  setTimeout(()=>{const d=document.getElementById('drawerMessages');if(d)d.scrollTop=d.scrollHeight;},100);
+  try { var b=document.getElementById('fabBadge'); if(b){b.textContent='';b.classList.remove('show');} } catch(e){}
+  setTimeout(function(){var d=document.getElementById('drawerMessages');if(d)d.scrollTop=d.scrollHeight;},350);
 }
 function closeChat(){
-  document.getElementById('chatDrawer').classList.remove('open');
-  document.getElementById('drawerOverlay').classList.remove('open');
+  var drawer = document.getElementById('chatDrawer');
+  var overlay = document.getElementById('drawerOverlay');
+  var fab = document.getElementById('chatFab');
+  if(drawer) {
+    drawer.style.transform='translateY(100%)';
+    setTimeout(function(){ drawer.style.display='none'; }, 350);
+  }
+  if(overlay) overlay.classList.remove('open');
   document.body.style.overflow='';
-  document.getElementById('chatFab').style.display='flex';
+  if(fab && currentUser) fab.style.display='flex';
 }
 
 async function sendChatDrawer(){
@@ -3096,7 +3114,7 @@ function renderAdminUsers() {
   }).length;
 
   c.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;">'+total+' regisztrált · '+tippedCount+' tippelt már</div>'
-    + entries.map(function(e){
+    + entries.map(function(e, idx){
     var safe = e[0];
     var info = e[1];
     var name = (info && info.name) ? info.name : safe;
@@ -3118,7 +3136,7 @@ function renderAdminUsers() {
     }
 
     return '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">'
-      +'<span style="font-size:13px;">'+(tipped?'✅':'⬜')+'</span>'
+      +'<span style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(240,244,240,0.3);min-width:22px;text-align:right;">'+(idx+1)+'.</span>'
       +'<span style="font-family:Oswald,sans-serif;font-size:13px;color:'+(tipped?'rgba(240,244,240,0.9)':'rgba(240,244,240,0.4)')+';flex:1;">'+escHtml(name)+userBadges(safe)+'</span>'
       +'<span style="font-size:11px;color:rgba(240,244,240,0.3);">'+(tipped?tipCount+' tipp':'–')+'</span>'
       +'<span style="font-size:10px;color:rgba(240,244,240,0.2);" title="* = első tipp dátuma">'+(joined||'?')+'</span>'
@@ -3527,18 +3545,14 @@ function renderBetPoll() {
 function updateBetBadge(votedCount) {
   var badge = document.getElementById('betBadge');
   if(!badge) return;
-  // Összes regisztrált user
-  var allUsers = new Set();
-  Object.values(allTips).forEach(function(mt){ Object.keys(mt).forEach(function(u){ allUsers.add(u); }); });
-  Object.keys(allRegisteredUsers).forEach(function(u){ allUsers.add(u); });
-  var totalUsers = allUsers.size || 17;
-  var notVoted = totalUsers - (votedCount || 0);
-  if(notVoted > 0) {
-    badge.style.display = '';
-    badge.textContent = votedCount + '/' + totalUsers;
-  } else {
-    badge.style.display = 'none';
-  }
+  var totalUsers = Object.keys(allRegisteredUsers).length || 17;
+  // allTips-ből is kiszűrjük az ismert usereket
+  Object.values(allTips).forEach(function(mt){ Object.keys(mt).forEach(function(u){
+    if(!allRegisteredUsers[u] && !allRegisteredUsers[u.toUpperCase()]) totalUsers = Math.max(totalUsers, totalUsers);
+  }); });
+  totalUsers = Math.max(totalUsers, 17);
+  badge.textContent = (votedCount||0) + '/' + totalUsers;
+  badge.style.display = '';
 }
 
 async function toggleBetPaid(safeName) {
@@ -4529,7 +4543,7 @@ function toggleDayGroup(groupId, storageKey) {
 
 <!-- MOBIL CHAT DRAWER -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeChat()"></div>
-<div class="chat-drawer" id="chatDrawer">
+<div class="chat-drawer" id="chatDrawer" style="display:none;">
   <div class="drawer-handle" onclick="closeChat()"></div>
   <button class="drawer-close" onclick="closeChat()">✕</button>
   <div style="padding:6px 16px 4px;margin-top:8px;display:flex;align-items:center;gap:8px;">
