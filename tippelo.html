@@ -921,6 +921,18 @@ footer a:hover{color:var(--gold);}
     </div>
     <div id="regMsg" style="font-size:12px;color:rgba(240,244,240,0.45);margin-bottom:8px;min-height:18px;"></div>
     <button onclick="register()" id="regBtn">BELÉPEK →</button>
+    <!-- Meghívó kérése (ha nincs invite token) -->
+    <div id="inviteRequestSection" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid rgba(245,197,24,0.1);">
+      <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(245,197,24,0.6);letter-spacing:0.5px;margin-bottom:8px;text-align:center;">🔗 NINCS MEGHÍVÓD? KÉRJ EGYET!</div>
+      <input type="text" id="reqName" placeholder="👤 Neved" maxlength="50"
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:6px;">
+      <input type="text" id="reqContact" placeholder="📧 Email vagy telefonszám" maxlength="100"
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:6px;">
+      <input type="text" id="reqConnection" placeholder="🤝 Honnan ismered a csoportot?" maxlength="100"
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+      <button onclick="submitInviteRequest()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">📩 MEGHÍVÓ KÉRÉSE</button>
+      <div id="reqMsg" style="font-size:11px;color:rgba(240,244,240,0.35);margin-top:6px;text-align:center;min-height:16px;"></div>
+    </div>
     <div style="margin-top:12px;font-size:11px;color:rgba(240,244,240,0.3);">
       Ha már van fiókod, add meg a neved és jelszavad.
     </div>
@@ -1472,6 +1484,10 @@ footer a:hover{color:var(--gold);}
           <button onclick="inviteGenerate()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.4);background:rgba(245,197,24,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Új link</button>
         </div>
         <div id="inviteList"></div>
+        <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;">
+          <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:1px;margin-bottom:6px;">📩 BEÉRKEZETT KÉRÉSEK</div>
+          <div id="inviteReqList"></div>
+        </div>
       </div>
     </div>
     </div>
@@ -2177,7 +2193,7 @@ function showTab(t) {
   if(colChat) colChat.style.display = (t==='meccsek' && window.innerWidth > 900) ? '' : 'none';
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
-  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); }
+  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); }
   if(t==='opl') oplLoad();
   if(t==='emob') renderEmobTab();
   if(t==='bl') renderBLTab();
@@ -4885,12 +4901,74 @@ async function inviteDelete(token) {
   } catch(e){ showToast('❌ Hiba!'); }
 }
 
+// --- MEGHÍVÓ KÉRÉS (látogatók számára) ---
+async function submitInviteRequest() {
+  var name = (document.getElementById('reqName')||{}).value;
+  name = name ? name.trim() : '';
+  var contact = (document.getElementById('reqContact')||{}).value;
+  contact = contact ? contact.trim() : '';
+  var connection = (document.getElementById('reqConnection')||{}).value;
+  connection = connection ? connection.trim() : '';
+  var msg = document.getElementById('reqMsg');
+  if(!name) { if(msg){msg.textContent='⚠️ Add meg a neved!';msg.style.color='#ef4444';} return; }
+  if(!contact) { if(msg){msg.textContent='⚠️ Add meg az elérhetőséged!';msg.style.color='#ef4444';} return; }
+  if(!connection) { if(msg){msg.textContent='⚠️ Írd be honnan ismered a csoportot!';msg.style.color='#ef4444';} return; }
+  try {
+    await fbPush('inviteRequests', {
+      name: name,
+      contact: contact,
+      connection: connection,
+      date: getBudapestToday(),
+      ts: Date.now()
+    });
+    // EmailJS értesítés adminnak
+    try {
+      emailjs.send('service_x5huqxn','template_pfrf10g',{
+        to_email: 'tamaskult2@icloud.com',
+        subject: '🔗 Meghívó kérés: ' + name,
+        message: '👤 Név: ' + name + '\n📧 Elérhetőség: ' + contact + '\n🤝 Kapcsolat: ' + connection + '\n📅 Dátum: ' + getBudapestToday()
+      });
+    } catch(e2){}
+    if(msg) { msg.textContent = '✅ Kérés elküldve! Az admin hamarosan küld egy meghívó linket.'; msg.style.color = '#4ade80'; }
+    document.getElementById('reqName').value = '';
+    document.getElementById('reqContact').value = '';
+    document.getElementById('reqConnection').value = '';
+  } catch(e) { if(msg){msg.textContent='❌ Hiba, próbáld újra!';msg.style.color='#ef4444';} }
+}
+
+// --- ADMIN: beérkezett meghívó kérések ---
+async function inviteLoadRequests() {
+  var el = document.getElementById('inviteReqList');
+  if(!el) return;
+  try {
+    var data = await fbGet('inviteRequests');
+    if(!data) { el.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.2);font-style:italic;">Nincs beérkezett kérés</div>'; return; }
+    var entries = Object.entries(data).sort(function(a,b){ return (b[1].ts||0)-(a[1].ts||0); });
+    el.innerHTML = entries.map(function(e){
+      var key=e[0], r=e[1];
+      return '<div style="padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid rgba(245,197,24,0.15);background:rgba(245,197,24,0.04);">'
+        +'<div style="display:flex;align-items:center;gap:6px;">'
+        +'<span style="font-family:Oswald,sans-serif;font-size:12px;color:var(--gold);font-weight:700;flex:1;">'+escHtml(r.name||'?')+'</span>'
+        +'<span style="font-size:10px;color:rgba(240,244,240,0.25);">'+(r.date||'')+'</span>'
+        +'<button onclick="inviteDeleteReq(\''+key+'\')" style="background:none;border:none;color:rgba(239,68,68,0.4);font-size:12px;cursor:pointer;">✕</button>'
+        +'</div>'
+        +'<div style="font-size:11px;color:rgba(240,244,240,0.45);margin-top:2px;">📧 '+escHtml(r.contact||'')+' · 🤝 '+escHtml(r.connection||'')+'</div>'
+        +'</div>';
+    }).join('');
+  } catch(e) { el.innerHTML = ''; }
+}
+
+async function inviteDeleteReq(key) {
+  try { await fbDel('inviteRequests/'+key); inviteLoadRequests(); showToast('✓ Kérés törölve'); } catch(e){}
+}
+
 // Regisztrációs modal frissítése meghívó állapot alapján
 function updateInviteStatus() {
   var el = document.getElementById('inviteStatus');
   var fields = document.getElementById('inviteFields');
   var uLabel = document.getElementById('usernameLabel');
   var nameInp = document.getElementById('nameInput');
+  var reqSec = document.getElementById('inviteRequestSection');
   if(!el) return;
   if(activeInviteToken) {
     el.style.display = 'block';
@@ -4901,6 +4979,7 @@ function updateInviteStatus() {
     if(fields) fields.style.display = 'block';
     if(uLabel) uLabel.style.display = 'block';
     if(nameInp) nameInp.placeholder = 'pl. BERCI, KOVACS_P, ZSOFI';
+    if(reqSec) reqSec.style.display = 'none';
   } else if(!currentUser) {
     el.style.display = 'block';
     el.style.background = 'rgba(245,197,24,0.08)';
@@ -4910,10 +4989,12 @@ function updateInviteStatus() {
     if(fields) fields.style.display = 'none';
     if(uLabel) uLabel.style.display = 'none';
     if(nameInp) nameInp.placeholder = 'NEVED (pl. Kovács Péter)';
+    if(reqSec) reqSec.style.display = 'block';
   } else {
     el.style.display = 'none';
     if(fields) fields.style.display = 'none';
     if(uLabel) uLabel.style.display = 'none';
+    if(reqSec) reqSec.style.display = 'none';
   }
 }
 
