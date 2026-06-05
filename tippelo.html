@@ -890,6 +890,8 @@ footer a:hover{color:var(--gold);}
 .legend{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;font-size:10px;color:rgba(240,244,240,0.35);}
 .legend-item{display:flex;align-items:center;gap:4px;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>if(typeof emailjs!=='undefined')emailjs.init('0k7yH8d4u-BjgACd1');</script>
 </head>
 <body>
 
@@ -1485,7 +1487,10 @@ footer a:hover{color:var(--gold);}
         </div>
         <div id="inviteList"></div>
         <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;">
-          <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:1px;margin-bottom:6px;">📩 BEÉRKEZETT KÉRÉSEK</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:1px;">📩 BEÉRKEZETT KÉRÉSEK</span>
+            <button onclick="inviteLoadRequests();showToast('🔄 Frissítve')" style="background:none;border:1px solid rgba(245,197,24,0.2);color:rgba(245,197,24,0.5);padding:2px 8px;border-radius:6px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;">🔄</button>
+          </div>
           <div id="inviteReqList"></div>
         </div>
       </div>
@@ -4913,27 +4918,34 @@ async function submitInviteRequest() {
   if(!name) { if(msg){msg.textContent='⚠️ Add meg a neved!';msg.style.color='#ef4444';} return; }
   if(!contact) { if(msg){msg.textContent='⚠️ Add meg az elérhetőséged!';msg.style.color='#ef4444';} return; }
   if(!connection) { if(msg){msg.textContent='⚠️ Írd be honnan ismered a csoportot!';msg.style.color='#ef4444';} return; }
+  if(msg) { msg.textContent='⏳ Küldés…'; msg.style.color='rgba(245,197,24,0.6)'; }
   try {
-    await fbPush('inviteRequests', {
+    var res = await fbPush('inviteRequests', {
       name: name,
       contact: contact,
       connection: connection,
       date: getBudapestToday(),
       ts: Date.now()
     });
-    // EmailJS értesítés adminnak
-    try {
-      emailjs.send('service_x5huqxn','template_pfrf10g',{
-        to_email: 'tamaskult2@icloud.com',
-        subject: '🔗 Meghívó kérés: ' + name,
-        message: '👤 Név: ' + name + '\n📧 Elérhetőség: ' + contact + '\n🤝 Kapcsolat: ' + connection + '\n📅 Dátum: ' + getBudapestToday()
-      });
-    } catch(e2){}
+    if(!res || res.error) {
+      if(msg) { msg.textContent='❌ Hiba a mentésnél: '+(res&&res.error?res.error:'ismeretlen'); msg.style.color='#ef4444'; }
+      return;
+    }
+    // EmailJS értesítés adminnak (ha elérhető)
+    if(typeof emailjs !== 'undefined') {
+      try {
+        emailjs.send('service_x5huqxn','template_pfrf10g',{
+          to_email: 'tamaskult2@icloud.com',
+          subject: '🔗 Meghívó kérés: ' + name,
+          message: '👤 Név: ' + name + '\n📧 Elérhetőség: ' + contact + '\n🤝 Kapcsolat: ' + connection + '\n📅 Dátum: ' + getBudapestToday()
+        });
+      } catch(e2){}
+    }
     if(msg) { msg.textContent = '✅ Kérés elküldve! Az admin hamarosan küld egy meghívó linket.'; msg.style.color = '#4ade80'; }
     document.getElementById('reqName').value = '';
     document.getElementById('reqContact').value = '';
     document.getElementById('reqConnection').value = '';
-  } catch(e) { if(msg){msg.textContent='❌ Hiba, próbáld újra!';msg.style.color='#ef4444';} }
+  } catch(e) { if(msg){msg.textContent='❌ Hiba: '+e.message;msg.style.color='#ef4444';} }
 }
 
 // --- ADMIN: beérkezett meghívó kérések ---
