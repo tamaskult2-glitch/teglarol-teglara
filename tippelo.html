@@ -1741,7 +1741,7 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw] = await Promise.all([
+    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
@@ -1752,6 +1752,7 @@ async function pollData() {
       fbGet('customMatches').catch(function(){return null;}),
       fbGet('musicPublic').catch(function(){return null;}),
       fbGet('opl').catch(function(){return null;}),
+      fbGet('users').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -1774,6 +1775,8 @@ async function pollData() {
     else if(customRaw && typeof customRaw==='object') custom=Object.values(customRaw).filter(Boolean);
     mergeCustomMatches(custom);
     musicPublic = !!musicPublicRaw;
+    // Regisztrált felhasználók
+    allRegisteredUsers = usersRaw || {};
     // OPL cache frissítése (badge-hez)
     if(Array.isArray(oplRaw)) oplItems = oplRaw.filter(Boolean);
     else if(oplRaw && typeof oplRaw==='object') oplItems = Object.values(oplRaw).filter(Boolean);
@@ -3194,6 +3197,19 @@ async function removeVipUser(safeName) {
 // ===== ADMIN FELHASZNÁLÓK =====
 let allRegisteredUsers = {}; // Firebase: tipp2026/users
 
+// Összes ismert felhasználó (users + tips + vbPoll)
+function getAllKnownUsers() {
+  var known = {};
+  Object.keys(allRegisteredUsers).forEach(function(u){ known[u] = true; });
+  Object.keys(allTips).forEach(function(mid){
+    if(!allTips[mid]) return;
+    Object.keys(allTips[mid]).forEach(function(safe){ known[safe.toUpperCase()] = true; });
+  });
+  if(vbPollData && vbPollData.winner) Object.keys(vbPollData.winner).forEach(function(u){ known[u] = true; });
+  if(vbPollData && vbPollData.scorer) Object.keys(vbPollData.scorer).forEach(function(u){ known[u] = true; });
+  return known;
+}
+
 async function loadAdminUsers() {
   try {
     var data = await fbGet('users');
@@ -3670,7 +3686,7 @@ function renderBetPoll() {
 function updateBetBadge(votedCount) {
   var badge = document.getElementById('betBadge');
   if(!badge) return;
-  var totalUsers = Object.keys(allRegisteredUsers).length || 17;
+  var totalUsers = Object.keys(getAllKnownUsers()).length || 17;
   // allTips-ből is kiszűrjük az ismert usereket
   Object.values(allTips).forEach(function(mt){ Object.keys(mt).forEach(function(u){
     if(!allRegisteredUsers[u] && !allRegisteredUsers[u.toUpperCase()]) totalUsers = Math.max(totalUsers, totalUsers);
@@ -3846,7 +3862,7 @@ function renderWatchParty() {
     var tlLoc = WATCH_LOCS.find(function(l){return l.id===topLoc;});
     var tmDate = tmSlot.huDate.split('-');
     html += '<div style="margin-top:18px;padding:14px 16px;background:linear-gradient(135deg,rgba(245,197,24,0.08),rgba(245,197,24,0.04));border:1px solid rgba(245,197,24,0.25);border-radius:12px;">';
-    html += '<div style="font-family:Oswald,sans-serif;font-size:13px;color:rgba(245,197,24,0.6);letter-spacing:1px;margin-bottom:8px;">🏆 BEFUTÓ — JELENLEGI ÁLLÁS ('+totalVoters+'/'+Math.max(Object.keys(allRegisteredUsers).length,17)+' szavazó)</div>';
+    html += '<div style="font-family:Oswald,sans-serif;font-size:13px;color:rgba(245,197,24,0.6);letter-spacing:1px;margin-bottom:8px;">🏆 BEFUTÓ — JELENLEGI ÁLLÁS ('+totalVoters+'/'+Math.max(Object.keys(getAllKnownUsers()).length,17)+' szavazó)</div>';
     html += '<div style="font-family:Oswald,sans-serif;font-size:17px;color:var(--gold);font-weight:700;">'+tmSlot.emoji+' '+tmSlot.round+' – '+topMatch+' <span style="font-size:13px;color:rgba(245,197,24,0.5);">('+topMatchCnt+' szavazat)</span></div>';
     html += '<div style="font-size:14px;color:rgba(240,244,240,0.6);margin:2px 0 6px;">'+tmDate[1].replace(/^0/,'')+'. '+tmDate[2].replace(/^0/,'')+'. ('+tmSlot.day+') '+tmSlot.huTime+' 🇭🇺</div>';
     html += '<div style="font-family:Oswald,sans-serif;font-size:17px;color:var(--gold);font-weight:700;">'+tlLoc.emoji+' '+tlLoc.name+' <span style="font-size:13px;color:rgba(245,197,24,0.5);">('+topLocCnt+' szavazat)</span></div>';
@@ -3903,7 +3919,7 @@ function renderWatchParty() {
 function updateKozosBadge(votedCount) {
   var badge = document.getElementById('kozosBadge');
   if(!badge) return;
-  var totalUsers = Math.max(Object.keys(allRegisteredUsers).length, 17);
+  var totalUsers = Math.max(Object.keys(getAllKnownUsers()).length, 17);
   badge.textContent = (votedCount||0) + '/' + totalUsers;
   badge.style.display = '';
 }
@@ -4615,14 +4631,7 @@ var pmMyMessages = [];
 async function pmPopulateUsers() {
   var sel = document.getElementById('pmUserSelect');
   if(!sel) return;
-  // Összegyűjtjük MINDEN ismert usert (users + tips)
-  var allKnown = {};
-  Object.keys(allRegisteredUsers).forEach(function(u){ allKnown[u] = true; });
-  Object.keys(allTips).forEach(function(mid){
-    if(!allTips[mid]) return;
-    Object.keys(allTips[mid]).forEach(function(safe){ allKnown[safe.toUpperCase()] = true; });
-  });
-  // Lekérjük az összes privát beszélgetést
+  var allKnown = getAllKnownUsers();
   var allPm = {};
   try { allPm = await fbGet('privateMsg') || {}; } catch(e){}
   var opts = '<option value="">— Válassz felhasználót —</option>';
