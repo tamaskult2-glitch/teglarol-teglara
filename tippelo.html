@@ -944,7 +944,7 @@ footer a:hover{color:var(--gold);}
         style="font-size:11px;color:rgba(240,244,240,0.25);cursor:pointer;letter-spacing:0.5px;">🔑 Elfelejtett fiók / Admin visszaállítás</span>
       <div id="adminRecoveryPanel" style="display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(245,197,24,0.2);border-radius:10px;">
         <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;letter-spacing:0.5px;">Admin azonosítás szükséges</div>
-        <input type="password" id="recoveryAdminPw" placeholder="Admin jelszó (titi2026)"
+        <input type="password" id="recoveryAdminPw" placeholder="Admin jelszó"
           style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.25);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:8px;"
           onkeydown="if(event.key==='Enter')runAccountRecovery()">
         <button onclick="runAccountRecovery()"
@@ -1624,7 +1624,7 @@ footer a:hover{color:var(--gold);}
 <script>
 // ===== CONFIG =====
 const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
-const ADMIN_PW = 'titi2026';
+const ADMIN_PW_HASH = '-uzxjkk';
 const ADMIN_USERS = ['KULT']; // Mindig admin jogú felhasználók (jelszó nélkül is)
 const POLL_MS = 8000;
 // localStorage kulcsok (csak session + jelszavak)
@@ -2952,7 +2952,21 @@ function renderUserBar() {
     }, 1200);
   }
 
-  c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}${userBadges(meSafe)}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span></div>`;
+  var logoutBtn = isHardcodeAdmin(currentUser) ? '<span class="u-change" onclick="adminLogout()" style="color:rgba(239,68,68,0.5);">kijelentkezés</span>' : '';
+  c.innerHTML=`<div class="user-bar"><div class="u-info">⚽ ${currentUser}${userBadges(meSafe)}</div><span class="u-score">${t} tipp leadva</span><span class="u-change" onclick="changeName()">névváltás</span>${logoutBtn}</div>`;
+}
+
+function adminLogout(){
+  localStorage.removeItem(LS_SESSION);
+  currentUser=null;
+  isAdminUnlocked=false;
+  document.getElementById('regModal').style.display='flex';
+  document.getElementById('nameInput').value='';
+  document.getElementById('pwInput').value='';
+  checkExistingUser();
+  updateInviteStatus();
+  renderAll();
+  pmHideNotify();
 }
 
 function changeName(){localStorage.removeItem(LS_SESSION);currentUser=null;document.getElementById('regModal').style.display='flex';document.getElementById('nameInput').value='';document.getElementById('pwInput').value='';checkExistingUser();renderAll();}
@@ -3056,12 +3070,12 @@ async function sendChat() {
 }
 
 // ===== ADMIN =====
-function checkAdmin(){if(document.getElementById('adminPwInput').value===ADMIN_PW){isAdminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').classList.add('visible');renderAdminMatches();renderProAdmin();}else showToast('❌ Hibás jelszó!');}
+function checkAdmin(){if(simpleHash(document.getElementById('adminPwInput').value)===ADMIN_PW_HASH){isAdminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').classList.add('visible');renderAdminMatches();renderProAdmin();}else showToast('❌ Hibás jelszó!');}
 
 function runAccountRecovery() {
   var pw = (document.getElementById('recoveryAdminPw').value||'').trim();
   var msg = document.getElementById('recoveryMsg');
-  if(pw !== ADMIN_PW) {
+  if(simpleHash(pw) !== ADMIN_PW_HASH) {
     msg.textContent = '❌ Hibás admin jelszó!';
     msg.style.color = '#ef4444';
     return;
