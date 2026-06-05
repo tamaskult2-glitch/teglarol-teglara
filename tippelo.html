@@ -890,10 +890,25 @@ footer a:hover{color:var(--gold);}
     <div class="mi">⚽</div>
     <h2 id="regTitle">REGISZTRÁCIÓ</h2>
     <p id="regSubtitle">Válassz nevet és jelszót.<br>Legközelebb ugyanezzel léphetsz be.</p>
+    <div id="inviteStatus" style="display:none;margin-bottom:8px;padding:8px 12px;border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;text-align:center;"></div>
     <input type="text" id="nameInput" placeholder="NEVED (pl. Kovács Péter)" maxlength="20" autocomplete="off"
       oninput="checkExistingUser()">
     <input type="password" id="pwInput" placeholder="JELSZÓ" maxlength="30" autocomplete="new-password"
       onkeydown="if(event.key==='Enter')register()">
+    <!-- Meghívós regisztráció kiegészítő kérdések -->
+    <div id="inviteFields" style="display:none;">
+      <div style="margin:8px 0 4px;border-top:1px solid rgba(245,197,24,0.1);padding-top:10px;">
+        <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:0.5px;margin-bottom:4px;">👤 TELJES NEVED</div>
+        <input type="text" id="inviteRealName" placeholder="pl. Kiss Béla" maxlength="50"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;margin-bottom:8px;">
+        <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:0.5px;margin-bottom:4px;">🤝 HONNAN ISMERED A CSOPORTOT?</div>
+        <input type="text" id="inviteConnection" placeholder="pl. Robi barátja, munkatárs, stb." maxlength="100"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;margin-bottom:8px;">
+        <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:0.5px;margin-bottom:4px;">📧 ELÉRHETŐSÉGED (email / telefon)</div>
+        <input type="text" id="inviteContact" placeholder="pl. kiss.bela@gmail.com vagy +36 30 ..." maxlength="100"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;">
+      </div>
+    </div>
     <div id="regMsg" style="font-size:12px;color:rgba(240,244,240,0.45);margin-bottom:8px;min-height:18px;"></div>
     <button onclick="register()" id="regBtn">BELÉPEK →</button>
     <div style="margin-top:12px;font-size:11px;color:rgba(240,244,240,0.3);">
@@ -1419,6 +1434,36 @@ footer a:hover{color:var(--gold);}
         <div id="adminMatchList"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
       </div>
     </div>
+    <!-- PRIVÁT ÜZENET -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">💬 PRIVÁT ÜZENET</span></div>
+      <div class="adm-collapse-body">
+        <div style="margin-bottom:8px;">
+          <select id="pmUserSelect" onchange="pmLoadConvo()" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.3);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+            <option value="">— Válassz felhasználót —</option>
+          </select>
+        </div>
+        <div id="pmChatArea" style="max-height:300px;overflow-y:auto;margin-bottom:8px;"></div>
+        <div id="pmInputWrap" style="display:none;gap:6px;">
+          <input type="text" id="pmInput" placeholder="Üzenet írása…" maxlength="500" onkeydown="if(event.key==='Enter')pmSend()"
+            style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+          <button onclick="pmSend()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.4);background:rgba(245,197,24,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Küld</button>
+          <button onclick="pmDeleteConvo()" style="padding:8px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:rgba(239,68,68,0.7);font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;" title="Beszélgetés törlése">🗑️</button>
+        </div>
+      </div>
+    </div>
+    <!-- MEGHÍVÓ LINKEK -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">🔗 MEGHÍVÓ LINKEK</span></div>
+      <div class="adm-collapse-body">
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <input type="text" id="inviteNote" placeholder="Kinek? (pl. Berci)" maxlength="40"
+            style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+          <button onclick="inviteGenerate()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.4);background:rgba(245,197,24,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Új link</button>
+        </div>
+        <div id="inviteList"></div>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -1672,6 +1717,10 @@ let allVipUsers=[];  // fbSafeNames listája (Firebase: tipp2026/vipUsers)
 let musicPublic=false; // Firebase: tipp2026/musicPublic — mindenki látja a dalt
 let isAdminUnlocked=false, activeTab='meccsek';
 let _scoreSaving=false; // renderMatches blokk amíg score mentés folyamatban
+
+// ===== MEGHÍVÓ RENDSZER =====
+var activeInviteToken = new URLSearchParams(window.location.search).get('invite') || '';
+
 
 // ===== FIREBASE REST =====
 // ===== Firebase REST API =====
@@ -1954,30 +2003,100 @@ function register() {
       if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
       showToast('❌ Hibás jelszó!'); return;
     }
+    // Sikeres belépés
+    finishLogin(n);
   } else {
-    // Új regisztráció – ellenőrzés: nincs-e már ilyen név Firebase-ben?
-    var safeTry = fbSafeName(n);
-    var takenInFirebase = Object.values(allTips).some(function(mt){
-      return mt && mt[safeTry] !== undefined;
-    });
-    if(takenInFirebase) {
-      if(msg) { msg.textContent = '❌ Ez a név már foglalt! Ha a tiéd, add meg az eredeti jelszavadat az eszközödön, vagy kérd KULT-ot a fiók kezeléséhez.'; msg.style.color='#ef4444'; }
-      showToast('❌ Ez a név már foglalt!'); return;
+    // Új regisztráció – meghívó szükséges
+    registerWithInvite(n, pw, hashed, msg);
+  }
+}
+
+async function registerWithInvite(n, pw, hashed, msg) {
+  var safeTry = fbSafeName(n);
+  var takenInFirebase = Object.values(allTips).some(function(mt){
+    return mt && mt[safeTry] !== undefined;
+  });
+  if(allRegisteredUsers[safeTry]) {
+    if(msg) { msg.textContent = '❌ Ez a név már foglalt! Ha a tiéd, add meg az eredeti jelszavadat az eszközödön, vagy kérd KULT-ot a fiók kezeléséhez.'; msg.style.color='#ef4444'; }
+    showToast('❌ Ez a név már foglalt!'); return;
+  }
+  if(takenInFirebase) {
+    if(msg) { msg.textContent = '❌ Ez a név már foglalt!'; msg.style.color='#ef4444'; }
+    showToast('❌ Ez a név már foglalt!'); return;
+  }
+
+  // Meghívó ellenőrzés
+  if(!activeInviteToken) {
+    if(msg) { msg.textContent = '🔒 Új regisztráció csak meghívó linkkel lehetséges! Kérd KULT-ot, hogy küldjön neked egyet.'; msg.style.color='#ef4444'; }
+    showToast('🔒 Meghívó link szükséges!'); return;
+  }
+
+  // Extra mezők validálás
+  var realName = (document.getElementById('inviteRealName')||{}).value;
+  realName = realName ? realName.trim() : '';
+  var connection = (document.getElementById('inviteConnection')||{}).value;
+  connection = connection ? connection.trim() : '';
+  var contact = (document.getElementById('inviteContact')||{}).value;
+  contact = contact ? contact.trim() : '';
+  if(!realName) {
+    if(msg) { msg.textContent = '⚠️ Kérlek írd be a teljes neved!'; msg.style.color='#ef4444'; }
+    showToast('⚠️ Teljes név szükséges!'); return;
+  }
+  if(!connection) {
+    if(msg) { msg.textContent = '⚠️ Kérlek írd be honnan ismered a csoportot!'; msg.style.color='#ef4444'; }
+    showToast('⚠️ Írd be honnan ismered a csoportot!'); return;
+  }
+  if(!contact) {
+    if(msg) { msg.textContent = '⚠️ Kérlek adj meg egy elérhetőséget (email vagy telefon)!'; msg.style.color='#ef4444'; }
+    showToast('⚠️ Elérhetőség szükséges!'); return;
+  }
+
+  // Firebase meghívó check
+  try {
+    var inv = await fbGet('invites/'+activeInviteToken);
+    if(!inv) {
+      if(msg) { msg.textContent = '❌ Érvénytelen meghívó link!'; msg.style.color='#ef4444'; }
+      showToast('❌ Érvénytelen meghívó!'); return;
     }
-    // Regisztráció
+    if(inv.usedBy) {
+      if(msg) { msg.textContent = '❌ Ez a meghívó már fel lett használva ('+inv.usedBy+')!'; msg.style.color='#ef4444'; }
+      showToast('❌ Meghívó már felhasználva!'); return;
+    }
+    // Meghívó érvényes — regisztráció!
+    var users = getUsers();
     users[n] = hashed;
     saveUsers(users);
+    // Meghívó felhasználva + extra adatok mentése
+    await fbSet('invites/'+activeInviteToken+'/usedBy', safeTry);
+    await fbSet('invites/'+activeInviteToken+'/usedAt', getBudapestToday());
+    await fbSet('invites/'+activeInviteToken+'/realName', realName);
+    await fbSet('invites/'+activeInviteToken+'/connection', connection);
+    await fbSet('invites/'+activeInviteToken+'/contact', contact);
+    finishLogin(n);
+  } catch(e) {
+    if(msg) { msg.textContent = '❌ Hiba a meghívó ellenőrzésekor!'; msg.style.color='#ef4444'; }
+    showToast('❌ Hiba!');
   }
+}
+
+function finishLogin(n) {
   currentUser = n;
   localStorage.setItem(LS_SESSION, n);
   document.getElementById('regModal').style.display = 'none';
   checkAutoAdmin();
   renderAll();
-  // Firebase-be menti a felhasználót (regisztrált, de még nem feltétlenül tippelt)
   var safe = fbSafeName(n);
   fbSet('users/'+safe, {name: n, joined: getBudapestToday()}).catch(function(){});
   pollChat();
   showToast('🎉 Üdv, ' + n + '!');
+  pmCheckForUser();
+  // Invite param eltávolítása URL-ből
+  if(activeInviteToken && window.history.replaceState) {
+    var url = new URL(window.location);
+    url.searchParams.delete('invite');
+    window.history.replaceState({}, '', url);
+    activeInviteToken = '';
+  }
 }
 
 document.getElementById('nameInput').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('pwInput').focus(); });
@@ -1985,6 +2104,8 @@ document.getElementById('pwInput').addEventListener('keydown', function(e){ if(e
 if(currentUser) document.getElementById('regModal').style.display='none';
 checkAutoAdmin();
 updateAdminTabLabel();
+updateInviteStatus();
+setTimeout(function(){ pmCheckForUser(); }, 2000); // PM check after initial data load
 
 // Hardcode admin felhasználók automatikus feloldása
 function isHardcodeAdmin(name) {
@@ -2043,7 +2164,7 @@ function showTab(t) {
   if(colChat) colChat.style.display = (t==='meccsek' && window.innerWidth > 900) ? '' : 'none';
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
-  if(t==='admin'&&isAdminUnlocked) renderAdminMatches();
+  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); }
   if(t==='opl') oplLoad();
   if(t==='emob') renderEmobTab();
   if(t==='bl') renderBLTab();
@@ -2628,6 +2749,7 @@ function renderAll() {
   try { loadBetPoll(); } catch(e){}
   try { oplUpdateBadge(); } catch(e){}
   try { loadWatchPartyBadge(); } catch(e){}
+  try { pmCheckForUser(); } catch(e){}
   if(activeTab==='bl') try { renderBLTab(); } catch(e){}
 }
 
@@ -3174,7 +3296,7 @@ function renderMusicPublicStatus() {
 function renderAdminMatches() {
   // NE rendereljünk ha admin input fókuszban van (ne tüntesse el a beírt adatokat)
   var activeEl = document.activeElement;
-  if(activeEl && activeEl.id && (activeEl.id.startsWith('atip_') || activeEl.id.startsWith('sh_') || activeEl.id.startsWith('sa_') || activeEl.id.startsWith('emob') || activeEl.id.startsWith('proAdd') || activeEl.id.startsWith('vipAdd'))) return;
+  if(activeEl && activeEl.id && (activeEl.id.startsWith('atip_') || activeEl.id.startsWith('sh_') || activeEl.id.startsWith('sa_') || activeEl.id.startsWith('emob') || activeEl.id.startsWith('proAdd') || activeEl.id.startsWith('vipAdd') || activeEl.id.startsWith('pm') || activeEl.id.startsWith('invite'))) return;
 
   try { renderMusicPublicStatus(); } catch(e){}
   try { loadAdminUsers(); } catch(e){}
@@ -4351,32 +4473,38 @@ function renderVbPoll() {
   var safe = currentUser ? fbSafeName(currentUser) : null;
   var myWinner = safe ? (vbPollData.winner[safe]||null) : null;
   var myScorer = safe ? (vbPollData.scorer[safe]||null) : null;
+  var bothVoted = safe && myWinner && myScorer;
 
-  // Ha mindkét szavazat megvan → összecsuk
-  if(safe && myWinner && myScorer) {
-    if(poll) poll.style.display = 'none';
-    return;
-  }
   if(poll) poll.style.display = '';
 
   var locked = isVbPollLocked();
 
-  grid.innerHTML = VB_TEAMS.map(function(t){
-    var sel = myWinner === t.name ? ' selected' : '';
-    var dis = locked ? ' disabled style="opacity:0.4;cursor:default;"' : '';
-    return '<button class="vb-team-btn'+sel+'"'+(locked?'':" onclick=\"submitVbWinner('"+escHtml(t.name)+"')\"")+(locked?' disabled style="opacity:0.45;cursor:default;"':'')+' >'
-      +'<span class="vb-flag">'+t.flag+'</span>'
-      +'<span>'+t.name+'</span>'
-      +'</button>';
-  }).join('');
+  // Ha lezárva ÉS mindkét szavazat megvan: kompakt nézet
+  // Ha NEM lezárva: mindig mutatjuk az inputokat (módosítható!)
+  if(locked && bothVoted) {
+    grid.innerHTML = '';
+    var inp = document.getElementById('vbScorerInput');
+    if(inp) inp.parentElement.style.display = 'none';
+  } else {
+    grid.innerHTML = VB_TEAMS.map(function(t){
+      var sel = myWinner === t.name ? ' selected' : '';
+      return '<button class="vb-team-btn'+sel+'"'+(locked?'':" onclick=\"submitVbWinner('"+escHtml(t.name)+"')\"")+(locked?' disabled style="opacity:0.45;cursor:default;"':'')+' >'
+        +'<span class="vb-flag">'+t.flag+'</span>'
+        +'<span>'+t.name+'</span>'
+        +'</button>';
+    }).join('');
+    var inp = document.getElementById('vbScorerInput');
+    if(inp) inp.parentElement.style.display = '';
+  }
+
   var myEl = document.getElementById('vbWinnerMy');
   var pulseW = document.getElementById('pulseWinner');
   var pulseS = document.getElementById('pulseScorer');
   if(pulseW) pulseW.style.display = (!locked && !myWinner) ? '' : 'none';
   if(pulseS) pulseS.style.display = (!locked && !myScorer) ? '' : 'none';
-  if(myEl) myEl.textContent = locked
-    ? (myWinner ? '🏆 '+myWinner+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult (jún. 11. 18:00)')
-    : (myWinner ? 'A te tipped: 🏆 '+myWinner : (safe?'Még nem szavaztál':''));
+  if(myEl) myEl.innerHTML = locked
+    ? (myWinner ? '🏆 '+escHtml(myWinner)+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult (jún. 11. 18:00)')
+    : (myWinner ? '✅ A te tipped: <strong style="color:var(--gold);">🏆 '+escHtml(myWinner)+'</strong> <span style="font-size:10px;color:rgba(240,244,240,0.3);">· kattints másikra a módosításhoz</span>' : (safe?'Még nem szavaztál':''));
   var counts = {};
   Object.values(vbPollData.winner).forEach(function(v){ counts[v]=(counts[v]||0)+1; });
   var sorted = Object.entries(counts).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
@@ -4389,9 +4517,9 @@ function renderVbPoll() {
       +'<span class="vb-result-cnt">'+e[1]+'</span></div>';
   }).join('') || '<span style="font-size:11px;color:rgba(240,244,240,0.25);">Még nincs szavazat</span>';
   var scorerMyEl = document.getElementById('vbScorerMy');
-  if(scorerMyEl) scorerMyEl.textContent = locked
-    ? (myScorer ? '⚽ '+myScorer+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult')
-    : (myScorer ? 'A te tipped: ⚽ '+myScorer : (safe?'Még nem szavaztál':''));
+  if(scorerMyEl) scorerMyEl.innerHTML = locked
+    ? (myScorer ? '⚽ '+escHtml(myScorer)+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult')
+    : (myScorer ? '✅ A te tipped: <strong style="color:var(--gold);">⚽ '+escHtml(myScorer)+'</strong> <span style="font-size:10px;color:rgba(240,244,240,0.3);">· írd felül a módosításhoz</span>' : (safe?'Még nem szavaztál':''));
   var sc = {};
   Object.values(vbPollData.scorer).forEach(function(v){ if(v){sc[v]=(sc[v]||0)+1;} });
   var sortedSc = Object.entries(sc).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
@@ -4432,6 +4560,285 @@ async function submitVbScorer() {
   renderVbPoll();
   try { await fbSet('vbPoll/scorer/'+safe, val); showToast('⚽ '+val+' mentve!'); }
   catch(e){ showToast('❌ Firebase hiba!'); }
+}
+
+// ===== PRIVÁT ÜZENET (admin↔user) =====
+var pmConvoData = {};
+var pmSelectedUser = '';
+var pmMyMessages = [];
+
+// --- ADMIN OLDAL ---
+async function pmPopulateUsers() {
+  var sel = document.getElementById('pmUserSelect');
+  if(!sel) return;
+  // Lekérjük az összes privát beszélgetést
+  var allPm = {};
+  try { allPm = await fbGet('privateMsg') || {}; } catch(e){}
+  var opts = '<option value="">— Válassz felhasználót —</option>';
+  Object.keys(allRegisteredUsers).sort().forEach(function(u){
+    if(u === 'KULT') return;
+    var hasConvo = allPm[u] && allPm[u].messages;
+    var hasUnread = hasConvo && Object.values(allPm[u].messages).some(function(m){ return m.from !== 'KULT'; });
+    opts += '<option value="'+escHtml(u)+'">'+(hasConvo?'💬 ':'')+(hasUnread?'🔴 ':'')+escHtml(u)+'</option>';
+  });
+  sel.innerHTML = opts;
+}
+
+async function pmLoadConvo() {
+  var sel = document.getElementById('pmUserSelect');
+  pmSelectedUser = sel ? sel.value : '';
+  var wrap = document.getElementById('pmInputWrap');
+  var area = document.getElementById('pmChatArea');
+  if(!pmSelectedUser) {
+    if(area) area.innerHTML = '';
+    if(wrap) wrap.style.display = 'none';
+    return;
+  }
+  if(wrap) wrap.style.display = 'flex';
+  try {
+    var data = await fbGet('privateMsg/'+pmSelectedUser);
+    pmConvoData = data || {};
+  } catch(e) { pmConvoData = {}; }
+  pmRenderAdminChat();
+}
+
+function pmRenderAdminChat() {
+  var area = document.getElementById('pmChatArea');
+  if(!area) return;
+  var msgs = [];
+  if(pmConvoData.messages) {
+    Object.keys(pmConvoData.messages).sort().forEach(function(k){
+      msgs.push(pmConvoData.messages[k]);
+    });
+  }
+  if(!msgs.length) {
+    area.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.25);font-style:italic;">Még nincs üzenet</div>';
+    return;
+  }
+  area.innerHTML = msgs.map(function(m){
+    var isAdmin = m.from === 'KULT';
+    return '<div style="display:flex;flex-direction:column;align-items:'+(isAdmin?'flex-end':'flex-start')+';margin-bottom:4px;">'
+      +'<div style="max-width:85%;padding:7px 11px;border-radius:'+(isAdmin?'10px 10px 2px 10px':'10px 10px 10px 2px')+';background:'+(isAdmin?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.06)')+';border:1px solid '+(isAdmin?'rgba(245,197,24,0.2)':'rgba(255,255,255,0.08)')+';word-break:break-word;">'
+      +'<div style="font-size:12px;color:'+(isAdmin?'var(--gold)':'rgba(240,244,240,0.7)')+';">'+escHtml(m.text)+'</div>'
+      +'</div>'
+      +'<div style="font-size:9px;color:rgba(240,244,240,0.2);margin-top:1px;">'+escHtml(m.from)+' · '+(m.ts?new Date(m.ts).toLocaleString('hu-HU',{timeZone:'Europe/Budapest',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'')+'</div>'
+      +'</div>';
+  }).join('');
+  area.scrollTop = area.scrollHeight;
+}
+
+async function pmSend() {
+  if(!pmSelectedUser) return;
+  var inp = document.getElementById('pmInput');
+  var text = inp ? inp.value.trim() : '';
+  if(!text) return;
+  var msg = {from:'KULT', text:text, ts:Date.now()};
+  try {
+    await fbPush('privateMsg/'+pmSelectedUser+'/messages', msg);
+    await fbSet('privateMsg/'+pmSelectedUser+'/unread', true);
+    if(inp) inp.value = '';
+    await pmLoadConvo();
+    showToast('✉️ Üzenet elküldve: '+pmSelectedUser);
+  } catch(e){ showToast('❌ Hiba!'); }
+}
+
+async function pmDeleteConvo() {
+  if(!pmSelectedUser) return;
+  if(!confirm('Biztosan törlöd a beszélgetést ezzel: '+pmSelectedUser+'?\nA másik fél sem fogja többé látni.')) return;
+  try {
+    await fbDel('privateMsg/'+pmSelectedUser);
+    pmConvoData = {};
+    pmRenderAdminChat();
+    showToast('🗑️ Beszélgetés törölve: '+pmSelectedUser);
+  } catch(e){ showToast('❌ Hiba!'); }
+}
+
+// --- USER OLDAL ---
+async function pmCheckForUser() {
+  if(!currentUser) return;
+  var safe = fbSafeName(currentUser);
+  if(isHardcodeAdmin(currentUser)) return; // admin nem kap saját magától
+  try {
+    var data = await fbGet('privateMsg/'+safe);
+    if(!data || !data.messages) { pmHideNotify(); return; }
+    pmMyMessages = [];
+    Object.keys(data.messages).sort().forEach(function(k){ pmMyMessages.push(data.messages[k]); });
+    if(!pmMyMessages.length) { pmHideNotify(); return; }
+    var unread = data.unread === true;
+    pmShowNotify(pmMyMessages.length, unread);
+  } catch(e) { pmHideNotify(); }
+}
+
+function pmShowNotify(count, unread) {
+  var btn = document.getElementById('pmNotifyBtn');
+  var badge = document.getElementById('pmNotifyBadge');
+  if(!btn) return;
+  btn.style.display = 'flex';
+  if(badge) { badge.textContent = count; badge.style.display = unread ? 'flex' : 'none'; }
+  // Ha unread, pulzáló animáció
+  btn.style.animation = unread ? 'pulse 2s infinite' : 'none';
+}
+
+function pmHideNotify() {
+  var btn = document.getElementById('pmNotifyBtn');
+  if(btn) btn.style.display = 'none';
+}
+
+async function pmOpenModal() {
+  var modal = document.getElementById('pmModal');
+  if(modal) modal.style.display = 'flex';
+  // Markoljuk olvasottnak
+  if(currentUser) {
+    var safe = fbSafeName(currentUser);
+    try { await fbSet('privateMsg/'+safe+'/unread', false); } catch(e){}
+    var badge = document.getElementById('pmNotifyBadge');
+    if(badge) badge.style.display = 'none';
+    var btn = document.getElementById('pmNotifyBtn');
+    if(btn) btn.style.animation = 'none';
+  }
+  pmRenderUserChat();
+}
+
+function pmCloseModal() {
+  var modal = document.getElementById('pmModal');
+  if(modal) modal.style.display = 'none';
+}
+
+function pmRenderUserChat() {
+  var area = document.getElementById('pmUserChat');
+  if(!area) return;
+  if(!pmMyMessages.length) {
+    area.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.25);font-style:italic;">Nincs üzenet</div>';
+    return;
+  }
+  var safe = currentUser ? fbSafeName(currentUser) : '';
+  area.innerHTML = pmMyMessages.map(function(m){
+    var isMe = m.from === safe;
+    return '<div style="display:flex;flex-direction:column;align-items:'+(isMe?'flex-end':'flex-start')+';">'
+      +'<div style="max-width:85%;padding:8px 12px;border-radius:'+(isMe?'12px 12px 2px 12px':'12px 12px 12px 2px')+';background:'+(isMe?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.06)')+';border:1px solid '+(isMe?'rgba(245,197,24,0.2)':'rgba(255,255,255,0.08)')+';word-break:break-word;">'
+      +'<div style="font-size:14px;color:'+(isMe?'var(--gold)':'rgba(240,244,240,0.8)')+';">'+escHtml(m.text)+'</div>'
+      +'</div>'
+      +'<div style="font-size:9px;color:rgba(240,244,240,0.2);margin-top:2px;">'+(isMe?'Te':'👑 Admin')+' · '+(m.ts?new Date(m.ts).toLocaleString('hu-HU',{timeZone:'Europe/Budapest',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'')+'</div>'
+      +'</div>';
+  }).join('');
+  area.scrollTop = area.scrollHeight;
+}
+
+async function pmUserReply() {
+  if(!currentUser) return;
+  var inp = document.getElementById('pmUserInput');
+  var text = inp ? inp.value.trim() : '';
+  if(!text){ showToast('⚠️ Írj be valamit!'); return; }
+  var safe = fbSafeName(currentUser);
+  var msg = {from:safe, text:text, ts:Date.now()};
+  try {
+    await fbPush('privateMsg/'+safe+'/messages', msg);
+    pmMyMessages.push(msg);
+    if(inp) inp.value = '';
+    pmRenderUserChat();
+    showToast('✉️ Válasz elküldve');
+  } catch(e){ showToast('❌ Hiba!'); }
+}
+
+// ===== MEGHÍVÓ RENDSZER =====
+function inviteGenerateToken() {
+  var chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  var s = '';
+  for(var i=0;i<8;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+async function inviteGenerate() {
+  var noteEl = document.getElementById('inviteNote');
+  var note = noteEl ? noteEl.value.trim() : '';
+  var token = inviteGenerateToken();
+  try {
+    await fbSet('invites/'+token, {
+      note: note || '',
+      createdAt: getBudapestToday(),
+      usedBy: null
+    });
+    if(noteEl) noteEl.value = '';
+    showToast('🔗 Meghívó generálva!');
+    inviteLoadList();
+  } catch(e){ showToast('❌ Hiba!'); }
+}
+
+async function inviteLoadList() {
+  var el = document.getElementById('inviteList');
+  if(!el) return;
+  try {
+    var data = await fbGet('invites');
+    if(!data) { el.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.25);font-style:italic;">Még nincs meghívó</div>'; return; }
+    var baseUrl = window.location.origin + window.location.pathname;
+    var html = '';
+    Object.keys(data).sort(function(a,b){
+      return (data[b].createdAt||'').localeCompare(data[a].createdAt||'');
+    }).forEach(function(token){
+      var inv = data[token];
+      var used = !!inv.usedBy;
+      var link = baseUrl + '?invite=' + token;
+      html += '<div style="padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid rgba('+(used?'255,255,255,0.05':'245,197,24,0.15')+');background:rgba('+(used?'0,0,0,0.15':'245,197,24,0.04')+');">'
+        +'<div style="display:flex;align-items:center;gap:8px;">'
+        +'<span style="font-size:13px;">'+(used?'✅':'🔗')+'</span>'
+        +'<span style="font-family:Oswald,sans-serif;font-size:12px;color:'+(used?'rgba(240,244,240,0.35)':'var(--gold)')+';flex:1;font-weight:700;">'+(inv.note||'(nincs megjegyzés)')+'</span>'
+        +'<span style="font-size:10px;color:rgba(240,244,240,0.25);">'+inv.createdAt+'</span>'
+        +(used?'':'<button onclick="inviteCopy(\''+link+'\')" style="background:none;border:1px solid rgba(245,197,24,0.3);color:var(--gold);padding:3px 8px;border-radius:6px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;">📋 Másol</button>')
+        +'<button onclick="inviteDelete(\''+token+'\')" style="background:none;border:none;color:rgba(239,68,68,0.4);font-size:12px;cursor:pointer;padding:3px;">✕</button>'
+        +'</div>';
+      if(used) {
+        html += '<div style="font-size:11px;color:rgba(34,197,94,0.6);margin-top:3px;">Felhasználta: <strong>'+escHtml(inv.usedBy)+'</strong>'+(inv.usedAt?' ('+inv.usedAt+')':'')+'</div>';
+        if(inv.realName) html += '<div style="font-size:11px;color:rgba(240,244,240,0.45);margin-top:2px;">👤 '+escHtml(inv.realName)+(inv.connection?' · 🤝 '+escHtml(inv.connection):'')+(inv.contact?' · 📧 '+escHtml(inv.contact):'')+'</div>';
+      } else {
+        html += '<div style="margin-top:4px;"><input type="text" value="'+escHtml(link)+'" readonly onclick="this.select()" style="width:100%;padding:4px 8px;border-radius:6px;border:1px solid rgba(245,197,24,0.15);background:rgba(0,0,0,0.2);color:rgba(240,244,240,0.5);font-size:10px;font-family:monospace;box-sizing:border-box;"></div>';
+      }
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  } catch(e) { el.innerHTML = '<div style="font-size:11px;color:rgba(239,68,68,0.5);">Hiba betöltéskor</div>'; }
+}
+
+function inviteCopy(link) {
+  if(navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function(){ showToast('📋 Link másolva!'); });
+  } else {
+    var t = document.createElement('textarea');
+    t.value = link; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
+    showToast('📋 Link másolva!');
+  }
+}
+
+async function inviteDelete(token) {
+  try {
+    await fbDel('invites/'+token);
+    showToast('🗑️ Meghívó törölve');
+    inviteLoadList();
+  } catch(e){ showToast('❌ Hiba!'); }
+}
+
+// Regisztrációs modal frissítése meghívó állapot alapján
+function updateInviteStatus() {
+  var el = document.getElementById('inviteStatus');
+  var fields = document.getElementById('inviteFields');
+  if(!el) return;
+  if(activeInviteToken) {
+    el.style.display = 'block';
+    el.style.background = 'rgba(34,197,94,0.12)';
+    el.style.border = '1px solid rgba(34,197,94,0.3)';
+    el.style.color = '#4ade80';
+    el.textContent = '✅ Meghívóval érkeztél! Válassz nevet és jelszót.';
+    if(fields) fields.style.display = 'block';
+  } else if(!currentUser) {
+    el.style.display = 'block';
+    el.style.background = 'rgba(245,197,24,0.08)';
+    el.style.border = '1px solid rgba(245,197,24,0.2)';
+    el.style.color = 'rgba(245,197,24,0.7)';
+    el.textContent = '🔒 Új regisztráció csak meghívó linkkel. Ha van fiókod, lépj be!';
+    if(fields) fields.style.display = 'none';
+  } else {
+    el.style.display = 'none';
+    if(fields) fields.style.display = 'none';
+  }
 }
 
 // ===== MECCS KERESŐ =====
@@ -5023,5 +5430,23 @@ function toggleDayGroup(groupId, storageKey) {
   </div>
 </div>
 
+<!-- PRIVÁT ÜZENET ÉRTESÍTÉS (user oldali) -->
+<button id="pmNotifyBtn" onclick="pmOpenModal()" style="display:none;position:fixed;bottom:20px;left:16px;z-index:150;width:48px;height:48px;border-radius:50%;background:var(--gold);color:#0a1c0c;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,0.4);align-items:center;justify-content:center;animation:pulse 2s infinite;">
+  ✉️<span id="pmNotifyBadge" style="position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;">0</span>
+</button>
+<div id="pmModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;">
+  <div style="width:100%;max-width:440px;max-height:70vh;background:linear-gradient(180deg,#0f2a14,#0a1c0c);border:1px solid rgba(245,197,24,0.25);border-radius:16px 16px 0 0;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(245,197,24,0.15);flex-shrink:0;">
+      <span style="font-family:Oswald,sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;flex:1;">✉️ PRIVÁT ÜZENET AZ ADMINTÓL</span>
+      <button onclick="pmCloseModal()" style="background:none;border:none;color:rgba(240,244,240,0.4);font-size:20px;cursor:pointer;padding:0 4px;">✕</button>
+    </div>
+    <div id="pmUserChat" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:120px;"></div>
+    <div style="border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;flex-shrink:0;background:rgba(0,0,0,0.2);">
+      <input type="text" id="pmUserInput" placeholder="Válasz írása…" maxlength="500" onkeydown="if(event.key==='Enter')pmUserReply()"
+        style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(255,255,255,0.05);color:white;font-family:Oswald,sans-serif;font-size:14px;">
+      <button onclick="pmUserReply()" style="padding:8px 16px;border-radius:8px;background:var(--gold);color:#0a1c0c;border:none;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Küld</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
