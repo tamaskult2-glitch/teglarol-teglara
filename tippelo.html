@@ -891,6 +891,7 @@ footer a:hover{color:var(--gold);}
     <h2 id="regTitle">REGISZTRÁCIÓ</h2>
     <p id="regSubtitle">Válassz nevet és jelszót.<br>Legközelebb ugyanezzel léphetsz be.</p>
     <div id="inviteStatus" style="display:none;margin-bottom:8px;padding:8px 12px;border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;text-align:center;"></div>
+    <div id="usernameLabel" style="display:none;font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);letter-spacing:0.5px;margin-bottom:4px;text-align:left;">🎮 KÍVÁNT FELHASZNÁLÓNÉV</div>
     <input type="text" id="nameInput" placeholder="NEVED (pl. Kovács Péter)" maxlength="20" autocomplete="off"
       oninput="checkExistingUser()">
     <input type="password" id="pwInput" placeholder="JELSZÓ" maxlength="30" autocomplete="new-password"
@@ -4479,13 +4480,24 @@ function renderVbPoll() {
 
   var locked = isVbPollLocked();
 
-  // Ha lezárva ÉS mindkét szavazat megvan: kompakt nézet
-  // Ha NEM lezárva: mindig mutatjuk az inputokat (módosítható!)
-  if(locked && bothVoted) {
+  // Subtitle frissítés
+  var subEl = document.querySelector('.vb-poll-sub');
+  if(subEl) {
+    if(bothVoted && !locked) subEl.textContent = 'Tippjeid leadva — módosíthatod a kickoff-ig';
+    else if(bothVoted && locked) subEl.textContent = 'Tippjeid leadva — szavazás lezárva';
+    else if(locked) subEl.textContent = 'Szavazás lezárva';
+    else subEl.textContent = 'Szavazz — 1 szavazat tippelőnként';
+  }
+
+  // Compact nézet: ha mindkét szavazat megvan → inputok elrejtése
+  var showInputs = !bothVoted || window._vbPollExpanded;
+  if(bothVoted && !showInputs) {
     grid.innerHTML = '';
+    grid.style.display = 'none';
     var inp = document.getElementById('vbScorerInput');
     if(inp) inp.parentElement.style.display = 'none';
   } else {
+    grid.style.display = '';
     grid.innerHTML = VB_TEAMS.map(function(t){
       var sel = myWinner === t.name ? ' selected' : '';
       return '<button class="vb-team-btn'+sel+'"'+(locked?'':" onclick=\"submitVbWinner('"+escHtml(t.name)+"')\"")+(locked?' disabled style="opacity:0.45;cursor:default;"':'')+' >'
@@ -4497,6 +4509,10 @@ function renderVbPoll() {
     if(inp) inp.parentElement.style.display = '';
   }
 
+  // Question labels: elrejtés compact módban
+  var qlabels = document.querySelectorAll('.vb-poll-qlabel');
+  qlabels.forEach(function(ql){ ql.style.display = (bothVoted && !showInputs) ? 'none' : ''; });
+
   var myEl = document.getElementById('vbWinnerMy');
   var pulseW = document.getElementById('pulseWinner');
   var pulseS = document.getElementById('pulseScorer');
@@ -4504,7 +4520,7 @@ function renderVbPoll() {
   if(pulseS) pulseS.style.display = (!locked && !myScorer) ? '' : 'none';
   if(myEl) myEl.innerHTML = locked
     ? (myWinner ? '🏆 '+escHtml(myWinner)+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult (jún. 11. 18:00)')
-    : (myWinner ? '✅ A te tipped: <strong style="color:var(--gold);">🏆 '+escHtml(myWinner)+'</strong> <span style="font-size:10px;color:rgba(240,244,240,0.3);">· kattints másikra a módosításhoz</span>' : (safe?'Még nem szavaztál':''));
+    : (myWinner ? '✅ A te tipped: <strong style="color:var(--gold);">🏆 '+escHtml(myWinner)+'</strong>' : (safe?'Még nem szavaztál':''));
   var counts = {};
   Object.values(vbPollData.winner).forEach(function(v){ counts[v]=(counts[v]||0)+1; });
   var sorted = Object.entries(counts).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
@@ -4519,18 +4535,46 @@ function renderVbPoll() {
   var scorerMyEl = document.getElementById('vbScorerMy');
   if(scorerMyEl) scorerMyEl.innerHTML = locked
     ? (myScorer ? '⚽ '+escHtml(myScorer)+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult')
-    : (myScorer ? '✅ A te tipped: <strong style="color:var(--gold);">⚽ '+escHtml(myScorer)+'</strong> <span style="font-size:10px;color:rgba(240,244,240,0.3);">· írd felül a módosításhoz</span>' : (safe?'Még nem szavaztál':''));
+    : (myScorer ? '✅ A te tipped: <strong style="color:var(--gold);">⚽ '+escHtml(myScorer)+'</strong>' : (safe?'Még nem szavaztál':''));
   var sc = {};
-  Object.values(vbPollData.scorer).forEach(function(v){ if(v){sc[v]=(sc[v]||0)+1;} });
+  var scDisplay = {}; // normalizált kulcs → legtöbbször használt írásmód
+  function normScorer(s){ return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
+  Object.values(vbPollData.scorer).forEach(function(v){
+    if(!v) return;
+    var key = normScorer(v);
+    sc[key] = (sc[key]||0) + 1;
+    if(!scDisplay[key]) scDisplay[key] = {};
+    scDisplay[key][v] = (scDisplay[key][v]||0) + 1;
+  });
+  // Display név: az adott key-hez a legtöbbször használt változat
+  var scBest = {};
+  Object.keys(scDisplay).forEach(function(key){
+    var best = Object.entries(scDisplay[key]).sort(function(a,b){return b[1]-a[1];})[0];
+    scBest[key] = best ? best[0] : key;
+  });
   var sortedSc = Object.entries(sc).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
   var totalSc = Object.values(sc).reduce(function(s,n){return s+n;},0);
   var scResEl = document.getElementById('vbScorerResults');
   if(scResEl) scResEl.innerHTML = sortedSc.map(function(e){
     var pct = totalSc ? Math.round(e[1]/totalSc*100) : 0;
-    return '<div class="vb-result-row"><span class="vb-result-label">'+escHtml(e[0])+'</span>'
+    var displayName = scBest[e[0]] || e[0];
+    return '<div class="vb-result-row"><span class="vb-result-label">'+escHtml(displayName)+'</span>'
       +'<div class="vb-result-bar-bg"><div class="vb-result-bar" style="width:'+pct+'%"></div></div>'
       +'<span class="vb-result-cnt">'+e[1]+'</span></div>';
   }).join('') || '<span style="font-size:11px;color:rgba(240,244,240,0.25);">Még nincs szavazat</span>';
+
+  // Módosítás gomb (compact módban, nem lezárva)
+  var modBtnId = 'vbPollModifyBtn';
+  var existing = document.getElementById(modBtnId);
+  if(existing) existing.remove();
+  if(bothVoted && !locked && !window._vbPollExpanded) {
+    var btn = document.createElement('button');
+    btn.id = modBtnId;
+    btn.innerHTML = '✏️ Módosítás';
+    btn.style.cssText = 'display:block;margin:8px auto 0;padding:6px 16px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(245,197,24,0.08);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;';
+    btn.onclick = function(){ window._vbPollExpanded = true; renderVbPoll(); };
+    poll.appendChild(btn);
+  }
 }
 
 // Első VB meccs kickoff alapján zárolás
@@ -4571,11 +4615,18 @@ var pmMyMessages = [];
 async function pmPopulateUsers() {
   var sel = document.getElementById('pmUserSelect');
   if(!sel) return;
+  // Összegyűjtjük MINDEN ismert usert (users + tips)
+  var allKnown = {};
+  Object.keys(allRegisteredUsers).forEach(function(u){ allKnown[u] = true; });
+  Object.keys(allTips).forEach(function(mid){
+    if(!allTips[mid]) return;
+    Object.keys(allTips[mid]).forEach(function(safe){ allKnown[safe.toUpperCase()] = true; });
+  });
   // Lekérjük az összes privát beszélgetést
   var allPm = {};
   try { allPm = await fbGet('privateMsg') || {}; } catch(e){}
   var opts = '<option value="">— Válassz felhasználót —</option>';
-  Object.keys(allRegisteredUsers).sort().forEach(function(u){
+  Object.keys(allKnown).sort().forEach(function(u){
     if(u === 'KULT') return;
     var hasConvo = allPm[u] && allPm[u].messages;
     var hasUnread = hasConvo && Object.values(allPm[u].messages).some(function(m){ return m.from !== 'KULT'; });
@@ -4820,14 +4871,18 @@ async function inviteDelete(token) {
 function updateInviteStatus() {
   var el = document.getElementById('inviteStatus');
   var fields = document.getElementById('inviteFields');
+  var uLabel = document.getElementById('usernameLabel');
+  var nameInp = document.getElementById('nameInput');
   if(!el) return;
   if(activeInviteToken) {
     el.style.display = 'block';
     el.style.background = 'rgba(34,197,94,0.12)';
     el.style.border = '1px solid rgba(34,197,94,0.3)';
     el.style.color = '#4ade80';
-    el.textContent = '✅ Meghívóval érkeztél! Válassz nevet és jelszót.';
+    el.textContent = '✅ Meghívóval érkeztél! Töltsd ki az alábbi mezőket.';
     if(fields) fields.style.display = 'block';
+    if(uLabel) uLabel.style.display = 'block';
+    if(nameInp) nameInp.placeholder = 'pl. BERCI, KOVACS_P, ZSOFI';
   } else if(!currentUser) {
     el.style.display = 'block';
     el.style.background = 'rgba(245,197,24,0.08)';
@@ -4835,9 +4890,12 @@ function updateInviteStatus() {
     el.style.color = 'rgba(245,197,24,0.7)';
     el.textContent = '🔒 Új regisztráció csak meghívó linkkel. Ha van fiókod, lépj be!';
     if(fields) fields.style.display = 'none';
+    if(uLabel) uLabel.style.display = 'none';
+    if(nameInp) nameInp.placeholder = 'NEVED (pl. Kovács Péter)';
   } else {
     el.style.display = 'none';
     if(fields) fields.style.display = 'none';
+    if(uLabel) uLabel.style.display = 'none';
   }
 }
 
