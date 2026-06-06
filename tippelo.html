@@ -4744,11 +4744,14 @@ function renderVbPoll() {
     if(!scDisplay[key]) scDisplay[key] = {};
     scDisplay[key][v] = (scDisplay[key][v]||0) + 1;
   });
-  // Display név: az adott key-hez a legtöbbször használt változat
+  // Display név: az adott key-hez a legtöbbször használt változat, nagy kezdőbetűvel
   var scBest = {};
   Object.keys(scDisplay).forEach(function(key){
     var best = Object.entries(scDisplay[key]).sort(function(a,b){return b[1]-a[1];})[0];
-    scBest[key] = best ? best[0] : key;
+    var name = best ? best[0] : key;
+    // Nagy kezdőbetű biztosítás
+    name = name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+    scBest[key] = name;
   });
   var sortedSc = Object.entries(sc).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
   var totalSc = Object.values(sc).reduce(function(s,n){return s+n;},0);
@@ -4797,6 +4800,8 @@ async function submitVbScorer() {
   var inp = document.getElementById('vbScorerInput');
   var val = (inp ? inp.value : '').trim();
   if(!val){ showToast('⚠️ Írd be a nevet!'); return; }
+  // Nagy kezdőbetű minden szóra
+  val = val.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
   var safe = fbSafeName(currentUser);
   vbPollData.scorer[safe] = val;
   renderVbPoll();
