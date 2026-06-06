@@ -4899,7 +4899,6 @@ async function pmDeleteConvo() {
 async function pmCheckForUser() {
   if(!currentUser) return;
   var safe = fbSafeName(currentUser);
-  if(isHardcodeAdmin(currentUser)) return; // admin nem kap saját magától
   try {
     var data = await fbGet('privateMsg/'+safe);
     if(!data || !data.messages) { pmHideNotify(); return; }
@@ -5083,6 +5082,15 @@ async function submitInviteRequest() {
       if(msg) { msg.textContent='❌ Hiba a mentésnél: '+(res&&res.error?res.error:'ismeretlen'); msg.style.color='#ef4444'; }
       return;
     }
+    // Privát üzenet az adminnak (KULT) — megjelenik a ✉️ ikonban
+    try {
+      await fbPush('privateMsg/KULT/messages', {
+        from: '📩 MEGHÍVÓ KÉRÉS',
+        text: '👤 '+name+'\n📧 '+contact+'\n🤝 '+connection,
+        ts: Date.now()
+      });
+      await fbSet('privateMsg/KULT/unread', true);
+    } catch(e3){}
     // EmailJS értesítés adminnak (ha elérhető)
     if(typeof emailjs !== 'undefined') {
       try {
