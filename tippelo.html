@@ -4974,6 +4974,9 @@ async function pmUserReply() {
   var msg = {from:safe, text:text, ts:Date.now()};
   try {
     await fbPush('privateMsg/'+safe+'/messages', msg);
+    // Admin értesítés — ✉️ ikon felvillan
+    await fbPush('privateMsg/KULT/messages', {from:'💬 '+safe, text:text, ts:Date.now()}).catch(function(){});
+    await fbSet('privateMsg/KULT/unread', true).catch(function(){});
     pmMyMessages.push(msg);
     if(inp) inp.value = '';
     pmRenderUserChat();
