@@ -1834,6 +1834,24 @@ async function pollData() {
     else if(oplRaw && typeof oplRaw==='object') oplItems = Object.values(oplRaw).filter(Boolean);
     // (ha null: megtartjuk a meglévő cache-t)
     setStatus('online','Szinkronizálva');
+    // Törölt felhasználó ellenőrzés
+    if(currentUser && !isHardcodeAdmin(currentUser)) {
+      var mySafe = fbSafeName(currentUser);
+      try {
+        var deleted = await fbGet('deletedUsers/'+mySafe);
+        if(deleted) {
+          localStorage.removeItem(LS_SESSION);
+          var usrs = getUsers(); delete usrs[currentUser]; saveUsers(usrs);
+          currentUser = null;
+          document.getElementById('regModal').style.display = 'flex';
+          document.getElementById('nameInput').value = '';
+          document.getElementById('pwInput').value = '';
+          updateInviteStatus();
+          pmHideNotify();
+          showToast('⚠️ A fiókod törölve lett.');
+        }
+      } catch(e){}
+    }
     renderAll();
   } catch(e) {
     setStatus('err','Kapcsolati hiba');
@@ -3554,7 +3572,7 @@ async function deleteUser(){
   var name = document.getElementById('delUserInput').value.trim().toUpperCase();
   if(!name){showToast('⚠️ Add meg a nevet!');return;}
   var safeName = fbSafeName(name);
-  if(!confirm('Biztosan törlöd ' + name + ' összes tippjét?')) return;
+  if(!confirm('Biztosan törlöd ' + name + ' összes tippjét és fiókját?')) return;
   try {
     // Összes meccsből töröljük
     var tips = await fbGet('tips').catch(function(){return null;});
@@ -3563,12 +3581,20 @@ async function deleteUser(){
     Object.keys(tips).forEach(function(mid){
       if(tips[mid][safeName]!==undefined){
         deletePromises.push(fbDel('tips/'+mid+'/'+safeName));
-        // allTips-ből is
         if(allTips[mid]) delete allTips[mid][safeName];
       }
     });
+    // Fiók törlése + jelölés
+    deletePromises.push(fbDel('users/'+safeName));
+    deletePromises.push(fbSet('deletedUsers/'+safeName, getBudapestToday()));
+    deletePromises.push(fbDel('vbPoll/winner/'+safeName));
+    deletePromises.push(fbDel('vbPoll/scorer/'+safeName));
+    deletePromises.push(fbDel('betPoll/'+safeName));
+    deletePromises.push(fbDel('watchParty/'+safeName));
+    deletePromises.push(fbDel('privateMsg/'+safeName));
     await Promise.all(deletePromises);
-    showToast('✅ ' + name + ' törölve (' + deletePromises.length + ' meccs)');
+    if(allRegisteredUsers[safeName]) delete allRegisteredUsers[safeName];
+    showToast('✅ ' + name + ' teljesen törölve (' + deletePromises.length + ' művelet)');
     document.getElementById('delUserInput').value = '';
     await pollData();
     renderAdminMatches();
