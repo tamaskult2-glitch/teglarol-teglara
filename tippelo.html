@@ -1495,6 +1495,35 @@ footer a:hover{color:var(--gold);}
         </div>
       </div>
     </div>
+    <!-- ADMIN JELSZÓ -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">🔑 ADMIN JELSZÓ MÓDOSÍTÁS</span></div>
+      <div class="adm-collapse-body">
+        <input type="password" id="admPwOld" placeholder="Jelenlegi jelszó" maxlength="30"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+        <input type="password" id="admPwNew" placeholder="Új jelszó (min. 4 karakter)" maxlength="30"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+        <input type="password" id="admPwNew2" placeholder="Új jelszó mégegyszer" maxlength="30"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:8px;">
+        <button onclick="adminChangePassword()" style="width:100%;padding:9px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔑 JELSZÓ MÓDOSÍTÁS</button>
+        <div id="admPwMsg" style="font-size:11px;margin-top:6px;min-height:16px;text-align:center;"></div>
+      </div>
+    </div>
+    <!-- ADMIN JELSZÓ -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">🔑 ADMIN JELSZÓ MÓDOSÍTÁS</span></div>
+      <div class="adm-collapse-body">
+        <div style="font-size:11px;color:rgba(240,244,240,0.3);margin-bottom:8px;">Az admin jelszó Firebase-ben tárolódik, nem a forráskódban.</div>
+        <input type="password" id="admPwOld" placeholder="Jelenlegi jelszó" maxlength="30"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+        <input type="password" id="admPwNew" placeholder="Új jelszó" maxlength="30"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+        <input type="password" id="admPwNew2" placeholder="Új jelszó mégegyszer" maxlength="30"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:8px;">
+        <button onclick="changeAdminPw()" style="width:100%;padding:9px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔑 JELSZÓ MÓDOSÍTÁSA</button>
+        <div id="admPwMsg" style="font-size:11px;margin-top:6px;min-height:16px;text-align:center;"></div>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -1624,7 +1653,7 @@ footer a:hover{color:var(--gold);}
 <script>
 // ===== CONFIG =====
 const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
-const ADMIN_PW_HASH = '-uzxjkk';
+var ADMIN_PW_HASH = null; // Firebase-ből töltődik: tipp2026/adminPwHash
 const ADMIN_USERS = ['KULT']; // Mindig admin jogú felhasználók (jelszó nélkül is)
 const POLL_MS = 8000;
 // localStorage kulcsok (csak session + jelszavak)
@@ -1771,7 +1800,7 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw] = await Promise.all([
+    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw,adminPwRaw] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
@@ -1783,6 +1812,7 @@ async function pollData() {
       fbGet('musicPublic').catch(function(){return null;}),
       fbGet('opl').catch(function(){return null;}),
       fbGet('users').catch(function(){return null;}),
+      fbGet('adminPwHash').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -1807,6 +1837,13 @@ async function pollData() {
     musicPublic = !!musicPublicRaw;
     // Regisztrált felhasználók
     allRegisteredUsers = usersRaw || {};
+    // Admin jelszó hash (Firebase-ből, ha nincs még → alapértelmezett beállítás)
+    if(adminPwRaw) {
+      ADMIN_PW_HASH = adminPwRaw;
+    } else if(!ADMIN_PW_HASH) {
+      ADMIN_PW_HASH = '-uzxjkk';
+      fbSet('adminPwHash', ADMIN_PW_HASH).catch(function(){});
+    }
     // OPL cache frissítése (badge-hez)
     if(Array.isArray(oplRaw)) oplItems = oplRaw.filter(Boolean);
     else if(oplRaw && typeof oplRaw==='object') oplItems = Object.values(oplRaw).filter(Boolean);
@@ -3072,6 +3109,27 @@ async function sendChat() {
 // ===== ADMIN =====
 function checkAdmin(){if(simpleHash(document.getElementById('adminPwInput').value)===ADMIN_PW_HASH){isAdminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').classList.add('visible');renderAdminMatches();renderProAdmin();}else showToast('❌ Hibás jelszó!');}
 
+async function adminChangePassword() {
+  var oldPw = (document.getElementById('admPwOld')||{}).value || '';
+  var newPw = (document.getElementById('admPwNew')||{}).value || '';
+  var newPw2 = (document.getElementById('admPwNew2')||{}).value || '';
+  var msg = document.getElementById('admPwMsg');
+  if(!oldPw) { if(msg){msg.textContent='⚠️ Add meg a jelenlegi jelszót!';msg.style.color='#ef4444';} return; }
+  if(simpleHash(oldPw) !== ADMIN_PW_HASH) { if(msg){msg.textContent='❌ Hibás jelenlegi jelszó!';msg.style.color='#ef4444';} return; }
+  if(newPw.length < 4) { if(msg){msg.textContent='⚠️ Az új jelszó legalább 4 karakter legyen!';msg.style.color='#ef4444';} return; }
+  if(newPw !== newPw2) { if(msg){msg.textContent='❌ A két új jelszó nem egyezik!';msg.style.color='#ef4444';} return; }
+  try {
+    var newHash = simpleHash(newPw);
+    await fbSet('adminPwHash', newHash);
+    ADMIN_PW_HASH = newHash;
+    document.getElementById('admPwOld').value = '';
+    document.getElementById('admPwNew').value = '';
+    document.getElementById('admPwNew2').value = '';
+    if(msg){msg.textContent='✅ Jelszó sikeresen módosítva!';msg.style.color='#4ade80';}
+    showToast('🔑 Admin jelszó megváltoztatva!');
+  } catch(e) { if(msg){msg.textContent='❌ Hiba a mentésnél!';msg.style.color='#ef4444';} }
+}
+
 function runAccountRecovery() {
   var pw = (document.getElementById('recoveryAdminPw').value||'').trim();
   var msg = document.getElementById('recoveryMsg');
@@ -3357,7 +3415,7 @@ function renderMusicPublicStatus() {
 function renderAdminMatches() {
   // NE rendereljünk ha admin input fókuszban van (ne tüntesse el a beírt adatokat)
   var activeEl = document.activeElement;
-  if(activeEl && activeEl.id && (activeEl.id.startsWith('atip_') || activeEl.id.startsWith('sh_') || activeEl.id.startsWith('sa_') || activeEl.id.startsWith('emob') || activeEl.id.startsWith('proAdd') || activeEl.id.startsWith('vipAdd') || activeEl.id.startsWith('pm') || activeEl.id.startsWith('invite'))) return;
+  if(activeEl && activeEl.id && (activeEl.id.startsWith('atip_') || activeEl.id.startsWith('sh_') || activeEl.id.startsWith('sa_') || activeEl.id.startsWith('emob') || activeEl.id.startsWith('proAdd') || activeEl.id.startsWith('vipAdd') || activeEl.id.startsWith('pm') || activeEl.id.startsWith('invite') || activeEl.id.startsWith('admPw'))) return;
 
   try { renderMusicPublicStatus(); } catch(e){}
   try { loadAdminUsers(); } catch(e){}
