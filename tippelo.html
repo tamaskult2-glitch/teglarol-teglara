@@ -1004,10 +1004,11 @@ footer a:hover{color:var(--gold);}
       <div class="ob-step">
         <div class="ob-step-icon">🎯</div>
         <div class="ob-step-body">
-          <div class="ob-step-title">Pontos eredmény (+3 pont)</div>
+          <div class="ob-step-title">Pontos eredmény (bónusz pontok)</div>
           <div class="ob-step-desc">
-            A <b>+3 pont</b> mezőbe beírhatsz pontos góleredményt is (pl. <b>2:1</b>).<br>
-            Írd be mindkét számot, majd nyomd meg a <b>+3pt</b> gombot.<br>
+            A <b>📐+🎯</b> mezőbe beírhatsz pontos góleredményt is (pl. <b>2:1</b>).<br>
+            Ha a gólkülönbség stimmel: <b>+1 bónusz</b> · Ha a pontos eredmény: <b>+3 pont</b>.<br>
+            Kieséses szakaszban és döntőben szorzóval számít!<br>
             Módosításhoz egyszerűen írd át és mentsd újra — a kickoffig bármikor.
           </div>
         </div>
@@ -1018,14 +1019,33 @@ footer a:hover{color:var(--gold);}
         <div class="ob-step-body">
           <div class="ob-step-title">Pontozás</div>
           <div class="ob-step-desc">
+            <div style="font-weight:700;margin-bottom:4px;">⚽ Csoportkör (1× szorzó)</div>
             <table class="ob-score-table">
               <tr><td>✅ Helyes kimenetel (1/X/2)</td><td class="pts">+1 pont</td></tr>
+              <tr><td>📐 Helyes gólkülönbség</td><td class="pts">+1 pont</td></tr>
               <tr><td>🎯 Pontos góleredmény</td><td class="pts">+3 pont</td></tr>
-              <tr><td>⚡ Helyes hosszabbítás kimenetel</td><td class="pts">+1 pont</td></tr>
-              <tr><td>🥅 Helyes 11-es győztes</td><td class="pts">+1 pont</td></tr>
               <tr><td>❌ Téves tipp</td><td class="pts">0 pont</td></tr>
             </table>
-            A pontos eredmény <b>felváltja</b> az 1 pontos tippet — ha eltalálod, +3 jár (nem +1+3).
+            <div style="font-weight:700;margin:8px 0 4px;">🏟️ Kieséses szakasz (2× szorzó)</div>
+            <table class="ob-score-table">
+              <tr><td>✅ Helyes kimenetel</td><td class="pts">+2 pont</td></tr>
+              <tr><td>📐 Helyes gólkülönbség</td><td class="pts">+2 pont</td></tr>
+              <tr><td>🎯 Pontos góleredmény</td><td class="pts">+6 pont</td></tr>
+              <tr><td>⚡ Helyes hosszabbítás</td><td class="pts">+2 pont</td></tr>
+              <tr><td>🥅 Helyes 11-es győztes</td><td class="pts">+2 pont</td></tr>
+            </table>
+            <div style="font-weight:700;margin:8px 0 4px;">🏆 Döntő (3× szorzó)</div>
+            <table class="ob-score-table">
+              <tr><td>✅ Helyes kimenetel</td><td class="pts">+3 pont</td></tr>
+              <tr><td>📐 Helyes gólkülönbség</td><td class="pts">+3 pont</td></tr>
+              <tr><td>🎯 Pontos góleredmény</td><td class="pts">+9 pont</td></tr>
+              <tr><td>⚡ Helyes hosszabbítás</td><td class="pts">+3 pont</td></tr>
+              <tr><td>🥅 Helyes 11-es győztes</td><td class="pts">+3 pont</td></tr>
+            </table>
+            <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-top:6px;">
+              📐 A gólkülönbség bónusz akkor jár, ha a kimenetel helyes és a gólkülönbség is stimmel (pl. tipp 2:0, eredmény 3:1 = azonos gólkülönbség).<br>
+              🎯 A pontos eredmény <b>felváltja</b> a kimenetel + gólkülönbség pontot (nem halmozódik).
+            </div>
           </div>
         </div>
       </div>
@@ -1033,11 +1053,11 @@ footer a:hover{color:var(--gold);}
       <div class="ob-step">
         <div class="ob-step-icon">⚡</div>
         <div class="ob-step-body">
-          <div class="ob-step-title">Hosszabbítás &amp; 11-esek (BL Döntő)</div>
+          <div class="ob-step-title">Hosszabbítás &amp; 11-esek</div>
           <div class="ob-step-desc">
-            A BL Döntőn (és más kiesési meccseken) ha <b>X-et tippelsz</b> a 90 percre, megjelenik a <b>⚡ HOSSZABBÍTÁS</b> sor — itt is tippelhetsz 1/X/2-re.<br>
+            Kieséses meccseknél ha <b>X-et tippelsz</b> a 90 percre, megjelenik a <b>⚡ HOSSZABBÍTÁS</b> sor — itt is tippelhetsz 1/X/2-re.<br>
             Ha ott is <b>X-et tippelsz</b>, megjelenik a <b>🥅 11-ESEK</b> sor (1 vagy 2 — nincs döntetlen).<br>
-            Helyes hosszabbítás-tipp: <b>+1 pont</b> · Helyes 11-es-tipp: <b>+1 pont</b>.<br>
+            Kieséses szakaszban <b>2× szorzó</b>, döntőben <b>3× szorzó</b>!<br>
             <b>Fontos:</b> ha visszaváltasz 1-re vagy 2-re a 90 percnél, a hosszabbítás és 11-es tipped törlődik.
           </div>
         </div>
@@ -1081,7 +1101,11 @@ footer a:hover{color:var(--gold);}
     </div>
 
     <div class="onboard-footer">
-      <button class="ob-start-btn" onclick="closeOnboard()">ÉRTEM, KEZDJÜK! ⚽</button>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px;padding:10px 14px;border-radius:10px;border:1px solid rgba(245,197,24,0.15);background:rgba(245,197,24,0.04);">
+        <input type="checkbox" id="obAccept" onchange="document.getElementById('obStartBtn').disabled=!this.checked;document.getElementById('obStartBtn').style.opacity=this.checked?'1':'0.35'" style="width:20px;height:20px;accent-color:var(--gold);cursor:pointer;">
+        <span style="font-family:'Source Sans 3',sans-serif;font-size:13px;color:rgba(240,244,240,0.7);line-height:1.4;">Elolvastam és megértettem a pontozási szabályokat és a játék feltételeit.</span>
+      </label>
+      <button class="ob-start-btn" id="obStartBtn" onclick="closeOnboard()" disabled style="opacity:0.35">ÉRTEM, KEZDJÜK! ⚽</button>
       <span class="ob-skip" onclick="closeOnboard()">Ne mutasd újra</span>
     </div>
   </div>
@@ -1954,17 +1978,11 @@ function getWeeklyMvpBukta() {
   var pts = {};
   weekMatches.forEach(function(m){
     var res = allResults[m.id];
-    var sc = allScores[m.id];
+    if(!res) return;
     if(!allTips[m.id]) return;
     Object.keys(allTips[m.id]).forEach(function(u){
       if(!pts[u]) pts[u]=0;
-      var tip = allTips[m.id][u];
-      var o = getTipOutcome(tip);
-      if(o===res){
-        var ts = getTipScore(tip);
-        if(ts && sc && ts.h+':'+ts.a===sc) pts[u]+=3;
-        else pts[u]+=1;
-      }
+      pts[u] += calcMatchPoints(m, allTips[m.id][u]);
     });
   });
   var entries = Object.entries(pts);
@@ -2255,6 +2273,58 @@ function getTipEt(t){ return t && typeof t==='object' && t.et ? t.et : null; }
 function getTipPen(t){ return t && typeof t==='object' && t.pen ? t.pen : null; }
 function isKnockoutMatch(m){ return !!(m && m.knockout); }
 
+// Szorzó: csoportkör=1x, kiesési=2x, döntő=3x
+function getMatchMultiplier(m) {
+  if(!m || !isVbMatch(m)) return 1;
+  if(!m.knockout) return 1;
+  if(m.group && /döntő|DÖNTŐ|final|FINAL/i.test(m.group)) return 3;
+  if(m.id && /FINAL/i.test(m.id)) return 3;
+  if(m.title && /döntő|DÖNTŐ|final/i.test(m.title) && !/elődöntő|negyeddöntő|bronz/i.test(m.title)) return 3;
+  return 2;
+}
+
+// Gólkülönbség eltalálása (de NEM pontos eredmény)
+function isGoalDiffCorrect(tipScore, realScore) {
+  if(!tipScore || !realScore) return false;
+  var parts = realScore.split(':');
+  if(parts.length !== 2) return false;
+  var rh = parseInt(parts[0]), ra = parseInt(parts[1]);
+  var th = parseInt(tipScore.h), ta = parseInt(tipScore.a);
+  if(isNaN(rh)||isNaN(ra)||isNaN(th)||isNaN(ta)) return false;
+  return (th - ta) === (rh - ra);
+}
+
+// Pont számítás egy meccsre
+function calcMatchPoints(m, tip) {
+  if(!m || !tip) return 0;
+  var res = allResults[m.id];
+  if(!res) return 0;
+  var outcome = getTipOutcome(tip);
+  if(!outcome) return 0;
+  var mult = getMatchMultiplier(m);
+  var pts = 0;
+  if(outcome === res) {
+    var tipSc = getTipScore(tip);
+    var realSc = allScores[m.id];
+    if(tipSc && realSc && tipSc.h+':'+tipSc.a === realSc) {
+      pts = 3; // pontos eredmény
+    } else {
+      pts = 1; // helyes kimenetel
+      if(tipSc && realSc && isGoalDiffCorrect(tipSc, realSc)) {
+        pts += 1; // gólkülönbség bónusz
+      }
+    }
+  }
+  // Knockout bónuszok
+  if(m.knockout) {
+    var etRes = allEtResults[m.id];
+    if(etRes) { var etTip = getTipEt(tip); if(etTip && etTip === etRes) pts += 1; }
+    var penRes = allPenResults[m.id];
+    if(penRes) { var penTip = getTipPen(tip); if(penTip && penTip === penRes) pts += 1; }
+  }
+  return pts * mult;
+}
+
 async function submitTip(mid,tip,phase) {
   phase = phase || 'o'; // 'o' = rendes játékidő, 'et' = hosszabbítás, 'pen' = 11-esek
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
@@ -2370,11 +2440,21 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
 
   if (result) {
     // Meccs lejátszva: pontszám megjelenítés
-    var pts = isExact ? 3 : (outcome === result ? 1 : 0);
-    var ptsBadge = pts === 3
-      ? '<span class="pts-badge pts3">+3 🎯</span>'
-      : pts === 1 ? '<span class="pts-badge">+1</span>'
-      : (outcome ? '<span class="pts-badge" style="opacity:0.35">0 pt</span>' : '');
+    var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+    var mult = m ? getMatchMultiplier(m) : 1;
+    var basePts = isExact ? 3 : (outcome === result ? 1 : 0);
+    var goalDiffBonus = 0;
+    if(!isExact && outcome === result && myScore && realScore && isGoalDiffCorrect(myScore, realScore)) {
+      goalDiffBonus = 1;
+    }
+    var pts = (basePts + goalDiffBonus) * mult;
+    var multLabel = mult > 1 ? ' ×'+mult : '';
+    var ptsBadge = isExact
+      ? '<span class="pts-badge pts3">+'+pts+' 🎯'+multLabel+'</span>'
+      : goalDiffBonus > 0
+        ? '<span class="pts-badge" style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35);">+'+pts+' 📐'+multLabel+'</span>'
+        : (outcome === result ? '<span class="pts-badge">+'+pts+multLabel+'</span>'
+        : (outcome ? '<span class="pts-badge" style="opacity:0.35">0 pt</span>' : ''));
     var scoreBadge = myScore
       ? '<span style="font-size:10px;color:' + (isExact?'#4ade80':'rgba(240,244,240,0.35)') + ';font-family:Oswald,sans-serif;font-weight:600;">' + myScore.h + ':' + myScore.a + (isExact?' 🎯':'') + '</span>'
       : '';
@@ -2388,7 +2468,7 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
     var btnCls = 'score-save-btn' + (myScore ? ' saved' : '');
     var btnTxt = myScore ? '✓ Mentve' : 'Mentés';
     return '<div class="score-row">'
-      + '<span class="score-row-label">+3:</span>'
+      + '<span class="score-row-label">📐+🎯:</span>'
       + '<div class="score-inputs-wrap">'
       + '<input type="number" min="0" max="20" id="sh_tip_' + mid + '" placeholder="–"'
       + ' value="' + hVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
@@ -3030,24 +3110,10 @@ function renderLeaderboard() {
       if(outcome){
         tot++;
         if(res){
-          if(outcome===res){
-            const tipSc=getTipScore(tip);
-            if(tipSc&&realSc&&tipSc.h+':'+tipSc.a===realSc){pts+=3;exact++;}
-            else pts+=1;
-          }
-          // Kiesési (knockout) meccseknél bónusz ET/PEN
-          if(m.knockout) {
-            var etRes = allEtResults[m.id];
-            if(etRes){
-              var etTip = getTipEt(tip);
-              if(etTip && etTip === etRes) pts+=1;
-            }
-            var penRes = allPenResults[m.id];
-            if(penRes){
-              var penTip = getTipPen(tip);
-              if(penTip && penTip === penRes) pts+=1;
-            }
-          }
+          pts += calcMatchPoints(m, tip);
+          // Pontos eredmény számláló (szorzó nélkül)
+          var tipSc=getTipScore(tip);
+          if(tipSc&&realSc&&tipSc.h+':'+tipSc.a===realSc) exact++;
         } else pend++;
       }
     });
