@@ -1281,6 +1281,18 @@ footer a:hover{color:var(--gold);}
           <div class="stat-item"><div class="stat-num" id="stCorrect">0</div><div class="stat-label">Pontjaim</div></div>
           <div class="stat-item"><div class="stat-num" id="stAcc">–</div><div class="stat-label">Pontosság</div></div>
         </div>
+        <!-- FELHÍVÁS BANNER -->
+        <div id="betAlertBanner" style="margin:10px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(245,197,24,0.08));border:2px solid rgba(239,68,68,0.35);border-radius:12px;position:relative;">
+          <div style="font-family:Oswald,sans-serif;font-size:15px;color:#ef4444;font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">⚠️ FONTOS FELHÍVÁS!</div>
+          <div style="font-size:13px;color:rgba(240,244,240,0.8);line-height:1.5;">
+            Mindenki adja le a <b style="color:var(--gold);">💰 Tét javaslatát</b> a Tét fülön!<br>
+            Aki nem szavaz, <b style="color:#ef4444;">kizárásra kerül</b> a versenyből.<br><br>
+            <span style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">📅 <b>Tét javaslat határidő:</b> <span style="color:var(--gold);font-weight:700;">szerda 23:59</span></span>
+            <span style="display:flex;align-items:center;gap:6px;">💸 <b>Tét befizetés határidő:</b> <span style="color:var(--gold);font-weight:700;">csütörtök 14:00</span></span>
+          </div>
+          <button onclick="this.parentElement.style.display='none';localStorage.setItem('betAlertDismissed','1')" style="position:absolute;top:8px;right:10px;background:none;border:none;color:rgba(240,244,240,0.3);font-size:16px;cursor:pointer;">✕</button>
+        </div>
+        <script>if(localStorage.getItem('betAlertDismissed')==='1')document.getElementById('betAlertBanner').style.display='none';</script>
         <!-- GYŐZTES BANNER - az orbitba került a fejlécbe -->
 
         <!-- VB SZUPERPOLL -->
@@ -1861,6 +1873,10 @@ async function pollData() {
     else if(oplRaw && typeof oplRaw==='object') oplItems = Object.values(oplRaw).filter(Boolean);
     // (ha null: megtartjuk a meglévő cache-t)
     setStatus('online','Szinkronizálva');
+    // Reg modal frissítés ha nyitva van
+    if(!currentUser && document.getElementById('regModal').style.display !== 'none') {
+      try { checkExistingUser(); } catch(e){}
+    }
     // Törölt felhasználó ellenőrzés
     if(currentUser && !isHardcodeAdmin(currentUser)) {
       var mySafe = fbSafeName(currentUser);
@@ -2068,11 +2084,13 @@ function checkExistingUser() {
   var subtitle = document.getElementById('regSubtitle');
   var btn = document.getElementById('regBtn');
   var msg = document.getElementById('regMsg');
-  if(n.length >= 2 && users[n]) {
+  var safeTry = n ? fbSafeName(n) : '';
+  var knownInFirebase = safeTry && (allRegisteredUsers[safeTry] || getAllKnownUsers()[safeTry]);
+  if(n.length >= 2 && (users[n] || knownInFirebase)) {
     if(title) title.textContent = 'BELÉPÉS';
     if(subtitle) subtitle.textContent = 'Üdv vissza! Add meg a jelszavad.';
     if(btn) btn.textContent = 'BELÉPEK →';
-    if(msg) msg.textContent = '✓ Ismert felhasználó';
+    if(msg) { msg.textContent = '✓ Ismert felhasználó'; msg.style.color='#4ade80'; }
   } else if(n.length >= 2) {
     if(title) title.textContent = 'REGISZTRÁCIÓ';
     if(subtitle) subtitle.textContent = 'Új fiók – válassz jelszót.';
@@ -2095,12 +2113,62 @@ function register() {
       if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
       showToast('❌ Hibás jelszó!'); return;
     }
-    // Sikeres belépés
     finishLogin(n);
   } else {
-    // Új regisztráció – meghívó szükséges
-    registerWithInvite(n, pw, hashed, msg);
+    // Nem ismert lokálisan — Firebase-ben megnézzük
+    checkFirebaseAndRegister(n, pw, hashed, msg);
   }
+}
+
+async function checkFirebaseAndRegister(n, pw, hashed, msg) {
+  var safeTry = fbSafeName(n);
+  if(msg) { msg.textContent = '⏳ Ellenőrzés…'; msg.style.color = 'rgba(245,197,24,0.6)'; }
+  try {
+    // 1. Törölt user ellenőrzés
+    var deleted = await fbGet('deletedUsers/'+safeTry).catch(function(){return null;});
+    if(deleted) {
+      if(msg) { msg.textContent = '❌ Ez a fiók törölve lett. Kérj új meghívót!'; msg.style.color='#ef4444'; }
+      return;
+    }
+    // 2. Regisztrált user ellenőrzés
+    var fbUser = await fbGet('users/'+safeTry).catch(function(){return null;});
+    if(fbUser) {
+      var users = getUsers();
+      users[n] = hashed;
+      saveUsers(users);
+      finishLogin(n);
+      return;
+    }
+    // 3. Tippekben keresés (egyszerűsítve: csak egy meccs tippjeit nézzük)
+    var tipsAll = await fbGet('tips').catch(function(){return null;});
+    if(tipsAll) {
+      var found = false;
+      for(var mid in tipsAll) {
+        if(tipsAll[mid] && tipsAll[mid][safeTry] !== undefined) { found = true; break; }
+      }
+      if(found) {
+        var users = getUsers();
+        users[n] = hashed;
+        saveUsers(users);
+        finishLogin(n);
+        return;
+      }
+    }
+    // 4. VB Poll-ban keresés
+    var vbWinner = await fbGet('vbPoll/winner/'+safeTry).catch(function(){return null;});
+    if(vbWinner) {
+      var users = getUsers();
+      users[n] = hashed;
+      saveUsers(users);
+      finishLogin(n);
+      return;
+    }
+  } catch(e) {
+    if(msg) { msg.textContent = '❌ Kapcsolati hiba: '+e.message; msg.style.color='#ef4444'; }
+    return;
+  }
+  // Nem létezik sehol — meghívó szükséges
+  registerWithInvite(n, pw, hashed, msg);
 }
 
 async function registerWithInvite(n, pw, hashed, msg) {
