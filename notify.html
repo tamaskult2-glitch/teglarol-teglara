@@ -161,14 +161,19 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 3 tégla frissítve (2026. máj. 29.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 8 tégla frissítve (2026. jún. 8.)
 
 📊 Mai frissítések:
-• 🇪🇺 Uniós források: TÖRTÉNELMI! 16,4 Mrd EUR (~6000 Mrd Ft) megállapodás Von der Leyennel Brüsszelben
-• ⚖️ Európai Ügyészség: Magyarország hivatalosan kérte a csatlakozást (EPPO)
-• 🚫 Vendégmunkás-stop: jún.1-i moratórium megerősítve
+• 📚 Pedagógusbérek: MK 1179/2026 – teljesítményértékelési rendszer eltörölve, új rendszer aug. 31-ig
+• 🚫 Vendégmunkás-stop: MK rendelet jún. 6-tól hatályos – harmadik országbeli foglalkoztatás korlátozva
+• 🇪🇺 Uniós források: korrupcióellenes törvénycsomag benyújtása jövő héten
+• 📺 Médiatörvény: közmédia átalakítás két lépcsőben, Demeter Szilárd távozott
+• 🚂 Vasúti modernizáció: Budapest–Belgrád átvilágítás elrendelve
+• ⚖️ Átláthatóság: korrupcióellenes csomag az OGY elé kerül
+• 🏛️ Pártfinanszírozás: felülvizsgálat bejelentve
+• 🔍 Gyanús szerződések: MK 1180/2026 – lélegeztetőgép-vizsgálat elrendelve
 
-📊 Ver. 3.4 – 102 tégla | 3 megvalósult | 72 bejelentve | 27 ígéret
+📊 102 tégla | 3 megvalósult | 72 bejelentve | 27 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -204,28 +209,30 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 3 tégla frissítve (2026. máj. 29.)
+    dbInput.value = `🧱 8 tégla frissítve (2026. jún. 8.)
 
 📊 Mai frissítések:
-• 🇪🇺 Uniós források: TÖRTÉNELMI! 16,4 Mrd EUR (~6000 Mrd Ft) megállapodás Von der Leyennel Brüsszelben
-• ⚖️ Európai Ügyészség: Magyarország hivatalosan kérte a csatlakozást (EPPO)
-• 🚫 Vendégmunkás-stop: jún.1-i moratórium megerősítve
+• 📚 Pedagógusbérek: MK 1179/2026 – teljesítményértékelési rendszer eltörölve, új rendszer aug. 31-ig
+• 🚫 Vendégmunkás-stop: MK rendelet jún. 6-tól hatályos – harmadik országbeli foglalkoztatás korlátozva
+• 🇪🇺 Uniós források: korrupcióellenes törvénycsomag benyújtása jövő héten
+• 📺 Médiatörvény: közmédia átalakítás két lépcsőben, Demeter Szilárd távozott
+• 🚂 Vasúti modernizáció: Budapest–Belgrád átvilágítás elrendelve
+• ⚖️ Átláthatóság: korrupcióellenes csomag az OGY elé kerül
+• 🏛️ Pártfinanszírozás: felülvizsgálat bejelentve
+• 🔍 Gyanús szerződések: MK 1180/2026 – lélegeztetőgép-vizsgálat elrendelve
 
-📊 Ver. 3.4 – 102 tégla | 3 megvalósult | 72 bejelentve | 27 ígéret
+📊 102 tégla | 3 megvalósult | 72 bejelentve | 27 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `🧱 3 tégla frissítve (2026. máj. 29.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. jún. 8.)
 
-📊 Mai frissítések:
-• 🇪🇺 Uniós források: TÖRTÉNELMI! 16,4 Mrd EUR (~6000 Mrd Ft) megállapodás Von der Leyennel Brüsszelben
-• ⚖️ Európai Ügyészség: Magyarország hivatalosan kérte a csatlakozást (EPPO)
-• 🚫 Vendégmunkás-stop: jún.1-i moratórium megerősítve
+📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
+• Üzemanyag, élelmiszer, rezsi összehasonlítás
+• TISZA ígéretek hatásvizsgálata
 
-📊 Ver. 3.4 – 102 tégla | 3 megvalósult | 72 bejelentve | 27 ígéret
-
-🔗 teglarol-teglara.hu`;
+🔗 teglarol-teglara.hu/penztarca.html`;
     dbInput.placeholder = 'Pénztárcaindex launch üzenet';
   } else {
     dbInput.value = '';
