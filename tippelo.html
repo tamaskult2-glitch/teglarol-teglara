@@ -2461,15 +2461,23 @@ function handleScoreSave(btn) {
   var hN = parseInt(hVal), aN = parseInt(aVal);
   if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){showToast('⚠️ 0-20 közötti szám!');return;}
   
-  var outcome = hN>aN?'1':hN===aN?'X':'2';
+  var scoreOutcome = hN>aN?'1':hN===aN?'X':'2';
   if(!allTips[mid]) allTips[mid]={};
   
-  // Megőrizzük a meglévő tippet (1/X/2) és hozzáadjuk a score-t, valamint az ET/pen-t is
+  // Megőrizzük a meglévő tippet (1/X/2)
   var existing = allTips[mid][fbSafeName(currentUser)] || {};
   var existingOutcome = getTipOutcome(existing);
   var existingEt = getTipEt(existing);
   var existingPen = getTipPen(existing);
-  var newTip = {o: existingOutcome||outcome, h:hN, a:aN};
+  
+  // Validáció: az eredmény egyezzen a kimenetellel
+  if(existingOutcome && existingOutcome !== scoreOutcome) {
+    var labels = {'1':'hazai győzelem (1)','X':'döntetlen (X)','2':'vendég győzelem (2)'};
+    showToast('⚠️ A '+hN+':'+aN+' eredmény nem egyezik a tippeddel: '+labels[existingOutcome]+'!');
+    return;
+  }
+  
+  var newTip = {o: existingOutcome||scoreOutcome, h:hN, a:aN};
   if(existingEt) newTip.et = existingEt;
   if(existingPen) newTip.pen = existingPen;
   allTips[mid][fbSafeName(currentUser)] = newTip;
