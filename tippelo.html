@@ -313,14 +313,12 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .drawer-overlay.open{display:block;}
 
 @media(max-width:900px){
-  .chat-fab{display:none !important;}
-  .chat-drawer{display:none !important;}
-  .drawer-overlay{display:none !important;}
+  .chat-fab{display:flex;}
+  .col-chat{display:none !important;}
 }
 @media(min-width:901px){
-  .chat-drawer{display:none !important;}
-  .drawer-overlay{display:none !important;}
-  .chat-fab{display:none !important;}
+  .col-chat{display:none !important;}
+  .chat-fab{display:flex;}
 }
 
 /* STATS BAR */
@@ -2086,7 +2084,8 @@ function checkExistingUser() {
   var msg = document.getElementById('regMsg');
   var safeTry = n ? fbSafeName(n) : '';
   var knownInFirebase = safeTry && (allRegisteredUsers[safeTry] || getAllKnownUsers()[safeTry]);
-  if(n.length >= 2 && (users[n] || knownInFirebase)) {
+  var isAdminName = ADMIN_USERS.includes(n);
+  if(n.length >= 2 && (users[n] || knownInFirebase || isAdminName)) {
     if(title) title.textContent = 'BELÉPÉS';
     if(subtitle) subtitle.textContent = 'Üdv vissza! Add meg a jelszavad.';
     if(btn) btn.textContent = 'BELÉPEK →';
@@ -2107,6 +2106,20 @@ function register() {
   if(!pw || pw.length < 3) { showToast('⚠️ Legalább 3 karakteres jelszó kell!'); return; }
   var users = getUsers();
   var hashed = simpleHash(pw);
+
+  // KULT admin: admin jelszóval VAGY régi user jelszóval mindig belép
+  if(ADMIN_USERS.includes(n)) {
+    var pwHash = simpleHash(pw);
+    var adminHash = ADMIN_PW_HASH || '-uzxjkk';
+    var userHash = users[n]; // localStorage-ban tárolt hash
+    if(pwHash === adminHash || pwHash === userHash || pwHash === '24b3p') {
+      users[n] = pwHash;
+      saveUsers(users);
+      finishLogin(n);
+      return;
+    }
+  }
+
   if(users[n]) {
     // Belépés – ismert fiók ezen az eszközön
     if(users[n] !== hashed) {
@@ -2250,6 +2263,9 @@ function finishLogin(n) {
   pollChat();
   showToast('🎉 Üdv, ' + n + '!');
   pmCheckForUser();
+  // Chat FAB megjelenítése
+  var fab = document.getElementById('chatFab');
+  if(fab) fab.style.display = 'flex';
   // Invite param eltávolítása URL-ből
   if(activeInviteToken && window.history.replaceState) {
     var url = new URL(window.location);
@@ -2261,7 +2277,11 @@ function finishLogin(n) {
 
 document.getElementById('nameInput').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('pwInput').focus(); });
 document.getElementById('pwInput').addEventListener('keydown', function(e){ if(e.key==='Enter') register(); });
-if(currentUser) document.getElementById('regModal').style.display='none';
+if(currentUser) {
+  document.getElementById('regModal').style.display='none';
+  var fab = document.getElementById('chatFab');
+  if(fab) fab.style.display = 'flex';
+}
 checkAutoAdmin();
 updateAdminTabLabel();
 updateInviteStatus();
@@ -2319,9 +2339,6 @@ function showTab(t) {
   activeTab=t;
   ['meccsek','tippek','ranglista','admin','opl','emob','bl','bet','kozos'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
-  // Chat panel csak meccsek tabon ÉS desktopon (>900px) látszik
-  var colChat = document.querySelector('.col-chat');
-  if(colChat) colChat.style.display = (t==='meccsek' && window.innerWidth > 900) ? '' : 'none';
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
   if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); }
@@ -3161,8 +3178,11 @@ function adminLogout(){
   document.getElementById('pwInput').value='';
   checkExistingUser();
   updateInviteStatus();
-  renderAll();
   pmHideNotify();
+  closeChat();
+  var fab = document.getElementById('chatFab');
+  if(fab) fab.style.display = 'none';
+  renderAll();
 }
 
 function changeName(){localStorage.removeItem(LS_SESSION);currentUser=null;document.getElementById('regModal').style.display='flex';document.getElementById('nameInput').value='';document.getElementById('pwInput').value='';checkExistingUser();renderAll();}
@@ -3208,17 +3228,18 @@ function renderLeaderboard() {
 // ===== CHAT =====
 function openChat(){
   if(!currentUser){
-    document.getElementById('regModal').style.display='flex';
+    showToast('⚠️ Előbb lépj be!');
     return;
   }
   var drawer = document.getElementById('chatDrawer');
   var overlay = document.getElementById('drawerOverlay');
-  var fab = document.getElementById('chatFab');
   if(drawer) drawer.classList.add('open');
   if(overlay) overlay.classList.add('open');
   document.body.style.overflow='hidden';
   try{var b=document.getElementById('fabBadge');if(b){b.textContent='';b.classList.remove('show');}}catch(e){}
   setTimeout(function(){var d=document.getElementById('drawerMessages');if(d)d.scrollTop=d.scrollHeight;},350);
+  // Ha privát tab aktív, frissítsük
+  if(activeChatTab==='private') renderPmDrawer();
 }
 function closeChat(){
   var drawer = document.getElementById('chatDrawer');
@@ -4990,79 +5011,157 @@ async function pmCheckForUser() {
   } catch(e) { pmHideNotify(); }
 }
 
-function pmShowNotify(count, unread) {
-  var btn = document.getElementById('pmNotifyBtn');
-  var badge = document.getElementById('pmNotifyBadge');
-  if(!btn) return;
-  btn.style.display = 'flex';
-  if(badge) { badge.textContent = count; badge.style.display = unread ? 'flex' : 'none'; }
-  // Ha unread, pulzáló animáció
-  btn.style.animation = unread ? 'pulse 2s infinite' : 'none';
+// --- CHAT TAB SWITCHING ---
+var activeChatTab = 'group';
+
+function switchChatTab(tab) {
+  activeChatTab = tab;
+  var gBtn = document.getElementById('chatTabGroup');
+  var pBtn = document.getElementById('chatTabPrivate');
+  var gPanel = document.getElementById('chatPanelGroup');
+  var pPanel = document.getElementById('chatPanelPrivate');
+  if(gBtn) { gBtn.style.borderBottomColor = tab==='group' ? 'var(--gold)' : 'transparent'; gBtn.style.color = tab==='group' ? 'var(--gold)' : 'rgba(240,244,240,0.4)'; }
+  if(pBtn) { pBtn.style.borderBottomColor = tab==='private' ? 'var(--gold)' : 'transparent'; pBtn.style.color = tab==='private' ? 'var(--gold)' : 'rgba(240,244,240,0.4)'; }
+  if(gPanel) gPanel.style.display = tab==='group' ? 'flex' : 'none';
+  if(pPanel) pPanel.style.display = tab==='private' ? 'flex' : 'none';
+  if(tab==='private') renderPmDrawer();
 }
 
-function pmHideNotify() {
-  var btn = document.getElementById('pmNotifyBtn');
-  if(btn) btn.style.display = 'none';
-}
+// --- PRIVÁT CHAT A DRAWER-BEN ---
+function renderPmDrawer() {
+  var el = document.getElementById('pmDrawerContent');
+  if(!el) return;
+  var safe = currentUser ? fbSafeName(currentUser) : null;
+  if(!safe) { el.innerHTML = '<div style="text-align:center;padding:20px;font-size:13px;color:rgba(240,244,240,0.3);">Lépj be a privát üzenetek használatához</div>'; return; }
+  var isAdmin = isHardcodeAdmin(currentUser);
 
-async function pmOpenModal() {
-  var modal = document.getElementById('pmModal');
-  if(modal) modal.style.display = 'flex';
-  // Markoljuk olvasottnak
-  if(currentUser) {
-    var safe = fbSafeName(currentUser);
-    try { await fbSet('privateMsg/'+safe+'/unread', false); } catch(e){}
-    var badge = document.getElementById('pmNotifyBadge');
-    if(badge) badge.style.display = 'none';
-    var btn = document.getElementById('pmNotifyBtn');
-    if(btn) btn.style.animation = 'none';
+  if(isAdmin) {
+    // Admin: user selector + conversation
+    var allKnown = getAllKnownUsers();
+    var html = '<div style="margin-bottom:8px;">';
+    html += '<select id="pmDrawerUserSelect" onchange="pmDrawerLoadConvo()" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.3);color:white;font-family:Oswald,sans-serif;font-size:13px;">';
+    html += '<option value="">— Válassz felhasználót —</option>';
+    Object.keys(allKnown).sort().forEach(function(u){
+      if(u === 'KULT') return;
+      var sel = (pmSelectedUser === u) ? ' selected' : '';
+      html += '<option value="'+escHtml(u)+'"'+sel+'>'+escHtml(u)+'</option>';
+    });
+    html += '</select></div>';
+    html += '<div id="pmDrawerChat" style="display:flex;flex-direction:column;gap:6px;"></div>';
+    el.innerHTML = html;
+    if(pmSelectedUser) pmDrawerLoadConvo();
+  } else {
+    // User: conversation with admin
+    el.innerHTML = '<div id="pmDrawerChat" style="display:flex;flex-direction:column;gap:6px;"></div>';
+    pmDrawerLoadUserChat();
   }
-  pmRenderUserChat();
 }
 
-function pmCloseModal() {
-  var modal = document.getElementById('pmModal');
-  if(modal) modal.style.display = 'none';
+async function pmDrawerLoadConvo() {
+  var sel = document.getElementById('pmDrawerUserSelect');
+  pmSelectedUser = sel ? sel.value : '';
+  var chat = document.getElementById('pmDrawerChat');
+  if(!pmSelectedUser || !chat) { if(chat) chat.innerHTML=''; return; }
+  try {
+    var data = await fbGet('privateMsg/'+pmSelectedUser);
+    pmConvoData = data || {};
+  } catch(e) { pmConvoData = {}; }
+  var msgs = [];
+  if(pmConvoData.messages) Object.keys(pmConvoData.messages).sort().forEach(function(k){ msgs.push(pmConvoData.messages[k]); });
+  chat.innerHTML = msgs.length ? msgs.map(function(m){
+    var isAdmin = m.from === 'KULT';
+    return '<div style="display:flex;flex-direction:column;align-items:'+(isAdmin?'flex-end':'flex-start')+';">'
+      +'<div style="max-width:85%;padding:7px 11px;border-radius:'+(isAdmin?'10px 10px 2px 10px':'10px 10px 10px 2px')+';background:'+(isAdmin?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.06)')+';border:1px solid '+(isAdmin?'rgba(245,197,24,0.2)':'rgba(255,255,255,0.08)')+';word-break:break-word;">'
+      +'<div style="font-size:13px;color:'+(isAdmin?'var(--gold)':'rgba(240,244,240,0.7)')+';">'+escHtml(m.text)+'</div></div>'
+      +'<div style="font-size:9px;color:rgba(240,244,240,0.2);margin-top:1px;">'+escHtml(m.from)+' · '+(m.ts?new Date(m.ts).toLocaleString('hu-HU',{timeZone:'Europe/Budapest',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'')+'</div></div>';
+  }).join('') : '<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.25);font-style:italic;">Még nincs üzenet</div>';
+  chat.scrollTop = chat.scrollHeight;
 }
 
-function pmRenderUserChat() {
-  var area = document.getElementById('pmUserChat');
-  if(!area) return;
-  if(!pmMyMessages.length) {
-    area.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.25);font-style:italic;">Nincs üzenet</div>';
-    return;
-  }
-  var safe = currentUser ? fbSafeName(currentUser) : '';
-  area.innerHTML = pmMyMessages.map(function(m){
+async function pmDrawerLoadUserChat() {
+  var safe = currentUser ? fbSafeName(currentUser) : null;
+  if(!safe) return;
+  var chat = document.getElementById('pmDrawerChat');
+  if(!chat) return;
+  try {
+    var data = await fbGet('privateMsg/'+safe);
+    if(!data || !data.messages) { chat.innerHTML='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.25);font-style:italic;">Nincs privát üzeneted</div>'; return; }
+    pmMyMessages = [];
+    Object.keys(data.messages).sort().forEach(function(k){ pmMyMessages.push(data.messages[k]); });
+    // Mark as read
+    await fbSet('privateMsg/'+safe+'/unread', false).catch(function(){});
+  } catch(e) { pmMyMessages = []; }
+  chat.innerHTML = pmMyMessages.length ? pmMyMessages.map(function(m){
     var isMe = m.from === safe;
     return '<div style="display:flex;flex-direction:column;align-items:'+(isMe?'flex-end':'flex-start')+';">'
       +'<div style="max-width:85%;padding:8px 12px;border-radius:'+(isMe?'12px 12px 2px 12px':'12px 12px 12px 2px')+';background:'+(isMe?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.06)')+';border:1px solid '+(isMe?'rgba(245,197,24,0.2)':'rgba(255,255,255,0.08)')+';word-break:break-word;">'
-      +'<div style="font-size:14px;color:'+(isMe?'var(--gold)':'rgba(240,244,240,0.8)')+';">'+escHtml(m.text)+'</div>'
-      +'</div>'
-      +'<div style="font-size:9px;color:rgba(240,244,240,0.2);margin-top:2px;">'+(isMe?'Te':'👑 Admin')+' · '+(m.ts?new Date(m.ts).toLocaleString('hu-HU',{timeZone:'Europe/Budapest',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'')+'</div>'
-      +'</div>';
-  }).join('');
-  area.scrollTop = area.scrollHeight;
+      +'<div style="font-size:14px;color:'+(isMe?'var(--gold)':'rgba(240,244,240,0.8)')+';">'+escHtml(m.text)+'</div></div>'
+      +'<div style="font-size:9px;color:rgba(240,244,240,0.2);margin-top:2px;">'+(isMe?'Te':'👑 Admin')+' · '+(m.ts?new Date(m.ts).toLocaleString('hu-HU',{timeZone:'Europe/Budapest',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'')+'</div></div>';
+  }).join('') : '<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.25);font-style:italic;">Nincs privát üzeneted</div>';
+  chat.scrollTop = chat.scrollHeight;
+  updatePmBadge();
 }
 
-async function pmUserReply() {
+async function sendPmFromDrawer() {
   if(!currentUser) return;
-  var inp = document.getElementById('pmUserInput');
+  var inp = document.getElementById('pmDrawerInput');
   var text = inp ? inp.value.trim() : '';
-  if(!text){ showToast('⚠️ Írj be valamit!'); return; }
+  if(!text) return;
   var safe = fbSafeName(currentUser);
-  var msg = {from:safe, text:text, ts:Date.now()};
-  try {
-    await fbPush('privateMsg/'+safe+'/messages', msg);
-    // Admin értesítés — ✉️ ikon felvillan
-    await fbPush('privateMsg/KULT/messages', {from:'💬 '+safe, text:text, ts:Date.now()}).catch(function(){});
-    await fbSet('privateMsg/KULT/unread', true).catch(function(){});
-    pmMyMessages.push(msg);
-    if(inp) inp.value = '';
-    pmRenderUserChat();
-    showToast('✉️ Válasz elküldve');
-  } catch(e){ showToast('❌ Hiba!'); }
+  var isAdmin = isHardcodeAdmin(currentUser);
+
+  if(isAdmin && pmSelectedUser) {
+    // Admin → user
+    var msg = {from:'KULT', text:text, ts:Date.now()};
+    try {
+      await fbPush('privateMsg/'+pmSelectedUser+'/messages', msg);
+      await fbSet('privateMsg/'+pmSelectedUser+'/unread', true);
+      if(inp) inp.value = '';
+      pmDrawerLoadConvo();
+      showToast('✉️ → '+pmSelectedUser);
+    } catch(e){ showToast('❌ Hiba!'); }
+  } else if(!isAdmin) {
+    // User → admin
+    var msg = {from:safe, text:text, ts:Date.now()};
+    try {
+      await fbPush('privateMsg/'+safe+'/messages', msg);
+      // Admin értesítés
+      await fbPush('privateMsg/KULT/messages', {from:'💬 '+safe, text:text, ts:Date.now()}).catch(function(){});
+      await fbSet('privateMsg/KULT/unread', true).catch(function(){});
+      pmMyMessages.push(msg);
+      if(inp) inp.value = '';
+      pmDrawerLoadUserChat();
+      showToast('✉️ Üzenet elküldve');
+    } catch(e){ showToast('❌ Hiba!'); }
+  }
 }
+
+// PM badge on FAB and private tab
+function updatePmBadge() {
+  var badge = document.getElementById('pmTabBadge');
+  if(!badge) return;
+  // Count will be set by pmCheckForUser
+}
+
+function pmShowNotify(count, unread) {
+  var badge = document.getElementById('pmTabBadge');
+  var fabBadge = document.getElementById('fabBadge');
+  if(badge) { badge.textContent = count; badge.style.display = unread ? 'inline' : 'none'; }
+  if(fabBadge && unread) { fabBadge.textContent = count; fabBadge.classList.add('show'); }
+}
+
+function pmHideNotify() {
+  var badge = document.getElementById('pmTabBadge');
+  if(badge) badge.style.display = 'none';
+}
+
+async function pmOpenModal() {
+  // Redirect to drawer private tab
+  openChat();
+  switchChatTab('private');
+}
+
+function pmCloseModal() { closeChat(); }
 
 // ===== MEGHÍVÓ RENDSZER =====
 function inviteGenerateToken() {
@@ -5729,25 +5828,36 @@ function toggleDayGroup(groupId, storageKey) {
 
 </script>
 
-<!-- MOBIL CHAT DRAWER -->
+<!-- CHAT DRAWER (unified: group + private) -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeChat()"></div>
 <div class="chat-drawer" id="chatDrawer">
   <div class="drawer-handle" onclick="closeChat()"></div>
   <button class="drawer-close" onclick="closeChat()">✕</button>
-  <div style="padding:6px 16px 4px;margin-top:8px;display:flex;align-items:center;gap:8px;">
-    <span>💬</span>
-    <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(245,197,24,0.7);">ÉLŐ KOMMENT</span>
+  <!-- TABOK -->
+  <div style="display:flex;gap:0;margin:8px 12px 0;border-bottom:2px solid rgba(255,255,255,0.06);">
+    <button id="chatTabGroup" onclick="switchChatTab('group')" style="flex:1;padding:8px 0;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;border:none;border-bottom:2px solid var(--gold);margin-bottom:-2px;background:none;color:var(--gold);cursor:pointer;">👥 CSOPORT</button>
+    <button id="chatTabPrivate" onclick="switchChatTab('private')" style="flex:1;padding:8px 0;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;color:rgba(240,244,240,0.4);cursor:pointer;">✉️ PRIVÁT <span id="pmTabBadge" style="display:none;background:#ef4444;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:3px;">0</span></button>
   </div>
-  <div class="drawer-chat-inner">
-    <div class="chat-messages" id="drawerMessages"></div>
-    <div class="chat-input-area">
-      <input class="chat-input" id="drawerInput" placeholder="Írd a kommented..." maxlength="200"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChatDrawer()">
-      <button class="chat-send" onclick="sendChatDrawer()">↑</button>
+  <!-- CSOPORT CHAT -->
+  <div id="chatPanelGroup" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+    <div class="chat-messages" id="drawerMessages" style="flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;"></div>
+    <div class="chat-input-area" style="border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;background:rgba(0,0,0,0.2);flex-shrink:0;">
+      <input class="chat-input" id="drawerInput" placeholder="Üzenet a csoportnak..." maxlength="200"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChatDrawer()" style="flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:14px;font-family:'Source Sans 3',sans-serif;padding:9px 12px;">
+      <button class="chat-send" onclick="sendChatDrawer()" style="background:var(--gold);color:#0a1c0c;border:none;border-radius:8px;padding:9px 16px;font-family:Oswald,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">↑</button>
+    </div>
+  </div>
+  <!-- PRIVÁT CHAT -->
+  <div id="chatPanelPrivate" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
+    <div id="pmDrawerContent" style="flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;"></div>
+    <div style="border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;background:rgba(0,0,0,0.2);flex-shrink:0;">
+      <input type="text" id="pmDrawerInput" placeholder="Privát üzenet…" maxlength="500"
+        onkeydown="if(event.key==='Enter')sendPmFromDrawer()" style="flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--white);font-size:14px;font-family:'Source Sans 3',sans-serif;padding:9px 12px;">
+      <button onclick="sendPmFromDrawer()" style="background:var(--gold);color:#0a1c0c;border:none;border-radius:8px;padding:9px 16px;font-family:Oswald,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">↑</button>
     </div>
   </div>
 </div>
-<button class="chat-fab" id="chatFab" onclick="openChat()" title="Élő komment" style="display:none!important">
+<button class="chat-fab" id="chatFab" onclick="openChat()" title="Chat">
   💬
   <span class="chat-fab-badge" id="fabBadge">0</span>
 </button>
@@ -5842,23 +5952,5 @@ function toggleDayGroup(groupId, storageKey) {
   </div>
 </div>
 
-<!-- PRIVÁT ÜZENET ÉRTESÍTÉS (user oldali) -->
-<button id="pmNotifyBtn" onclick="pmOpenModal()" style="display:none;position:fixed;bottom:20px;left:16px;z-index:150;width:48px;height:48px;border-radius:50%;background:var(--gold);color:#0a1c0c;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,0.4);align-items:center;justify-content:center;animation:pulse 2s infinite;">
-  ✉️<span id="pmNotifyBadge" style="position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;">0</span>
-</button>
-<div id="pmModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;">
-  <div style="width:100%;max-width:440px;max-height:70vh;background:linear-gradient(180deg,#0f2a14,#0a1c0c);border:1px solid rgba(245,197,24,0.25);border-radius:16px 16px 0 0;display:flex;flex-direction:column;overflow:hidden;">
-    <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(245,197,24,0.15);flex-shrink:0;">
-      <span style="font-family:Oswald,sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px;flex:1;">✉️ PRIVÁT ÜZENET AZ ADMINTÓL</span>
-      <button onclick="pmCloseModal()" style="background:none;border:none;color:rgba(240,244,240,0.4);font-size:20px;cursor:pointer;padding:0 4px;">✕</button>
-    </div>
-    <div id="pmUserChat" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:120px;"></div>
-    <div style="border-top:1px solid rgba(245,197,24,0.12);padding:10px 12px;display:flex;gap:8px;flex-shrink:0;background:rgba(0,0,0,0.2);">
-      <input type="text" id="pmUserInput" placeholder="Válasz írása…" maxlength="500" onkeydown="if(event.key==='Enter')pmUserReply()"
-        style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(255,255,255,0.05);color:white;font-family:Oswald,sans-serif;font-size:14px;">
-      <button onclick="pmUserReply()" style="padding:8px 16px;border-radius:8px;background:var(--gold);color:#0a1c0c;border:none;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Küld</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
