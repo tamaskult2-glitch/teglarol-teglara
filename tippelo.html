@@ -1185,18 +1185,15 @@ footer a:hover{color:var(--gold);}
           <div class="stat-item" style="flex:1;text-align:center;"><div class="stat-num" id="stCorrect">0</div><div class="stat-label">Pontjaim</div></div>
           <div class="stat-item" style="flex:1;text-align:center;"><div class="stat-num" id="stAcc">–</div><div class="stat-label">Pontosság</div></div>
         </div>
-        <!-- FELHÍVÁS BANNER -->
-        <div id="betAlertBanner" style="margin:10px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(245,197,24,0.08));border:2px solid rgba(239,68,68,0.35);border-radius:12px;position:relative;">
-          <div style="font-family:Oswald,sans-serif;font-size:15px;color:#ef4444;font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">⚠️ FONTOS FELHÍVÁS!</div>
-          <div style="font-size:13px;color:rgba(240,244,240,0.8);line-height:1.5;">
-            Mindenki adja le a <b style="color:var(--gold);">💰 Tét javaslatát</b> a Tét fülön!<br>
-            Aki nem szavaz, <b style="color:#ef4444;">kizárásra kerül</b> a versenyből.<br><br>
-            <span style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">📅 <b>Tét javaslat határidő:</b> <span style="color:var(--gold);font-weight:700;">szerda 23:59</span></span>
-            <span style="display:flex;align-items:center;gap:6px;">💸 <b>Tét befizetés határidő:</b> <span style="color:var(--gold);font-weight:700;">csütörtök 14:00</span></span>
+        <!-- TÉT EREDMÉNY POPUP -->
+        <div id="betResultPopup" style="display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,0.7);backdrop-filter:blur(3px);align-items:center;justify-content:center;">
+          <div style="width:90%;max-width:380px;background:linear-gradient(180deg,#0f2a14,#0a1c0c);border:2px solid rgba(245,197,24,0.35);border-radius:16px;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+            <div style="text-align:center;font-size:28px;margin-bottom:4px;">💰</div>
+            <div style="text-align:center;font-family:Oswald,sans-serif;font-size:18px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:12px;">TÉT VÉGEREDMÉNY</div>
+            <div id="betResultContent"></div>
+            <button onclick="closeBetPopup()" style="width:100%;margin-top:16px;padding:12px;border-radius:10px;border:1px solid rgba(245,197,24,0.4);background:rgba(245,197,24,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">ÉRTEM ✓</button>
           </div>
-          <button onclick="this.parentElement.style.display='none';localStorage.setItem('betAlertDismissed','1')" style="position:absolute;top:8px;right:10px;background:none;border:none;color:rgba(240,244,240,0.3);font-size:16px;cursor:pointer;">✕</button>
         </div>
-        <script>if(localStorage.getItem('betAlertDismissed')==='1')document.getElementById('betAlertBanner').style.display='none';</script>
         <!-- GYŐZTES BANNER - az orbitba került a fejlécbe -->
 
         <!-- VB SZUPERPOLL -->
@@ -3669,6 +3666,51 @@ function updateBetBadge(votedCount) {
   var totalUsers = Object.keys(getAllKnownUsers()).length;
   badge.textContent = (votedCount||0) + '/' + totalUsers;
   badge.style.display = '';
+  if(votedCount > 0 && !localStorage.getItem('betResultSeen')) {
+    setTimeout(function(){
+      // Csak ha nincs más popup nyitva
+      var music = document.getElementById('musicWelcomeModal');
+      var musicOpen = music && music.style.display === 'flex';
+      if(!musicOpen) showBetResultPopup();
+    }, 2000);
+  }
+}
+
+function showBetResultPopup() {
+  var el = document.getElementById('betResultContent');
+  var popup = document.getElementById('betResultPopup');
+  if(!el || !popup) return;
+  var opts = [500,1000,5000,10000];
+  var counts = {}; opts.forEach(function(o){ counts[o]=0; });
+  var total = 0;
+  Object.values(betPollData).forEach(function(v){ if(v && counts[v]!==undefined){ counts[v]++; total++; }});
+  if(total === 0) return;
+  var winner = opts[0];
+  opts.forEach(function(o){ if(counts[o] > counts[winner]) winner = o; });
+  var html = '<div style="text-align:center;margin-bottom:14px;">';
+  html += '<div style="font-family:Oswald,sans-serif;font-size:36px;color:var(--gold);font-weight:700;">'+winner.toLocaleString('hu')+' Ft</div>';
+  html += '<div style="font-size:12px;color:rgba(240,244,240,0.4);">'+counts[winner]+'/'+total+' szavazat — GYŐZTES</div></div>';
+  opts.forEach(function(o){
+    var pct = total ? Math.round(counts[o]/total*100) : 0;
+    var isW = o === winner;
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">'
+      +'<span style="font-family:Oswald,sans-serif;font-size:13px;color:'+(isW?'var(--gold)':'rgba(240,244,240,0.5)')+';min-width:65px;font-weight:'+(isW?'700':'400')+';">'+o.toLocaleString('hu')+' Ft</span>'
+      +'<div style="flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+(isW?'var(--gold)':'rgba(245,197,24,0.3)')+';border-radius:4px;"></div></div>'
+      +'<span style="font-size:11px;color:rgba(240,244,240,0.35);min-width:28px;text-align:right;">'+counts[o]+'</span></div>';
+  });
+  html += '<div style="margin-top:14px;padding:10px 12px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.15);border-radius:10px;font-size:13px;color:rgba(240,244,240,0.7);line-height:1.6;">'
+    +'💸 <strong style="color:var(--gold);">'+winner.toLocaleString('hu')+' Ft</strong> beadása <strong>LESZNIK</strong>-nek<br>'
+    +'⏰ Határidő: <strong style="color:var(--gold);">jún. 11. (szerda) 21:00</strong><br>'
+    +'Az első meccs kickoffjáig!<br>'
+    +'❌ Aki nem fizet, nem vesz részt a nyereményből</div>';
+  el.innerHTML = html;
+  popup.style.display = 'flex';
+}
+
+function closeBetPopup() {
+  var p = document.getElementById('betResultPopup');
+  if(p) p.style.display = 'none';
+  localStorage.setItem('betResultSeen','1');
 }
 
 async function voteBet(amount) {
