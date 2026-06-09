@@ -3605,7 +3605,7 @@ async function loadBetPoll() {
     betPollData = data || {};
     betPaidData = paid || {};
   } catch(e) { betPollData = {}; betPaidData = {}; }
-  renderBetPoll();
+  try { renderBetPoll(); } catch(e) { var el=document.getElementById('betPollContainer'); if(el) el.innerHTML='<div style="color:#ef4444;padding:12px;">Hiba: '+escHtml(e.message)+'</div>'; }
 }
 
 function renderBetPoll() {
@@ -4446,7 +4446,7 @@ let watchPartyData = {};
 
 async function loadWatchParty() {
   try { watchPartyData = await fbGet('watchParty') || {}; } catch(e) { watchPartyData = {}; }
-  renderWatchParty();
+  try { renderWatchParty(); } catch(e) { var el=document.getElementById('kozosContainer'); if(el) el.innerHTML='<div style="color:#ef4444;padding:12px;">Hiba: '+escHtml(e.message)+'</div>'; }
 }
 
 async function loadWatchPartyBadge() {
