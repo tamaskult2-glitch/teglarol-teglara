@@ -3221,15 +3221,19 @@ function renderLeaderboard() {
 // ===== CHAT =====
 function openChat(){
   if(!currentUser){ showToast('⚠️ Előbb lépj be!'); return; }
-  document.getElementById('chatDrawer').classList.add('open');
-  document.getElementById('drawerOverlay').classList.add('open');
+  var d = document.getElementById('chatDrawer');
+  var o = document.getElementById('drawerOverlay');
+  if(d) d.style.display = 'flex';
+  if(o) o.style.display = 'block';
   document.body.style.overflow='hidden';
   if(activeChatTab==='private') renderPmDrawer();
-  setTimeout(function(){var d=document.getElementById('drawerMessages');if(d)d.scrollTop=d.scrollHeight;},100);
+  setTimeout(function(){var m=document.getElementById('drawerMessages');if(m)m.scrollTop=m.scrollHeight;},100);
 }
 function closeChat(){
-  document.getElementById('chatDrawer').classList.remove('open');
-  document.getElementById('drawerOverlay').classList.remove('open');
+  var d = document.getElementById('chatDrawer');
+  var o = document.getElementById('drawerOverlay');
+  if(d) d.style.display = 'none';
+  if(o) o.style.display = 'none';
   document.body.style.overflow='';
 }
 
@@ -5840,7 +5844,7 @@ function toggleDayGroup(groupId, storageKey) {
     </div>
   </div>
 </div>
-<button class="chat-fab" id="chatFab" onclick="openChat()" title="Chat">
+<button class="chat-fab" id="chatFab" onclick="try{openChat();}catch(e){alert('Chat hiba: '+e.message);}" title="Chat">
   💬
   <span class="chat-fab-badge" id="fabBadge">0</span>
 </button>
