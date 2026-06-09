@@ -275,16 +275,9 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 
 .chat-drawer{
   display:none;
-  position:fixed;bottom:0;left:0;right:0;z-index:140;
-  background:#0d2412;
-  border-top:1px solid rgba(245,197,24,0.25);
-  border-radius:18px 18px 0 0;
-  height:70vh;max-height:520px;
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;
+  background:#0a1c0c;
   flex-direction:column;
-  box-shadow:0 -8px 32px rgba(0,0,0,0.5);
-}
-.chat-drawer.open{
-  display:flex;
 }
 .drawer-handle{
   width:36px;height:4px;border-radius:2px;
@@ -3221,19 +3214,13 @@ function renderLeaderboard() {
 // ===== CHAT =====
 function openChat(){
   if(!currentUser){ showToast('⚠️ Előbb lépj be!'); return; }
-  var d = document.getElementById('chatDrawer');
-  var o = document.getElementById('drawerOverlay');
-  if(d) d.style.display = 'flex';
-  if(o) o.style.display = 'block';
+  document.getElementById('chatDrawer').style.display = 'flex';
   document.body.style.overflow='hidden';
   if(activeChatTab==='private') renderPmDrawer();
   setTimeout(function(){var m=document.getElementById('drawerMessages');if(m)m.scrollTop=m.scrollHeight;},100);
 }
 function closeChat(){
-  var d = document.getElementById('chatDrawer');
-  var o = document.getElementById('drawerOverlay');
-  if(d) d.style.display = 'none';
-  if(o) o.style.display = 'none';
+  document.getElementById('chatDrawer').style.display = 'none';
   document.body.style.overflow='';
 }
 
@@ -5844,7 +5831,7 @@ function toggleDayGroup(groupId, storageKey) {
     </div>
   </div>
 </div>
-<button class="chat-fab" id="chatFab" onclick="try{openChat();}catch(e){alert('Chat hiba: '+e.message);}" title="Chat">
+<button class="chat-fab" id="chatFab" onclick="openChat()" title="Chat">
   💬
   <span class="chat-fab-badge" id="fabBadge">0</span>
 </button>
