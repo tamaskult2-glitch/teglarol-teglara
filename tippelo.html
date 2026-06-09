@@ -274,24 +274,17 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 50%{transform:scale(1.12)}}
 
 .chat-drawer{
-  display:flex;
+  display:none;
   position:fixed;bottom:0;left:0;right:0;z-index:140;
   background:#0d2412;
   border-top:1px solid rgba(245,197,24,0.25);
   border-radius:18px 18px 0 0;
   height:70vh;max-height:520px;
   flex-direction:column;
-  transform:translateY(100%);
-  transition:transform 0.32s cubic-bezier(0.32,0.72,0,1), visibility 0s linear 0.32s;
-  visibility:hidden;
-  pointer-events:none;
   box-shadow:0 -8px 32px rgba(0,0,0,0.5);
 }
 .chat-drawer.open{
-  transform:translateY(0);
-  visibility:visible;
-  pointer-events:all;
-  transition:transform 0.32s cubic-bezier(0.32,0.72,0,1), visibility 0s linear 0s;
+  display:flex;
 }
 .drawer-handle{
   width:36px;height:4px;border-radius:2px;
@@ -3227,26 +3220,16 @@ function renderLeaderboard() {
 
 // ===== CHAT =====
 function openChat(){
-  if(!currentUser){
-    showToast('⚠️ Előbb lépj be!');
-    return;
-  }
-  var drawer = document.getElementById('chatDrawer');
-  var overlay = document.getElementById('drawerOverlay');
-  if(drawer) drawer.classList.add('open');
-  if(overlay) overlay.classList.add('open');
+  if(!currentUser){ showToast('⚠️ Előbb lépj be!'); return; }
+  document.getElementById('chatDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
   document.body.style.overflow='hidden';
-  try{var b=document.getElementById('fabBadge');if(b){b.textContent='';b.classList.remove('show');}}catch(e){}
-  setTimeout(function(){var d=document.getElementById('drawerMessages');if(d)d.scrollTop=d.scrollHeight;},350);
-  // Ha privát tab aktív, frissítsük
   if(activeChatTab==='private') renderPmDrawer();
+  setTimeout(function(){var d=document.getElementById('drawerMessages');if(d)d.scrollTop=d.scrollHeight;},100);
 }
 function closeChat(){
-  var drawer = document.getElementById('chatDrawer');
-  var overlay = document.getElementById('drawerOverlay');
-  var fab = document.getElementById('chatFab');
-  if(drawer) drawer.classList.remove('open');
-  if(overlay) overlay.classList.remove('open');
+  document.getElementById('chatDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
   document.body.style.overflow='';
 }
 
