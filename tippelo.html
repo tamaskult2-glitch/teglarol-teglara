@@ -938,7 +938,7 @@ footer a:hover{color:var(--gold);}
               <tr><td>⚡ Helyes hosszabbítás</td><td class="pts">+2 pont</td></tr>
               <tr><td>🥅 Helyes 11-es győztes</td><td class="pts">+2 pont</td></tr>
             </table>
-            <div style="font-weight:700;margin:8px 0 4px;">🏆 Döntő (3× szorzó)</div>
+            <div style="font-weight:700;margin:8px 0 4px;">🏆 Bronzmeccs + Döntő (3× szorzó)</div>
             <table class="ob-score-table">
               <tr><td>✅ Helyes kimenetel</td><td class="pts">+3 pont</td></tr>
               <tr><td>📐 Helyes gólkülönbség</td><td class="pts">+3 pont</td></tr>
@@ -1103,6 +1103,15 @@ footer a:hover{color:var(--gold);}
     <span style="top:88%;right:13%;font-size:11px;opacity:0.9;">TORONTO</span>
     <span style="top:30%;left:30%;font-size:10px;opacity:0.7;">MESSI</span>
     <span style="top:73%;right:30%;font-size:10px;opacity:0.7;">ZIDANE</span>
+    <span style="top:82%;left:3%;font-size:10px;opacity:0.6;">⚽ GUADALAJARA</span>
+    <span style="top:83%;right:3%;font-size:10px;opacity:0.6;">LOS ANGELES ⚽</span>
+    <span style="top:95%;left:5%;font-size:9px;opacity:0.5;">MIAMI</span>
+    <span style="top:95%;left:25%;font-size:9px;opacity:0.5;">⚽</span>
+    <span style="top:94%;right:5%;font-size:9px;opacity:0.5;">VANCOUVER</span>
+    <span style="top:96%;left:58%;font-size:9px;opacity:0.5;">⚽</span>
+    <span style="top:45%;left:46%;font-size:9px;opacity:0.35;">⚽</span>
+    <span style="top:57%;right:14%;font-size:8px;opacity:0.3;">⚽</span>
+    <span style="top:70%;left:15%;font-size:8px;opacity:0.3;">⚽</span>
   </div>
   <div class="header-content">
   <svg class="trophy-svg" viewBox="0 0 120 144" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aranykupa">
@@ -1410,6 +1419,15 @@ footer a:hover{color:var(--gold);}
         </div>
       </div>
     </div>
+    <!-- FIREBASE PARANCSOK -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">🔧 FIREBASE PARANCSOK</span></div>
+      <div class="adm-collapse-body">
+        <button onclick="fixYamalVote()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">⚽ Yamal szavazat visszaállítás</button>
+        <button onclick="showDeletedUsers()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">👤 Törölt felhasználók listázása</button>
+        <div id="fbCmdResult" style="font-size:12px;color:rgba(240,244,240,0.6);min-height:16px;margin-top:6px;word-break:break-all;white-space:pre-wrap;"></div>
+      </div>
+    </div>
     <!-- ADMIN JELSZÓ -->
     <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);border-radius:10px;">
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">🔑 ADMIN JELSZÓ MÓDOSÍTÁS</span></div>
@@ -1562,6 +1580,10 @@ const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
 
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
+  {id:"TESZT_CS",group:"🧪 Teszt",huDate:"2026-06-10",huTime:"09:00",home:"Teszt Hazai",homeFlag:"🟢",away:"Teszt Vendég",awayFlag:"🔴",venue:"Teszt Stadion",title:"🧪 TESZT: Csoportkör (1×)"},
+  {id:"TESZT_KI",group:"🧪 Teszt",huDate:"2026-06-10",huTime:"09:15",home:"Teszt Alfa",homeFlag:"🟡",away:"Teszt Béta",awayFlag:"🔵",venue:"Teszt Stadion",title:"🧪 TESZT: Kieséses (2×)",knockout:true},
+  {id:"TESZT_BR",group:"🧪 Teszt Bronzmeccs",huDate:"2026-06-10",huTime:"09:30",home:"Teszt Bronz A",homeFlag:"🥉",away:"Teszt Bronz B",awayFlag:"🥉",venue:"Teszt Stadion",title:"🧪 TESZT: Bronzmeccs (3×)",knockout:true},
+  {id:"TESZT_DO",group:"🧪 Teszt Döntő",huDate:"2026-06-10",huTime:"09:45",home:"Teszt Döntő A",homeFlag:"🏆",away:"Teszt Döntő B",awayFlag:"🏆",venue:"Teszt Stadion",title:"🧪 TESZT: Döntő (3×)",knockout:true},
   {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat",homeLineup:["Fercsik","Hermán","Temesi","Lesznik","Berkes"],awayLineup:["Huszár","Kult","Lakatos","Török","Toma"]},
   {id:"BL2026",group:"⭐BL",huDate:"2026-05-30",huTime:"18:00",home:"PSG",homeFlag:"🔵🔴",away:"Arsenal",awayFlag:"🔴⚪",venue:"Puskás Aréna, Budapest",title:"🏆 Bajnokok Ligája Döntő 2026",knockout:true},
   {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Mexico City"},
@@ -1881,6 +1903,7 @@ function getWeeklyMvpBukta() {
     var diff = VB_START - now;
     if(diff <= 0) {
       el.innerHTML = '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);letter-spacing:2px;">⚽ A VB ELKEZDŐDÖTT!</span>';
+      toggleKickoffBalls(true);
       return;
     }
     var d = Math.floor(diff / 86400000);
@@ -1888,6 +1911,40 @@ function getWeeklyMvpBukta() {
     var m = Math.floor((diff % 3600000) / 60000);
     var s = Math.floor((diff % 60000) / 1000);
     el.innerHTML = unit(d,'nap') + sep() + unit(h,'óra') + sep() + unit(m,'perc') + sep() + unit(s,'mp');
+    // 1 napon belül: labdás animáció
+    if(d === 0) toggleKickoffBalls(true); else toggleKickoffBalls(false);
+  }
+
+  function toggleKickoffBalls(show) {
+    var existing = document.getElementById('kickoffBalls');
+    if(show && !existing) {
+      var container = document.querySelector('.hero-section') || el.parentElement;
+      if(!container) return;
+      var div = document.createElement('div');
+      div.id = 'kickoffBalls';
+      div.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;';
+      var balls = '';
+      for(var i = 0; i < 8; i++) {
+        var left = 5 + Math.random()*90;
+        var top = 10 + Math.random()*70;
+        var size = 16 + Math.random()*20;
+        var dur = 2.5 + Math.random()*3;
+        var delay = Math.random()*2;
+        balls += '<span style="position:absolute;left:'+left+'%;top:'+top+'%;font-size:'+size+'px;opacity:0.15;animation:ballFloat '+dur+'s ease-in-out '+delay+'s infinite alternate;">⚽</span>';
+      }
+      div.innerHTML = balls;
+      container.style.position = 'relative';
+      container.appendChild(div);
+      // CSS animation hozzáadás ha nincs
+      if(!document.getElementById('ballFloatCSS')) {
+        var style = document.createElement('style');
+        style.id = 'ballFloatCSS';
+        style.textContent = '@keyframes ballFloat{0%{transform:translateY(0) rotate(0deg);opacity:0.08;}50%{opacity:0.2;}100%{transform:translateY(-18px) rotate(360deg);opacity:0.08;}}';
+        document.head.appendChild(style);
+      }
+    } else if(!show && existing) {
+      existing.remove();
+    }
   }
 
   tick();
@@ -2212,9 +2269,10 @@ function isKnockoutMatch(m){ return !!(m && m.knockout); }
 function getMatchMultiplier(m) {
   if(!m || !isVbMatch(m)) return 1;
   if(!m.knockout) return 1;
-  if(m.group && /döntő|DÖNTŐ|final|FINAL/i.test(m.group)) return 3;
-  if(m.id && /FINAL/i.test(m.id)) return 3;
-  if(m.title && /döntő|DÖNTŐ|final/i.test(m.title) && !/elődöntő|negyeddöntő|bronz/i.test(m.title)) return 3;
+  // Döntő + Bronzmeccs = 3x
+  if(m.group && /döntő|DÖNTŐ|final|FINAL|bronz|BRONZ|3RD/i.test(m.group)) return 3;
+  if(m.id && /FINAL|3RD/i.test(m.id)) return 3;
+  if(m.title && /döntő|bronz|3rd|FINAL/i.test(m.title) && !/elődöntő|negyeddöntő/i.test(m.title)) return 3;
   return 2;
 }
 
@@ -3700,7 +3758,7 @@ function showBetResultPopup() {
   });
   html += '<div style="margin-top:14px;padding:10px 12px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.15);border-radius:10px;font-size:13px;color:rgba(240,244,240,0.7);line-height:1.6;">'
     +'💸 <strong style="color:var(--gold);">'+winner.toLocaleString('hu')+' Ft</strong> beadása <strong>LESZNIK</strong>-nek<br>'
-    +'⏰ Határidő: <strong style="color:var(--gold);">jún. 11. (szerda) 21:00</strong><br>'
+    +'⏰ Határidő: <strong style="color:var(--gold);">jún. 11. (csütörtök) 21:00</strong><br>'
     +'Az első meccs kickoffjáig!<br>'
     +'❌ Aki nem fizet, nem vesz részt a nyereményből</div>';
   el.innerHTML = html;
@@ -3711,6 +3769,57 @@ function closeBetPopup() {
   var p = document.getElementById('betResultPopup');
   if(p) p.style.display = 'none';
   localStorage.setItem('betResultSeen','1');
+}
+
+async function fixYamalVote() {
+  var res = document.getElementById('fbCmdResult');
+  if(res) res.textContent = '⏳ Ellenőrzés…';
+  try {
+    var scorers = await fbGet('vbPoll/scorer');
+    if(!scorers) { if(res) res.textContent = '❌ Nincs scorer adat'; return; }
+    var yamalVoters = [];
+    Object.entries(scorers).forEach(function(e) {
+      if(e[1] && e[1].toLowerCase().replace(/[^a-z]/g,'') === 'yamal') yamalVoters.push(e[0]);
+    });
+    if(res) res.textContent = '🔍 Jelenlegi Yamal szavazatok: ' + yamalVoters.length + ' (' + yamalVoters.join(', ') + ')';
+    if(yamalVoters.length >= 2) { if(res) res.textContent += '\n✅ Már 2 szavazat van, nincs teendő.'; return; }
+    // Keressük a törölt usert aki Yamal-ra szavazott
+    var deleted = await fbGet('deletedUsers');
+    if(deleted) {
+      var deletedNames = Object.keys(deleted);
+      if(res) res.textContent += '\n👤 Töröltek: ' + deletedNames.join(', ');
+      // Az első törölt user nevét használjuk
+      if(deletedNames.length > 0) {
+        var restoreAs = deletedNames[0] + '_YAMAL';
+        await fbSet('vbPoll/scorer/' + restoreAs, 'Yamal');
+        if(res) res.textContent += '\n✅ Visszaállítva: ' + restoreAs + ' → Yamal';
+        loadVbPoll();
+      }
+    } else {
+      // Nincs törölt user, manuálisan adjuk hozzá
+      await fbSet('vbPoll/scorer/YAMAL_RESTORE', 'Yamal');
+      if(res) res.textContent += '\n✅ Hozzáadva: YAMAL_RESTORE → Yamal';
+      loadVbPoll();
+    }
+  } catch(e) { if(res) res.textContent = '❌ Hiba: ' + e.message; }
+}
+
+async function showDeletedUsers() {
+  var res = document.getElementById('fbCmdResult');
+  if(res) res.textContent = '⏳ Lekérdezés…';
+  try {
+    var deleted = await fbGet('deletedUsers');
+    var scorers = await fbGet('vbPoll/scorer');
+    var txt = '👤 TÖRÖLT FELHASZNÁLÓK:\n';
+    if(deleted) {
+      Object.entries(deleted).forEach(function(e) { txt += '  • ' + e[0] + ' (törölve: ' + e[1] + ')\n'; });
+    } else { txt += '  (nincs)\n'; }
+    txt += '\n⚽ GÓLKIRÁLY SZAVAZATOK:\n';
+    if(scorers) {
+      Object.entries(scorers).forEach(function(e) { txt += '  • ' + e[0] + ' → ' + e[1] + '\n'; });
+    }
+    if(res) res.textContent = txt;
+  } catch(e) { if(res) res.textContent = '❌ Hiba: ' + e.message; }
 }
 
 async function voteBet(amount) {
