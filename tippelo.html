@@ -1449,6 +1449,7 @@ footer a:hover{color:var(--gold);}
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">🔧 FIREBASE PARANCSOK</span></div>
       <div class="adm-collapse-body">
         <button onclick="fixYamalVote()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">⚽ Yamal szavazat visszaállítás</button>
+        <button onclick="cleanTestData()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#ef4444;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">🧹 Teszt meccs adatok törlése</button>
         <button onclick="showDeletedUsers()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">👤 Törölt felhasználók listázása</button>
         <div id="fbCmdResult" style="font-size:12px;color:rgba(240,244,240,0.6);min-height:16px;margin-top:6px;word-break:break-all;white-space:pre-wrap;"></div>
       </div>
@@ -1605,10 +1606,6 @@ const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
 
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
-  {id:"TESZT_CS",group:"🧪 Teszt",huDate:"2026-06-10",huTime:"09:00",home:"Teszt Hazai",homeFlag:"🟢",away:"Teszt Vendég",awayFlag:"🔴",venue:"Teszt Stadion",title:"🧪 TESZT: Csoportkör (1×)"},
-  {id:"TESZT_KI",group:"🧪 Teszt",huDate:"2026-06-10",huTime:"09:15",home:"Teszt Alfa",homeFlag:"🟡",away:"Teszt Béta",awayFlag:"🔵",venue:"Teszt Stadion",title:"🧪 TESZT: Kieséses (2×)",knockout:true},
-  {id:"TESZT_BR",group:"🧪 Teszt Bronzmeccs",huDate:"2026-06-10",huTime:"09:30",home:"Teszt Bronz A",homeFlag:"🥉",away:"Teszt Bronz B",awayFlag:"🥉",venue:"Teszt Stadion",title:"🧪 TESZT: Bronzmeccs (3×)",knockout:true},
-  {id:"TESZT_DO",group:"🧪 Teszt Döntő",huDate:"2026-06-10",huTime:"09:45",home:"Teszt Döntő A",homeFlag:"🏆",away:"Teszt Döntő B",awayFlag:"🏆",venue:"Teszt Stadion",title:"🧪 TESZT: Döntő (3×)",knockout:true},
   {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat",homeLineup:["Fercsik","Hermán","Temesi","Lesznik","Berkes"],awayLineup:["Huszár","Kult","Lakatos","Török","Toma"]},
   {id:"BL2026",group:"⭐BL",huDate:"2026-05-30",huTime:"18:00",home:"PSG",homeFlag:"🔵🔴",away:"Arsenal",awayFlag:"🔴⚪",venue:"Puskás Aréna, Budapest",title:"🏆 Bajnokok Ligája Döntő 2026",knockout:true},
   {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Mexico City"},
@@ -3838,6 +3835,31 @@ async function fixYamalVote() {
       loadVbPoll();
     }
   } catch(e) { if(res) res.textContent = '❌ Hiba: ' + e.message; }
+}
+
+async function cleanTestData() {
+  var res = document.getElementById('fbCmdResult');
+  if(res) res.textContent = '⏳ Teszt adatok törlése…';
+  var testIds = ['TESZT_CS','TESZT_KI','TESZT_BR','TESZT_DO'];
+  var ops = [];
+  testIds.forEach(function(id){
+    ops.push(fbDel('tips/'+id));
+    ops.push(fbDel('results/'+id));
+    ops.push(fbDel('scores/'+id));
+    ops.push(fbDel('etResults/'+id));
+    ops.push(fbDel('penResults/'+id));
+  });
+  try {
+    await Promise.all(ops);
+    // Lokális cache is törlése
+    testIds.forEach(function(id){
+      delete allTips[id]; delete allResults[id]; delete allScores[id];
+      delete allEtResults[id]; delete allPenResults[id];
+    });
+    if(res) res.textContent = '✅ Teszt adatok törölve ('+testIds.join(', ')+')';
+    renderAll();
+    showToast('🧹 Teszt meccsek törölve!');
+  } catch(e) { if(res) res.textContent = '❌ Hiba: '+e.message; }
 }
 
 async function showDeletedUsers() {
