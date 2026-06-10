@@ -1147,7 +1147,7 @@ footer a:hover{color:var(--gold);}
   <div style="margin-top:10px;">
     
   </div>
-  <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;">
+  <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
     <button onclick="document.getElementById('onboardModal').style.display='flex'"
       style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"
       title="Használati útmutató">?</button>
@@ -1157,11 +1157,15 @@ footer a:hover{color:var(--gold);}
       style="display:none;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);color:rgba(245,197,24,0.6);border-radius:50%;width:28px;height:28px;font-size:13px;cursor:pointer;align-items:center;justify-content:center;text-decoration:none;transition:all 0.2s;">🎤</a>
     <audio id="bgMusic" src="https://cdn1.suno.ai/c05a9b6e-d2c6-4386-871c-6819737f3046.mp3" preload="none" loop></audio>
     <button onclick="document.getElementById('supportModal').style.display='flex';if(typeof loadSupportAmount==='function')loadSupportAmount();if(typeof initSupportQR==='function')initSupportQR();"
-      style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#CE2939,#a01020);color:white;border:none;border-radius:12px;padding:8px 16px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 14px rgba(0,0,0,0.35);transition:transform 0.2s;"
-      onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
-      <span style="font-size:16px;">❤️</span>
-      <span>Támogass!</span>
-    </button>
+      style="background:linear-gradient(135deg,#CE2939,#a01020);color:white;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.3);"
+      title="Támogass!">❤️</button>
+    <button id="voteIconBtn" onclick="jumpToNextUntipped()" title="Tippelj!" style="display:none;background:rgba(245,197,24,0.2);border:2px solid var(--gold);color:var(--gold);border-radius:50%;width:42px;height:42px;font-size:22px;cursor:pointer;align-items:center;justify-content:center;animation:pulse 2s infinite;box-shadow:0 3px 14px rgba(245,197,24,0.25);">
+      ⚽</button>
+    <button id="adminBroadcastIcon" onclick="sendDaySummary()" title="📢 Napi összefoglaló küldése" style="display:none;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;align-items:center;justify-content:center;">📢</button>
+    <button id="adminResultIcon" onclick="showTab('admin')" title="🏟️ Eredmény rögzítés" style="display:none;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;align-items:center;justify-content:center;">🏟️</button>
+  </div>
+  <div id="untippedText" onclick="jumpToNextUntipped()" style="display:none;text-align:center;margin-top:6px;cursor:pointer;animation:pulse 2s infinite;">
+    <span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);letter-spacing:0.5px;">Mai meccsre még nem szagoltál! Tedd meg a tipped a labdán!</span>
   </div>
   </div>
 </header>
@@ -1264,23 +1268,6 @@ footer a:hover{color:var(--gold);}
             <div class="vb-poll-my" id="vbScorerMy"></div>
             <div class="vb-poll-results" id="vbScorerResults"></div>
           </div>
-        </div>
-
-        <!-- BELÉPÉSKORI FIGYELMEZTETÉS -->
-        <div class="login-warn" id="loginWarn">
-          <span style="font-size:18px;flex-shrink:0;">⚠️</span>
-          <span id="loginWarnText"></span>
-          <button class="login-warn-close" onclick="document.getElementById('loginWarn').classList.remove('show')">✕</button>
-        </div>
-
-        <div class="matchday-banner" id="matchdayBanner">
-          <button class="md-close" onclick="dismissMatchday()" title="Bezárás">✕</button>
-          <div class="md-emoji" id="mdEmoji">🔥</div>
-          <div class="md-text">
-            <div class="md-title" id="mdTitle">Ma meccsnap!</div>
-            <div class="md-sub" id="mdSub"></div>
-          </div>
-          <button class="md-btn" id="mdBtn" onclick="jumpToNextUntipped()">⚡ Szavazz!</button>
         </div>
 
         <!-- MECCS KERESŐ -->
@@ -2230,6 +2217,11 @@ function checkAutoAdmin() {
     if(content) content.classList.add('visible');
     updateAdminTabLabel();
   }
+  // Admin gyorsikonok
+  var bc = document.getElementById('adminBroadcastIcon');
+  var rs = document.getElementById('adminResultIcon');
+  if(bc) bc.style.display = isAdminUnlocked ? 'inline-flex' : 'none';
+  if(rs) rs.style.display = isAdminUnlocked ? 'inline-flex' : 'none';
   // OPL gomb megjelenítése minden bejelentkezett usernek
   var oplBtn = document.getElementById('navOpl');
   if(oplBtn) oplBtn.style.display = currentUser ? '' : 'none';
@@ -2771,47 +2763,19 @@ function getMatchdayInfo() {
 }
 
 function renderMatchdayBanner() {
-  var banner = document.getElementById('matchdayBanner');
-  if(!banner) return;
-  // Csak a Meccsek fülön és ha nincs eldobva ebben a sessionben
-  if(activeTab !== 'meccsek' || sessionStorage.getItem('mdDismissed') === getBudapestToday()) {
-    banner.classList.remove('show'); return;
-  }
+  var voteBtn = document.getElementById('voteIconBtn');
+  var untippedTxt = document.getElementById('untippedText');
+  if(!voteBtn) return;
+  if(!currentUser) { voteBtn.style.display = 'none'; if(untippedTxt) untippedTxt.style.display = 'none'; return; }
   var info = getMatchdayInfo();
-  if(info.todays.length === 0) { banner.classList.remove('show'); return; }
-
-  var emojiEl = document.getElementById('mdEmoji');
-  var titleEl = document.getElementById('mdTitle');
-  var subEl   = document.getElementById('mdSub');
-  var btnEl   = document.getElementById('mdBtn');
-  var n = info.todays.length;
-
-  if(!currentUser) {
-    emojiEl.textContent = '🔥';
-    titleEl.textContent = 'Ma ' + n + ' meccs!';
-    subEl.textContent = 'Regisztrálj és tippelj a mai meccsekre!';
-    btnEl.style.display = '';
-    btnEl.innerHTML = '⚡ Tippelek!';
-  } else if(info.untipped.length > 0) {
-    emojiEl.textContent = '🔥';
-    titleEl.textContent = 'Ma ' + n + ' meccs!';
-    subEl.textContent = 'Még ' + info.untipped.length + ' meccsre nem tippeltél – ne maradj le!';
-    btnEl.style.display = '';
-    btnEl.innerHTML = '⚡ Szavazz!';
-  } else if(info.actionable.length > 0) {
-    // Minden nyitott mai meccsre tippelt
-    emojiEl.textContent = '✅';
-    titleEl.textContent = 'Minden tipp leadva!';
-    subEl.textContent = 'A mai ' + n + ' meccsre megvan a tipped. Hajrá! 🎉';
-    btnEl.style.display = 'none';
+  if(info.untipped.length > 0) {
+    voteBtn.style.display = 'inline-flex';
+    voteBtn.title = 'Még ' + info.untipped.length + ' meccsre nem tippeltél!';
+    if(untippedTxt) untippedTxt.style.display = 'block';
   } else {
-    // Van ma meccs, de a tippelési idő mindre lejárt
-    emojiEl.textContent = '⚽';
-    titleEl.textContent = 'Ma ' + n + ' meccs zajlik';
-    subEl.textContent = 'A tippelési idő lejárt – nézd az eredményeket élőben!';
-    btnEl.style.display = 'none';
+    voteBtn.style.display = 'none';
+    if(untippedTxt) untippedTxt.style.display = 'none';
   }
-  banner.classList.add('show');
 }
 
 // Ugrás a nap első még nem tippelt meccséhez
@@ -4126,30 +4090,8 @@ function closeOnboard() {
 
 // ===== GYŐZTES BANNER =====
 
-// Belépéskori figyelmeztetés: mai meccsekre nem tippelt
-function renderLoginWarning() {
-  var warn = document.getElementById('loginWarn');
-  var txt = document.getElementById('loginWarnText');
-  if(!warn || !txt || !currentUser) { if(warn) warn.classList.remove('show'); return; }
-
-  var today = getBudapestToday();
-  var now = getBudapestNow();
-  var safe = fbSafeName(currentUser);
-
-  var untipped = ALL_MATCHES.filter(function(m) {
-    if(m.huDate !== today) return false;
-    if(allResults[m.id]) return false;                          // már van eredmény
-    if((m.huDate + 'T' + m.huTime) <= now) return false;       // kickoff után
-    return !(allTips[m.id] && allTips[m.id][safe]);             // nincs tipp
-  });
-
-  if(untipped.length > 0) {
-    txt.textContent = 'Ma még ' + untipped.length + ' meccsre nem tippeltél – a kickoff előtt leadhatod!';
-    warn.classList.add('show');
-  } else {
-    warn.classList.remove('show');
-  }
-}
+// Belépéskori figyelmeztetés (loginWarn eltávolítva, user bar subtitle-ben marad)
+function renderLoginWarning() {}
 
 // ===== E-MOB FOCI =====
 let _emobGeneratedA = [];
