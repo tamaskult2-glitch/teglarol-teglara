@@ -2581,6 +2581,37 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
   return html;
 }
 
+// Mások tippjei (kickoff után látható)
+function buildOtherTips(mid, locked) {
+  if(!locked || !allTips[mid]) return '';
+  var meSafe = currentUser ? fbSafeName(currentUser) : '';
+  var others = Object.entries(allTips[mid]).filter(function(e){ return e[0] !== meSafe; });
+  if(others.length === 0) return '';
+  var result = allResults[mid];
+  var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+  var html = '<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+  others.forEach(function(e){
+    var u = e[0], tip = e[1];
+    var o = getTipOutcome(tip);
+    var sc = getTipScore(tip);
+    var pts = (result && m) ? calcMatchPoints(m, tip) : null;
+    var tipStr = sc ? sc.h+':'+sc.a : (o||'?');
+    var bg = 'rgba(255,255,255,0.04)', clr = 'rgba(240,244,240,0.5)';
+    if(result && pts !== null) {
+      if(pts > 0) { bg = 'rgba(34,197,94,0.1)'; clr = '#4ade80'; }
+      else { bg = 'rgba(239,68,68,0.06)'; clr = 'rgba(240,244,240,0.3)'; }
+    }
+    html += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;background:'+bg+';font-family:Oswald,sans-serif;font-size:11px;color:'+clr+';">'
+      +escHtml(u.substring(0,8))
+      +' <b>'+tipStr+'</b>'
+      +(pts!==null&&pts>0?' <span style="color:#22c55e;font-size:10px;">+'+pts+'</span>':'')
+      +'</span>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
 // ===== RENDER MATCHES (dátum szerint csoportosítva) =====
 
 // ===== TIPPEK TÁBLÁZAT =====
@@ -2999,7 +3030,7 @@ function renderMatches() {
           </div>
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
           </div>
-          ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}
+          ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
         </div>
       </div>`;
@@ -4225,6 +4256,7 @@ function renderEmobMatches() {
       if(myTip && !cardLocked) html += '<button onclick="clearTip(\''+m.id+'\')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;">⌫</button>';
       html += '</div>';
       html += buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked);
+      html += buildOtherTips(m.id, cardLocked);
       html += '</div></div>';
     });
     html += '</div>';
@@ -4351,6 +4383,7 @@ function renderBLTab() {
     if(myTip && !cardLocked) html += '<button onclick="clearTip(\''+m.id+'\')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;">⌫</button>';
     html += '</div>';
     html += buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked);
+      html += buildOtherTips(m.id, cardLocked);
     html += isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : '';
     html += '</div></div>';
   });
