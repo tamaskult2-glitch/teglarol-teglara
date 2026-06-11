@@ -1181,8 +1181,7 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')" id="navAdmin">🔐 Admin</button>
   <button class="nav-tab" onclick="showTab('bl')">🏆 BL</button>
-  <button class="nav-tab" id="navEmob" onclick="showTab('emob')">⚽ Foca</button>
-  <button class="nav-tab" id="navBet" onclick="showTab('bet')">💰 Tét <span id="betBadge" style="background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
+<button class="nav-tab" id="navBet" onclick="showTab('bet')">💰 Tét <span id="betBadge" style="background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
 </div>
@@ -1459,9 +1458,6 @@ footer a:hover{color:var(--gold);}
   </div>
 
   <!-- BL TAB -->
-  <div id="tab-bl" style="display:none;">
-    <div id="blMatchContainer"></div>
-  </div>
 
   <!-- TÉT TAB -->
   <div id="tab-bet" style="display:none;">
@@ -1534,50 +1530,6 @@ footer a:hover{color:var(--gold);}
     </div>
   </div>
 
-  <!-- E-MOB FOCI TAB -->
-  <div id="tab-emob" style="display:none;">
-    <div class="section-header" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;">
-      <h2>⚽ Foca Meccsek</h2>
-    </div>
-
-    <!-- Admin: csapatgenerátor -->
-    <div id="emobAdminSection" style="display:none;">
-      <div style="background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.2);border-radius:12px;padding:14px;margin-bottom:14px;">
-        <div style="font-family:Oswald,sans-serif;font-size:12px;color:var(--gold);letter-spacing:1px;margin-bottom:10px;">🎲 VÉLETLENSZERŰ CSAPATGENERÁTOR</div>
-        <div style="font-size:11px;color:rgba(240,244,240,0.45);margin-bottom:8px;">Írd be a játékosok nevét soronként vagy vesszővel elválasztva, majd osztja ketté véletlenszerűen. Páratlan szám esetén az egyik csapat eggyel több játékost kap.</div>
-        <textarea id="emobPlayerInput" rows="6" placeholder="Fercsik&#10;Hermán&#10;Temesi&#10;Lesznik&#10;Berkes&#10;Huszár&#10;Kult&#10;Lakatos&#10;Török&#10;Toma"
-          style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:13px;resize:vertical;margin-bottom:8px;"></textarea>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button onclick="generateEmobTeams()" style="padding:8px 16px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.4);color:var(--gold);border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🎲 CSAPATOK GENERÁLÁSA</button>
-          <button onclick="applyEmobTeams()" id="emobApplyBtn" style="display:none;padding:8px 16px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);color:#4ade80;border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">✓ ALKALMAZ → MECCS FORM</button>
-        </div>
-        <div id="emobTeamResult" style="margin-top:10px;"></div>
-      </div>
-
-      <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);border-radius:12px;padding:14px;margin-bottom:14px;">
-        <div style="font-family:Oswald,sans-serif;font-size:12px;color:#93c5fd;letter-spacing:1px;margin-bottom:10px;">⚽ GYORS MECCS FELVITEL</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><div class="cm-label">📅 Dátum</div><input type="date" id="emobDate" class="cm-inp"></div>
-          <div><div class="cm-label">🕐 Időpont</div><input type="time" id="emobTime" value="17:00" class="cm-inp"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><div class="cm-label">🏠 Hazai csapat neve</div><input type="text" id="emobHomeName" placeholder="A csapat" class="cm-inp"></div>
-          <div><div class="cm-label">✈️ Vendég csapat neve</div><input type="text" id="emobAwayName" placeholder="B csapat" class="cm-inp"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><div class="cm-label">🏠 Hazai kezdők</div><textarea id="emobHomeLineup" rows="3" placeholder="Fercsik, Hermán..." class="cm-inp" style="resize:vertical;"></textarea></div>
-          <div><div class="cm-label">✈️ Vendég kezdők</div><textarea id="emobAwayLineup" rows="3" placeholder="Huszár, Kult..." class="cm-inp" style="resize:vertical;"></textarea></div>
-        </div>
-        <div style="margin-bottom:10px;">
-          <div class="cm-label">🏟️ Helyszín</div>
-          <input type="text" id="emobVenue" value="Műfüves Pálya" class="cm-inp">
-        </div>
-        <button onclick="saveEmobMatch()" style="width:100%;padding:9px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">💾 MECCS MENTÉSE</button>
-      </div>
-    </div>
-
-    <div id="emobMatchList"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
-  </div>
 
 </div>
 
@@ -1593,9 +1545,7 @@ const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
 
 // ===== MECCS ADATOK (HU idő szerint rendezve) =====
 const ALL_MATCHES = [
-  {id:"TEST1",group:"🧪",huDate:"2026-05-27",huTime:"17:00",home:"Ipari taktikusok",homeFlag:"🏭",away:"Ipari taktikusok",awayFlag:"🏭",venue:"Estadio Söpte",title:"🏆 Próba meccs",homeLabel:"A csapat",awayLabel:"B csapat",homeLineup:["Fercsik","Hermán","Temesi","Lesznik","Berkes"],awayLineup:["Huszár","Kult","Lakatos","Török","Toma"]},
-  {id:"BL2026",group:"⭐BL",huDate:"2026-05-30",huTime:"18:00",home:"PSG",homeFlag:"🔵🔴",away:"Arsenal",awayFlag:"🔴⚪",venue:"Puskás Aréna, Budapest",title:"🏆 Bajnokok Ligája Döntő 2026",knockout:true},
-  {id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Mexico City"},
+{id:"A1",group:"A",huDate:"2026-06-11",huTime:"21:00",home:"Mexikó",homeFlag:"🇲🇽",away:"Dél-Afrika",awayFlag:"🇿🇦",venue:"Mexico City"},
   {id:"B1",group:"B",huDate:"2026-06-12",huTime:"21:00",home:"Kanada",homeFlag:"🇨🇦",away:"Bosznia-Hercegovina",awayFlag:"🇧🇦",venue:"Toronto"},
   {id:"A2",group:"A",huDate:"2026-06-12",huTime:"04:00",home:"Dél-Korea",homeFlag:"🇰🇷",away:"Csehország",awayFlag:"🇨🇿",venue:"Guadalajara"},
   {id:"B2",group:"B",huDate:"2026-06-13",huTime:"21:00",home:"Katar",homeFlag:"🇶🇦",away:"Svájc",awayFlag:"🇨🇭",venue:"San Francisco"},
@@ -2259,7 +2209,7 @@ async function clearTip(mid) {
 
 function showTab(t) {
   activeTab=t;
-  ['meccsek','tippek','ranglista','admin','opl','emob','bl','bet','kozos'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
+  ['meccsek','tippek','ranglista','admin','opl','bet','kozos'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
@@ -2668,10 +2618,10 @@ function buildTippTable() {
         ALL_MATCHES.forEach(function(m) {
           var mt = t[m.id];
           if(!mt) return;
+          // BL és Foca meccsek kihagyása
+          if(m.id === 'BL2026' || m.id === 'TEST1' || m.isEmob || m.group === '⭐BL' || m.group === '🏭') return;
           var hasTip = mt && Object.keys(mt).some(function(u){ var tip=mt[u]; return tip && (typeof tip==='object' ? tip.o : tip); });
-          // BL2026 mindig látszik, TEST1 a Foca fülre kerül
-          var alwaysShow = (m.id === 'BL2026' || !!m.alwaysShow);
-          if(!hasTip && !alwaysShow) return;
+          if(!hasTip) return;
 
           var result = r[m.id] || '';
           var score  = s[m.id] || '';
@@ -4786,6 +4736,129 @@ async function voteWatchMatch(id){if(!currentUser){showToast('⚠️ Előbb lép
 async function voteWatchLoc(id){if(!currentUser){showToast('⚠️ Előbb lépj be!');return;}var s=fbSafeName(currentUser);if(!watchPartyData[s])watchPartyData[s]={};watchPartyData[s].loc=id;if(id!=='egyeb')delete watchPartyData[s].locCustom;renderWatchParty();try{await fbSet('watchParty/'+s+'/loc',id);if(id!=='egyeb')await fbDel('watchParty/'+s+'/locCustom');}catch(e){}}
 async function saveWatchCustomLoc(){if(!currentUser)return;var v=(document.getElementById('wpCustomLoc')||{}).value;v=v?v.trim():'';if(!v)return;var s=fbSafeName(currentUser);if(!watchPartyData[s])watchPartyData[s]={};watchPartyData[s].locCustom=v;try{await fbSet('watchParty/'+s+'/locCustom',v);showToast('📍 '+v);renderWatchParty();}catch(e){}}
 async function saveWatchVenue(){if(!currentUser)return;var v=(document.getElementById('wpVenue')||{}).value;v=v?v.trim():'';var s=fbSafeName(currentUser);if(!watchPartyData[s])watchPartyData[s]={};if(v){watchPartyData[s].venue=v;await fbSet('watchParty/'+s+'/venue',v).catch(function(){});}else{delete watchPartyData[s].venue;await fbDel('watchParty/'+s+'/venue').catch(function(){});}renderWatchParty();}
+
+// ===== AUTOMATA EREDMÉNY EMLÉKEZTETŐ + API =====
+var AUTO_RES_API = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+
+async function fetchLiveScores() {
+  try {
+    var resp = await fetch(AUTO_RES_API);
+    if(!resp.ok) return null;
+    var data = await resp.json();
+    if(!data || !data.events) return null;
+    var results = [];
+    data.events.forEach(function(ev) {
+      if(!ev.competitions || !ev.competitions[0]) return;
+      var comp = ev.competitions[0];
+      var status = comp.status && comp.status.type ? comp.status.type.name : '';
+      if(status !== 'STATUS_FULL_TIME' && status !== 'STATUS_FINAL') return;
+      var teams = comp.competitors || [];
+      if(teams.length < 2) return;
+      var home = teams.find(function(t){return t.homeAway==='home';});
+      var away = teams.find(function(t){return t.homeAway==='away';});
+      if(!home || !away) return;
+      results.push({
+        homeName: home.team.displayName || home.team.name || '',
+        awayName: away.team.displayName || away.team.name || '',
+        homeShort: home.team.abbreviation || '',
+        awayShort: away.team.abbreviation || '',
+        homeScore: parseInt(home.score) || 0,
+        awayScore: parseInt(away.score) || 0,
+        dateStr: ev.date ? ev.date.substring(0,10) : ''
+      });
+    });
+    return results;
+  } catch(e) { return null; }
+}
+
+function matchApiToLocal(apiResult) {
+  // Keresünk egyező meccset dátum + csapatnév alapján
+  var best = null;
+  ALL_MATCHES.filter(isVbMatch).forEach(function(m) {
+    if(allResults[m.id]) return; // már van eredmény
+    var hNorm = (m.home||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    var aNorm = (m.away||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    var apiH = apiResult.homeName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    var apiA = apiResult.awayName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    var apiHS = apiResult.homeShort.toLowerCase();
+    var apiAS = apiResult.awayShort.toLowerCase();
+    // Egyezés: teljes név tartalmazza, vagy abbreviation egyezik
+    var homeMatch = apiH.indexOf(hNorm) >= 0 || hNorm.indexOf(apiH) >= 0 || hNorm.indexOf(apiHS) >= 0 || apiH.indexOf(hNorm.substring(0,4)) >= 0;
+    var awayMatch = apiA.indexOf(aNorm) >= 0 || aNorm.indexOf(apiA) >= 0 || aNorm.indexOf(apiAS) >= 0 || apiA.indexOf(aNorm.substring(0,4)) >= 0;
+    if(homeMatch && awayMatch) best = m;
+  });
+  return best;
+}
+
+async function checkAutoResults() {
+  if(!isAdminUnlocked) return;
+  var now = getBudapestNow();
+  var needsResult = ALL_MATCHES.filter(function(m) {
+    if(!isVbMatch(m) || allResults[m.id]) return false;
+    var kickoff = m.huDate + 'T' + m.huTime;
+    if(kickoff > now) return false;
+    var ko = new Date(kickoff.replace('T',' ').replace(/-/g,'/'));
+    var endTime = new Date(ko.getTime() + 100*60*1000);
+    var nowDate = new Date(now.replace('T',' ').replace(/-/g,'/'));
+    return nowDate >= endTime;
+  });
+  if(needsResult.length === 0) return;
+
+  // API-ból próbáljuk lekérni
+  var apiResults = await fetchLiveScores();
+  var autoSaved = 0;
+
+  if(apiResults && apiResults.length > 0) {
+    for(var i = 0; i < apiResults.length; i++) {
+      var ar = apiResults[i];
+      var localMatch = matchApiToLocal(ar);
+      if(localMatch && !allResults[localMatch.id]) {
+        var h = ar.homeScore, a = ar.awayScore;
+        var result = h>a?'1':h===a?'X':'2';
+        var score = h+':'+a;
+        try {
+          await fbSet('results/'+localMatch.id, result);
+          await fbSet('scores/'+localMatch.id, score);
+          allResults[localMatch.id] = result;
+          allScores[localMatch.id] = score;
+          autoSaved++;
+          showToast('🤖 Auto: '+localMatch.home+' '+score+' '+localMatch.away);
+        } catch(e){}
+      }
+    }
+    if(autoSaved > 0) renderAll();
+  }
+
+  // Ami nem sikerült API-ból: manuális popup
+  needsResult.forEach(function(m) {
+    if(allResults[m.id]) return; // már mentve API-ból
+    if(sessionStorage.getItem('autoRes_'+m.id)) return;
+    showAutoResultPopup(m);
+    sessionStorage.setItem('autoRes_'+m.id, '1');
+  });
+}
+
+function showAutoResultPopup(m) {
+  var ex = document.getElementById('autoResPopup'); if(ex) ex.remove();
+  var d = document.createElement('div'); d.id = 'autoResPopup';
+  d.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;';
+  d.innerHTML = '<div style="width:90%;max-width:360px;background:linear-gradient(180deg,#0f2a14,#0a1c0c);border:2px solid rgba(239,68,68,0.4);border-radius:16px;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,0.5);"><div style="text-align:center;font-size:24px;margin-bottom:4px;">🏟️</div><div style="text-align:center;font-family:Oswald,sans-serif;font-size:16px;color:#ef4444;font-weight:700;margin-bottom:4px;">MECCS VÉGET ÉRT!</div><div style="text-align:center;font-size:12px;color:rgba(240,244,240,0.35);margin-bottom:4px;">API nem elérhető — manuális rögzítés</div><div style="text-align:center;font-size:14px;color:rgba(240,244,240,0.7);margin-bottom:12px;">'+(m.homeFlag||'')+' <b>'+escHtml(m.home)+'</b> vs <b>'+escHtml(m.away)+'</b> '+(m.awayFlag||'')+'</div><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;"><input type="text" inputmode="numeric" id="arH_'+m.id+'" placeholder="0" maxlength="2" style="width:50px;text-align:center;padding:10px;border-radius:10px;border:2px solid rgba(245,197,24,0.3);background:rgba(0,0,0,0.3);color:var(--gold);font-family:Oswald,sans-serif;font-size:24px;font-weight:700;"><span style="font-family:Oswald,sans-serif;font-size:20px;color:rgba(240,244,240,0.3);">:</span><input type="text" inputmode="numeric" id="arA_'+m.id+'" placeholder="0" maxlength="2" style="width:50px;text-align:center;padding:10px;border-radius:10px;border:2px solid rgba(245,197,24,0.3);background:rgba(0,0,0,0.3);color:var(--gold);font-family:Oswald,sans-serif;font-size:24px;font-weight:700;"></div><div style="display:flex;gap:8px;"><button onclick="document.getElementById(\'autoResPopup\').remove()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:rgba(240,244,240,0.5);font-family:Oswald,sans-serif;font-size:13px;cursor:pointer;">Később</button><button onclick="submitAutoResult(\''+m.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(34,197,94,0.4);background:rgba(34,197,94,0.15);color:#4ade80;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✓ Mentés</button></div></div>';
+  document.body.appendChild(d);
+}
+async function submitAutoResult(mid) {
+  var hEl=document.getElementById('arH_'+mid), aEl=document.getElementById('arA_'+mid);
+  if(!hEl||!aEl) return;
+  var h=parseInt(hEl.value), a=parseInt(aEl.value);
+  if(isNaN(h)||isNaN(a)||h<0||a<0){showToast('⚠️ Érvényes eredményt adj meg!');return;}
+  var result=h>a?'1':h===a?'X':'2', score=h+':'+a;
+  try {
+    await fbSet('results/'+mid, result); await fbSet('scores/'+mid, score);
+    allResults[mid]=result; allScores[mid]=score;
+    showToast('✅ Eredmény: '+score); document.getElementById('autoResPopup').remove(); renderAll();
+  } catch(e){showToast('❌ Hiba: '+e.message);}
+}
+setInterval(checkAutoResults, 300000); // 5 percenként
+setTimeout(checkAutoResults, 15000); // első: 15mp
 
 // ===== MEGHÍVÓ RENDSZER =====
 function inviteGenerateToken() {
