@@ -2953,8 +2953,9 @@ function renderMatches() {
                 ${m.homeLabel?'<span class="tn-sub">'+m.homeLabel+'</span>':''}
               </div>
             </div>
-            <span class="vs-block">VS</span>
+            <span class="vs-block">${liveScores[m.id] ? '' : 'VS'}</span>
             <span class="sc-block" style="visibility:hidden;display:block">–</span>
+            ${liveScores[m.id] && !result ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:'+(liveScores[m.id].status==='ft'?'var(--gold)':'#4ade80')+';">'+liveScores[m.id].home+' : '+liveScores[m.id].away+'</span><span style="font-size:10px;color:'+(liveScores[m.id].status==='ft'?'rgba(240,244,240,0.4)':'#4ade80')+';'+(liveScores[m.id].status==='live'?'animation:pulse 2s infinite;':'')+'">⚽ '+liveScores[m.id].minute+'</span></div>' : ''}
             <div class="team-blk away-blk">
               ${getTeamBadge(m.awayFlag, m.away)}
               <div class="tn-wrap">
@@ -4703,15 +4704,29 @@ function renderWatchParty() {
   var meSafe=currentUser?fbSafeName(currentUser):null, myVote=meSafe?watchPartyData[meSafe]:null;
   if(myVote&&myVote.match&&!myVote.matches){myVote.matches={};myVote.matches[myVote.match]=true;}
   var myM=(myVote&&myVote.matches)?myVote.matches:{}, myL=myVote?myVote.loc:null;
-  var mc={},lc={},tv=0; WATCH_SLOTS.forEach(function(s){mc[s.id]=0;}); WATCH_LOCS.forEach(function(l){lc[l.id]=0;});
-  Object.values(watchPartyData).forEach(function(v){if(!v)return;var ms=v.matches||(v.match?(function(){var o={};o[v.match]=true;return o;})():{});var h=false;Object.keys(ms).forEach(function(k){if(ms[k]&&mc[k]!==undefined){mc[k]++;h=true;}});if(v.loc&&lc[v.loc]!==undefined)lc[v.loc]++;if(h||v.loc)tv++;});
+  var mc={},lc={},tv=0,matchVoters={},locVoters={};
+  WATCH_SLOTS.forEach(function(s){mc[s.id]=0;matchVoters[s.id]=[];});
+  WATCH_LOCS.forEach(function(l){lc[l.id]=0;locVoters[l.id]=[];});
+  Object.entries(watchPartyData).forEach(function(e){var u=e[0],v=e[1];if(!v)return;var ms=v.matches||(v.match?(function(){var o={};o[v.match]=true;return o;})():{});var h=false;Object.keys(ms).forEach(function(k){if(ms[k]&&mc[k]!==undefined){mc[k]++;matchVoters[k].push(u);h=true;}});if(v.loc&&lc[v.loc]!==undefined){lc[v.loc]++;locVoters[v.loc].push(u);}if(h||v.loc)tv++;});
   var html='<div style="font-family:Oswald,sans-serif;font-size:14px;color:rgba(245,197,24,0.6);margin-bottom:10px;">⚽ MELYIK MECCS(EK)RE JÖNNÉL?</div>';
   var lr=''; WATCH_SLOTS.forEach(function(s){if(s.round!==lr){lr=s.round;html+='<div style="font-family:Oswald,sans-serif;font-size:15px;font-weight:700;color:rgba(245,197,24,0.45);margin:'+(s.id==='QF1'?'0':'14px')+' 0 8px;">'+s.emoji+' '+s.round+'</div>';}
     var sel=!!myM[s.id],cnt=mc[s.id],dp=s.huDate.split('-');
-    html+='<button onclick="voteWatchMatch(\''+s.id+'\')" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 14px;margin-bottom:5px;border-radius:10px;cursor:pointer;border:1px solid rgba(245,197,24,'+(sel?'0.5':'0.12')+');background:'+(sel?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.03)')+';color:'+(sel?'var(--gold)':'rgba(240,244,240,0.6)')+';font-family:Oswald,sans-serif;font-size:15px;"><span style="flex:1;display:flex;align-items:center;gap:10px;"><span style="font-weight:700;min-width:44px;">'+s.id+'</span><span style="font-size:14px;color:rgba(240,244,240,0.4);">'+dp[1].replace(/^0/,'')+'.'+dp[2].replace(/^0/,'')+'. ('+s.day+')</span><span style="font-size:14px;color:rgba(245,197,24,0.5);font-weight:600;">'+s.huTime+'</span></span>'+(tv>0?'<span style="font-size:12px;color:rgba(240,244,240,0.3);">'+cnt+'×</span>':'')+'<span style="font-size:16px;">'+(sel?'☑️':'⬜')+'</span></button>';
+    var voters=matchVoters[s.id]||[];
+    html+='<div style="margin-bottom:5px;">';
+    html+='<button onclick="voteWatchMatch(\''+s.id+'\')" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 14px;border-radius:'+(voters.length>0?'10px 10px 0 0':'10px')+';cursor:pointer;border:1px solid rgba(245,197,24,'+(sel?'0.5':'0.12')+');background:'+(sel?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.03)')+';color:'+(sel?'var(--gold)':'rgba(240,244,240,0.6)')+';font-family:Oswald,sans-serif;font-size:15px;"><span style="flex:1;display:flex;align-items:center;gap:10px;"><span style="font-weight:700;min-width:44px;">'+s.id+'</span><span style="font-size:14px;color:rgba(240,244,240,0.4);">'+dp[1].replace(/^0/,'')+'.'+dp[2].replace(/^0/,'')+'. ('+s.day+')</span><span style="font-size:14px;color:rgba(245,197,24,0.5);font-weight:600;">'+s.huTime+'</span></span>'+(tv>0?'<span style="font-size:12px;color:rgba(240,244,240,0.3);">'+cnt+'×</span>':'')+'<span style="font-size:16px;">'+(sel?'☑️':'⬜')+'</span></button>';
+    if(voters.length>0){
+      html+='<div style="padding:4px 14px 6px;background:rgba(255,255,255,0.02);border:1px solid rgba(245,197,24,0.08);border-top:none;border-radius:0 0 10px 10px;display:flex;flex-wrap:wrap;gap:3px;">';
+      voters.forEach(function(u){html+='<span style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(240,244,240,0.4);background:rgba(255,255,255,0.04);padding:1px 6px;border-radius:4px;">'+escHtml(u)+'</span>';});
+      html+='</div>';
+    }
+    html+='</div>';
   });
   html+='<div style="font-family:Oswald,sans-serif;font-size:14px;color:rgba(245,197,24,0.6);margin:18px 0 10px;">📍 HOL?</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
-  WATCH_LOCS.forEach(function(l){var sel=myL===l.id; html+='<button onclick="voteWatchLoc(\''+l.id+'\')" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border-radius:10px;cursor:pointer;border:1px solid rgba(245,197,24,'+(sel?'0.5':'0.12')+');background:'+(sel?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.03)')+';color:'+(sel?'var(--gold)':'rgba(240,244,240,0.6)')+';font-family:Oswald,sans-serif;"><span style="font-size:26px;">'+l.emoji+'</span><span style="font-size:15px;font-weight:700;">'+l.name+'</span>'+(sel?'<span style="font-size:12px;color:var(--gold);">✓</span>':'')+'</button>';});
+  WATCH_LOCS.forEach(function(l){var sel=myL===l.id;var voters=locVoters[l.id]||[];
+    html+='<div style="display:flex;flex-direction:column;"><button onclick="voteWatchLoc(\''+l.id+'\')" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border-radius:'+(voters.length>0?'10px 10px 0 0':'10px')+';cursor:pointer;border:1px solid rgba(245,197,24,'+(sel?'0.5':'0.12')+');background:'+(sel?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.03)')+';color:'+(sel?'var(--gold)':'rgba(240,244,240,0.6)')+';font-family:Oswald,sans-serif;width:100%;"><span style="font-size:26px;">'+l.emoji+'</span><span style="font-size:15px;font-weight:700;">'+l.name+'</span>'+(sel?'<span style="font-size:12px;color:var(--gold);">✓</span>':'')+'</button>';
+    if(voters.length>0){html+='<div style="padding:3px 4px;background:rgba(255,255,255,0.02);border:1px solid rgba(245,197,24,0.08);border-top:none;border-radius:0 0 10px 10px;text-align:center;"><span style="font-family:Oswald,sans-serif;font-size:9px;color:rgba(240,244,240,0.35);">'+voters.map(function(u){return escHtml(u);}).join(', ')+'</span></div>';}
+    html+='</div>';
+  });
   html+='</div>';
   if(myL==='egyeb'){var cl=(myVote&&myVote.locCustom)||'';html+='<div style="margin-top:10px;display:flex;gap:6px;"><input type="text" id="wpCustomLoc" value="'+escHtml(cl)+'" placeholder="Település…" maxlength="40" onkeydown="if(event.key===\'Enter\')saveWatchCustomLoc()" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:14px;"><button onclick="saveWatchCustomLoc()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.4);background:rgba(245,197,24,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">OK</button></div>';}
   if(myL){var vn=(myVote&&myVote.venue)||'';html+='<div style="margin-top:10px;"><div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(245,197,24,0.5);margin-bottom:4px;">🍺 KOCSMA / PUB</div><div style="display:flex;gap:6px;"><input type="text" id="wpVenue" value="'+escHtml(vn)+'" placeholder="pl. Fregatt Pub" maxlength="60" onkeydown="if(event.key===\'Enter\')saveWatchVenue()" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:14px;"><button onclick="saveWatchVenue()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.4);background:rgba(245,197,24,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">OK</button></div></div>';}
@@ -4739,6 +4754,7 @@ async function saveWatchVenue(){if(!currentUser)return;var v=(document.getElemen
 
 // ===== AUTOMATA EREDMÉNY EMLÉKEZTETŐ + API =====
 var AUTO_RES_API = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+var liveScores = {}; // {matchId: {home:2, away:1, minute:'67', status:'live'|'ft'}}
 
 async function fetchLiveScores() {
   try {
@@ -4750,13 +4766,22 @@ async function fetchLiveScores() {
     data.events.forEach(function(ev) {
       if(!ev.competitions || !ev.competitions[0]) return;
       var comp = ev.competitions[0];
-      var status = comp.status && comp.status.type ? comp.status.type.name : '';
-      if(status !== 'STATUS_FULL_TIME' && status !== 'STATUS_FINAL') return;
+      var statusType = comp.status && comp.status.type ? comp.status.type.name : '';
+      var clock = comp.status && comp.status.displayClock ? comp.status.displayClock : '';
+      var period = comp.status && comp.status.period ? comp.status.period : 0;
+      var isLive = statusType === 'STATUS_IN_PROGRESS' || statusType === 'STATUS_HALFTIME' || statusType === 'STATUS_FIRST_HALF' || statusType === 'STATUS_SECOND_HALF';
+      var isFT = statusType === 'STATUS_FULL_TIME' || statusType === 'STATUS_FINAL';
+      if(!isLive && !isFT) return;
       var teams = comp.competitors || [];
       if(teams.length < 2) return;
       var home = teams.find(function(t){return t.homeAway==='home';});
       var away = teams.find(function(t){return t.homeAway==='away';});
       if(!home || !away) return;
+      var minute = '';
+      if(isLive) {
+        if(statusType === 'STATUS_HALFTIME') minute = 'Félidő';
+        else minute = clock || (period === 1 ? '1. félidő' : '2. félidő');
+      }
       results.push({
         homeName: home.team.displayName || home.team.name || '',
         awayName: away.team.displayName || away.team.name || '',
@@ -4764,7 +4789,9 @@ async function fetchLiveScores() {
         awayShort: away.team.abbreviation || '',
         homeScore: parseInt(home.score) || 0,
         awayScore: parseInt(away.score) || 0,
-        dateStr: ev.date ? ev.date.substring(0,10) : ''
+        dateStr: ev.date ? ev.date.substring(0,10) : '',
+        status: isFT ? 'ft' : 'live',
+        minute: minute
       });
     });
     return results;
@@ -4791,51 +4818,65 @@ function matchApiToLocal(apiResult) {
 }
 
 async function checkAutoResults() {
-  if(!isAdminUnlocked) return;
-  var now = getBudapestNow();
-  var needsResult = ALL_MATCHES.filter(function(m) {
-    if(!isVbMatch(m) || allResults[m.id]) return false;
-    var kickoff = m.huDate + 'T' + m.huTime;
-    if(kickoff > now) return false;
-    var ko = new Date(kickoff.replace('T',' ').replace(/-/g,'/'));
-    var endTime = new Date(ko.getTime() + 100*60*1000);
-    var nowDate = new Date(now.replace('T',' ').replace(/-/g,'/'));
-    return nowDate >= endTime;
-  });
-  if(needsResult.length === 0) return;
-
-  // API-ból próbáljuk lekérni
   var apiResults = await fetchLiveScores();
   var autoSaved = 0;
+  var liveUpdated = false;
 
   if(apiResults && apiResults.length > 0) {
-    for(var i = 0; i < apiResults.length; i++) {
-      var ar = apiResults[i];
+    // Élő meccsek kijelzése (mindenki számára)
+    apiResults.forEach(function(ar) {
       var localMatch = matchApiToLocal(ar);
-      if(localMatch && !allResults[localMatch.id]) {
+      if(!localMatch) return;
+
+      if(ar.status === 'live') {
+        // Élő eredmény mentése a kijelzéshez
+        liveScores[localMatch.id] = {home: ar.homeScore, away: ar.awayScore, minute: ar.minute, status: 'live'};
+        liveUpdated = true;
+      } else if(ar.status === 'ft' && !allResults[localMatch.id] && isAdminUnlocked) {
+        // Végleges eredmény mentése (csak admin)
         var h = ar.homeScore, a = ar.awayScore;
-        var result = h>a?'1':h===a?'X':'2';
-        var score = h+':'+a;
-        try {
-          await fbSet('results/'+localMatch.id, result);
-          await fbSet('scores/'+localMatch.id, score);
-          allResults[localMatch.id] = result;
-          allScores[localMatch.id] = score;
-          autoSaved++;
-          showToast('🤖 Auto: '+localMatch.home+' '+score+' '+localMatch.away);
-        } catch(e){}
+        var result = h>a?'1':h===a?'X':'2', score = h+':'+a;
+        liveScores[localMatch.id] = {home:h, away:a, minute:'Vége', status:'ft'};
+        fbSet('results/'+localMatch.id, result).catch(function(){});
+        fbSet('scores/'+localMatch.id, score).catch(function(){});
+        allResults[localMatch.id] = result;
+        allScores[localMatch.id] = score;
+        autoSaved++;
+        showToast('🤖 Auto: '+localMatch.home+' '+score+' '+localMatch.away);
       }
-    }
-    if(autoSaved > 0) renderAll();
+    });
+
+    // Élő állapot eltávolítása ha a meccs már nem az API-ban
+    Object.keys(liveScores).forEach(function(mid) {
+      if(liveScores[mid].status === 'live') {
+        var still = apiResults.some(function(ar) {
+          var lm = matchApiToLocal(ar);
+          return lm && lm.id === mid && ar.status === 'live';
+        });
+        if(!still) delete liveScores[mid];
+      }
+    });
+
+    if(autoSaved > 0 || liveUpdated) renderAll();
   }
 
-  // Ami nem sikerült API-ból: manuális popup
-  needsResult.forEach(function(m) {
-    if(allResults[m.id]) return; // már mentve API-ból
-    if(sessionStorage.getItem('autoRes_'+m.id)) return;
-    showAutoResultPopup(m);
-    sessionStorage.setItem('autoRes_'+m.id, '1');
-  });
+  // Manuális popup (csak admin, ha nincs API eredmény)
+  if(isAdminUnlocked) {
+    var now = getBudapestNow();
+    ALL_MATCHES.filter(function(m) {
+      if(!isVbMatch(m) || allResults[m.id]) return false;
+      var kickoff = m.huDate+'T'+m.huTime;
+      if(kickoff > now) return false;
+      var ko = new Date(kickoff.replace('T',' ').replace(/-/g,'/'));
+      return new Date(now.replace('T',' ').replace(/-/g,'/')) >= new Date(ko.getTime()+100*60*1000);
+    }).forEach(function(m) {
+      if(allResults[m.id] || sessionStorage.getItem('autoRes_'+m.id)) return;
+      if(!apiResults || !apiResults.some(function(ar){var lm=matchApiToLocal(ar);return lm&&lm.id===m.id&&ar.status==='ft';})) {
+        showAutoResultPopup(m);
+        sessionStorage.setItem('autoRes_'+m.id, '1');
+      }
+    });
+  }
 }
 
 function showAutoResultPopup(m) {
@@ -4857,7 +4898,7 @@ async function submitAutoResult(mid) {
     showToast('✅ Eredmény: '+score); document.getElementById('autoResPopup').remove(); renderAll();
   } catch(e){showToast('❌ Hiba: '+e.message);}
 }
-setInterval(checkAutoResults, 300000); // 5 percenként
+var autoResInterval = setInterval(checkAutoResults, 120000); // 2 percenként
 setTimeout(checkAutoResults, 15000); // első: 15mp
 
 // ===== MEGHÍVÓ RENDSZER =====
