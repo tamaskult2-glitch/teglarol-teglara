@@ -1180,7 +1180,6 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')" id="navAdmin">🔐 Admin</button>
-  <button class="nav-tab" onclick="showTab('bl')">🏆 BL</button>
 <button class="nav-tab" id="navBet" onclick="showTab('bet')">💰 Tét <span id="betBadge" style="background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
@@ -1233,13 +1232,15 @@ footer a:hover{color:var(--gold);}
 
         <!-- VB SZUPERPOLL -->
         <div class="vb-poll" id="vbPoll">
-          <div class="vb-poll-header">
+          <div class="vb-poll-header" onclick="var b=document.getElementById('vbPollBody');b.style.display=b.style.display==='none'?'block':'none';this.querySelector('.vb-toggle').textContent=b.style.display==='none'?'▶':'▼';" style="cursor:pointer;">
             <span class="vb-poll-icon">🌍</span>
-            <div>
+            <div style="flex:1;">
               <div class="vb-poll-title">VB 2026 Előrejelzések</div>
               <div class="vb-poll-sub">Szavazz — 1 szavazat tippelőnként</div>
             </div>
+            <span class="vb-toggle" style="font-size:14px;color:rgba(245,197,24,0.5);">▶</span>
           </div>
+          <div id="vbPollBody" style="display:none;">
 
           <!-- Ki nyeri a VB-t? -->
           <div class="vb-poll-section">
@@ -1267,6 +1268,7 @@ footer a:hover{color:var(--gold);}
             <div class="vb-poll-my" id="vbScorerMy"></div>
             <div class="vb-poll-results" id="vbScorerResults"></div>
           </div>
+          </div><!-- /vbPollBody -->
         </div>
 
         <!-- MECCS KERESŐ -->
@@ -2822,21 +2824,54 @@ function dismissMatchday() {
 
 // ===== LINEUP POPUP =====
 function closeLineup(){var el=document.getElementById('lineupPopupOverlay');if(el)el.remove();}
-function showLineup(mid) {
+async function showLineup(mid) {
   var m = ALL_MATCHES.find(function(x){return x.id===mid;});
   if(!m) return;
   closeLineup();
+  // Ha nincs még lineup, próbáljuk ESPN API-ból
+  if((!m.homeLineup || !m.homeLineup.length) && (!m.awayLineup || !m.awayLineup.length)) {
+    try {
+      var sb = await fetch(AUTO_RES_API).then(function(r){return r.json();});
+      if(sb && sb.events) {
+        for(var i=0;i<sb.events.length;i++) {
+          var ev = sb.events[i];
+          var comp = ev.competitions && ev.competitions[0];
+          if(!comp) continue;
+          var teams = comp.competitors||[];
+          var home = teams.find(function(t){return t.homeAway==='home';});
+          var away = teams.find(function(t){return t.homeAway==='away';});
+          if(!home||!away) continue;
+          var homeHu = TEAM_MAP[home.team.abbreviation]||'';
+          var awayHu = TEAM_MAP[away.team.abbreviation]||'';
+          if(homeHu===m.home && awayHu===m.away) {
+            // Lineup kinyerés
+            if(home.lineups && home.lineups.length) {
+              m.homeLineup = home.lineups.map(function(p){return p.athlete?p.athlete.displayName:p.displayName||'';}).filter(Boolean);
+            } else if(home.roster) {
+              m.homeLineup = home.roster.filter(function(p){return p.starter;}).map(function(p){return p.athlete?p.athlete.displayName:p.displayName||'';}).filter(Boolean);
+            }
+            if(away.lineups && away.lineups.length) {
+              m.awayLineup = away.lineups.map(function(p){return p.athlete?p.athlete.displayName:p.displayName||'';}).filter(Boolean);
+            } else if(away.roster) {
+              m.awayLineup = away.roster.filter(function(p){return p.starter;}).map(function(p){return p.athlete?p.athlete.displayName:p.displayName||'';}).filter(Boolean);
+            }
+            break;
+          }
+        }
+      }
+    } catch(e){}
+  }
   var homeList = m.homeLineup||[];
   var awayList = m.awayLineup||[];
   var homeHtml = homeList.map(function(p,i){
-    return '<div class="lineup-player"><span class="lineup-player-num">'+(i+1)+'</span>'+p+'</div>';
+    return '<div class="lineup-player"><span class="lineup-player-num">'+(i+1)+'</span>'+escHtml(p)+'</div>';
   }).join('');
   var awayHtml = awayList.map(function(p,i){
-    return '<div class="lineup-player"><span class="lineup-player-num">'+(i+1)+'</span>'+p+'</div>';
+    return '<div class="lineup-player"><span class="lineup-player-num">'+(i+1)+'</span>'+escHtml(p)+'</div>';
   }).join('');
   var noData = !homeList.length && !awayList.length;
   var inner = noData
-    ? '<div class="lineup-no-data">Még nincs bejelentett kezdőcsapat</div>'
+    ? '<div class="lineup-no-data">Kezdőcsapatok nem elérhetők az ESPN API-ból</div>'
     : '<div class="lineup-teams">'
       + '<div><div class="lineup-team-name">'+(m.homeFlag||'')+' '+(m.homeLabel||m.home)+'</div>'+homeHtml+'</div>'
       + '<div><div class="lineup-team-name">'+(m.awayFlag||'')+' '+(m.awayLabel||m.away)+'</div>'+awayHtml+'</div>'
@@ -2936,7 +2971,7 @@ function renderMatches() {
       html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}" id="mc_${m.id}">
         <div class="match-meta">
           <span class="time-tag">${m.huTime}</span>
-          <span class="grp-tag" style="${m.id==='BL2026'?'background:rgba(201,162,39,0.2);color:#c9a227;border:1px solid rgba(201,162,39,0.4);font-size:10px;':''}">${m.id==='BL2026'?'🏆 BL Döntő':(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>
+          <span class="grp-tag">${(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>
           <span style="margin-left:auto;color:rgba(240,244,240,0.25);">${m.venue}</span>
           ${(m.homeLineup&&m.homeLineup.length)||kickoffLocked?'<button onclick="showLineup(\''+m.id+'\')" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:var(--gold);border-radius:6px;padding:1px 8px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;letter-spacing:0.5px;">⚽ kezdők</button>':''}
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
