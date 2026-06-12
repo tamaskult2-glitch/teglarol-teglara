@@ -4798,21 +4798,39 @@ async function fetchLiveScores() {
   } catch(e) { return null; }
 }
 
+// ESPN rövidítés → magyar csapatnév mapping
+var TEAM_MAP = {
+  'MEX':'Mexikó','RSA':'Dél-Afrika','KOR':'Dél-Korea','CZE':'Csehország',
+  'CAN':'Kanada','BIH':'Bosznia-Hercegovina','QAT':'Katar','SUI':'Svájc',
+  'BRA':'Brazília','MAR':'Marokkó','USA':'Egyesült Államok','PAR':'Paraguay',
+  'AUS':'Ausztrália','TUR':'Törökország','GER':'Németország','CUW':'Curaçao',
+  'NED':'Hollandia','JPN':'Japán','CIV':'Elefántcsontpart','ECU':'Ecuador',
+  'FRA':'Franciaország','PAN':'Panama','ARG':'Argentína','PER':'Peru',
+  'SEN':'Szenegál','ALB':'Albánia','COL':'Kolumbia','SRB':'Szerbia',
+  'ENG':'Anglia','NGA':'Nigéria','ESP':'Spanyolország','BOL':'Bolívia',
+  'KSA':'Szaúd-Arábia','IRN':'Irán','URU':'Uruguay','CMR':'Kamerun',
+  'POR':'Portugália','CRC':'Costa Rica','DEN':'Dánia','ITA':'Olaszország',
+  'EGY':'Egyiptom','BEL':'Belgium','CRO':'Horvátország','ISR':'Izrael',
+  'POL':'Lengyelország','JAM':'Jamaica','WAL':'Wales','SLO':'Szlovénia',
+  'TRI':'Trinidad és Tobago','UZB':'Üzbegisztán'
+};
+
 function matchApiToLocal(apiResult) {
-  // Keresünk egyező meccset dátum + csapatnév alapján
   var best = null;
+  var apiHS = apiResult.homeShort.toUpperCase();
+  var apiAS = apiResult.awayShort.toUpperCase();
   ALL_MATCHES.filter(isVbMatch).forEach(function(m) {
-    if(allResults[m.id]) return; // már van eredmény
-    var hNorm = (m.home||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    var aNorm = (m.away||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    var apiH = apiResult.homeName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    var apiA = apiResult.awayName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    var apiHS = apiResult.homeShort.toLowerCase();
-    var apiAS = apiResult.awayShort.toLowerCase();
-    // Egyezés: teljes név tartalmazza, vagy abbreviation egyezik
-    var homeMatch = apiH.indexOf(hNorm) >= 0 || hNorm.indexOf(apiH) >= 0 || hNorm.indexOf(apiHS) >= 0 || apiH.indexOf(hNorm.substring(0,4)) >= 0;
-    var awayMatch = apiA.indexOf(aNorm) >= 0 || aNorm.indexOf(apiA) >= 0 || aNorm.indexOf(apiAS) >= 0 || apiA.indexOf(aNorm.substring(0,4)) >= 0;
-    if(homeMatch && awayMatch) best = m;
+    if(allResults[m.id] && apiResult.status !== 'live') return;
+    // 1. Rövidítés alapú egyeztetés
+    var homeHu = TEAM_MAP[apiHS] || '';
+    var awayHu = TEAM_MAP[apiAS] || '';
+    if(homeHu && m.home === homeHu && awayHu && m.away === awayHu) { best = m; return; }
+    // 2. Dátum + fuzzy név fallback
+    var hNorm = (m.home||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
+    var aNorm = (m.away||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
+    var apiH = apiResult.homeName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
+    var apiA = apiResult.awayName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
+    if(hNorm === apiH && aNorm === apiA) best = m;
   });
   return best;
 }
