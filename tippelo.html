@@ -2953,9 +2953,8 @@ function renderMatches() {
                 ${m.homeLabel?'<span class="tn-sub">'+m.homeLabel+'</span>':''}
               </div>
             </div>
-            <span class="vs-block">${liveScores[m.id] ? '' : 'VS'}</span>
-            <span class="sc-block" style="visibility:hidden;display:block">–</span>
-            ${liveScores[m.id] && !result ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:'+(liveScores[m.id].status==='ft'?'var(--gold)':'#4ade80')+';">'+liveScores[m.id].home+' : '+liveScores[m.id].away+'</span><span style="font-size:10px;color:'+(liveScores[m.id].status==='ft'?'rgba(240,244,240,0.4)':'#4ade80')+';'+(liveScores[m.id].status==='live'?'animation:pulse 2s infinite;':'')+'">⚽ '+liveScores[m.id].minute+'</span></div>' : ''}
+            <span class="vs-block">${liveScores[m.id] && !result ? '' : (result ? '' : 'VS')}</span>
+            ${result ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:24px;font-weight:700;color:var(--gold);">'+(allScores[m.id]||result)+'</span><span style="font-size:10px;color:rgba(240,244,240,0.35);">VÉGE</span></div>' : (liveScores[m.id] ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:#4ade80;">'+liveScores[m.id].home+' : '+liveScores[m.id].away+'</span><span style="font-size:10px;color:#4ade80;animation:pulse 2s infinite;">⚽ '+liveScores[m.id].minute+'</span></div>' : '')}
             <div class="team-blk away-blk">
               ${getTeamBadge(m.awayFlag, m.away)}
               <div class="tn-wrap">
