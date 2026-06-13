@@ -1446,6 +1446,7 @@ footer a:hover{color:var(--gold);}
       <div class="adm-collapse-body">
         <button onclick="fixYamalVote()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">⚽ Yamal szavazat visszaállítás</button>
         <button onclick="cleanTestData()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#ef4444;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">🧹 Teszt meccs adatok törlése</button>
+        <button onclick="checkManipulation()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#ef4444;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">🚩 Manipuláció ellenőrzés</button>
         <button onclick="showDeletedUsers()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">👤 Törölt felhasználók listázása</button>
         <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
           <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:6px;">🔑 JELSZÓ RESET (felhasználónak)</div>
@@ -2350,6 +2351,7 @@ async function submitTip(mid,tip,phase) {
     newTip.pen = tip;
   }
 
+  newTip.ts = Date.now();
   allTips[mid][fbSafeName(currentUser)]=newTip;
   if(!_scoreSaving) try{renderMatches();}catch(e){}
   renderStats(); renderUserBar();
@@ -2418,6 +2420,7 @@ function handleScoreSave(btn) {
   
   // Lock: renderMatches ne törölje a kártyát
   _scoreSaving = true;
+  newTip.ts = Date.now();
   
   renderStats(); renderUserBar();
   
@@ -3600,6 +3603,7 @@ async function adminSetTip(mid) {
     tip.h = parseInt(h);
     tip.a = parseInt(a);
   }
+  tip.ts = Date.now();
   try {
     // Közvetlen Firebase írás — NEM hívunk pollData/renderAll hogy ne renderelje újra a kártyát
     await fbSet('tips/'+mid+'/'+safe, tip);
@@ -3892,6 +3896,66 @@ async function cleanTestData() {
     renderAll();
     showToast('🧹 Teszt meccsek törölve!');
   } catch(e) { if(res) res.textContent = '❌ Hiba: '+e.message; }
+}
+
+// ===== MANIPULÁCIÓ ÉRZÉKELÉS =====
+async function checkManipulation() {
+  var res = document.getElementById('fbCmdResult');
+  if(res) res.textContent = '⏳ Manipuláció ellenőrzés…';
+  try {
+    var tips = await fbGet('tips');
+    if(!tips) { if(res) res.textContent = '❌ Nincs tipp adat'; return; }
+    var flagged = [];
+    ALL_MATCHES.filter(isVbMatch).forEach(function(m) {
+      if(!tips[m.id]) return;
+      var kickoff = new Date((m.huDate+'T'+m.huTime).replace('T',' ').replace(/-/g,'/')).getTime();
+      Object.entries(tips[m.id]).forEach(function(e) {
+        var user = e[0], tip = e[1];
+        if(!tip || typeof tip !== 'object' || !tip.ts) return;
+        if(tip.ts > kickoff) {
+          var delay = Math.round((tip.ts - kickoff) / 60000);
+          flagged.push({user:user, match:m.id, home:m.home, away:m.away, delay:delay, tip:tip});
+        }
+      });
+    });
+    if(flagged.length === 0) {
+      if(res) res.textContent = '✅ Nincs manipuláció! Minden tipp a kickoff ELŐTT érkezett.';
+      showToast('✅ Tiszta — nincs manipuláció');
+    } else {
+      var txt = '🚩 GYANÚS TIPPEK ('+flagged.length+' db):\n\n';
+      flagged.forEach(function(f) {
+        var tipStr = f.tip.h!==undefined ? f.tip.o+' ('+f.tip.h+':'+f.tip.a+')' : f.tip.o||f.tip;
+        txt += '⚠️ '+f.user+' — '+f.home+' vs '+f.away+'\n';
+        txt += '   Tipp: '+tipStr+' | Kickoff után '+f.delay+' perccel\n\n';
+      });
+      if(res) res.textContent = txt;
+      // Popup is
+      showManipulationPopup(flagged);
+    }
+  } catch(e) { if(res) res.textContent = '❌ Hiba: '+e.message; }
+}
+
+function showManipulationPopup(flagged) {
+  var ex = document.getElementById('manipPopup'); if(ex) ex.remove();
+  var html = '<div style="max-height:60vh;overflow-y:auto;">';
+  flagged.forEach(function(f) {
+    var tipStr = f.tip.h!==undefined ? f.tip.o+' ('+f.tip.h+':'+f.tip.a+')' : (f.tip.o||'?');
+    html += '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">'
+      +'<div style="font-family:Oswald,sans-serif;font-size:14px;color:#ef4444;font-weight:700;">⚠️ '+escHtml(f.user)+'</div>'
+      +'<div style="font-size:12px;color:rgba(240,244,240,0.6);">'+escHtml(f.home)+' vs '+escHtml(f.away)+' ('+f.match+')</div>'
+      +'<div style="font-size:12px;color:rgba(240,244,240,0.5);">Tipp: <b>'+tipStr+'</b> — <span style="color:#ef4444;">kickoff után '+f.delay+' perccel</span></div>'
+      +'</div>';
+  });
+  html += '</div>';
+  var d = document.createElement('div'); d.id = 'manipPopup';
+  d.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;';
+  d.innerHTML = '<div style="width:90%;max-width:400px;background:linear-gradient(180deg,#0f2a14,#0a1c0c);border:2px solid rgba(239,68,68,0.5);border-radius:16px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">'
+    +'<div style="text-align:center;font-size:24px;margin-bottom:4px;">🚩</div>'
+    +'<div style="text-align:center;font-family:Oswald,sans-serif;font-size:16px;color:#ef4444;font-weight:700;margin-bottom:12px;">MANIPULÁCIÓ ÉRZÉKELVE ('+flagged.length+')</div>'
+    +html
+    +'<button onclick="document.getElementById(\'manipPopup\').remove()" style="width:100%;margin-top:14px;padding:10px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#ef4444;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">BEZÁRÁS</button>'
+    +'</div>';
+  document.body.appendChild(d);
 }
 
 async function adminResetPassword() {
@@ -4972,7 +5036,7 @@ async function checkAutoResults() {
       var kickoff = m.huDate+'T'+m.huTime;
       if(kickoff > now) return false;
       var ko = new Date(kickoff.replace('T',' ').replace(/-/g,'/'));
-      return new Date(now.replace('T',' ').replace(/-/g,'/')) >= new Date(ko.getTime()+100*60*1000);
+      return new Date(now.replace('T',' ').replace(/-/g,'/')) >= new Date(ko.getTime()+120*60*1000);
     }).forEach(function(m) {
       if(allResults[m.id] || sessionStorage.getItem('autoRes_'+m.id)) return;
       if(!apiResults || !apiResults.some(function(ar){var lm=matchApiToLocal(ar);return lm&&lm.id===m.id&&ar.status==='ft';})) {
