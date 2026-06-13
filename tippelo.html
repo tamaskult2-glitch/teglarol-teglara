@@ -3748,11 +3748,16 @@ function renderBetPoll() {
   });
   html += '</div>';
 
-  // Befizetések lista (admin + LESZNIK)
-  if(isAdminUnlocked || isHardcodeAdmin(currentUser) || (safe && safe === 'LESZNIK')) {
+  // Befizetések lista (KIZÁRÓLAG KULT és LESZNIK látja)
+  var isTreasurer = safe && (safe === 'KULT' || safe === 'LESZNIK');
+  if(isTreasurer) {
     var voters = Object.entries(betPollData).filter(function(e){ return e[1] && opts.indexOf(e[1])>=0; });
+    // M_ROB hozzáadása ha nincs benne
+    if(!voters.some(function(e){return e[0]==='M_ROB';})) voters.push(['M_ROB',5000]);
     voters.sort(function(a,b){ return a[0].localeCompare(b[0]); });
     var paidCount = 0;
+    // M_ROB auto-paid
+    if(!betPaidData['M_ROB']) { betPaidData['M_ROB'] = true; fbSet('betPaid/M_ROB', true).catch(function(){}); }
     voters.forEach(function(e){ if(betPaidData[e[0]]) paidCount++; });
     html += '<div style="margin-top:6px;border-top:1px solid rgba(255,255,255,0.06);padding-top:4px;">';
     html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
@@ -3762,12 +3767,11 @@ function renderBetPoll() {
     html += '<div>';
     voters.forEach(function(e){
       var u = e[0];
-      var amt = e[1];
       var paid = betPaidData[u] || false;
       html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);">'
         +'<button onclick="toggleBetPaid(\''+escHtml(u)+'\')" style="background:none;border:none;cursor:pointer;font-size:24px;padding:0 2px;min-width:32px;">'+(paid?'✅':'⬜')+'</button>'
         +'<span style="font-family:Oswald,sans-serif;font-size:15px;color:'+(paid?'rgba(240,244,240,0.8)':'rgba(240,244,240,0.45)')+';flex:1;">'+escHtml(u)+userBadges(u)+'</span>'
-        +'<span style="font-family:Oswald,sans-serif;font-size:14px;color:rgba(245,197,24,0.5);">'+amt.toLocaleString('hu')+' Ft</span>'
+        +'<span style="font-family:Oswald,sans-serif;font-size:14px;color:rgba(245,197,24,0.5);">5 000 Ft</span>'
         +'</div>';
     });
     html += '</div></div>';
@@ -3932,7 +3936,8 @@ async function voteBet(amount) {
 }
 
 async function toggleBetPaid(safeName) {
-  if(!isAdminUnlocked && !isHardcodeAdmin(currentUser) && fbSafeName(currentUser)!=='LESZNIK') return;
+  var mySafe = currentUser ? fbSafeName(currentUser) : '';
+  if(mySafe !== 'KULT' && mySafe !== 'LESZNIK') return;
   var wasPaid = !!betPaidData[safeName];
   betPaidData[safeName] = !wasPaid;
   renderBetPoll();
