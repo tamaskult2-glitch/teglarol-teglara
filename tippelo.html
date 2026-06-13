@@ -1447,6 +1447,14 @@ footer a:hover{color:var(--gold);}
         <button onclick="fixYamalVote()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">⚽ Yamal szavazat visszaállítás</button>
         <button onclick="cleanTestData()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#ef4444;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">🧹 Teszt meccs adatok törlése</button>
         <button onclick="showDeletedUsers()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px;">👤 Törölt felhasználók listázása</button>
+        <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+          <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:6px;">🔑 JELSZÓ RESET (felhasználónak)</div>
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="resetPwUser" placeholder="Felhasználónév (pl. BERCI)" maxlength="30" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,197,24,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+            <button onclick="adminResetPassword()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🔑 Reset</button>
+          </div>
+          <div id="resetPwMsg" style="font-size:11px;color:rgba(240,244,240,0.4);margin-top:4px;"></div>
+        </div>
         <div id="fbCmdResult" style="font-size:12px;color:rgba(240,244,240,0.6);min-height:16px;margin-top:6px;word-break:break-all;white-space:pre-wrap;"></div>
       </div>
     </div>
@@ -2004,8 +2012,25 @@ function register() {
   if(users[n]) {
     // Belépés – ismert fiók ezen az eszközön
     if(users[n] !== hashed) {
-      if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
-      showToast('❌ Hibás jelszó!'); return;
+      // Jelszó reset ellenőrzés
+      var resetSafe = fbSafeName(n);
+      fbGet('passwordReset/'+resetSafe).then(function(resetFlag) {
+        if(resetFlag) {
+          // Reset aktív — új jelszó elfogadása
+          users[n] = hashed;
+          saveUsers(users);
+          fbDel('passwordReset/'+resetSafe).catch(function(){});
+          finishLogin(n);
+          showToast('🔑 Jelszó frissítve!');
+        } else {
+          if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
+          showToast('❌ Hibás jelszó!');
+        }
+      }).catch(function() {
+        if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
+        showToast('❌ Hibás jelszó!');
+      });
+      return;
     }
     finishLogin(n);
   } else {
@@ -3861,6 +3886,20 @@ async function cleanTestData() {
     renderAll();
     showToast('🧹 Teszt meccsek törölve!');
   } catch(e) { if(res) res.textContent = '❌ Hiba: '+e.message; }
+}
+
+async function adminResetPassword() {
+  var inp = document.getElementById('resetPwUser');
+  var msg = document.getElementById('resetPwMsg');
+  var name = inp ? inp.value.trim().toUpperCase() : '';
+  if(!name) { if(msg) msg.textContent = '⚠️ Írd be a felhasználónevet!'; return; }
+  var safe = fbSafeName(name);
+  try {
+    await fbSet('passwordReset/'+safe, true);
+    if(msg) { msg.textContent = '✅ '+name+' jelszava resetelve. Bármilyen jelszóval beléphet.'; msg.style.color = '#4ade80'; }
+    if(inp) inp.value = '';
+    showToast('🔑 '+name+' jelszó resetelve!');
+  } catch(e) { if(msg) { msg.textContent = '❌ Hiba: '+e.message; msg.style.color = '#ef4444'; } }
 }
 
 async function showDeletedUsers() {
