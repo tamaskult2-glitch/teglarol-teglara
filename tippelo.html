@@ -953,6 +953,14 @@ footer a:hover{color:var(--gold);}
               📐 A gólkülönbség bónusz akkor jár, ha a kimenetel helyes és a gólkülönbség is stimmel (pl. tipp 2:0, eredmény 3:1 = azonos gólkülönbség).<br>
               🎯 A pontos eredmény <b>felváltja</b> a kimenetel + gólkülönbség pontot (nem halmozódik).
             </div>
+            <div style="margin-top:10px;font-size:12px;color:rgba(240,244,240,0.5);line-height:1.6;">
+              <b style="color:rgba(240,244,240,0.7);">📊 Ranglista jelölések:</b><br>
+              🔥 <b>Sorozat</b> — egymás utáni helyes tippek száma (3-tól jelenik meg)<br>
+              🎯 <b>Pontos</b> — pontos góleredmény eltalálások száma<br>
+              ⭐ <b>Heti MVP</b> — az adott hét legtöbb pontot szerző tippelője<br>
+              💀 <b>Heti bukta</b> — az adott hét legkevesebb pontot szerző tippelője<br>
+              💰 <b>Nyeremény</b> — az 1-3. helyezett várható nyereménye
+            </div>
           </div>
         </div>
       </div>
@@ -2973,7 +2981,6 @@ function renderMatches() {
           <span class="time-tag">${m.huTime}</span>
           <span class="grp-tag">${(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>
           <span style="margin-left:auto;color:rgba(240,244,240,0.25);">${m.venue}</span>
-          ${(m.homeLineup&&m.homeLineup.length)||kickoffLocked?'<button onclick="showLineup(\''+m.id+'\')" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:var(--gold);border-radius:6px;padding:1px 8px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;letter-spacing:0.5px;">⚽ kezdők</button>':''}
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
           ${result?'<span style="font-size:9px;color:rgba(245,197,24,0.6);background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>':''}
@@ -4351,7 +4358,6 @@ function renderBLTab() {
     html += '<div class="match-meta"><span class="time-tag">'+m.huTime+'</span>';
     html += '<span class="grp-tag" style="background:rgba(201,162,39,0.2);color:#c9a227;border:1px solid rgba(201,162,39,0.4);font-size:10px;">🏆 BL Döntő</span>';
     html += '<span style="margin-left:auto;color:rgba(240,244,240,0.25);">'+(m.venue||'')+'</span>';
-    if((m.homeLineup&&m.homeLineup.length)||kickoffLocked) html += '<button onclick="showLineup(\''+m.id+'\')" style="background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);color:var(--gold);border-radius:6px;padding:1px 8px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;letter-spacing:0.5px;">⚽ kezdők</button>';
     if(total>0) html += '<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>';
     if(kickoffLocked&&!result) html += '<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>';
     if(result) html += '<span style="font-size:9px;color:rgba(245,197,24,0.6);background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>';
