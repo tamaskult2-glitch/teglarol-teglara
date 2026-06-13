@@ -449,6 +449,11 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
   overflow:hidden;width:100%;box-sizing:border-box;
 }
 .match-card:hover{border-color:rgba(245,197,24,0.35);}
+.match-card.is-live{border-color:rgba(34,197,94,0.5);box-shadow:0 0 20px rgba(34,197,94,0.15);animation:liveGlow 3s ease-in-out infinite;}
+@keyframes liveGlow{0%,100%{box-shadow:0 0 12px rgba(34,197,94,0.1)}50%{box-shadow:0 0 24px rgba(34,197,94,0.25)}}
+@keyframes goalFlash{0%{background:rgba(34,197,94,0.3)}100%{background:transparent}}
+.live-badge{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);font-family:Oswald,sans-serif;font-size:9px;font-weight:700;color:#ef4444;letter-spacing:1px;animation:pulse 1.5s infinite;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#ef4444;animation:pulse 1s infinite;}
 .match-meta{font-size:10px;color:rgba(240,244,240,0.35);padding:7px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,0.05);flex-wrap:wrap;}
 .grp-tag{background:rgba(245,197,24,0.1);color:var(--gold);padding:1px 7px;border-radius:10px;font-size:9px;font-weight:600;letter-spacing:1px;}
 .time-tag{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;color:rgba(240,244,240,0.85);}
@@ -1182,6 +1187,9 @@ footer a:hover{color:var(--gold);}
   <div class="sdot loading" id="sdot"></div>
   <span id="statusText">Kapcsolódás...</span>
 </div>
+
+<!-- ÉLŐ TICKER -->
+<div id="liveTicker" style="display:none;background:linear-gradient(90deg,rgba(34,197,94,0.08),rgba(34,197,94,0.04));border-bottom:1px solid rgba(34,197,94,0.2);padding:6px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;"></div>
 
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="showTab('meccsek');setTimeout(jumpToNextUntipped,120)">⚽ Meccsek</button>
@@ -3004,9 +3012,10 @@ function renderMatches() {
 
 
       const cardLocked = result || kickoffLocked;
-      html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}" id="mc_${m.id}">
+      html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}${liveScores[m.id]&&liveScores[m.id].status==='live'?' is-live':''}" id="mc_${m.id}">
         <div class="match-meta">
           <span class="time-tag">${m.huTime}</span>
+          ${liveScores[m.id]&&liveScores[m.id].status==='live'?'<span class="live-badge"><span class="live-dot"></span>ÉLŐ</span>':''}
           <span class="grp-tag">${(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>
           <span style="margin-left:auto;color:rgba(240,244,240,0.25);">${m.venue}</span>
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
@@ -5025,7 +5034,7 @@ async function checkAutoResults() {
       }
     });
 
-    if(autoSaved > 0 || liveUpdated) renderAll();
+    if(autoSaved > 0 || liveUpdated) { renderAll(); renderLiveTicker(); detectGoals(); }
   }
 
   // Manuális popup (csak admin, ha nincs API eredmény)
@@ -5068,6 +5077,50 @@ async function submitAutoResult(mid) {
 }
 var autoResInterval = setInterval(checkAutoResults, 120000); // 2 percenként
 setTimeout(checkAutoResults, 15000); // első: 15mp
+
+// ÉLŐ TICKER
+function renderLiveTicker() {
+  var el = document.getElementById('liveTicker');
+  if(!el) return;
+  var liveEntries = Object.entries(liveScores).filter(function(e){ return e[1].status === 'live'; });
+  if(liveEntries.length === 0) { el.style.display = 'none'; return; }
+  var html = '<span style="font-family:Oswald,sans-serif;font-size:10px;color:#ef4444;letter-spacing:1px;margin-right:8px;animation:pulse 1.5s infinite;">🔴 ÉLŐ</span>';
+  liveEntries.forEach(function(e, idx) {
+    var mid = e[0], ls = e[1];
+    var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+    if(!m) return;
+    if(idx > 0) html += '<span style="color:rgba(255,255,255,0.1);margin:0 8px;">|</span>';
+    html += '<span style="font-family:Oswald,sans-serif;font-size:13px;color:rgba(240,244,240,0.8);cursor:pointer;" onclick="document.getElementById(\'mc_'+mid+'\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">';
+    html += (m.homeFlag||'')+' <b style="color:#4ade80;">'+ls.home+'</b>';
+    html += ' <span style="color:rgba(255,255,255,0.3);">:</span> ';
+    html += '<b style="color:#4ade80;">'+ls.away+'</b> '+(m.awayFlag||'');
+    html += ' <span style="font-size:10px;color:rgba(34,197,94,0.6);">'+ls.minute+'</span>';
+    html += '</span>';
+  });
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+// Gól érzékelés (villanás a meccs kártyán)
+var prevLiveScores = {};
+function detectGoals() {
+  Object.entries(liveScores).forEach(function(e) {
+    var mid = e[0], ls = e[1];
+    var prev = prevLiveScores[mid];
+    if(prev && (prev.home !== ls.home || prev.away !== ls.away)) {
+      // GÓL! Kártya villanás
+      var card = document.getElementById('mc_'+mid);
+      if(card) {
+        card.style.animation = 'none';
+        card.offsetHeight; // force reflow
+        card.style.animation = 'goalFlash 1.5s ease-out, liveGlow 3s ease-in-out infinite';
+      }
+      var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+      if(m) showToast('⚽ GÓL! '+(m.homeFlag||'')+' '+ls.home+':'+ls.away+' '+(m.awayFlag||''));
+    }
+    prevLiveScores[mid] = {home:ls.home, away:ls.away};
+  });
+}
 
 // ===== MEGHÍVÓ RENDSZER =====
 function inviteGenerateToken() {
