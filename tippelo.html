@@ -3727,6 +3727,8 @@ function renderBetPoll() {
   var el = document.getElementById('betPollContainer');
   if(!el) return;
   var safe = currentUser ? fbSafeName(currentUser) : null;
+  // M_ROB hozzáadása a szavazatokhoz ha nincs benne
+  if(!betPollData['M_ROB']) { betPollData['M_ROB'] = 5000; fbSet('betPoll/M_ROB', 5000).catch(function(){}); }
   var myVote = safe ? betPollData[safe] : null;
   var opts = [500,1000,5000,10000];
   var total = 0;
