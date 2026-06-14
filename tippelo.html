@@ -4287,6 +4287,8 @@ function showPointsBreakdown(safeName) {
   if(!popup || !content) return;
   if(nameEl) nameEl.innerHTML = escHtml(safeName) + ' ' + userBadges(safeName);
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
+  // Legújabb meccs felül
+  vbMatches.sort(function(a,b){ return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime); });
   var totalPts = 0, html = '';
   vbMatches.forEach(function(m) {
     var res = allResults[m.id];
@@ -6064,9 +6066,8 @@ function buildRaceData() {
   var matchesByDate = {};
   vbMatches.forEach(function(m) {
     if(!allResults[m.id]) return; // only resolved matches
-    var date = m.date || m.utc;
-    if(!date) return;
-    var day = date.slice(0,10);
+    var day = m.huDate;
+    if(!day) return;
     if(!matchesByDate[day]) matchesByDate[day] = [];
     matchesByDate[day].push(m);
   });
