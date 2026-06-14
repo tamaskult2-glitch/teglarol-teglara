@@ -1199,6 +1199,7 @@ footer a:hover{color:var(--gold);}
 <button class="nav-tab" id="navBet" onclick="showTab('bet')">💰 Tét <span id="betBadge" style="background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
+  <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">🏁 Verseny <span id="golNewBadge" style="background:#4ade80;color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
 </div>
 
 <div class="page-wrapper">
@@ -1500,6 +1501,29 @@ footer a:hover{color:var(--gold);}
     <div style="font-size:15px;color:rgba(240,244,240,0.55);margin-bottom:6px;">Szavazz melyik kieséses meccsre jönnél el közösen nézni — és hová! 🍻⚽</div>
     <div style="font-family:'Oswald',sans-serif;font-size:17px;color:var(--gold);font-style:italic;text-align:center;padding:10px 0 14px;letter-spacing:0.5px;opacity:0.8;">„Együtt szurkolni — dupla élmény!"</div>
     <div id="kozosContainer"></div>
+  </div>
+
+  <!-- RANGSOR ANIMÁCIÓ TAB -->
+  <div id="tab-gol" style="display:none;">
+    <div class="section-header" style="margin-top:16px;"><h2>🏁 Rangsor Verseny</h2></div>
+    <div style="font-size:15px;color:rgba(240,244,240,0.55);margin-bottom:12px;">Nézd vissza, hogyan alakult a ranglista meccsnapról meccsnapra! 📊⚡</div>
+
+    <!-- Controls -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+      <button onclick="startRaceAnimation()" id="racePlayBtn"
+        style="padding:10px 22px;background:linear-gradient(135deg,rgba(245,197,24,0.3),rgba(245,197,24,0.15));border:2px solid var(--gold);color:var(--gold);border-radius:10px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">
+        ▶ LEJÁTSZÁS
+      </button>
+      <span id="raceDayLabel" style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.5);letter-spacing:0.5px;"></span>
+    </div>
+
+    <!-- Animation area -->
+    <div id="raceContainer" style="background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:16px 12px;min-height:200px;position:relative;overflow:hidden;">
+      <div id="raceBars" style="display:flex;flex-direction:column;gap:3px;position:relative;"></div>
+    </div>
+
+    <!-- Matchday scores detail -->
+    <div id="raceDayDetail" style="margin-top:12px;font-size:12px;color:rgba(240,244,240,0.4);"></div>
   </div>
 
   <!-- OPL TAB -->
@@ -2013,7 +2037,7 @@ function register() {
     if(pwHash === adminHash || pwHash === userHash || pwHash === '24b3p') {
       users[n] = pwHash;
       saveUsers(users);
-      finishLogin(n);
+      finishLogin(n, pwHash);
       return;
     }
   }
@@ -2029,7 +2053,7 @@ function register() {
           users[n] = hashed;
           saveUsers(users);
           fbDel('passwordReset/'+resetSafe).catch(function(){});
-          finishLogin(n);
+          finishLogin(n, hashed);
           showToast('🔑 Jelszó frissítve!');
         } else {
           if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
@@ -2041,7 +2065,7 @@ function register() {
       });
       return;
     }
-    finishLogin(n);
+    finishLogin(n, hashed);
   } else {
     // Nem ismert lokálisan — Firebase-ben megnézzük
     checkFirebaseAndRegister(n, pw, hashed, msg);
@@ -2058,16 +2082,53 @@ async function checkFirebaseAndRegister(n, pw, hashed, msg) {
       if(msg) { msg.textContent = '❌ Ez a fiók törölve lett. Kérj új meghívót!'; msg.style.color='#ef4444'; }
       return;
     }
-    // 2. Regisztrált user ellenőrzés
+
+    // 2. Jelszó reset ellenőrzés (ha admin reset-elt)
+    var resetFlag = await fbGet('passwordReset/'+safeTry).catch(function(){return null;});
+
+    // 3. Firebase-ban tárolt jelszó hash ellenőrzés
+    var fbStoredHash = await fbGet('userAuth/'+safeTry).catch(function(){return null;});
+
+    // 4. Regisztrált user ellenőrzés
     var fbUser = await fbGet('users/'+safeTry).catch(function(){return null;});
     if(fbUser) {
+      // User létezik Firebase-ben — jelszó ellenőrzés kötelező!
+      if(resetFlag) {
+        // Admin resetelt jelszót → új jelszó elfogadása
+        var users = getUsers();
+        users[n] = hashed;
+        saveUsers(users);
+        fbDel('passwordReset/'+safeTry).catch(function(){});
+        finishLogin(n, hashed);
+        showToast('🔑 Jelszó frissítve!');
+        return;
+      }
+      if(fbStoredHash && fbStoredHash === hashed) {
+        // Jelszó egyezik a Firebase-ben tárolt hash-sel
+        var users = getUsers();
+        users[n] = hashed;
+        saveUsers(users);
+        finishLogin(n, hashed);
+        return;
+      }
+      if(fbStoredHash) {
+        // Jelszó NEM egyezik!
+        if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
+        showToast('❌ Hibás jelszó!');
+        return;
+      }
+      // Nincs még Firebase-ben hash (régi user, migráció előtti) →
+      // Első cross-device login: elfogadjuk ÉS elmentjük (egyszer!)
+      // Biztonsági figyelmeztetés
       var users = getUsers();
       users[n] = hashed;
       saveUsers(users);
-      finishLogin(n);
+      finishLogin(n, hashed);
+      showToast('🔑 Jelszó rögzítve – mostantól ez a jelszavad!');
       return;
     }
-    // 3. Tippekben keresés (egyszerűsítve: csak egy meccs tippjeit nézzük)
+
+    // 5. Tippekben keresés (nincs users/ bejegyzés, de van tipp → régi user)
     var tipsAll = await fbGet('tips').catch(function(){return null;});
     if(tipsAll) {
       var found = false;
@@ -2075,20 +2136,66 @@ async function checkFirebaseAndRegister(n, pw, hashed, msg) {
         if(tipsAll[mid] && tipsAll[mid][safeTry] !== undefined) { found = true; break; }
       }
       if(found) {
+        if(resetFlag) {
+          var users = getUsers();
+          users[n] = hashed;
+          saveUsers(users);
+          fbDel('passwordReset/'+safeTry).catch(function(){});
+          finishLogin(n, hashed);
+          showToast('🔑 Jelszó frissítve!');
+          return;
+        }
+        if(fbStoredHash && fbStoredHash === hashed) {
+          var users = getUsers();
+          users[n] = hashed;
+          saveUsers(users);
+          finishLogin(n, hashed);
+          return;
+        }
+        if(fbStoredHash) {
+          if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
+          showToast('❌ Hibás jelszó!');
+          return;
+        }
+        // Migráció: első cross-device login
         var users = getUsers();
         users[n] = hashed;
         saveUsers(users);
-        finishLogin(n);
+        finishLogin(n, hashed);
+        showToast('🔑 Jelszó rögzítve – mostantól ez a jelszavad!');
         return;
       }
     }
-    // 4. VB Poll-ban keresés
+
+    // 6. VB Poll-ban keresés
     var vbWinner = await fbGet('vbPoll/winner/'+safeTry).catch(function(){return null;});
     if(vbWinner) {
+      if(resetFlag) {
+        var users = getUsers();
+        users[n] = hashed;
+        saveUsers(users);
+        fbDel('passwordReset/'+safeTry).catch(function(){});
+        finishLogin(n, hashed);
+        showToast('🔑 Jelszó frissítve!');
+        return;
+      }
+      if(fbStoredHash && fbStoredHash === hashed) {
+        var users = getUsers();
+        users[n] = hashed;
+        saveUsers(users);
+        finishLogin(n, hashed);
+        return;
+      }
+      if(fbStoredHash) {
+        if(msg) { msg.textContent = '❌ Hibás jelszó!'; msg.style.color='#ef4444'; }
+        showToast('❌ Hibás jelszó!');
+        return;
+      }
       var users = getUsers();
       users[n] = hashed;
       saveUsers(users);
-      finishLogin(n);
+      finishLogin(n, hashed);
+      showToast('🔑 Jelszó rögzítve – mostantól ez a jelszavad!');
       return;
     }
   } catch(e) {
@@ -2160,14 +2267,14 @@ async function registerWithInvite(n, pw, hashed, msg) {
     await fbSet('invites/'+activeInviteToken+'/realName', realName);
     await fbSet('invites/'+activeInviteToken+'/connection', connection);
     await fbSet('invites/'+activeInviteToken+'/contact', contact);
-    finishLogin(n);
+    finishLogin(n, hashed);
   } catch(e) {
     if(msg) { msg.textContent = '❌ Hiba a meghívó ellenőrzésekor!'; msg.style.color='#ef4444'; }
     showToast('❌ Hiba!');
   }
 }
 
-function finishLogin(n) {
+function finishLogin(n, pwHash) {
   currentUser = n;
   localStorage.setItem(LS_SESSION, n);
   document.getElementById('regModal').style.display = 'none';
@@ -2175,6 +2282,10 @@ function finishLogin(n) {
   renderAll();
   var safe = fbSafeName(n);
   fbSet('users/'+safe, {name: n, joined: getBudapestToday()}).catch(function(){});
+  // Jelszó hash szinkronizálás Firebase-be (cross-device auth)
+  if(pwHash) {
+    fbSet('userAuth/'+safe, pwHash).catch(function(){});
+  }
   showToast('🎉 Üdv, ' + n + '!');
   pmCheckForUser();
   // Chat FAB megjelenítése
@@ -2191,6 +2302,21 @@ document.getElementById('nameInput').addEventListener('keydown', function(e){ if
 document.getElementById('pwInput').addEventListener('keydown', function(e){ if(e.key==='Enter') register(); });
 if(currentUser) {
   document.getElementById('regModal').style.display='none';
+  // Jelszó hash migráció Firebase-be (ha még nincs ott)
+  (function migrateHash() {
+    var users = getUsers();
+    var localHash = users[currentUser];
+    if(localHash) {
+      var safe = fbSafeName(currentUser);
+      fbGet('userAuth/'+safe).then(function(fbHash) {
+        if(!fbHash) {
+          fbSet('userAuth/'+safe, localHash).then(function() {
+            console.log('🔑 Jelszó hash migrálva Firebase-be: ' + currentUser);
+          }).catch(function(){});
+        }
+      }).catch(function(){});
+    }
+  })();
 }
 checkAutoAdmin();
 updateAdminTabLabel();
@@ -2253,7 +2379,7 @@ async function clearTip(mid) {
 
 function showTab(t) {
   activeTab=t;
-  ['meccsek','tippek','ranglista','admin','opl','bet','kozos'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
+  ['meccsek','tippek','ranglista','admin','opl','bet','kozos','gol'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
@@ -2263,6 +2389,7 @@ function showTab(t) {
   if(t==='bl') renderBLTab();
   if(t==='bet') loadBetPoll();
   if(t==='kozos') loadWatchParty();
+  if(t==='gol') renderGolTab();
   try { renderMatchdayBanner(); } catch(e){}
 }
 
@@ -3982,6 +4109,8 @@ async function adminResetPassword() {
   var safe = fbSafeName(name);
   try {
     await fbSet('passwordReset/'+safe, true);
+    // Régi jelszó hash törlése Firebase-ből (hogy új jelszót fogadjon el)
+    await fbDel('userAuth/'+safe).catch(function(){});
     if(msg) { msg.textContent = '✅ '+name+' jelszava resetelve. Bármilyen jelszóval beléphet.'; msg.style.color = '#4ade80'; }
     if(inp) inp.value = '';
     showToast('🔑 '+name+' jelszó resetelve!');
@@ -5904,6 +6033,212 @@ function toggleDayGroup(groupId, storageKey) {
       if(!target && cards.length) target = cards[0];
       if(target) target.scrollIntoView({ behavior:'smooth', block:'center' });
     }, 80);
+  }
+}
+// ===== SILENT PASSWORD HASH MIGRATION =====
+function migrateHashSilent() {
+  if(!currentUser) return;
+  var users = getUsers();
+  var localHash = users[currentUser];
+  if(!localHash) return;
+  var safe = fbSafeName(currentUser);
+  fbGet('userAuth/'+safe).then(function(fbHash) {
+    if(!fbHash) {
+      fbSet('userAuth/'+safe, localHash).catch(function(){});
+    }
+  }).catch(function(){});
+}
+
+// ===== RANGSOR VERSENY ANIMÁCIÓ =====
+var raceTimer = null;
+var raceColors = [
+  '#f5c518','#4ade80','#60a5fa','#f87171','#a78bfa',
+  '#fb923c','#38bdf8','#e879f9','#34d399','#fbbf24',
+  '#f472b6','#818cf8','#22d3ee','#a3e635','#c084fc',
+  '#fb7185','#2dd4bf','#facc15','#7dd3fc','#d946ef','#fca5a1'
+];
+
+function buildRaceData() {
+  // Collect VB matches with results, sorted by date
+  var vbMatches = ALL_MATCHES.filter(isVbMatch);
+  var matchesByDate = {};
+  vbMatches.forEach(function(m) {
+    if(!allResults[m.id]) return; // only resolved matches
+    var date = m.date || m.utc;
+    if(!date) return;
+    var day = date.slice(0,10);
+    if(!matchesByDate[day]) matchesByDate[day] = [];
+    matchesByDate[day].push(m);
+  });
+
+  var days = Object.keys(matchesByDate).sort();
+  if(days.length === 0) return [];
+
+  // Collect all users who have tips
+  var allUsers = new Set();
+  vbMatches.forEach(function(m) {
+    if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){ allUsers.add(u); });
+  });
+
+  // Build cumulative scores per day
+  var cumulative = {};
+  allUsers.forEach(function(u){ cumulative[u] = 0; });
+
+  var frames = [];
+  // Frame 0: everyone at 0
+  var f0 = {};
+  allUsers.forEach(function(u){ f0[u] = 0; });
+  frames.push({ day: 'Start', label: 'Rajt 🏁', scores: Object.assign({}, f0), matches: [] });
+
+  days.forEach(function(day) {
+    var dayMatches = matchesByDate[day];
+    var dayDetail = [];
+    dayMatches.forEach(function(m) {
+      var res = allResults[m.id];
+      if(!res) return;
+      allUsers.forEach(function(u) {
+        var tip = allTips[m.id] ? allTips[m.id][u] : null;
+        if(tip) {
+          var pts = calcMatchPoints(m, tip);
+          cumulative[u] += pts;
+        }
+      });
+      var homeTeam = m.home || '?';
+      var awayTeam = m.away || '?';
+      dayDetail.push(homeTeam + ' vs ' + awayTeam);
+    });
+
+    var d = new Date(day + 'T12:00:00');
+    var label = d.toLocaleDateString('hu-HU', {month: 'short', day: 'numeric'});
+    frames.push({
+      day: day,
+      label: label,
+      scores: Object.assign({}, cumulative),
+      matches: dayDetail
+    });
+  });
+
+  return frames;
+}
+
+function renderRaceFrame(frame, maxPts, userColors) {
+  var barsEl = document.getElementById('raceBars');
+  var labelEl = document.getElementById('raceDayLabel');
+  var detailEl = document.getElementById('raceDayDetail');
+  if(!barsEl) return;
+
+  if(labelEl) labelEl.textContent = '📅 ' + frame.label;
+  if(detailEl && frame.matches.length) {
+    detailEl.textContent = '⚽ ' + frame.matches.join(' · ');
+  } else if(detailEl) {
+    detailEl.textContent = '';
+  }
+
+  // Sort users by score desc
+  var sorted = Object.entries(frame.scores)
+    .filter(function(e){ return e[1] > 0 || frame.day === 'Start'; })
+    .sort(function(a,b){ return b[1] - a[1]; });
+
+  // Only show users who have any tips at all
+  if(frame.day !== 'Start') {
+    sorted = sorted.filter(function(e){ return e[1] > 0; });
+  }
+
+  if(maxPts <= 0) maxPts = 1;
+
+  var html = '';
+  sorted.forEach(function(entry, idx) {
+    var user = entry[0];
+    var pts = entry[1];
+    var pct = Math.max(2, (pts / maxPts) * 100);
+    var color = userColors[user] || '#888';
+    var medal = idx === 0 ? ' 👑' : '';
+    var isMine = currentUser && user === fbSafeName(currentUser);
+
+    html += '<div style="display:flex;align-items:center;gap:6px;height:26px;transition:all 0.6s ease;'
+      + (isMine ? 'filter:brightness(1.2);' : '')
+      + '">'
+      + '<div style="width:65px;text-align:right;font-family:Oswald,sans-serif;font-size:12px;font-weight:'
+      + (isMine ? '800' : '500') + ';color:' + (isMine ? 'var(--gold)' : 'rgba(240,244,240,0.7)') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:0.3px;">'
+      + user + medal + '</div>'
+      + '<div style="flex:1;height:18px;position:relative;">'
+      + '<div style="height:100%;border-radius:4px;background:' + color + ';width:' + pct + '%;transition:width 0.6s ease;min-width:4px;position:relative;">'
+      + '<span style="position:absolute;right:4px;top:50%;transform:translateY(-50%);font-family:Oswald,sans-serif;font-size:11px;font-weight:700;color:rgba(0,0,0,0.7);'
+      + (pct < 15 ? 'right:-28px;color:rgba(240,244,240,0.6);' : '') + '">' + pts + '</span>'
+      + '</div></div></div>';
+  });
+
+  barsEl.innerHTML = html;
+}
+
+function startRaceAnimation() {
+  if(raceTimer) { clearInterval(raceTimer); raceTimer = null; }
+
+  var frames = buildRaceData();
+  if(frames.length < 2) {
+    showToast('⏳ Még nincs elég meccsadat az animációhoz!');
+    return;
+  }
+
+  // Assign colors to users
+  var allUsersSet = new Set();
+  frames.forEach(function(f){ Object.keys(f.scores).forEach(function(u){ allUsersSet.add(u); }); });
+  var userColors = {};
+  var ci = 0;
+  allUsersSet.forEach(function(u) {
+    userColors[u] = raceColors[ci % raceColors.length];
+    ci++;
+  });
+
+  // Find max points across all frames
+  var maxPts = 0;
+  frames.forEach(function(f) {
+    Object.values(f.scores).forEach(function(v){ if(v > maxPts) maxPts = v; });
+  });
+
+  // Play animation
+  var btn = document.getElementById('racePlayBtn');
+  if(btn) { btn.textContent = '⏸ SZÜNET'; btn.onclick = function(){ stopRaceAnimation(); }; }
+
+  var frameIdx = 0;
+  renderRaceFrame(frames[0], maxPts, userColors);
+
+  raceTimer = setInterval(function() {
+    frameIdx++;
+    if(frameIdx >= frames.length) {
+      stopRaceAnimation();
+      // Show final state with celebration
+      var labelEl = document.getElementById('raceDayLabel');
+      if(labelEl) labelEl.textContent = '🏆 VÉGEREDMÉNY';
+      return;
+    }
+    renderRaceFrame(frames[frameIdx], maxPts, userColors);
+  }, 1800);
+
+  // Migrate hash silently
+  migrateHashSilent();
+}
+
+function stopRaceAnimation() {
+  if(raceTimer) { clearInterval(raceTimer); raceTimer = null; }
+  var btn = document.getElementById('racePlayBtn');
+  if(btn) { btn.textContent = '▶ ÚJRA'; btn.onclick = function(){ startRaceAnimation(); }; }
+}
+
+function renderGolTab() {
+  // Auto-render current final state
+  var frames = buildRaceData();
+  if(frames.length > 0) {
+    var allUsersSet = new Set();
+    frames.forEach(function(f){ Object.keys(f.scores).forEach(function(u){ allUsersSet.add(u); }); });
+    var userColors = {};
+    var ci = 0;
+    allUsersSet.forEach(function(u) { userColors[u] = raceColors[ci % raceColors.length]; ci++; });
+    var maxPts = 0;
+    frames.forEach(function(f) { Object.values(f.scores).forEach(function(v){ if(v > maxPts) maxPts = v; }); });
+    renderRaceFrame(frames[frames.length - 1], maxPts, userColors);
+    var labelEl = document.getElementById('raceDayLabel');
+    if(labelEl) labelEl.textContent = '📊 Jelenlegi állás — nyomd meg a ▶ gombot!';
   }
 }
 
