@@ -4925,12 +4925,19 @@ var liveScores = {};
 async function fetchFromApiFootball() {
   try {
     var today = getBudapestToday();
+    var myHeaders = new Headers();
+    myHeaders.append('x-apisports-key', API_FOOTBALL_KEY);
     var resp = await fetch(API_FOOTBALL_URL+'?league=1&season=2026&date='+today, {
-      headers: {'x-apisports-key': API_FOOTBALL_KEY}
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
     });
-    if(!resp.ok) return null;
+    if(!resp.ok) { console.log('API-Football HTTP hiba:', resp.status); return null; }
     var data = await resp.json();
-    if(!data || !data.response || !data.response.length) return null;
+    console.log('API-Football válasz:', data);
+    if(!data || !data.response) return null;
+    if(data.errors && Object.keys(data.errors).length > 0) { console.log('API-Football hiba:', data.errors); return null; }
+    if(!data.response.length) return null;
     var results = [];
     data.response.forEach(function(fix) {
       var st = fix.fixture && fix.fixture.status ? fix.fixture.status.short : '';
@@ -4951,7 +4958,7 @@ async function fetchFromApiFootball() {
       });
     });
     return results.length > 0 ? results : null;
-  } catch(e) { return null; }
+  } catch(e) { console.log('API-Football fetch hiba:', e.message); return null; }
 }
 
 // ESPN API (tartalék 1)
@@ -5193,7 +5200,8 @@ async function refreshLiveScore(mid) {
   showToast('🔄 Frissítés…');
   try {
     var apiResults = await fetchLiveScores();
-    if(!apiResults || apiResults.length === 0) { showToast('⚠️ ESPN API nem elérhető'); return; }
+    console.log('🔄 Frissítés eredmény:', apiResults);
+    if(!apiResults || apiResults.length === 0) { showToast('⚠️ Egyik API sem elérhető'); return; }
     var found = false;
     apiResults.forEach(function(ar) {
       var lm = matchApiToLocal(ar);
