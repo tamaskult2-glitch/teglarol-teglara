@@ -3020,6 +3020,7 @@ function renderMatches() {
           <span style="margin-left:auto;color:rgba(240,244,240,0.25);">${m.venue}</span>
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
+          ${kickoffLocked&&!result&&isAdminUnlocked?'<button onclick="event.stopPropagation();refreshLiveScore(\''+m.id+'\')" style="font-size:9px;color:#4ade80;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">🔄</button>':''}
           ${result?'<span style="font-size:9px;color:rgba(245,197,24,0.6);background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>':''}
         </div>
         ${m.title?'<div style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.5);letter-spacing:1.5px;padding:6px 0 0;">'+m.title+'</div>':''}
@@ -5105,6 +5106,33 @@ function renderLiveTicker() {
 
 // Gól érzékelés (villanás a meccs kártyán)
 var prevLiveScores = {};
+
+// Admin kézi frissítés egy meccshez
+async function refreshLiveScore(mid) {
+  var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+  if(!m) return;
+  showToast('🔄 Frissítés…');
+  try {
+    var apiResults = await fetchLiveScores();
+    if(!apiResults || apiResults.length === 0) { showToast('⚠️ ESPN API nem elérhető'); return; }
+    var found = false;
+    apiResults.forEach(function(ar) {
+      var lm = matchApiToLocal(ar);
+      if(lm && lm.id === mid) {
+        found = true;
+        if(ar.status === 'live') {
+          liveScores[mid] = {home:ar.homeScore, away:ar.awayScore, minute:ar.minute, status:'live'};
+          showToast('⚽ ÉLŐ: '+ar.homeScore+':'+ar.awayScore+' ('+ar.minute+')');
+        } else if(ar.status === 'ft') {
+          liveScores[mid] = {home:ar.homeScore, away:ar.awayScore, minute:'Vége', status:'ft'};
+          showToast('🏁 Vége: '+ar.homeScore+':'+ar.awayScore+' — rögzítés az auto rendszerre vár');
+        }
+        renderAll(); renderLiveTicker(); detectGoals();
+      }
+    });
+    if(!found) showToast('⚠️ Meccs nem található az API-ban');
+  } catch(e) { showToast('❌ Hiba: '+e.message); }
+}
 function detectGoals() {
   Object.entries(liveScores).forEach(function(e) {
     var mid = e[0], ls = e[1];
