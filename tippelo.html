@@ -4917,9 +4917,44 @@ async function saveWatchVenue(){if(!currentUser)return;var v=(document.getElemen
 // ===== AUTOMATA EREDMÉNY EMLÉKEZTETŐ + API =====
 var AUTO_RES_API = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
 var AUTO_RES_API2 = 'https://worldcup26.ir/get/games';
+var API_FOOTBALL_URL = 'https://v3.football.api-sports.io/fixtures';
+var API_FOOTBALL_KEY = 'b3d3d4e51557c6a7856be239e346e190';
 var liveScores = {};
 
-// ESPN API
+// API-FOOTBALL (elsődleges — legmegbízhatóbb)
+async function fetchFromApiFootball() {
+  try {
+    var today = getBudapestToday();
+    var resp = await fetch(API_FOOTBALL_URL+'?league=1&season=2026&date='+today, {
+      headers: {'x-apisports-key': API_FOOTBALL_KEY}
+    });
+    if(!resp.ok) return null;
+    var data = await resp.json();
+    if(!data || !data.response || !data.response.length) return null;
+    var results = [];
+    data.response.forEach(function(fix) {
+      var st = fix.fixture && fix.fixture.status ? fix.fixture.status.short : '';
+      var isLive = st==='1H'||st==='2H'||st==='HT'||st==='ET'||st==='P'||st==='BT';
+      var isFT = st==='FT'||st==='AET'||st==='PEN';
+      if(!isLive && !isFT) return;
+      var elapsed = fix.fixture.status.elapsed || 0;
+      var minute = isLive ? (st==='HT'?'Félidő':elapsed+"'") : '';
+      results.push({
+        homeName: fix.teams.home.name||'',
+        awayName: fix.teams.away.name||'',
+        homeShort: '',
+        awayShort: '',
+        homeScore: fix.goals.home!==null ? fix.goals.home : 0,
+        awayScore: fix.goals.away!==null ? fix.goals.away : 0,
+        status: isFT ? 'ft' : 'live',
+        minute: minute
+      });
+    });
+    return results.length > 0 ? results : null;
+  } catch(e) { return null; }
+}
+
+// ESPN API (tartalék 1)
 async function fetchFromESPN() {
   try {
     var resp = await fetch(AUTO_RES_API);
@@ -4970,14 +5005,16 @@ async function fetchFromWC26() {
   } catch(e) { return null; }
 }
 
-// Multi-source: ESPN → WC26.ir
+// Multi-source: API-Football → ESPN → WC26.ir
 async function fetchLiveScores() {
-  var r = await fetchFromESPN();
+  var r = await fetchFromApiFootball();
+  if(r) return r;
+  r = await fetchFromESPN();
   if(r) return r;
   return await fetchFromWC26();
 }
 
-// ESPN rövidítés → magyar csapatnév mapping
+// ESPN rövidítés + api-football angol név → magyar csapatnév mapping
 var TEAM_MAP = {
   'MEX':'Mexikó','RSA':'Dél-Afrika','KOR':'Dél-Korea','CZE':'Csehország',
   'CAN':'Kanada','BIH':'Bosznia-Hercegovina','QAT':'Katar','SUI':'Svájc',
@@ -4993,22 +5030,47 @@ var TEAM_MAP = {
   'POL':'Lengyelország','JAM':'Jamaica','WAL':'Wales','SLO':'Szlovénia',
   'TRI':'Trinidad és Tobago','UZB':'Üzbegisztán'
 };
+// Angol teljes név → magyar (api-football kompatibilitás)
+var TEAM_NAME_MAP = {
+  'mexico':'Mexikó','south africa':'Dél-Afrika','south korea':'Dél-Korea','korea republic':'Dél-Korea','czechia':'Csehország','czech republic':'Csehország',
+  'canada':'Kanada','bosnia and herzegovina':'Bosznia-Hercegovina','bosnia & herzegovina':'Bosznia-Hercegovina','qatar':'Katar','switzerland':'Svájc',
+  'brazil':'Brazília','morocco':'Marokkó','united states':'Egyesült Államok','usa':'Egyesült Államok','paraguay':'Paraguay',
+  'australia':'Ausztrália','turkey':'Törökország','türkiye':'Törökország','germany':'Németország','curaçao':'Curaçao','curacao':'Curaçao',
+  'netherlands':'Hollandia','japan':'Japán','ivory coast':'Elefántcsontpart','cote d\'ivoire':'Elefántcsontpart','ecuador':'Ecuador',
+  'france':'Franciaország','panama':'Panama','argentina':'Argentína','peru':'Peru',
+  'senegal':'Szenegál','albania':'Albánia','colombia':'Kolumbia','serbia':'Szerbia',
+  'england':'Anglia','nigeria':'Nigéria','spain':'Spanyolország','bolivia':'Bolívia',
+  'saudi arabia':'Szaúd-Arábia','iran':'Irán','uruguay':'Uruguay','cameroon':'Kamerun',
+  'portugal':'Portugália','costa rica':'Costa Rica','denmark':'Dánia','italy':'Olaszország',
+  'egypt':'Egyiptom','belgium':'Belgium','croatia':'Horvátország','israel':'Izrael',
+  'poland':'Lengyelország','jamaica':'Jamaica','wales':'Wales','slovenia':'Szlovénia',
+  'trinidad and tobago':'Trinidad és Tobago','uzbekistan':'Üzbegisztán',
+  'haiti':'Haiti','scotland':'Skócia','ghana':'Ghána','new zealand':'Új-Zéland',
+  'cape verde':'Zöld-foki Köztársaság','iraq':'Irak','norway':'Norvégia','jordan':'Jordánia',
+  'dr congo':'Kongói DK','congo dr':'Kongói DK','sweden':'Svédország','tunisia':'Tunézia'
+};
 
 function matchApiToLocal(apiResult) {
   var best = null;
-  var apiHS = apiResult.homeShort.toUpperCase();
-  var apiAS = apiResult.awayShort.toUpperCase();
+  var apiHS = (apiResult.homeShort||'').toUpperCase();
+  var apiAS = (apiResult.awayShort||'').toUpperCase();
+  var apiHN = (apiResult.homeName||'').toLowerCase();
+  var apiAN = (apiResult.awayName||'').toLowerCase();
   ALL_MATCHES.filter(isVbMatch).forEach(function(m) {
     if(allResults[m.id] && apiResult.status !== 'live') return;
-    // 1. Rövidítés alapú egyeztetés
+    // 1. Rövidítés alapú (ESPN)
     var homeHu = TEAM_MAP[apiHS] || '';
     var awayHu = TEAM_MAP[apiAS] || '';
     if(homeHu && m.home === homeHu && awayHu && m.away === awayHu) { best = m; return; }
-    // 2. Dátum + fuzzy név fallback
+    // 2. Angol teljes név (api-football)
+    var homeHu2 = TEAM_NAME_MAP[apiHN] || '';
+    var awayHu2 = TEAM_NAME_MAP[apiAN] || '';
+    if(homeHu2 && m.home === homeHu2 && awayHu2 && m.away === awayHu2) { best = m; return; }
+    // 3. Fuzzy fallback
     var hNorm = (m.home||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
     var aNorm = (m.away||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
-    var apiH = apiResult.homeName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
-    var apiA = apiResult.awayName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
+    var apiH = apiHN.normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
+    var apiA = apiAN.normalize('NFD').replace(/[\u0300-\u036f]/g,'').substring(0,5);
     if(hNorm === apiH && aNorm === apiA) best = m;
   });
   return best;
