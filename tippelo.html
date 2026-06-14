@@ -3187,8 +3187,9 @@ function renderLeaderboard() {
     var _oc = {}; _opts.forEach(function(o){_oc[o]=0;});
     Object.values(betPollData).forEach(function(v){if(v&&_oc[v]!==undefined)_oc[v]++;});
     var _winAmt = _opts[0]; _opts.forEach(function(o){if(_oc[o]>_oc[_winAmt])_winAmt=o;});
-    var _paidCnt = 0; Object.values(betPaidData).forEach(function(v){if(v)_paidCnt++;});
-    _pp = _paidCnt * _winAmt;
+    var _knownUsers = getAllKnownUsers();
+    var _paidCnt = 0; Object.keys(betPaidData).forEach(function(u){if(betPaidData[u] && _knownUsers[u])_paidCnt++;});
+    _pp = _paidCnt * 5000;
   } catch(e){}
   var _prizes = [Math.round(_pp*0.5), Math.round(_pp*0.3), Math.round(_pp*0.2)];
 
@@ -4086,8 +4087,9 @@ async function sendDaySummary() {
   _opts2.forEach(function(o){_oc2[o]=0;});
   Object.values(betPollData).forEach(function(v){if(v&&_oc2[v]!==undefined)_oc2[v]++;});
   var _winAmt2 = _opts2[0]; _opts2.forEach(function(o){if(_oc2[o]>_oc2[_winAmt2])_winAmt2=o;});
-  var _paidCnt2 = 0; Object.values(betPaidData).forEach(function(v){if(v)_paidCnt2++;});
-  var _pool2 = _paidCnt2 * _winAmt2;
+  var _knownUsers2 = getAllKnownUsers();
+  var _paidCnt2 = 0; Object.keys(betPaidData).forEach(function(u){if(betPaidData[u] && _knownUsers2[u])_paidCnt2++;});
+  var _pool2 = _paidCnt2 * 5000;
   var _pr = [Math.round(_pool2*0.5), Math.round(_pool2*0.3), Math.round(_pool2*0.2)];
 
   var msg = '📊 Napi összefoglaló ('+today+')\n⚽ '+todayMatches.length+' meccs zárult ma.\n\n'
