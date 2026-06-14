@@ -4916,9 +4916,11 @@ async function saveWatchVenue(){if(!currentUser)return;var v=(document.getElemen
 
 // ===== AUTOMATA EREDMÉNY EMLÉKEZTETŐ + API =====
 var AUTO_RES_API = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
-var liveScores = {}; // {matchId: {home:2, away:1, minute:'67', status:'live'|'ft'}}
+var AUTO_RES_API2 = 'https://worldcup26.ir/get/games';
+var liveScores = {};
 
-async function fetchLiveScores() {
+// ESPN API
+async function fetchFromESPN() {
   try {
     var resp = await fetch(AUTO_RES_API);
     if(!resp.ok) return null;
@@ -4931,33 +4933,48 @@ async function fetchLiveScores() {
       var statusType = comp.status && comp.status.type ? comp.status.type.name : '';
       var clock = comp.status && comp.status.displayClock ? comp.status.displayClock : '';
       var period = comp.status && comp.status.period ? comp.status.period : 0;
-      var isLive = statusType === 'STATUS_IN_PROGRESS' || statusType === 'STATUS_HALFTIME' || statusType === 'STATUS_FIRST_HALF' || statusType === 'STATUS_SECOND_HALF';
-      var isFT = statusType === 'STATUS_FULL_TIME' || statusType === 'STATUS_FINAL';
+      var isLive = statusType==='STATUS_IN_PROGRESS'||statusType==='STATUS_HALFTIME'||statusType==='STATUS_FIRST_HALF'||statusType==='STATUS_SECOND_HALF';
+      var isFT = statusType==='STATUS_FULL_TIME'||statusType==='STATUS_FINAL';
       if(!isLive && !isFT) return;
       var teams = comp.competitors || [];
       if(teams.length < 2) return;
       var home = teams.find(function(t){return t.homeAway==='home';});
       var away = teams.find(function(t){return t.homeAway==='away';});
       if(!home || !away) return;
-      var minute = '';
-      if(isLive) {
-        if(statusType === 'STATUS_HALFTIME') minute = 'Félidő';
-        else minute = clock || (period === 1 ? '1. félidő' : '2. félidő');
-      }
-      results.push({
-        homeName: home.team.displayName || home.team.name || '',
-        awayName: away.team.displayName || away.team.name || '',
-        homeShort: home.team.abbreviation || '',
-        awayShort: away.team.abbreviation || '',
-        homeScore: parseInt(home.score) || 0,
-        awayScore: parseInt(away.score) || 0,
-        dateStr: ev.date ? ev.date.substring(0,10) : '',
-        status: isFT ? 'ft' : 'live',
-        minute: minute
-      });
+      var minute = isLive?(statusType==='STATUS_HALFTIME'?'Félidő':(clock||(period===1?'1. félidő':'2. félidő'))):'';
+      results.push({homeName:home.team.displayName||'',awayName:away.team.displayName||'',homeShort:home.team.abbreviation||'',awayShort:away.team.abbreviation||'',homeScore:parseInt(home.score)||0,awayScore:parseInt(away.score)||0,status:isFT?'ft':'live',minute:minute});
     });
-    return results;
+    return results.length > 0 ? results : null;
   } catch(e) { return null; }
+}
+
+// WorldCup26.ir API (tartalék)
+async function fetchFromWC26() {
+  try {
+    var resp = await fetch(AUTO_RES_API2);
+    if(!resp.ok) return null;
+    var data = await resp.json();
+    if(!data) return null;
+    var games = Array.isArray(data) ? data : (data.data||data.games||data.matches||[]);
+    var results = [];
+    games.forEach(function(g) {
+      var st = (g.status||g.state||'').toLowerCase();
+      var isLive = st.indexOf('live')>=0||st.indexOf('progress')>=0||st==='1h'||st==='2h'||st==='ht';
+      var isFT = st.indexOf('finished')>=0||st.indexOf('completed')>=0||st==='ft';
+      if(!isLive && !isFT) return;
+      var hT = g.homeTeam||g.home_team||g.home||{};
+      var aT = g.awayTeam||g.away_team||g.away||{};
+      results.push({homeName:hT.name||hT.teamName||g.homeName||'',awayName:aT.name||aT.teamName||g.awayName||'',homeShort:hT.code||hT.abbreviation||'',awayShort:aT.code||aT.abbreviation||'',homeScore:parseInt(g.homeScore||g.home_score||hT.score)||0,awayScore:parseInt(g.awayScore||g.away_score||aT.score)||0,status:isFT?'ft':'live',minute:g.minute||g.clock||g.time||st||''});
+    });
+    return results.length > 0 ? results : null;
+  } catch(e) { return null; }
+}
+
+// Multi-source: ESPN → WC26.ir
+async function fetchLiveScores() {
+  var r = await fetchFromESPN();
+  if(r) return r;
+  return await fetchFromWC26();
 }
 
 // ESPN rövidítés → magyar csapatnév mapping
