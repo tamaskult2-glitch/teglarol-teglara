@@ -1195,7 +1195,7 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab active" onclick="showTab('meccsek');setTimeout(jumpToNextUntipped,120)">⚽ Meccsek</button>
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
-  <button class="nav-tab" onclick="showTab('admin')" id="navAdmin">🔐 Admin</button>
+  <button class="nav-tab" onclick="showTab('admin')" id="navAdmin" style="display:none">🔐 Admin</button>
 <button class="nav-tab" id="navBet" onclick="showTab('bet')">💰 Tét <span id="betBadge" style="background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
@@ -2351,11 +2351,13 @@ function checkAutoAdmin() {
     if(content) content.classList.add('visible');
     updateAdminTabLabel();
   }
-  // Admin gyorsikonok
+  // Admin gyorsikonok + tab gomb
   var bc = document.getElementById('adminBroadcastIcon');
   var rs = document.getElementById('adminResultIcon');
+  var navAdm = document.getElementById('navAdmin');
   if(bc) bc.style.display = isAdminUnlocked ? 'inline-flex' : 'none';
   if(rs) rs.style.display = isAdminUnlocked ? 'inline-flex' : 'none';
+  if(navAdm) navAdm.style.display = isAdminUnlocked ? '' : 'none';
   // OPL gomb megjelenítése minden bejelentkezett usernek
   var oplBtn = document.getElementById('navOpl');
   if(oplBtn) oplBtn.style.display = currentUser ? '' : 'none';
