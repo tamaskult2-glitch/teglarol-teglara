@@ -130,7 +130,7 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 #statusText{color:rgba(240,244,240,0.35);letter-spacing:0.5px;}
 
 /* NAV */
-.nav-tabs{display:flex;justify-content:center;gap:7px;padding:16px 16px 0;flex-wrap:wrap;position:relative;z-index:1;}
+.nav-tabs{display:flex;justify-content:center;gap:7px;padding:16px 16px 12px;flex-wrap:wrap;position:sticky;top:0;z-index:100;background:var(--pitch);border-bottom:1px solid rgba(255,255,255,0.06);}
 .nav-tab{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;padding:7px 16px;border-radius:30px;border:1.5px solid rgba(245,197,24,0.22);background:transparent;color:rgba(240,244,240,0.55);cursor:pointer;transition:all 0.2s;}
 .nav-tab:hover{border-color:var(--gold);color:var(--gold);}
 .nav-tab.active{background:var(--gold);color:#0a1c0c;border-color:var(--gold);font-weight:700;}
@@ -1200,6 +1200,20 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">🏁 Verseny <span id="golNewBadge" style="background:#4ade80;color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
+</div>
+
+<!-- VB MOTIVÁCIÓS POPUP (jelszó migráció trigger) -->
+<div id="vbMotivPopup" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:linear-gradient(145deg,#1a3a1f,#0f2813);border:2px solid rgba(245,197,24,0.3);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:slideIn 0.4s ease-out;">
+    <div style="font-size:40px;margin-bottom:8px;">⚽🏆</div>
+    <div id="vbMotivName" style="font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:12px;"></div>
+    <div id="vbMotivQuote" style="font-size:14px;color:rgba(240,244,240,0.7);line-height:1.6;margin-bottom:6px;font-style:italic;padding:0 8px;"></div>
+    <div id="vbMotivAuthor" style="font-size:12px;color:rgba(245,197,24,0.5);margin-bottom:18px;font-family:'Oswald',sans-serif;letter-spacing:0.5px;"></div>
+    <div id="vbMotivMsg" style="font-size:13px;color:rgba(240,244,240,0.5);margin-bottom:20px;line-height:1.5;"></div>
+    <button onclick="dismissMotivPopup()" style="padding:14px 36px;background:linear-gradient(135deg,rgba(245,197,24,0.3),rgba(245,197,24,0.15));border:2px solid var(--gold);color:var(--gold);border-radius:12px;font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:transform 0.15s;width:100%;">
+      HAJRÁ! ⚽🔥
+    </button>
+  </div>
 </div>
 
 <div class="page-wrapper">
@@ -2390,6 +2404,14 @@ function showTab(t) {
   if(t==='bet') loadBetPoll();
   if(t==='kozos') loadWatchParty();
   if(t==='gol') renderGolTab();
+  // Scroll: nav-tabs tetejére görget (content a sticky nav alatt jelenik meg)
+  setTimeout(function(){
+    var navEl = document.querySelector('.nav-tabs');
+    if(navEl) {
+      var navTop = navEl.offsetTop;
+      window.scrollTo({top: navTop, behavior: 'smooth'});
+    }
+  }, 80);
   try { renderMatchdayBanner(); } catch(e){}
 }
 
@@ -2430,10 +2452,20 @@ function calcMatchPoints(m, tip) {
   if(!res) return 0;
   var outcome = getTipOutcome(tip);
   if(!outcome) return 0;
+  
+  // Védelmi ellenőrzés: ha a pontos eredmény ellentmond a kimenetelnek,
+  // a pontos eredmény a mérvadó (specifikusabb tipp)
+  var tipSc = getTipScore(tip);
+  if(tipSc) {
+    var scoreImplied = tipSc.h > tipSc.a ? '1' : tipSc.h === tipSc.a ? 'X' : '2';
+    if(scoreImplied !== outcome) {
+      outcome = scoreImplied; // pontos eredmény felülírja
+    }
+  }
+  
   var mult = getMatchMultiplier(m);
   var pts = 0;
   if(outcome === res) {
-    var tipSc = getTipScore(tip);
     var realSc = allScores[m.id];
     if(tipSc && realSc && tipSc.h+':'+tipSc.a === realSc) {
       pts = 3; // pontos eredmény
@@ -2476,6 +2508,14 @@ async function submitTip(mid,tip,phase) {
 
   if(phase==='o') {
     newTip.o = tip;
+    // Ha az új kimenetel nem egyezik a meglévő pontos eredménnyel → töröljük a score-t
+    if(newTip.h !== undefined && newTip.a !== undefined) {
+      var scoreImpliedOutcome = newTip.h > newTip.a ? '1' : newTip.h === newTip.a ? 'X' : '2';
+      if(scoreImpliedOutcome !== tip) {
+        delete newTip.h;
+        delete newTip.a;
+      }
+    }
     // Ha 90 perces tipp már nem X, töröljük az ET-t és pen-t
     if(tip !== 'X') { delete newTip.et; delete newTip.pen; }
   } else if(phase==='et') {
@@ -3819,6 +3859,7 @@ async function deleteUser(){
     // Fiók törlése + jelölés
     deletePromises.push(fbDel('users/'+safeName));
     deletePromises.push(fbSet('deletedUsers/'+safeName, getBudapestToday()));
+    deletePromises.push(fbDel('userAuth/'+safeName));
     deletePromises.push(fbDel('vbPoll/winner/'+safeName));
     deletePromises.push(fbDel('vbPoll/scorer/'+safeName));
     deletePromises.push(fbDel('betPoll/'+safeName));
@@ -4297,6 +4338,11 @@ function showPointsBreakdown(safeName) {
     if(!tip) return;
     var outcome = getTipOutcome(tip);
     var tipSc = getTipScore(tip);
+    // Védelmi: ha score ellentmond az outcome-nak, score a mérvadó
+    if(tipSc && outcome) {
+      var implied = tipSc.h > tipSc.a ? '1' : tipSc.h === tipSc.a ? 'X' : '2';
+      if(implied !== outcome) outcome = implied;
+    }
     var realSc = allScores[m.id];
     var pts = calcMatchPoints(m, tip);
     var mult = getMatchMultiplier(m);
@@ -6242,6 +6288,66 @@ function renderGolTab() {
     if(labelEl) labelEl.textContent = '📊 Jelenlegi állás — nyomd meg a ▶ gombot!';
   }
 }
+// ===== VB MOTIVÁCIÓS POPUP (jelszó migráció trigger) =====
+var VB_MOTIV_QUOTES = [
+  {q: "Góóóól! Fantasztikus! Ezt nem lehet elhinni, kedves nézők!", a: "— id. Knézy Jenő"},
+  {q: "Figyeljenek, most jön a java! A futball csodálatos, mert bármi megtörténhet!", a: "— id. Knézy Jenő"},
+  {q: "Na, kedves nézők, most aztán kapaszkodjanak!", a: "— Vitray Tamás"},
+  {q: "A labdarúgás egyszerű játék: huszonkét ember kergeti a labdát, és a végén a németek nyernek.", a: "— Gary Lineker"},
+  {q: "A futball nem élet-halál kérdése — sokkal fontosabb annál!", a: "— Bill Shankly"},
+  {q: "Nem az a fontos, hogy nyersz vagy vesztesz, hanem hogy jól tippeltél-e!", a: "— Gólszagló Bajnokság, 2026"},
+  {q: "A világbajnokságon nincsenek kis csapatok — csak nagy meglepetések!", a: "— Szepesi György szelleme"},
+  {q: "Aki nem tippel, az nem nyer. Aki rosszul tippel, az is szórakozik!", a: "— Gólszagló Bölcsesség"},
+  {q: "Ez a pillanat! Három ország, 48 csapat, egyetlen trónus! Mindenki feszüljön be!", a: "— id. Knézy Jenő hangján"},
+  {q: "A tippverseny olyan, mint a VB: a favorit is kieshet, a kívülálló is nyerhet!", a: "— Gólszagló Bajnokság"}
+];
+
+var VB_MOTIV_MSGS = [
+  "A csoportkör rohan — ne maradj le egyetlen tippről sem! 🏃‍♂️",
+  "Minden pont számít! Az élmezőny szorosan alakul. 📊",
+  "Ma is vannak meccsek — szerezz pontokat! 🎯",
+  "A VB nem vár — a tippjeid igen! ⏰",
+  "Emlékezz: pontos eredmény = 3 pont! 🎯🎯🎯"
+];
+
+function showMotivPopup() {
+  if(!currentUser) return;
+  // Csak egyszer jelenjen meg (localStorage flag)
+  var flag = 'vbMotiv_shown_v2';
+  if(localStorage.getItem(flag)) return;
+
+  var popup = document.getElementById('vbMotivPopup');
+  var nameEl = document.getElementById('vbMotivName');
+  var quoteEl = document.getElementById('vbMotivQuote');
+  var authorEl = document.getElementById('vbMotivAuthor');
+  var msgEl = document.getElementById('vbMotivMsg');
+  if(!popup) return;
+
+  // Személyre szóló üdvözlés
+  if(nameEl) nameEl.textContent = 'Szia, ' + currentUser + '! 👋';
+
+  // Random idézet
+  var q = VB_MOTIV_QUOTES[Math.floor(Math.random() * VB_MOTIV_QUOTES.length)];
+  if(quoteEl) quoteEl.textContent = '„' + q.q + '"';
+  if(authorEl) authorEl.textContent = q.a;
+
+  // Random buzdító szöveg
+  var msg = VB_MOTIV_MSGS[Math.floor(Math.random() * VB_MOTIV_MSGS.length)];
+  if(msgEl) msgEl.textContent = msg;
+
+  popup.style.display = 'flex';
+}
+
+function dismissMotivPopup() {
+  var popup = document.getElementById('vbMotivPopup');
+  if(popup) popup.style.display = 'none';
+  localStorage.setItem('vbMotiv_shown_v2', '1');
+  // 🔑 Jelszó hash migráció Firebase-be!
+  migrateHashSilent();
+}
+
+// Popup megjelenítés: várd meg amíg a Firebase adatok betöltődnek
+setTimeout(function(){ showMotivPopup(); }, 3500);
 
 </script>
 
