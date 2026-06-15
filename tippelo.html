@@ -1197,7 +1197,6 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')" id="navAdmin" style="display:none">🔐 Admin</button>
-<button class="nav-tab" id="navBet" onclick="showTab('bet')">💰 Tét <span id="betBadge" style="background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">📊 VB <span id="golNewBadge" style="background:#4ade80;color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
@@ -1480,6 +1479,11 @@ footer a:hover{color:var(--gold);}
           </div>
           <div id="resetPwMsg" style="font-size:11px;color:rgba(240,244,240,0.4);margin-top:4px;"></div>
         </div>
+        <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+          <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:6px;">🔐 JELSZÓ MIGRÁCIÓ ÁLLAPOT</div>
+          <button onclick="checkAuthMigration()" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔍 Ellenőrzés</button>
+          <div id="authMigrationResult" style="font-size:11px;color:rgba(240,244,240,0.5);margin-top:6px;white-space:pre-wrap;max-height:200px;overflow-y:auto;"></div>
+        </div>
         <div id="fbCmdResult" style="font-size:12px;color:rgba(240,244,240,0.6);min-height:16px;margin-top:6px;word-break:break-all;white-space:pre-wrap;"></div>
       </div>
     </div>
@@ -1503,12 +1507,7 @@ footer a:hover{color:var(--gold);}
   <!-- BL TAB -->
 
   <!-- TÉT TAB -->
-  <div id="tab-bet" style="display:none;">
-    <div class="section-header" style="margin-top:16px;"><h2>💰 Alap tét szavazás</h2></div>
-    <div style="font-size:13px;color:rgba(240,244,240,0.55);margin-bottom:14px;">Szavazz mekkora legyen az alap tét fejenként! A tétet <strong style="color:var(--gold);">LESZNIK</strong>-nek kell megadni.</div>
-    <div style="font-family:'Oswald',sans-serif;font-size:15px;color:var(--gold);font-style:italic;text-align:center;padding:10px 0 14px;letter-spacing:0.5px;opacity:0.8;">„Ha kicsi a tét, a kedvem sötét!"</div>
-    <div id="betPollContainer"></div>
-  </div>
+  <div id="tab-bet" style="display:none;"></div>
 
   <!-- KÖZÖS MECCSNÉZÉS TAB -->
   <div id="tab-kozos" style="display:none;">
@@ -6149,6 +6148,53 @@ function toggleDayGroup(groupId, storageKey) {
     }, 80);
   }
 }
+// ===== JELSZÓ MIGRÁCIÓ ELLENŐRZÉS =====
+async function checkAuthMigration() {
+  var res = document.getElementById('authMigrationResult');
+  if(!res) return;
+  res.textContent = '⏳ Ellenőrzés…';
+  try {
+    var usersData = await fbGet('users');
+    var authData = await fbGet('userAuth');
+    if(!usersData) { res.textContent = '❌ Nincs users/ adat'; return; }
+    
+    var allUserNames = Object.keys(usersData);
+    var authNames = authData ? Object.keys(authData) : [];
+    
+    var migrated = [];
+    var notMigrated = [];
+    
+    allUserNames.forEach(function(safeName) {
+      if(authData && authData[safeName]) {
+        migrated.push(safeName);
+      } else {
+        notMigrated.push(safeName);
+      }
+    });
+    
+    var html = '📊 Összesen: ' + allUserNames.length + ' felhasználó\n';
+    html += '✅ Migrált (jelszó Firebase-ben): ' + migrated.length + '\n';
+    html += '❌ Nem migrált: ' + notMigrated.length + '\n\n';
+    
+    if(migrated.length > 0) {
+      html += '✅ VÉDETT:\n';
+      migrated.forEach(function(n) { html += '  🟢 ' + n + '\n'; });
+    }
+    if(notMigrated.length > 0) {
+      html += '\n❌ NINCS JELSZÓ FIREBASE-BEN:\n';
+      notMigrated.forEach(function(n) { html += '  🔴 ' + n + '\n'; });
+      html += '\n⚠️ Ezek a felhasználók még nem nyitották meg az oldalt az új kóddal!';
+    }
+    if(notMigrated.length === 0) {
+      html += '\n🎉 MINDENKI MIGRÁLT! A jelszó védelem teljes.';
+    }
+    
+    res.innerHTML = html.replace(/\n/g, '<br>');
+  } catch(e) {
+    res.textContent = '❌ Hiba: ' + e.message;
+  }
+}
+
 // ===== VB STATS SUB-NAV =====
 function showStatsSection(sec) {
   ['tabella','gollovo','verseny'].forEach(function(s){
@@ -6565,11 +6611,31 @@ var VB_MOTIV_QUOTES = [
   {q: "Na, kedves nézők, most aztán kapaszkodjanak!", a: "— Vitray Tamás"},
   {q: "A labdarúgás egyszerű játék: huszonkét ember kergeti a labdát, és a végén a németek nyernek.", a: "— Gary Lineker"},
   {q: "A futball nem élet-halál kérdése — sokkal fontosabb annál!", a: "— Bill Shankly"},
-  {q: "Nem az a fontos, hogy nyersz vagy vesztesz, hanem hogy jól tippeltél-e!", a: "— Gólszagló Bajnokság, 2026"},
+  {q: "Nem az a fontos, hogy nyersz vagy vesztesz, hanem hogy jól tippeltél-e!", a: "— Gólszagló Bajnokság"},
   {q: "A világbajnokságon nincsenek kis csapatok — csak nagy meglepetések!", a: "— Szepesi György szelleme"},
   {q: "Aki nem tippel, az nem nyer. Aki rosszul tippel, az is szórakozik!", a: "— Gólszagló Bölcsesség"},
-  {q: "Ez a pillanat! Három ország, 48 csapat, egyetlen trónus! Mindenki feszüljön be!", a: "— id. Knézy Jenő hangján"},
-  {q: "A tippverseny olyan, mint a VB: a favorit is kieshet, a kívülálló is nyerhet!", a: "— Gólszagló Bajnokság"}
+  {q: "Ez a pillanat! Három ország, 48 csapat, egyetlen trónus!", a: "— id. Knézy Jenő hangján"},
+  {q: "A tippverseny olyan, mint a VB: a favorit is kieshet, a kívülálló is nyerhet!", a: "— Gólszagló Bajnokság"},
+  {q: "Mindig van esély — és a labda az gömbölyű!", a: "— Sepp Herberger"},
+  {q: "Egy meccs kilencven perc, és a végén én nyerek.", a: "— Minden tippjátékos, valahol"},
+  {q: "A győzelem nem a legfontosabb — az egyetlen, ami számít!", a: "— Vince Lombardi"},
+  {q: "A csoportkörben még mindenki hős. Az igazi dráma a kiesésben kezdődik.", a: "— Gólszagló Bölcsesség"},
+  {q: "A legjobb védekezés a támadás — és a pontos tipp!", a: "— Johan Cruyff szelleme"},
+  {q: "A VB olyan, mint az élet: néha 0-0, néha 7-1.", a: "— Gólszagló Filozófia"},
+  {q: "Soha ne becsüld alá az esélytelent — főleg, ha délután játszik!", a: "— Gólszagló Tapasztalat"},
+  {q: "A második félidőben dől el minden — a tippverseny és a VB is!", a: "— Gólszagló Bölcsesség"},
+  {q: "Tippelni kell, mert a sors szereti a bátrat!", a: "— Magyar tippelő népi bölcsesség"},
+  {q: "Ha a kedvenced kiesett, legalább a tippjeid még versenyben vannak!", a: "— Gólszagló Vigasz"},
+  {q: "A legjobb meccs az, amit a kanapéról nézünk — pontos tippel a zsebben!", a: "— Gólszagló Bölcsesség"},
+  {q: "A statisztika nem hazudik. A labda viszont igen.", a: "— Gólszagló Filozófia"},
+  {q: "Ma este minden eldőlhet — vagy épp semmi. Ettől szép!", a: "— Gólszagló Misztikum"},
+  {q: "Három pont a pontos eredményért — de a legszebb pont a közös élmény!", a: "— Gólszagló Bajnokság"},
+  {q: "Mindegy ki nyer, a lényeg hogy mi jól szórakozzunk!", a: "— id. Knézy Jenő szelleme"},
+  {q: "A VB olyan kaland, amit négyévente egyszer élhetünk át — most épp itt van!", a: "— Gólszagló Mottó"},
+  {q: "Nincs barátság a pályán — de a tippversenyben is erős a rivalizálás!", a: "— Gólszagló Igazság"},
+  {q: "Egy jó tipp többet ér, mint ezer okos elemzés utólag.", a: "— Gólszagló Tapasztalat"},
+  {q: "A VB csoportkör a nyitány — a kieséses szakasz a főétel!", a: "— Gólszagló Bölcsesség"},
+  {q: "Légy bátor! Az X tippek néha csodákat tesznek.", a: "— Gólszagló Stratégia"}
 ];
 
 var VB_MOTIV_MSGS = [
@@ -6577,13 +6643,23 @@ var VB_MOTIV_MSGS = [
   "Minden pont számít! Az élmezőny szorosan alakul. 📊",
   "Ma is vannak meccsek — szerezz pontokat! 🎯",
   "A VB nem vár — a tippjeid igen! ⏰",
-  "Emlékezz: pontos eredmény = 3 pont! 🎯🎯🎯"
+  "Emlékezz: pontos eredmény = 3 pont! 🎯🎯🎯",
+  "Ki tippel ma elsőként? Ne hagyd az utolsó pillanatra! ⚡",
+  "A ranglistán bármi változhat — egy jó nap elég az előzéshez! 🚀",
+  "Nézd meg a csoportállásokat az új 📊 VB tabban! 🆕",
+  "Meglepetésekre mindig számítani kell — a VB-n és a tippversenyben is! 🎲",
+  "A mai meccsek különösen izgalmasak lesznek! 🔥",
+  "Tippeltél már? A kickoff előtt még módosíthatsz! ✏️",
+  "Nézd meg ki vezet a ranglistán → 🏅 Ranglista tab! 👀",
+  "A gólkülönbség tipp +1 bónusz pontot ér — ne felejtsd el beírni! 📐",
+  "Ma lesz a nap, amikor te kerülsz az élre? 👑",
+  "Láttad már a Rangsor Verseny animációt? → 📊 VB tab → 🏁 Verseny! 🏁"
 ];
 
 function showMotivPopup() {
   if(!currentUser) return;
-  // Csak egyszer jelenjen meg (localStorage flag)
-  var flag = 'vbMotiv_shown_v2';
+  // Naponta egyszer jelenjen meg
+  var flag = 'vbMotiv_' + getBudapestToday();
   if(localStorage.getItem(flag)) return;
 
   var popup = document.getElementById('vbMotivPopup');
@@ -6596,13 +6672,13 @@ function showMotivPopup() {
   // Személyre szóló üdvözlés
   if(nameEl) nameEl.textContent = 'Szia, ' + currentUser + '! 👋';
 
-  // Random idézet
-  var q = VB_MOTIV_QUOTES[Math.floor(Math.random() * VB_MOTIV_QUOTES.length)];
+  // Nap alapú rotáció (mindenki ugyanazt látja aznap)
+  var dayIndex = Math.floor((Date.now() - new Date('2026-06-11').getTime()) / 86400000);
+  var q = VB_MOTIV_QUOTES[Math.abs(dayIndex) % VB_MOTIV_QUOTES.length];
   if(quoteEl) quoteEl.textContent = '„' + q.q + '"';
   if(authorEl) authorEl.textContent = q.a;
 
-  // Random buzdító szöveg
-  var msg = VB_MOTIV_MSGS[Math.floor(Math.random() * VB_MOTIV_MSGS.length)];
+  var msg = VB_MOTIV_MSGS[Math.abs(dayIndex) % VB_MOTIV_MSGS.length];
   if(msgEl) msgEl.textContent = msg;
 
   popup.style.display = 'flex';
@@ -6611,7 +6687,7 @@ function showMotivPopup() {
 function dismissMotivPopup() {
   var popup = document.getElementById('vbMotivPopup');
   if(popup) popup.style.display = 'none';
-  localStorage.setItem('vbMotiv_shown_v2', '1');
+  localStorage.setItem('vbMotiv_' + getBudapestToday(), '1');
   // 🔑 Jelszó hash migráció Firebase-be!
   migrateHashSilent();
 }
