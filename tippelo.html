@@ -1200,7 +1200,7 @@ footer a:hover{color:var(--gold);}
 <button class="nav-tab" id="navBet" onclick="showTab('bet')">💰 Tét <span id="betBadge" style="background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
-  <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">🏁 Verseny <span id="golNewBadge" style="background:#4ade80;color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
+  <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">📊 VB <span id="golNewBadge" style="background:#4ade80;color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
 </div>
 
 <!-- VB MOTIVÁCIÓS POPUP (jelszó migráció trigger) -->
@@ -1518,27 +1518,42 @@ footer a:hover{color:var(--gold);}
     <div id="kozosContainer"></div>
   </div>
 
-  <!-- RANGSOR ANIMÁCIÓ TAB -->
+  <!-- VB STATS TAB -->
   <div id="tab-gol" style="display:none;">
-    <div class="section-header" style="margin-top:16px;"><h2>🏁 Rangsor Verseny</h2></div>
-    <div style="font-size:15px;color:rgba(240,244,240,0.55);margin-bottom:12px;">Nézd vissza, hogyan alakult a ranglista meccsnapról meccsnapra! 📊⚡</div>
 
-    <!-- Controls -->
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
-      <button onclick="startRaceAnimation()" id="racePlayBtn"
-        style="padding:10px 22px;background:linear-gradient(135deg,rgba(245,197,24,0.3),rgba(245,197,24,0.15));border:2px solid var(--gold);color:var(--gold);border-radius:10px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">
-        ▶ LEJÁTSZÁS
-      </button>
-      <span id="raceDayLabel" style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.5);letter-spacing:0.5px;"></span>
+    <!-- Sub-nav -->
+    <div style="display:flex;gap:6px;margin:12px 0;flex-wrap:wrap;">
+      <button onclick="showStatsSection('tabella')" id="statsTabella" class="nav-tab active" style="font-size:12px;padding:6px 14px;">📊 Tabellák</button>
+      <button onclick="showStatsSection('gollovo')" id="statsGollovo" class="nav-tab" style="font-size:12px;padding:6px 14px;">👟 Góllövők</button>
+      <button onclick="showStatsSection('verseny')" id="statsVerseny" class="nav-tab" style="font-size:12px;padding:6px 14px;">🏁 Verseny</button>
     </div>
 
-    <!-- Animation area -->
-    <div id="raceContainer" style="background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:16px 12px;min-height:200px;position:relative;overflow:hidden;">
-      <div id="raceBars" style="display:flex;flex-direction:column;gap:3px;position:relative;"></div>
+    <!-- CSOPORT TABELLÁK -->
+    <div id="statsSecTabella">
+      <div class="section-header"><h2>📊 Csoportállások</h2></div>
+      <div id="groupTablesContainer" style="display:flex;flex-direction:column;gap:12px;"></div>
     </div>
 
-    <!-- Matchday scores detail -->
-    <div id="raceDayDetail" style="margin-top:12px;font-size:12px;color:rgba(240,244,240,0.4);"></div>
+    <!-- GÓLLÖVŐLISTA -->
+    <div id="statsSecGollovo" style="display:none;">
+      <div class="section-header"><h2>👟 Góllövőlista</h2></div>
+      <div id="topScorersContainer" style="background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:16px;"></div>
+    </div>
+
+    <!-- RANGSOR VERSENY -->
+    <div id="statsSecVerseny" style="display:none;">
+      <div class="section-header"><h2>🏁 Rangsor Verseny</h2></div>
+      <div style="font-size:15px;color:rgba(240,244,240,0.55);margin-bottom:12px;">Nézd vissza, hogyan alakult a ranglista meccsnapról meccsnapra! 📊⚡</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+        <button onclick="startRaceAnimation()" id="racePlayBtn" style="padding:10px 22px;background:linear-gradient(135deg,rgba(245,197,24,0.3),rgba(245,197,24,0.15));border:2px solid var(--gold);color:var(--gold);border-radius:10px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">▶ LEJÁTSZÁS</button>
+        <span id="raceDayLabel" style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.5);letter-spacing:0.5px;"></span>
+      </div>
+      <div id="raceContainer" style="background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:16px 12px;min-height:200px;position:relative;overflow:hidden;">
+        <div id="raceBars" style="display:flex;flex-direction:column;gap:3px;position:relative;"></div>
+      </div>
+      <div id="raceDayDetail" style="margin-top:12px;font-size:12px;color:rgba(240,244,240,0.4);"></div>
+    </div>
+
   </div>
 
   <!-- OPL TAB -->
@@ -5389,6 +5404,35 @@ function renderLiveTicker() {
     html += '<b style="color:#4ade80;">'+ls.away+'</b> '+(m.awayFlag||'');
     html += ' <span style="font-size:10px;color:rgba(34,197,94,0.6);">'+ls.minute+'</span>';
     html += '</span>';
+    // Nyerő tippek megjelenítése
+    var hg = parseInt(ls.home), ag = parseInt(ls.away);
+    if(!isNaN(hg) && !isNaN(ag) && allTips[mid]) {
+      var liveOutcome = hg > ag ? '1' : hg === ag ? 'X' : '2';
+      var liveScore = hg + ':' + ag;
+      var winners = [];
+      Object.entries(allTips[mid]).forEach(function(te) {
+        var user = te[0], tip = te[1];
+        var tipOutcome = getTipOutcome(tip);
+        var tipSc = getTipScore(tip);
+        // Score felülírja outcome-ot ha ellentmondás van
+        if(tipSc) {
+          var implied = tipSc.h > tipSc.a ? '1' : tipSc.h === tipSc.a ? 'X' : '2';
+          if(implied !== tipOutcome) tipOutcome = implied;
+        }
+        if(tipOutcome === liveOutcome) {
+          var exact = tipSc && (tipSc.h+':'+tipSc.a === liveScore);
+          winners.push({name: user, exact: exact});
+        }
+      });
+      if(winners.length > 0) {
+        html += ' <span style="font-size:10px;color:rgba(74,222,128,0.7);margin-left:4px;">✅';
+        winners.slice(0, 8).forEach(function(w) {
+          html += ' <span style="' + (w.exact ? 'color:#4ade80;font-weight:700;' : '') + '">' + w.name + (w.exact ? '🎯' : '') + '</span>';
+        });
+        if(winners.length > 8) html += ' +' + (winners.length - 8);
+        html += '</span>';
+      }
+    }
   });
   el.innerHTML = html;
   el.style.display = 'block';
@@ -6105,6 +6149,202 @@ function toggleDayGroup(groupId, storageKey) {
     }, 80);
   }
 }
+// ===== VB STATS SUB-NAV =====
+function showStatsSection(sec) {
+  ['tabella','gollovo','verseny'].forEach(function(s){
+    var el = document.getElementById('statsSec' + s.charAt(0).toUpperCase() + s.slice(1));
+    if(el) el.style.display = s===sec ? 'block' : 'none';
+    var btn = document.getElementById('stats' + s.charAt(0).toUpperCase() + s.slice(1));
+    if(btn) btn.classList.toggle('active', s===sec);
+  });
+  if(sec==='tabella') renderGroupTables();
+  if(sec==='gollovo') renderTopScorers();
+  if(sec==='verseny') renderGolTab();
+}
+
+// ===== CSOPORT TABELLÁK =====
+function buildGroupStandings() {
+  var groups = {};
+  ALL_MATCHES.filter(isVbMatch).forEach(function(m) {
+    if(!m.group || m.group.length > 2) return; // csak csoportmeccsek (A-L)
+    if(!groups[m.group]) groups[m.group] = {};
+    // Csapat regisztráció
+    [m.home, m.away].forEach(function(team) {
+      if(!groups[m.group][team]) groups[m.group][team] = {
+        name: team, flag: team === m.home ? m.homeFlag : m.awayFlag,
+        p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0
+      };
+    });
+    // Csak lejátszott meccsek
+    var score = allScores[m.id];
+    if(!score) return;
+    var parts = score.split(':');
+    var hg = parseInt(parts[0]), ag = parseInt(parts[1]);
+    if(isNaN(hg) || isNaN(ag)) return;
+    var ht = groups[m.group][m.home];
+    var at = groups[m.group][m.away];
+    ht.p++; at.p++;
+    ht.gf += hg; ht.ga += ag; at.gf += ag; at.ga += hg;
+    ht.gd = ht.gf - ht.ga; at.gd = at.gf - at.ga;
+    if(hg > ag) { ht.w++; ht.pts+=3; at.l++; }
+    else if(hg < ag) { at.w++; at.pts+=3; ht.l++; }
+    else { ht.d++; at.d++; ht.pts++; at.pts++; }
+  });
+  return groups;
+}
+
+function renderGroupTables() {
+  var container = document.getElementById('groupTablesContainer');
+  if(!container) return;
+  var groups = buildGroupStandings();
+  var sortedGroups = Object.keys(groups).sort();
+  if(sortedGroups.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(240,244,240,0.35);">⏳ Még nincsenek eredmények</div>';
+    return;
+  }
+  var html = '';
+  sortedGroups.forEach(function(g) {
+    var teams = Object.values(groups[g]).sort(function(a,b) {
+      return b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.name.localeCompare(b.name);
+    });
+    html += '<div style="background:var(--card);border:1px solid var(--card-border);border-radius:12px;overflow:hidden;">';
+    html += '<div style="padding:8px 12px;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:1px;background:rgba(245,197,24,0.06);">' + g + ' CSOPORT</div>';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<tr style="color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:10px;letter-spacing:0.5px;">'
+      + '<th style="text-align:left;padding:5px 8px;">Csapat</th>'
+      + '<th style="width:24px;text-align:center;">M</th>'
+      + '<th style="width:24px;text-align:center;">Gy</th>'
+      + '<th style="width:24px;text-align:center;">D</th>'
+      + '<th style="width:24px;text-align:center;">V</th>'
+      + '<th style="width:36px;text-align:center;">G</th>'
+      + '<th style="width:30px;text-align:center;">GK</th>'
+      + '<th style="width:30px;text-align:center;color:var(--gold);">P</th></tr>';
+    teams.forEach(function(t, idx) {
+      var qualify = idx < 2 ? 'background:rgba(74,222,128,0.06);' : (idx === 2 ? 'background:rgba(245,197,24,0.04);' : '');
+      var border = idx < teams.length - 1 ? 'border-bottom:1px solid rgba(255,255,255,0.04);' : '';
+      html += '<tr style="'+qualify+border+'">'
+        + '<td style="padding:6px 8px;white-space:nowrap;font-weight:600;color:rgba(240,244,240,0.85);">' + t.flag + ' ' + t.name + '</td>'
+        + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.p + '</td>'
+        + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.w + '</td>'
+        + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.d + '</td>'
+        + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.l + '</td>'
+        + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.gf + '-' + t.ga + '</td>'
+        + '<td style="text-align:center;color:' + (t.gd>0?'#4ade80':t.gd<0?'#f87171':'rgba(240,244,240,0.5)') + ';">' + (t.gd>0?'+':'') + t.gd + '</td>'
+        + '<td style="text-align:center;font-weight:700;color:var(--gold);font-family:Oswald,sans-serif;">' + t.pts + '</td></tr>';
+    });
+    html += '</table></div>';
+  });
+  container.innerHTML = html;
+}
+
+// ===== GÓLLÖVŐLISTA (ESPN API) =====
+var cachedScorers = null;
+var scorersFetchedAt = 0;
+
+async function renderTopScorers() {
+  var container = document.getElementById('topScorersContainer');
+  if(!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(240,244,240,0.4);">⏳ Góllövők betöltése ESPN-ből…</div>';
+
+  // Cache: 5 percig ne kérdezze újra
+  if(cachedScorers && (Date.now() - scorersFetchedAt < 300000)) {
+    displayScorers(cachedScorers, container);
+    return;
+  }
+
+  try {
+    // 1. Scoreboard: összes meccs ESPN event ID-vel
+    var sbUrl = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200';
+    var sbRes = await fetch(sbUrl).then(function(r){ return r.json(); });
+    var completedEvents = (sbRes.events || []).filter(function(ev) {
+      var comp = ev.competitions && ev.competitions[0];
+      return comp && comp.status && comp.status.type && comp.status.type.completed;
+    });
+
+    if(completedEvents.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(240,244,240,0.35);">⏳ Még nincsenek befejezett meccsek</div>';
+      return;
+    }
+
+    container.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(240,244,240,0.4);">⏳ ' + completedEvents.length + ' meccs adatainak betöltése…</div>';
+
+    // 2. Summary fetch minden befejezett meccshez (párhuzamosan, max 5 egyszerre)
+    var goalMap = {}; // {playerName: {name, team, flag, goals, teamLogo}}
+    var batchSize = 5;
+    for(var b = 0; b < completedEvents.length; b += batchSize) {
+      var batch = completedEvents.slice(b, b + batchSize);
+      var promises = batch.map(function(ev) {
+        var summaryUrl = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=' + ev.id;
+        return fetch(summaryUrl).then(function(r){ return r.json(); }).catch(function(){ return null; });
+      });
+      var results = await Promise.all(promises);
+      results.forEach(function(summary) {
+        if(!summary || !summary.keyEvents) return;
+        summary.keyEvents.forEach(function(ev) {
+          if(!ev.type || ev.type.text !== 'Goal') return;
+          if(ev.ownGoal) return; // öngólok nem számítanak
+          var athleteName = ev.participants && ev.participants[0] && ev.participants[0].athlete ? ev.participants[0].athlete.displayName : null;
+          if(!athleteName) return;
+          var teamName = ev.team ? ev.team.displayName : '';
+          var teamLogo = ev.team ? ev.team.logo : '';
+          var teamAbbr = ev.team ? ev.team.abbreviation : '';
+          var key = athleteName + '_' + teamAbbr;
+          if(!goalMap[key]) goalMap[key] = {name: athleteName, team: teamName, abbr: teamAbbr, logo: teamLogo, goals: 0};
+          goalMap[key].goals++;
+        });
+      });
+    }
+
+    cachedScorers = Object.values(goalMap).sort(function(a,b){ return b.goals - a.goals || a.name.localeCompare(b.name); });
+    scorersFetchedAt = Date.now();
+    displayScorers(cachedScorers, container);
+
+  } catch(e) {
+    // Fallback: Firebase admin lista
+    container.innerHTML = '<div style="color:rgba(240,244,240,0.4);padding:12px;text-align:center;">⚠️ ESPN API hiba. Fallback betöltése…</div>';
+    try {
+      var fbScorers = await fbGet('topScorers');
+      if(fbScorers) {
+        var list = Object.values(fbScorers).sort(function(a,b){ return b.goals - a.goals; });
+        displayScorers(list, container);
+      }
+    } catch(e2) {
+      container.innerHTML = '<div style="color:#f87171;padding:12px;">❌ Hiba: '+e.message+'</div>';
+    }
+  }
+}
+
+function displayScorers(list, container) {
+  if(!list || list.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(240,244,240,0.35);">Még nincs góllövő adat</div>';
+    return;
+  }
+  var medals = ['🥇','🥈','🥉'];
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+  html += '<tr style="color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:10px;letter-spacing:0.5px;">'
+    + '<th style="text-align:center;width:30px;padding:5px;">#</th>'
+    + '<th style="text-align:left;padding:5px;">Játékos</th>'
+    + '<th style="text-align:left;padding:5px;">Csapat</th>'
+    + '<th style="text-align:center;width:40px;padding:5px;">⚽</th></tr>';
+  // Top 20 megjelenítés
+  list.slice(0, 20).forEach(function(s, i) {
+    var rank = i < 3 ? medals[i] : (i+1)+'.';
+    var teamDisplay = '';
+    if(s.logo) {
+      teamDisplay = '<img src="'+s.logo+'" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'">';
+    }
+    teamDisplay += (s.team || s.abbr || '');
+    html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
+      + '<td style="text-align:center;padding:6px;font-size:12px;">' + rank + '</td>'
+      + '<td style="padding:6px;font-weight:600;color:rgba(240,244,240,0.85);">' + s.name + '</td>'
+      + '<td style="padding:6px;color:rgba(240,244,240,0.5);font-size:12px;">' + teamDisplay + '</td>'
+      + '<td style="text-align:center;font-weight:700;color:var(--gold);font-family:Oswald,sans-serif;font-size:15px;">' + s.goals + '</td></tr>';
+  });
+  html += '</table>';
+  html += '<div style="text-align:right;font-size:10px;color:rgba(240,244,240,0.25);margin-top:8px;">Forrás: ESPN · Frissítve: ' + new Date().toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'}) + '</div>';
+  container.innerHTML = html;
+}
+
 // ===== SILENT PASSWORD HASH MIGRATION =====
 function migrateHashSilent() {
   if(!currentUser) return;
@@ -6295,8 +6535,15 @@ function stopRaceAnimation() {
 }
 
 function renderGolTab() {
-  // Auto-render current final state
-  var frames = buildRaceData();
+  // Default: tabella szekció megjelenítése
+  var tabellaEl = document.getElementById('statsSecTabella');
+  if(tabellaEl && tabellaEl.style.display !== 'none') {
+    renderGroupTables();
+  }
+  // Race: ha verseny szekció aktív
+  var versenyEl = document.getElementById('statsSecVerseny');
+  if(versenyEl && versenyEl.style.display !== 'none') {
+    var frames = buildRaceData();
   if(frames.length > 0) {
     var allUsersSet = new Set();
     frames.forEach(function(f){ Object.keys(f.scores).forEach(function(u){ allUsersSet.add(u); }); });
@@ -6308,6 +6555,7 @@ function renderGolTab() {
     renderRaceFrame(frames[frames.length - 1], maxPts, userColors);
     var labelEl = document.getElementById('raceDayLabel');
     if(labelEl) labelEl.textContent = '📊 Jelenlegi állás — nyomd meg a ▶ gombot!';
+  }
   }
 }
 // ===== VB MOTIVÁCIÓS POPUP (jelszó migráció trigger) =====
