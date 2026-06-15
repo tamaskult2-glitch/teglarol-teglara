@@ -2974,36 +2974,46 @@ function renderMatchdayBanner() {
   }
 }
 
-// Ugrás a nap első még nem tippelt meccséhez
+// Ugrás: ÉLŐ meccs → következő tippeletlen → következő jövőbeli
 function jumpToNextUntipped() {
   if(!currentUser) {
     document.getElementById('regModal').style.display = 'flex';
     return;
   }
   var safe = fbSafeName(currentUser);
+  var now = getBudapestNow();
+  var target = null;
 
-  // 1. próba: mai tippeletlen nyitott meccs
-  var info = getMatchdayInfo();
-  var target = info.untipped[0] || info.actionable[0] || info.todays[0];
+  // 1. ÉLŐ meccs (kickoff volt, de nincs végeredmény)
+  target = ALL_MATCHES.find(function(m) {
+    if(!isVbMatch(m)) return false;
+    if(!isKickoffPassed(m.huDate, m.huTime)) return false;
+    if(allResults[m.id]) return false; // már vége
+    return true;
+  });
 
-  // 2. próba: ha nincs mai meccs → legközelebbi jövőbeli tippeletlen
+  // 2. Mai/holnapi tippeletlen nyitott meccs
   if(!target) {
-    var now = getBudapestNow();
+    var info = getMatchdayInfo();
+    target = info.untipped[0] || info.actionable[0];
+  }
+
+  // 3. Legközelebbi jövőbeli tippeletlen
+  if(!target) {
     target = ALL_MATCHES.find(function(m) {
-      if(m.id === 'TEST1' || m.id === 'BL2026') return false;
+      if(!isVbMatch(m)) return false;
       var kickoff = m.huDate + 'T' + m.huTime;
-      if(kickoff <= now) return false; // már elkezdődött
+      if(kickoff <= now) return false;
       var hasTip = allTips[m.id] && allTips[m.id][safe];
       return !hasTip;
     });
   }
 
-  // 3. próba: ha minden kitippelve → legközelebbi jövőbeli meccs
+  // 4. Legközelebbi jövőbeli meccs (minden kitippelve)
   if(!target) {
-    var now2 = getBudapestNow();
     target = ALL_MATCHES.find(function(m) {
-      if(m.id === 'TEST1' || m.id === 'BL2026') return false;
-      return (m.huDate + 'T' + m.huTime) > now2;
+      if(!isVbMatch(m)) return false;
+      return (m.huDate + 'T' + m.huTime) > now;
     });
   }
 
