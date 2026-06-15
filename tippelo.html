@@ -1192,6 +1192,7 @@ footer a:hover{color:var(--gold);}
 <div id="liveTicker" style="display:none;background:linear-gradient(90deg,rgba(34,197,94,0.08),rgba(34,197,94,0.04));border-bottom:1px solid rgba(34,197,94,0.2);padding:6px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;"></div>
 
 <div class="nav-tabs">
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:1px solid rgba(245,197,24,0.25);background:rgba(245,197,24,0.08);color:var(--gold);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;" title="Fel">▲</button>
   <button class="nav-tab active" onclick="showTab('meccsek');setTimeout(jumpToNextUntipped,120)">⚽ Meccsek</button>
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
@@ -1926,7 +1927,16 @@ function getWeeklyMvpBukta() {
     var now = new Date();
     var diff = VB_START - now;
     if(diff <= 0) {
-      el.innerHTML = '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);letter-spacing:2px;">⚽ A VB ELKEZDŐDÖTT!</span>';
+      // VB napszámláló + meccs progress
+      var vbStart = new Date('2026-06-11T00:00:00');
+      var vbEnd = new Date('2026-07-19T23:59:59');
+      var today = new Date();
+      var dayNum = Math.floor((today - vbStart) / 86400000) + 1;
+      var totalDays = Math.floor((vbEnd - vbStart) / 86400000) + 1;
+      if(dayNum > totalDays) dayNum = totalDays;
+      var totalMatches = ALL_MATCHES.filter(isVbMatch).length;
+      var playedMatches = ALL_MATCHES.filter(function(m){ return isVbMatch(m) && allResults[m.id]; }).length;
+      el.innerHTML = '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);letter-spacing:1px;">⚽ ' + dayNum + '/' + totalDays + '. NAP · ' + playedMatches + '/' + totalMatches + ' MECCS</span>';
       toggleKickoffBalls(true);
       return;
     }
