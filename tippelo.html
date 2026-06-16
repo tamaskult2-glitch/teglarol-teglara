@@ -6499,39 +6499,53 @@ function showLiveStandings() {
   var content = document.getElementById('liveStandingsContent');
   if(!modal || !content) return;
 
-  // Aktuális valós ranglista
-  var realScores = calcAllUserScores(false);
-  // Hipotetikus: élő eredményeket is hozzáadjuk
-  var hypoScores = calcAllUserScores(true);
+  // Ranglista MA NÉLKÜL (tegnap végi állapot)
+  var beforeTodayScores = calcDayFilteredScores(false);
+  // Ranglista mindennel (lejátszott + élő)
+  var currentScores = calcDayFilteredScores(true);
 
-  // Rendezés
-  var realSorted = Object.entries(realScores).sort(function(a,b){ return b[1]-a[1]; });
-  var hypoSorted = Object.entries(hypoScores).sort(function(a,b){ return b[1]-a[1]; });
+  var beforeSorted = Object.entries(beforeTodayScores).sort(function(a,b){ return b[1]-a[1]; });
+  var currentSorted = Object.entries(currentScores).sort(function(a,b){ return b[1]-a[1]; });
 
-  // Rank map
-  var realRank = {};
-  realSorted.forEach(function(e,i){ realRank[e[0]] = i+1; });
+  var beforeRank = {};
+  beforeSorted.forEach(function(e,i){ beforeRank[e[0]] = i+1; });
 
   var medals = ['🥇','🥈','🥉'];
-  var html = '<div style="font-size:11px;color:rgba(240,244,240,0.35);margin-bottom:10px;">Az élő eredmények alapján így nézne ki a ranglista:</div>';
+  var hasLive = Object.values(liveScores).some(function(ls){ return ls.status === 'live'; });
+
+  var html = '<div style="font-size:11px;color:rgba(240,244,240,0.35);margin-bottom:10px;">'
+    + (hasLive ? '🔴 Élő eredmények + mai meccsek alapján:' : '📊 Mai meccsek hatása a ranglistára:')
+    + '</div>';
   html += '<div style="display:flex;flex-direction:column;gap:3px;">';
-  hypoSorted.forEach(function(e, i) {
+
+  currentSorted.forEach(function(e, i) {
     var user = e[0], pts = e[1];
-    var oldRank = realRank[user] || 99;
+    var oldRank = beforeRank[user] || currentSorted.length;
     var newRank = i + 1;
     var diff = oldRank - newRank;
-    var arrow = diff > 0 ? '<span style="color:#4ade80;font-weight:700;">▲'+diff+'</span>' : (diff < 0 ? '<span style="color:#f87171;font-weight:700;">▼'+Math.abs(diff)+'</span>' : '<span style="color:rgba(240,244,240,0.3);">—</span>');
-    var realPts = realScores[user] || 0;
-    var gained = pts - realPts;
-    var gainedStr = gained > 0 ? '<span style="color:#4ade80;font-size:11px;">+'+gained+'</span>' : '';
+    var arrow;
+    if(diff > 0) arrow = '<span style="color:#4ade80;font-weight:700;font-size:14px;">🔼+'+diff+'</span>';
+    else if(diff < 0) arrow = '<span style="color:#f87171;font-weight:700;font-size:14px;">🔽'+diff+'</span>';
+    else arrow = '<span style="color:rgba(240,244,240,0.25);font-size:12px;">➖</span>';
+
+    var beforePts = beforeTodayScores[user] || 0;
+    var gained = pts - beforePts;
+    var gainedStr = gained > 0 ? '<span style="color:#4ade80;font-size:12px;font-weight:700;background:rgba(74,222,128,0.1);padding:1px 6px;border-radius:6px;">+'+gained+'</span>' : '<span style="color:rgba(240,244,240,0.2);font-size:11px;">+0</span>';
     var medal = i < 3 ? medals[i] : (i+1)+'.';
     var isMine = currentUser && user === fbSafeName(currentUser);
-    html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;'+(isMine?'background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.15);':'')+'font-size:13px;">'
-      + '<span style="width:26px;text-align:center;">'+medal+'</span>'
-      + '<span style="width:28px;text-align:center;">'+arrow+'</span>'
+    var rowBg = '';
+    if(diff > 0) rowBg = 'background:rgba(74,222,128,0.06);';
+    else if(diff < 0) rowBg = 'background:rgba(248,113,113,0.04);';
+    if(isMine) rowBg = 'background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.15);';
+
+    html += '<div style="display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:8px;'
+      + rowBg
+      + 'font-size:13px;">'
+      + '<span style="width:26px;text-align:center;font-family:Oswald,sans-serif;">'+medal+'</span>'
+      + '<span style="width:44px;text-align:center;">'+arrow+'</span>'
       + '<span style="flex:1;'+(isMine?'color:var(--gold);font-weight:700;':'color:rgba(240,244,240,0.7);')+'">'+user+'</span>'
-      + '<span style="font-family:Oswald,sans-serif;font-weight:700;color:var(--gold);">'+pts+'</span> '
-      + gainedStr
+      + '<span style="font-family:Oswald,sans-serif;font-weight:700;color:var(--gold);min-width:28px;text-align:right;">'+pts+'</span>'
+      + '<span style="min-width:36px;text-align:right;">'+gainedStr+'</span>'
       + '</div>';
   });
   html += '</div>';
@@ -6539,7 +6553,7 @@ function showLiveStandings() {
   // Élő meccsek összefoglaló
   var liveMatches = Object.entries(liveScores).filter(function(e){ return e[1].status === 'live'; });
   if(liveMatches.length > 0) {
-    html += '<div style="margin-top:12px;font-size:11px;color:rgba(240,244,240,0.35);border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">🔴 Élő: ';
+    html += '<div style="margin-top:12px;font-size:11px;color:rgba(74,222,128,0.5);border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">🔴 Élő: ';
     html += liveMatches.map(function(e) {
       var m = ALL_MATCHES.find(function(x){return x.id===e[0];});
       return m ? (m.home+' '+e[1].home+':'+e[1].away+' '+m.away) : '';
@@ -6551,30 +6565,32 @@ function showLiveStandings() {
   modal.style.display = 'flex';
 }
 
-function calcAllUserScores(includeLive) {
+// Pontozás: includeToday=false → csak tegnap előtti meccsek, true → minden + élő
+function calcDayFilteredScores(includeToday) {
   var scores = {};
   var allUsers = new Set();
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
+  var today = getBudapestToday();
 
-  // Collect all users
   vbMatches.forEach(function(m) {
     if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){ allUsers.add(u); });
   });
   allUsers.forEach(function(u){ scores[u] = 0; });
 
   vbMatches.forEach(function(m) {
+    var isToday = m.huDate === today;
     var hasResult = allResults[m.id];
     var ls = liveScores[m.id];
     var isLive = ls && ls.status === 'live';
 
     if(hasResult) {
-      // Lejátszott meccs - normál pontozás
-      allUsers.forEach(function(u) {
-        var tip = allTips[m.id] ? allTips[m.id][u] : null;
-        if(tip) scores[u] += calcMatchPoints(m, tip);
-      });
-    } else if(includeLive && isLive) {
-      // Élő meccs - hipotetikus pontozás
+      if(!isToday || includeToday) {
+        allUsers.forEach(function(u) {
+          var tip = allTips[m.id] ? allTips[m.id][u] : null;
+          if(tip) scores[u] += calcMatchPoints(m, tip);
+        });
+      }
+    } else if(includeToday && isLive) {
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
       if(!isNaN(hg) && !isNaN(ag)) {
         var liveOutcome = hg > ag ? '1' : hg === ag ? 'X' : '2';
