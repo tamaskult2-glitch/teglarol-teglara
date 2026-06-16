@@ -2788,8 +2788,8 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
 function buildOtherTips(mid, locked) {
   if(!locked || !allTips[mid]) return '';
   var meSafe = currentUser ? fbSafeName(currentUser) : '';
-  var others = Object.entries(allTips[mid]).filter(function(e){ return e[0] !== meSafe; });
-  if(others.length === 0) return '';
+  var allEntries = Object.entries(allTips[mid]);
+  if(allEntries.length === 0) return '';
   var result = allResults[mid];
   var m = ALL_MATCHES.find(function(x){return x.id===mid;});
   var ls = liveScores[mid];
@@ -2811,49 +2811,52 @@ function buildOtherTips(mid, locked) {
 
   var html = '<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">';
   html += '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
-  others.forEach(function(e){
+  allEntries.forEach(function(e){
     var u = e[0], tip = e[1];
+    var isMe = u === meSafe;
     var o = getTipOutcome(tip);
     var sc = getTipScore(tip);
     if(sc) { var implied = sc.h>sc.a?'1':sc.h===sc.a?'X':'2'; if(implied!==o) o=implied; }
     var pts = (result && m) ? calcMatchPoints(m, tip) : null;
     var tipStr = sc ? sc.h+':'+sc.a : (o||'?');
-    var bg = 'rgba(255,255,255,0.04)', clr = 'rgba(240,244,240,0.5)';
+    var bg = 'rgba(255,255,255,0.04)';
+    var nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.85)';
     var livePtsStr = '', rankStr = '';
 
     if(result && pts !== null) {
-      if(pts > 0) { bg = 'rgba(34,197,94,0.1)'; clr = '#4ade80'; }
-      else { bg = 'rgba(239,68,68,0.06)'; clr = 'rgba(240,244,240,0.3)'; }
+      if(pts > 0) { bg = 'rgba(34,197,94,0.1)'; }
+      else { bg = 'rgba(239,68,68,0.06)'; nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.5)'; }
     } else if(isLive && !result) {
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
       if(!isNaN(hg) && !isNaN(ag)) {
         var liveOutcome = hg>ag?'1':hg===ag?'X':'2';
         var liveScore = hg+':'+ag;
         if(o === liveOutcome) {
-          bg = 'rgba(34,197,94,0.08)'; clr = '#4ade80';
+          bg = 'rgba(34,197,94,0.08)';
           var lPts = 1;
           if(sc && sc.h+':'+sc.a===liveScore) { lPts=3; livePtsStr=' <span style="color:#22c55e;font-size:10px;">🎯+3</span>'; }
           else { if(sc){var tD=sc.h-sc.a,rD=hg-ag;if(tD===rD)lPts=2;} livePtsStr=' <span style="color:#22c55e;font-size:10px;">+'+lPts+'</span>'; }
         } else {
-          bg = 'rgba(239,68,68,0.06)'; clr = 'rgba(240,244,240,0.3)';
+          bg = 'rgba(239,68,68,0.06)';
+          nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.5)';
           livePtsStr = ' <span style="color:rgba(239,68,68,0.4);font-size:10px;">+0</span>';
         }
-        // Ranking change
         if(rankData) {
           var oldR = rankData.beforeRank[u]||99;
           var newR = rankData.withLiveRank[u]||99;
           var diff = oldR - newR;
-          var totalPts = rankData.withLiveScores[u]||0;
           if(diff>0) rankStr='<span style="color:#4ade80;font-size:9px;">▲'+diff+'</span>';
           else if(diff<0) rankStr='<span style="color:#f87171;font-size:9px;">▼'+Math.abs(diff)+'</span>';
           rankStr = '<span style="font-size:9px;color:rgba(240,244,240,0.35);">#'+newR+'</span>'+rankStr+' ';
         }
       }
     }
-    html += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;background:'+bg+';font-family:Oswald,sans-serif;font-size:11px;color:'+clr+';">'
+    var meBorder = isMe ? 'border:1px solid rgba(245,197,24,0.3);' : '';
+    var meFw = isMe ? 'font-weight:700;' : '';
+    html += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;background:'+bg+';'+meBorder+'font-family:Oswald,sans-serif;font-size:11px;">'
       +rankStr
-      +escHtml(u.substring(0,8))
-      +' <b>'+tipStr+'</b>'
+      +'<span style="color:'+nameClr+';'+meFw+'">'+escHtml(u.substring(0,8))+'</span>'
+      +' <b style="color:rgba(240,244,240,0.7);">'+tipStr+'</b>'
       +(pts!==null&&pts>0?' <span style="color:#22c55e;font-size:10px;">+'+pts+'</span>':'')
       +livePtsStr
       +'</span>';
