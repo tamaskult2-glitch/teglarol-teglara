@@ -1226,17 +1226,6 @@ footer a:hover{color:var(--gold);}
   </div>
 </div>
 
-<!-- "HA MOST VÉGET ÉRNE" MODAL -->
-<div id="liveStandingsModal" style="display:none;position:fixed;inset:0;z-index:280;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;" onclick="if(event.target===this)this.style.display='none'">
-  <div style="background:linear-gradient(145deg,#1a3a1f,#0f2813);border:2px solid rgba(74,222,128,0.3);border-radius:16px;padding:20px;max-width:400px;width:100%;margin-top:40px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <div style="font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;color:#4ade80;letter-spacing:1px;">📊 HA MOST VÉGET ÉRNE…</div>
-      <button onclick="document.getElementById('liveStandingsModal').style.display='none'" style="background:rgba(255,255,255,0.08);border:none;color:rgba(240,244,240,0.6);font-size:16px;width:28px;height:28px;border-radius:50%;cursor:pointer;">✕</button>
-    </div>
-    <div id="liveStandingsContent" style="font-size:13px;"></div>
-  </div>
-</div>
-
 <div class="page-wrapper">
 
   <!-- MECCSEK TAB -->
@@ -2803,23 +2792,70 @@ function buildOtherTips(mid, locked) {
   if(others.length === 0) return '';
   var result = allResults[mid];
   var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+  var ls = liveScores[mid];
+  var isLive = ls && ls.status === 'live';
+
+  // Élő ranglista adatok előkalkulálása
+  var rankData = null;
+  if(isLive && !result) {
+    try {
+      var beforeScores = calcDayFilteredScores(false);
+      var withLiveScores = calcDayFilteredScores(true);
+      var beforeSorted = Object.entries(beforeScores).sort(function(a,b){ return b[1]-a[1]; });
+      var withLiveSorted = Object.entries(withLiveScores).sort(function(a,b){ return b[1]-a[1]; });
+      var beforeRank = {}; beforeSorted.forEach(function(e,i){ beforeRank[e[0]]=i+1; });
+      var withLiveRank = {}; withLiveSorted.forEach(function(e,i){ withLiveRank[e[0]]=i+1; });
+      rankData = {beforeRank:beforeRank, withLiveRank:withLiveRank, withLiveScores:withLiveScores};
+    } catch(e){}
+  }
+
   var html = '<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">';
   html += '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
   others.forEach(function(e){
     var u = e[0], tip = e[1];
     var o = getTipOutcome(tip);
     var sc = getTipScore(tip);
+    if(sc) { var implied = sc.h>sc.a?'1':sc.h===sc.a?'X':'2'; if(implied!==o) o=implied; }
     var pts = (result && m) ? calcMatchPoints(m, tip) : null;
     var tipStr = sc ? sc.h+':'+sc.a : (o||'?');
     var bg = 'rgba(255,255,255,0.04)', clr = 'rgba(240,244,240,0.5)';
+    var livePtsStr = '', rankStr = '';
+
     if(result && pts !== null) {
       if(pts > 0) { bg = 'rgba(34,197,94,0.1)'; clr = '#4ade80'; }
       else { bg = 'rgba(239,68,68,0.06)'; clr = 'rgba(240,244,240,0.3)'; }
+    } else if(isLive && !result) {
+      var hg = parseInt(ls.home), ag = parseInt(ls.away);
+      if(!isNaN(hg) && !isNaN(ag)) {
+        var liveOutcome = hg>ag?'1':hg===ag?'X':'2';
+        var liveScore = hg+':'+ag;
+        if(o === liveOutcome) {
+          bg = 'rgba(34,197,94,0.08)'; clr = '#4ade80';
+          var lPts = 1;
+          if(sc && sc.h+':'+sc.a===liveScore) { lPts=3; livePtsStr=' <span style="color:#22c55e;font-size:10px;">🎯+3</span>'; }
+          else { if(sc){var tD=sc.h-sc.a,rD=hg-ag;if(tD===rD)lPts=2;} livePtsStr=' <span style="color:#22c55e;font-size:10px;">+'+lPts+'</span>'; }
+        } else {
+          bg = 'rgba(239,68,68,0.06)'; clr = 'rgba(240,244,240,0.3)';
+          livePtsStr = ' <span style="color:rgba(239,68,68,0.4);font-size:10px;">+0</span>';
+        }
+        // Ranking change
+        if(rankData) {
+          var oldR = rankData.beforeRank[u]||99;
+          var newR = rankData.withLiveRank[u]||99;
+          var diff = oldR - newR;
+          var totalPts = rankData.withLiveScores[u]||0;
+          if(diff>0) rankStr='<span style="color:#4ade80;font-size:9px;">▲'+diff+'</span>';
+          else if(diff<0) rankStr='<span style="color:#f87171;font-size:9px;">▼'+Math.abs(diff)+'</span>';
+          rankStr = '<span style="font-size:9px;color:rgba(240,244,240,0.35);">#'+newR+'</span>'+rankStr+' ';
+        }
+      }
     }
     html += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;background:'+bg+';font-family:Oswald,sans-serif;font-size:11px;color:'+clr+';">'
+      +rankStr
       +escHtml(u.substring(0,8))
       +' <b>'+tipStr+'</b>'
       +(pts!==null&&pts>0?' <span style="color:#22c55e;font-size:10px;">+'+pts+'</span>':'')
+      +livePtsStr
       +'</span>';
   });
   html += '</div></div>';
@@ -3297,8 +3333,7 @@ function renderMatches() {
             <button onclick="sendReaction('${m.id}','😤')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">😤</button>
             <button onclick="sendReaction('${m.id}','👏')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">👏</button>
           </div>
-          <div id="lrr_${m.id}" style="font-size:11px;color:rgba(240,244,240,0.45);text-align:center;min-height:14px;padding:0 4px 6px;"></div>
-          <div style="text-align:center;padding:0 0 8px;"><button onclick="showLiveStandings()" style="font-size:11px;color:rgba(74,222,128,0.7);background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:4px 14px;cursor:pointer;font-family:Oswald,sans-serif;letter-spacing:0.5px;">📊 Ha most véget érne…</button></div>`:''}
+          <div id="lrr_${m.id}" style="font-size:11px;color:rgba(240,244,240,0.45);text-align:center;min-height:14px;padding:0 4px 6px;"></div>`:''}
         </div>
       </div>`;
     });
@@ -6452,38 +6487,74 @@ function displayScorers(list, container) {
 }
 
 // ===== 1. ÉLŐ REAKCIÓK =====
+var localReactions = {}; // {mid: {u: emoji, t: timestamp}} - helyi cache
+
 async function sendReaction(mid, emoji) {
   if(!currentUser) return;
   var safe = fbSafeName(currentUser);
   var ts = Date.now();
-  await fbSet('reactions/'+mid+'/'+ts+'_'+safe, {u:safe, e:emoji, t:ts}).catch(function(){});
-  // Helyi animáció
-  var btn = event.target;
-  btn.style.transform = 'scale(1.4)';
-  setTimeout(function(){ btn.style.transform = 'scale(1)'; }, 200);
-  loadReactions(mid);
+  // Azonnal megjelenítés (lokális cache)
+  if(!localReactions[mid]) localReactions[mid] = {};
+  localReactions[mid][safe] = {u:safe, e:emoji, t:ts};
+  renderReactions(mid);
+  // Firebase mentés háttérben
+  fbSet('reactions/'+mid+'/'+ts+'_'+safe, {u:safe, e:emoji, t:ts}).catch(function(){});
 }
 
 async function loadReactions(mid) {
-  var container = document.getElementById('lrr_'+mid);
-  if(!container) return;
   try {
     var data = await fbGet('reactions/'+mid);
-    if(!data) { container.textContent = ''; return; }
-    // Utolsó 60 mp reakciói
-    var now = Date.now();
-    var recent = Object.values(data).filter(function(r){ return r.t && (now - r.t) < 60000; });
-    if(recent.length === 0) { container.textContent = ''; return; }
-    // Csoportosítás user szerint (utolsó reakció)
-    var byUser = {};
-    recent.sort(function(a,b){ return a.t - b.t; });
-    recent.forEach(function(r){ byUser[r.u] = r.e; });
-    var html = Object.entries(byUser).map(function(e) {
-      var isMine = currentUser && e[0] === fbSafeName(currentUser);
-      return '<span style="'+(isMine?'color:var(--gold);font-weight:700;':'')+'">'+e[1]+e[0]+'</span>';
-    }).join(' ');
-    container.innerHTML = html;
-  } catch(e) {}
+    if(!data && !localReactions[mid]) {
+      var container = document.getElementById('lrr_'+mid);
+      if(container) container.textContent = '';
+      return;
+    }
+    // Firebase + lokális cache összefésülés
+    var merged = {};
+    if(data) {
+      Object.values(data).forEach(function(r) {
+        if(r.u && r.t) merged[r.u+'_'+r.t] = r;
+      });
+    }
+    if(localReactions[mid]) {
+      Object.values(localReactions[mid]).forEach(function(r) {
+        merged[r.u+'_'+r.t] = r;
+      });
+    }
+    // Cache frissítés Firebase adattal
+    var allR = Object.values(merged);
+    renderReactionsFromData(mid, allR);
+  } catch(e) {
+    // Ha hiba, lokális cache-ből renderelünk
+    if(localReactions[mid]) {
+      renderReactionsFromData(mid, Object.values(localReactions[mid]));
+    }
+  }
+}
+
+function renderReactions(mid) {
+  // Gyors renderelés lokális + eddigi adatból
+  if(localReactions[mid]) {
+    renderReactionsFromData(mid, Object.values(localReactions[mid]));
+  }
+}
+
+function renderReactionsFromData(mid, allReactions) {
+  var container = document.getElementById('lrr_'+mid);
+  if(!container) return;
+  var now = Date.now();
+  // Utolsó 2 perc reakciói
+  var recent = allReactions.filter(function(r){ return r.t && (now - r.t) < 120000; });
+  if(recent.length === 0) { container.textContent = ''; return; }
+  // User szerint: utolsó reakció
+  var byUser = {};
+  recent.sort(function(a,b){ return a.t - b.t; });
+  recent.forEach(function(r){ byUser[r.u] = r.e; });
+  var html = Object.entries(byUser).map(function(e) {
+    var isMine = currentUser && e[0] === fbSafeName(currentUser);
+    return '<span style="'+(isMine?'color:var(--gold);font-weight:700;':'')+'">'+e[1]+e[0]+'</span>';
+  }).join(' ');
+  container.innerHTML = html;
 }
 
 // Reakciók frissítése élő meccseknél (5 mp-enként)
