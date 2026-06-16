@@ -1216,6 +1216,27 @@ footer a:hover{color:var(--gold);}
   </div>
 </div>
 
+<!-- GÓL PILLANAT OVERLAY -->
+<div id="goalMomentOverlay" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;animation:mIn 0.2s ease-out;" onclick="this.style.display='none'">
+  <div style="text-align:center;max-width:360px;width:100%;">
+    <div id="goalMomentEmoji" style="font-size:64px;animation:pulse 0.8s ease infinite;">⚽</div>
+    <div id="goalMomentTitle" style="font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;color:#4ade80;letter-spacing:2px;margin:8px 0;">GÓL!</div>
+    <div id="goalMomentScore" style="font-family:'Oswald',sans-serif;font-size:22px;color:var(--gold);margin-bottom:12px;"></div>
+    <div id="goalMomentWinners" style="font-size:13px;color:rgba(240,244,240,0.7);line-height:1.8;"></div>
+  </div>
+</div>
+
+<!-- "HA MOST VÉGET ÉRNE" MODAL -->
+<div id="liveStandingsModal" style="display:none;position:fixed;inset:0;z-index:280;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:linear-gradient(145deg,#1a3a1f,#0f2813);border:2px solid rgba(74,222,128,0.3);border-radius:16px;padding:20px;max-width:400px;width:100%;margin-top:40px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;color:#4ade80;letter-spacing:1px;">📊 HA MOST VÉGET ÉRNE…</div>
+      <button onclick="document.getElementById('liveStandingsModal').style.display='none'" style="background:rgba(255,255,255,0.08);border:none;color:rgba(240,244,240,0.6);font-size:16px;width:28px;height:28px;border-radius:50%;cursor:pointer;">✕</button>
+    </div>
+    <div id="liveStandingsContent" style="font-size:13px;"></div>
+  </div>
+</div>
+
 <div class="page-wrapper">
 
   <!-- MECCSEK TAB -->
@@ -3269,6 +3290,15 @@ function renderMatches() {
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
+          ${liveScores[m.id]&&liveScores[m.id].status==='live'?`<div class="live-react-bar" id="lrb_${m.id}" style="display:flex;gap:4px;justify-content:center;padding:8px 0 4px;flex-wrap:wrap;">
+            <button onclick="sendReaction('${m.id}','⚽')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">⚽</button>
+            <button onclick="sendReaction('${m.id}','😱')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">😱</button>
+            <button onclick="sendReaction('${m.id}','🎉')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">🎉</button>
+            <button onclick="sendReaction('${m.id}','😤')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">😤</button>
+            <button onclick="sendReaction('${m.id}','👏')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">👏</button>
+          </div>
+          <div id="lrr_${m.id}" style="font-size:11px;color:rgba(240,244,240,0.45);text-align:center;min-height:14px;padding:0 4px 6px;"></div>
+          <div style="text-align:center;padding:0 0 8px;"><button onclick="showLiveStandings()" style="font-size:11px;color:rgba(74,222,128,0.7);background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:4px 14px;cursor:pointer;font-family:Oswald,sans-serif;letter-spacing:0.5px;">📊 Ha most véget érne…</button></div>`:''}
         </div>
       </div>`;
     });
@@ -5502,11 +5532,15 @@ function detectGoals() {
       var card = document.getElementById('mc_'+mid);
       if(card) {
         card.style.animation = 'none';
-        card.offsetHeight; // force reflow
+        card.offsetHeight;
         card.style.animation = 'goalFlash 1.5s ease-out, liveGlow 3s ease-in-out infinite';
       }
       var m = ALL_MATCHES.find(function(x){return x.id===mid;});
-      if(m) showToast('⚽ GÓL! '+(m.homeFlag||'')+' '+ls.home+':'+ls.away+' '+(m.awayFlag||''));
+      if(m) {
+        var hg = parseInt(ls.home), ag = parseInt(ls.away);
+        var scoringTeam = (prev.home !== ls.home) ? m.home : m.away;
+        showGoalMoment(mid, m, scoringTeam, hg+':'+ag, hg, ag);
+      }
     }
     prevLiveScores[mid] = {home:ls.home, away:ls.away};
   });
@@ -6415,6 +6449,208 @@ function displayScorers(list, container) {
   html += '</table>';
   html += '<div style="text-align:right;font-size:10px;color:rgba(240,244,240,0.25);margin-top:8px;">Forrás: ESPN · Frissítve: ' + new Date().toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'}) + '</div>';
   container.innerHTML = html;
+}
+
+// ===== 1. ÉLŐ REAKCIÓK =====
+async function sendReaction(mid, emoji) {
+  if(!currentUser) return;
+  var safe = fbSafeName(currentUser);
+  var ts = Date.now();
+  await fbSet('reactions/'+mid+'/'+ts+'_'+safe, {u:safe, e:emoji, t:ts}).catch(function(){});
+  // Helyi animáció
+  var btn = event.target;
+  btn.style.transform = 'scale(1.4)';
+  setTimeout(function(){ btn.style.transform = 'scale(1)'; }, 200);
+  loadReactions(mid);
+}
+
+async function loadReactions(mid) {
+  var container = document.getElementById('lrr_'+mid);
+  if(!container) return;
+  try {
+    var data = await fbGet('reactions/'+mid);
+    if(!data) { container.textContent = ''; return; }
+    // Utolsó 60 mp reakciói
+    var now = Date.now();
+    var recent = Object.values(data).filter(function(r){ return r.t && (now - r.t) < 60000; });
+    if(recent.length === 0) { container.textContent = ''; return; }
+    // Csoportosítás user szerint (utolsó reakció)
+    var byUser = {};
+    recent.sort(function(a,b){ return a.t - b.t; });
+    recent.forEach(function(r){ byUser[r.u] = r.e; });
+    var html = Object.entries(byUser).map(function(e) {
+      var isMine = currentUser && e[0] === fbSafeName(currentUser);
+      return '<span style="'+(isMine?'color:var(--gold);font-weight:700;':'')+'">'+e[1]+e[0]+'</span>';
+    }).join(' ');
+    container.innerHTML = html;
+  } catch(e) {}
+}
+
+// Reakciók frissítése élő meccseknél (5 mp-enként)
+setInterval(function() {
+  Object.entries(liveScores).forEach(function(e) {
+    if(e[1].status === 'live') loadReactions(e[0]);
+  });
+}, 5000);
+
+// ===== 2. "HA MOST VÉGET ÉRNE" ÉLŐ RANGLISTA =====
+function showLiveStandings() {
+  var modal = document.getElementById('liveStandingsModal');
+  var content = document.getElementById('liveStandingsContent');
+  if(!modal || !content) return;
+
+  // Aktuális valós ranglista
+  var realScores = calcAllUserScores(false);
+  // Hipotetikus: élő eredményeket is hozzáadjuk
+  var hypoScores = calcAllUserScores(true);
+
+  // Rendezés
+  var realSorted = Object.entries(realScores).sort(function(a,b){ return b[1]-a[1]; });
+  var hypoSorted = Object.entries(hypoScores).sort(function(a,b){ return b[1]-a[1]; });
+
+  // Rank map
+  var realRank = {};
+  realSorted.forEach(function(e,i){ realRank[e[0]] = i+1; });
+
+  var medals = ['🥇','🥈','🥉'];
+  var html = '<div style="font-size:11px;color:rgba(240,244,240,0.35);margin-bottom:10px;">Az élő eredmények alapján így nézne ki a ranglista:</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:3px;">';
+  hypoSorted.forEach(function(e, i) {
+    var user = e[0], pts = e[1];
+    var oldRank = realRank[user] || 99;
+    var newRank = i + 1;
+    var diff = oldRank - newRank;
+    var arrow = diff > 0 ? '<span style="color:#4ade80;font-weight:700;">▲'+diff+'</span>' : (diff < 0 ? '<span style="color:#f87171;font-weight:700;">▼'+Math.abs(diff)+'</span>' : '<span style="color:rgba(240,244,240,0.3);">—</span>');
+    var realPts = realScores[user] || 0;
+    var gained = pts - realPts;
+    var gainedStr = gained > 0 ? '<span style="color:#4ade80;font-size:11px;">+'+gained+'</span>' : '';
+    var medal = i < 3 ? medals[i] : (i+1)+'.';
+    var isMine = currentUser && user === fbSafeName(currentUser);
+    html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;'+(isMine?'background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.15);':'')+'font-size:13px;">'
+      + '<span style="width:26px;text-align:center;">'+medal+'</span>'
+      + '<span style="width:28px;text-align:center;">'+arrow+'</span>'
+      + '<span style="flex:1;'+(isMine?'color:var(--gold);font-weight:700;':'color:rgba(240,244,240,0.7);')+'">'+user+'</span>'
+      + '<span style="font-family:Oswald,sans-serif;font-weight:700;color:var(--gold);">'+pts+'</span> '
+      + gainedStr
+      + '</div>';
+  });
+  html += '</div>';
+
+  // Élő meccsek összefoglaló
+  var liveMatches = Object.entries(liveScores).filter(function(e){ return e[1].status === 'live'; });
+  if(liveMatches.length > 0) {
+    html += '<div style="margin-top:12px;font-size:11px;color:rgba(240,244,240,0.35);border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">🔴 Élő: ';
+    html += liveMatches.map(function(e) {
+      var m = ALL_MATCHES.find(function(x){return x.id===e[0];});
+      return m ? (m.home+' '+e[1].home+':'+e[1].away+' '+m.away) : '';
+    }).join(' · ');
+    html += '</div>';
+  }
+
+  content.innerHTML = html;
+  modal.style.display = 'flex';
+}
+
+function calcAllUserScores(includeLive) {
+  var scores = {};
+  var allUsers = new Set();
+  var vbMatches = ALL_MATCHES.filter(isVbMatch);
+
+  // Collect all users
+  vbMatches.forEach(function(m) {
+    if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){ allUsers.add(u); });
+  });
+  allUsers.forEach(function(u){ scores[u] = 0; });
+
+  vbMatches.forEach(function(m) {
+    var hasResult = allResults[m.id];
+    var ls = liveScores[m.id];
+    var isLive = ls && ls.status === 'live';
+
+    if(hasResult) {
+      // Lejátszott meccs - normál pontozás
+      allUsers.forEach(function(u) {
+        var tip = allTips[m.id] ? allTips[m.id][u] : null;
+        if(tip) scores[u] += calcMatchPoints(m, tip);
+      });
+    } else if(includeLive && isLive) {
+      // Élő meccs - hipotetikus pontozás
+      var hg = parseInt(ls.home), ag = parseInt(ls.away);
+      if(!isNaN(hg) && !isNaN(ag)) {
+        var liveOutcome = hg > ag ? '1' : hg === ag ? 'X' : '2';
+        var liveScore = hg + ':' + ag;
+        var mult = getMatchMultiplier(m);
+        allUsers.forEach(function(u) {
+          var tip = allTips[m.id] ? allTips[m.id][u] : null;
+          if(!tip) return;
+          var outcome = getTipOutcome(tip);
+          var tipSc = getTipScore(tip);
+          if(tipSc) {
+            var implied = tipSc.h > tipSc.a ? '1' : tipSc.h === tipSc.a ? 'X' : '2';
+            if(implied !== outcome) outcome = implied;
+          }
+          if(outcome === liveOutcome) {
+            if(tipSc && tipSc.h+':'+tipSc.a === liveScore) {
+              scores[u] += 3 * mult;
+            } else {
+              scores[u] += 1 * mult;
+              if(tipSc) {
+                var tDiff = tipSc.h - tipSc.a;
+                var rDiff = hg - ag;
+                if(tDiff === rDiff) scores[u] += 1 * mult;
+              }
+            }
+          }
+        });
+      }
+    }
+  });
+  return scores;
+}
+
+// ===== 3. GÓL PILLANAT KÁRTYA =====
+function showGoalMoment(mid, m, scoringTeam, scoreStr, hg, ag) {
+  var overlay = document.getElementById('goalMomentOverlay');
+  var titleEl = document.getElementById('goalMomentTitle');
+  var scoreEl = document.getElementById('goalMomentScore');
+  var winnersEl = document.getElementById('goalMomentWinners');
+  if(!overlay) return;
+
+  if(titleEl) titleEl.textContent = '⚽ GÓL! ' + scoringTeam + '!';
+  if(scoreEl) scoreEl.textContent = (m.homeFlag||'') + ' ' + m.home + ' ' + scoreStr + ' ' + m.away + ' ' + (m.awayFlag||'');
+
+  // Ki nyer/veszít ezzel a gólal?
+  if(winnersEl && allTips[mid]) {
+    var liveOutcome = hg > ag ? '1' : hg === ag ? 'X' : '2';
+    var liveScore = hg + ':' + ag;
+    var winners = [], losers = [], exact = [];
+    Object.entries(allTips[mid]).forEach(function(te) {
+      var user = te[0], tip = te[1];
+      var outcome = getTipOutcome(tip);
+      var tipSc = getTipScore(tip);
+      if(tipSc) {
+        var implied = tipSc.h > tipSc.a ? '1' : tipSc.h === tipSc.a ? 'X' : '2';
+        if(implied !== outcome) outcome = implied;
+      }
+      if(outcome === liveOutcome) {
+        if(tipSc && tipSc.h+':'+tipSc.a === liveScore) exact.push(user);
+        else winners.push(user);
+      } else {
+        losers.push(user);
+      }
+    });
+    var html = '';
+    if(exact.length) html += '🎯 <span style="color:#4ade80;font-weight:700;">PONTOS: ' + exact.join(', ') + '</span><br>';
+    if(winners.length) html += '✅ Nyernek: ' + winners.slice(0,8).join(', ') + (winners.length>8?' +'+( winners.length-8):'') + '<br>';
+    if(losers.length) html += '❌ <span style="color:rgba(240,244,240,0.35);">Mellé: ' + losers.slice(0,8).join(', ') + (losers.length>8?' +'+(losers.length-8):'') + '</span>';
+    winnersEl.innerHTML = html;
+  }
+
+  overlay.style.display = 'flex';
+  // 6 mp után automatikus bezárás
+  setTimeout(function() {
+    if(overlay.style.display === 'flex') overlay.style.display = 'none';
+  }, 6000);
 }
 
 // ===== SILENT PASSWORD HASH MIGRATION =====
