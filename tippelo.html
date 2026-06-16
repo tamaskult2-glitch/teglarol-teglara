@@ -6499,9 +6499,9 @@ function showLiveStandings() {
   var content = document.getElementById('liveStandingsContent');
   if(!modal || !content) return;
 
-  // Ranglista MA NÉLKÜL (tegnap végi állapot)
+  // Ranglista élő meccs NÉLKÜL (eddigi lejátszott meccsek)
   var beforeTodayScores = calcDayFilteredScores(false);
-  // Ranglista mindennel (lejátszott + élő)
+  // Ranglista élő meccs eredményével
   var currentScores = calcDayFilteredScores(true);
 
   var beforeSorted = Object.entries(beforeTodayScores).sort(function(a,b){ return b[1]-a[1]; });
@@ -6514,7 +6514,7 @@ function showLiveStandings() {
   var hasLive = Object.values(liveScores).some(function(ls){ return ls.status === 'live'; });
 
   var html = '<div style="font-size:11px;color:rgba(240,244,240,0.35);margin-bottom:10px;">'
-    + (hasLive ? '🔴 Élő eredmények + mai meccsek alapján:' : '📊 Mai meccsek hatása a ranglistára:')
+    + (hasLive ? '🔴 Az élő meccs(ek) eredménye alapján ezek lennének a helyezések:' : '📊 Nincs éppen élő meccs.')
     + '</div>';
   html += '<div style="display:flex;flex-direction:column;gap:3px;">';
 
@@ -6566,11 +6566,10 @@ function showLiveStandings() {
 }
 
 // Pontozás: includeToday=false → csak tegnap előtti meccsek, true → minden + élő
-function calcDayFilteredScores(includeToday) {
+function calcDayFilteredScores(includeLive) {
   var scores = {};
   var allUsers = new Set();
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
-  var today = getBudapestToday();
 
   vbMatches.forEach(function(m) {
     if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){ allUsers.add(u); });
@@ -6578,19 +6577,18 @@ function calcDayFilteredScores(includeToday) {
   allUsers.forEach(function(u){ scores[u] = 0; });
 
   vbMatches.forEach(function(m) {
-    var isToday = m.huDate === today;
     var hasResult = allResults[m.id];
     var ls = liveScores[m.id];
     var isLive = ls && ls.status === 'live';
 
     if(hasResult) {
-      if(!isToday || includeToday) {
-        allUsers.forEach(function(u) {
-          var tip = allTips[m.id] ? allTips[m.id][u] : null;
-          if(tip) scores[u] += calcMatchPoints(m, tip);
-        });
-      }
-    } else if(includeToday && isLive) {
+      // Lejátszott meccs — mindig számít (mai befejezettek is!)
+      allUsers.forEach(function(u) {
+        var tip = allTips[m.id] ? allTips[m.id][u] : null;
+        if(tip) scores[u] += calcMatchPoints(m, tip);
+      });
+    } else if(includeLive && isLive) {
+      // Élő meccs — csak ha includeLive=true
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
       if(!isNaN(hg) && !isNaN(ag)) {
         var liveOutcome = hg > ag ? '1' : hg === ag ? 'X' : '2';
