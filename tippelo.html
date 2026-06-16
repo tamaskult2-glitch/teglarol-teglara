@@ -3119,7 +3119,9 @@ function jumpToNextUntipped() {
 
   var card = document.getElementById('mc_' + target.id);
   if(card) {
-    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var navH = document.querySelector('.nav-tabs') ? document.querySelector('.nav-tabs').offsetHeight + 8 : 0;
+    var cardTop = card.getBoundingClientRect().top + window.scrollY - navH;
+    window.scrollTo({ top: cardTop, behavior: 'smooth' });
     card.classList.remove('md-highlight');
     void card.offsetWidth;
     card.classList.add('md-highlight');
