@@ -6625,7 +6625,7 @@ async function fetchMatchScorers() {
         var typeId = (kev.type&&kev.type.id)||'';
         // Debug: log all event types
         if(match) console.log('EVENT ['+match.id+']:', typeText, '|', typeId, '| athlete:', kev.participants&&kev.participants[0]&&kev.participants[0].athlete?kev.participants[0].athlete.displayName:'?', '| scoreValue:', kev.scoreValue, '| text:', kev.text);
-        var isGoal = typeText.startsWith('Goal')||typeText==='Penalty Goal'||typeText==='Own Goal'||typeId==='goal'||typeText.includes('Goal –')||typeText.includes('Goal -')||kev.scoreValue>0;
+        var isGoal = typeText.startsWith('Goal')||typeText==='Penalty Goal'||typeText==='Own Goal'||typeText.startsWith('Penalty – Scored')||typeText.startsWith('Penalty - Scored')||typeId==='goal'||typeId==='98'||typeText.includes('Goal –')||typeText.includes('Goal -')||kev.scoreValue>0;
         var isYellow = typeText==='Yellow Card'||typeId==='yellowcard'||typeId==='94';
         var isRed = typeText==='Red Card'||typeId==='redcard';
         var isYellow2 = typeText.includes('Second Yellow')||typeId==='yellowcard2';
@@ -6641,13 +6641,14 @@ async function fetchMatchScorers() {
         else if(kev.homeAway) teamId = kev.homeAway === 'home' ? 'home' : 'away';
         var minute = (kev.clock&&kev.clock.displayValue)||(kev.period&&kev.period.number?kev.period.number+'.'+'félidő':'')||'';
         var eventType = isGoal ? 'goal' : isYellow2 ? 'yellow2' : isRed ? 'red' : 'yellow';
+        var isPen = typeText==='Penalty Goal'||typeText.startsWith('Penalty – Scored')||typeText.startsWith('Penalty - Scored')||!!kev.penaltyKick;
         goals.push({
           name: athleteName,
           minute: minute,
           teamId: teamId,
           type: eventType,
           isOg: typeText==='Own Goal'||!!kev.ownGoal,
-          isPen: typeText==='Penalty Goal'||!!kev.penaltyKick
+          isPen: isPen
         });
       });
       if(goals.length > 0 || eventsToProcess.length > 0) {
@@ -6669,6 +6670,7 @@ function teamNameToHu(engName) {
 // Scorer fetch indítása oldalbetöltéskor és 60 mp-enként
 // Első fetch: mai + tegnap; + kiegészítő fetch a korábbi napokra is
 setTimeout(function() {
+  matchScorers = {}; // cache törlés hogy a javított parser újra fusson
   fetchMatchScorers();
   fetchHistoricalScorers();
 }, 4000);
@@ -6744,19 +6746,21 @@ async function fetchHistoricalScorers() {
         evList.forEach(function(kev){
           var typeText=(kev.type&&kev.type.text)||'';
           var typeId=(kev.type&&kev.type.id)||'';
-          var isGoal=typeText.startsWith('Goal')||typeText==='Penalty Goal'||typeText==='Own Goal'||typeId==='goal'||typeText.includes('Goal –')||typeText.includes('Goal -');
+          var isGoal=typeText.startsWith('Goal')||typeText==='Penalty Goal'||typeText==='Own Goal'||typeText.startsWith('Penalty – Scored')||typeText.startsWith('Penalty - Scored')||typeId==='goal'||typeId==='98'||typeText.includes('Goal –')||typeText.includes('Goal -');
           var isYellow=typeText==='Yellow Card'||typeId==='yellowcard'||typeId==='94';
           var isRed=typeText==='Red Card'||typeId==='redcard';
           var isYellow2=typeText.includes('Second Yellow')||typeId==='yellowcard2';
           if(!isGoal&&!isYellow&&!isRed&&!isYellow2) return;
           var athleteName='';
           if(kev.participants&&kev.participants[0]&&kev.participants[0].athlete)
-            athleteName=kev.participants[0].athlete.displayName||'';
+            athleteName=kev.participants[0].athlete.displayName||kev.participants[0].athlete.shortName||'';
+          if(!athleteName) athleteName=kev.text||'';
           if(!athleteName) return;
           var teamId=kev.team&&kev.team.id===homeTeam.team.id?'home':'away';
           var minute=(kev.clock&&kev.clock.displayValue)||'';
           var eventType=isGoal?'goal':isYellow2?'yellow2':isRed?'red':'yellow';
-          goals.push({name:athleteName,minute:minute,teamId:teamId,type:eventType,isOg:typeText==='Own Goal'||!!kev.ownGoal,isPen:typeText==='Penalty Goal'||!!kev.penaltyKick});
+          var isPen=typeText==='Penalty Goal'||typeText.startsWith('Penalty – Scored')||typeText.startsWith('Penalty - Scored')||!!kev.penaltyKick;
+          goals.push({name:athleteName,minute:minute,teamId:teamId,type:eventType,isOg:typeText==='Own Goal'||!!kev.ownGoal,isPen:isPen});
         });
         if(goals.length>0){matchScorers[match.id]=goals;changed=true;}
       });
