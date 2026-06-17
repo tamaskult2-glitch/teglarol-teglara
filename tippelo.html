@@ -1500,6 +1500,11 @@ footer a:hover{color:var(--gold);}
           <button onclick="debugApiSources()" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔍 API Teszt</button>
           <div id="apiDebugResult" style="font-size:11px;color:rgba(240,244,240,0.5);margin-top:6px;white-space:pre-wrap;max-height:160px;overflow-y:auto;"></div>
         </div>
+        <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+          <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:6px;">⚽ GÓLSZERZŐK DEBUG</div>
+          <button onclick="debugScorers()" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">⚽ Gólszerzők lekérés</button>
+          <div id="scorerDebugResult" style="font-size:11px;color:rgba(240,244,240,0.5);margin-top:6px;white-space:pre-wrap;max-height:300px;overflow-y:auto;font-family:monospace;"></div>
+        </div>
       </div>
     </div>
     <!-- ADMIN JELSZÓ -->
@@ -6418,6 +6423,51 @@ function toggleDayGroup(groupId, storageKey) {
     }, 80);
   }
 }
+async function debugScorers() {
+  var res = document.getElementById('scorerDebugResult');
+  if(!res) return;
+  res.textContent = '⏳ Lekérés...';
+  var log = [];
+  try {
+    var today = getBudapestToday().replace(/-/g,'');
+    var d = new Date(); d.setDate(d.getDate()-1);
+    var yesterday = d.toLocaleDateString('sv-SE',{timeZone:'Europe/Budapest'}).replace(/-/g,'');
+    var url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+yesterday+'-'+today+'&limit=50';
+    var resp = await fetch(url);
+    var data = await resp.json();
+    var events = (data.events||[]).filter(function(ev){
+      var st=ev.competitions&&ev.competitions[0]&&ev.competitions[0].status&&ev.competitions[0].status.type?ev.competitions[0].status.type.name:'';
+      return st.includes('FULL_TIME')||st.includes('FINAL')||st.includes('PROGRESS')||st.includes('HALFTIME');
+    });
+    log.push('📡 '+events.length+' meccs találva\n');
+    for(var i=0;i<events.length;i++) {
+      var ev = events[i];
+      var comp = ev.competitions&&ev.competitions[0];
+      var teams = comp&&comp.competitors||[];
+      var homeTeam = teams.find(function(t){return t.homeAway==='home';});
+      var awayTeam = teams.find(function(t){return t.homeAway==='away';});
+      log.push('─── '+(homeTeam&&homeTeam.team.displayName||'?')+' vs '+(awayTeam&&awayTeam.team.displayName||'?')+' ───');
+      try {
+        var sumResp = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event='+ev.id);
+        var sum = await sumResp.json();
+        var evList = sum.keyEvents||sum.scoringPlays||[];
+        log.push('  keyEvents: '+(sum.keyEvents||[]).length+' | scoringPlays: '+(sum.scoringPlays||[]).length);
+        evList.slice(0,20).forEach(function(kev){
+          var tt=(kev.type&&kev.type.text)||'-';
+          var tid=(kev.type&&kev.type.id)||'-';
+          var athlete=kev.participants&&kev.participants[0]&&kev.participants[0].athlete;
+          var name=athlete?(athlete.displayName||athlete.shortName||'-'):(kev.text||kev.athleteName||'-');
+          var min=(kev.clock&&kev.clock.displayValue)||'';
+          var sv=kev.scoreValue||0;
+          log.push('  ['+tt+'|'+tid+'] '+name+' '+min+(sv?' score:'+sv:''));
+        });
+      } catch(e){ log.push('  ❌ '+e.message); }
+      log.push('');
+    }
+  } catch(e) { log.push('❌ '+e.message); }
+  res.textContent = log.join('\n');
+}
+
 // ===== API DEBUG =====
 async function debugApiSources() {
   var res = document.getElementById('apiDebugResult');
