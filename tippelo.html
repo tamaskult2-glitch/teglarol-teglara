@@ -2447,6 +2447,7 @@ function showTab(t) {
   if(t==='emob') renderEmobTab();
   if(t==='bl') renderBLTab();
   if(t==='bet') loadBetPoll();
+  if(t !== 'meccsek') { _navLastId = null; _navPhase = 0; }
   if(t==='kozos') loadWatchParty();
   if(t==='gol') renderGolTab();
   // Scroll: nav-tabs tetejére görget (content a sticky nav alatt jelenik meg)
@@ -3068,61 +3069,97 @@ function renderMatchdayBanner() {
 }
 
 // Ugrás: ÉLŐ meccs → következő tippeletlen → következő jövőbeli
+// Ciklikus navigátor állapot
+var _navLastId = null;  // utoljára mutatott meccs ID
+var _navPhase = 0;      // 0=mai tippeletlen, 1=következő jövőbeli, 2=következő tippeletlen
+
 function jumpToNextUntipped() {
   if(!currentUser) {
     document.getElementById('regModal').style.display = 'flex';
     return;
   }
   var safe = fbSafeName(currentUser);
+  var today = getBudapestToday();
   var now = getBudapestNow();
+  var vbMatches = ALL_MATCHES.filter(isVbMatch);
   var target = null;
 
-  // 1. ÉLŐ meccs (kickoff volt, de nincs végeredmény)
-  target = ALL_MATCHES.find(function(m) {
-    if(!isVbMatch(m)) return false;
-    if(!isKickoffPassed(m.huDate, m.huTime)) return false;
-    if(allResults[m.id]) return false; // már vége
-    return true;
+  // ÉLŐ meccs mindig prioritás (felülírja a ciklust)
+  var live = vbMatches.find(function(m) {
+    return isKickoffPassed(m.huDate, m.huTime) && !allResults[m.id] && liveScores[m.id] && liveScores[m.id].status === 'live';
   });
-
-  // 2. Mai/holnapi tippeletlen nyitott meccs
-  if(!target) {
-    var info = getMatchdayInfo();
-    target = info.untipped[0] || info.actionable[0];
+  if(live && live.id !== _navLastId) {
+    target = live;
+    _navLastId = target.id;
+    return scrollToMatch(target);
   }
 
-  // 3. Legközelebbi jövőbeli tippeletlen
-  if(!target) {
-    target = ALL_MATCHES.find(function(m) {
-      if(!isVbMatch(m)) return false;
-      var kickoff = m.huDate + 'T' + m.huTime;
-      if(kickoff <= now) return false;
+  // --- MAI TIPPELETLEN MECCSEK LISTÁJA ---
+  var todayUntipped = vbMatches.filter(function(m) {
+    if(m.huDate !== today) return false;
+    if(allResults[m.id]) return false;          // már lejátszott
+    if(isKickoffPassed(m.huDate, m.huTime) && !liveScores[m.id]) return false; // lezárt
+    var hasTip = allTips[m.id] && allTips[m.id][safe];
+    return !hasTip;
+  });
+
+  // --- Ha van aznapi tippeletlen: ciklikusan léptessük ---
+  if(todayUntipped.length > 0) {
+    var lastIdx = -1;
+    if(_navLastId) {
+      lastIdx = todayUntipped.findIndex(function(m){ return m.id === _navLastId; });
+    }
+    var nextIdx = lastIdx + 1;
+    if(nextIdx >= todayUntipped.length) nextIdx = 0;
+    target = todayUntipped[nextIdx];
+    _navLastId = target.id;
+    return scrollToMatch(target);
+  }
+
+  // --- Nincs aznapi tippeletlen: fázisváltás ---
+  if(_navPhase === 0 || _navPhase === 2) {
+    // FÁZIS 1: Következő jövőbeli meccs (tippelt is OK — megmutatjuk mi jön)
+    _navPhase = 1;
+    target = vbMatches.find(function(m) {
+      return (m.huDate + 'T' + m.huTime) > now && !allResults[m.id];
+    });
+    if(target) {
+      _navLastId = target.id;
+      return scrollToMatch(target);
+    }
+  }
+
+  if(_navPhase === 1) {
+    // FÁZIS 2: Következő tippeletlen jövőbeli meccs
+    _navPhase = 2;
+    target = vbMatches.find(function(m) {
+      if((m.huDate + 'T' + m.huTime) <= now) return false;
+      if(allResults[m.id]) return false;
       var hasTip = allTips[m.id] && allTips[m.id][safe];
       return !hasTip;
     });
+    if(target) {
+      _navLastId = target.id;
+      return scrollToMatch(target);
+    }
+    // Ha minden kitippelve: visszaállítunk
+    _navPhase = 0;
+    _navLastId = null;
   }
+}
 
-  // 4. Legközelebbi jövőbeli meccs (minden kitippelve)
-  if(!target) {
-    target = ALL_MATCHES.find(function(m) {
-      if(!isVbMatch(m)) return false;
-      return (m.huDate + 'T' + m.huTime) > now;
-    });
-  }
-
-  if(!target) return;
-
+function scrollToMatch(m) {
+  if(!m) return;
   // Nap kinyitása ha össze van csukva
-  var gId = 'dg_' + target.huDate.replace(/-/g, '');
+  var gId = 'dg_' + m.huDate.replace(/-/g, '');
   var grp = document.getElementById(gId);
   if(grp && grp.style.display === 'none') {
     grp.style.display = '';
     var btn = document.getElementById('toggle_' + gId);
     if(btn) btn.textContent = '−';
-    sessionStorage.setItem('dc_' + target.huDate, 'open');
+    sessionStorage.setItem('dc_' + m.huDate, 'open');
   }
-
-  var card = document.getElementById('mc_' + target.id);
+  var card = document.getElementById('mc_' + m.id);
   if(card) {
     var navH = document.querySelector('.nav-tabs') ? document.querySelector('.nav-tabs').offsetHeight + 8 : 0;
     var cardTop = card.getBoundingClientRect().top + window.scrollY - navH;
