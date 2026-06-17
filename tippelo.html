@@ -1495,6 +1495,11 @@ footer a:hover{color:var(--gold);}
           <div id="authMigrationResult" style="font-size:11px;color:rgba(240,244,240,0.5);margin-top:6px;white-space:pre-wrap;max-height:200px;overflow-y:auto;"></div>
         </div>
         <div id="fbCmdResult" style="font-size:12px;color:rgba(240,244,240,0.6);min-height:16px;margin-top:6px;word-break:break-all;white-space:pre-wrap;"></div>
+        <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+          <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:6px;">🔌 API FORRÁS DEBUG</div>
+          <button onclick="debugApiSources()" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔍 API Teszt</button>
+          <div id="apiDebugResult" style="font-size:11px;color:rgba(240,244,240,0.5);margin-top:6px;white-space:pre-wrap;max-height:160px;overflow-y:auto;"></div>
+        </div>
       </div>
     </div>
     <!-- ADMIN JELSZÓ -->
@@ -5326,13 +5331,88 @@ async function fetchFromWC26() {
   } catch(e) { return null; }
 }
 
-// Multi-source: API-Football → ESPN → WC26.ir
+// TheSportsDB API (tartalék 3 — ingyenes, nincs kulcs)
+async function fetchFromSportsDB() {
+  try {
+    var today = getBudapestToday();
+    var resp = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d='+today+'&s=Soccer&l=FIFA+World+Cup');
+    if(!resp.ok) return null;
+    var data = await resp.json();
+    var events = data && data.events ? data.events : [];
+    if(!events.length) return null;
+    var results = [];
+    events.forEach(function(ev) {
+      var st = (ev.strStatus||'').toLowerCase();
+      var isLive = st==='1h'||st==='2h'||st==='ht'||st==='live'||st==='inprogress';
+      var isFT = st==='ft'||st==='aet'||st==='pen'||st==='finished';
+      if(!isLive && !isFT) return;
+      var hg = parseInt(ev.intHomeScore), ag = parseInt(ev.intAwayScore);
+      if(isNaN(hg)||isNaN(ag)) return;
+      results.push({
+        homeName: ev.strHomeTeam||'',
+        awayName: ev.strAwayTeam||'',
+        homeShort: '',
+        awayShort: '',
+        homeScore: hg,
+        awayScore: ag,
+        status: isFT?'ft':'live',
+        minute: ev.strProgress||st||''
+      });
+    });
+    return results.length > 0 ? results : null;
+  } catch(e) { console.log('SportsDB hiba:', e.message); return null; }
+}
+
+// Multi-source: api-football → ESPN → WC26.ir → TheSportsDB → OpenFootball
 async function fetchLiveScores() {
   var r = await fetchFromApiFootball();
-  if(r) return r;
+  if(r) { console.log('✅ Forrás: api-football'); return r; }
   r = await fetchFromESPN();
-  if(r) return r;
-  return await fetchFromWC26();
+  if(r) { console.log('✅ Forrás: ESPN'); return r; }
+  r = await fetchFromWC26();
+  if(r) { console.log('✅ Forrás: WC26.ir'); return r; }
+  r = await fetchFromSportsDB();
+  if(r) { console.log('✅ Forrás: TheSportsDB'); return r; }
+  r = await fetchFromOpenFootball();
+  if(r) { console.log('✅ Forrás: OpenFootball'); return r; }
+  console.log('❌ Minden API forrás sikertelen');
+  return null;
+}
+
+// 5. OpenFootball GitHub (statikus JSON, minden meccs)
+async function fetchFromOpenFootball() {
+  try {
+    var resp = await fetch('https://raw.githubusercontent.com/openfootball/world-cup.json/master/2026/worldcup.json');
+    if(!resp.ok) return null;
+    var data = await resp.json();
+    var today = getBudapestToday();
+    var results = [];
+    var rounds = data.rounds || [];
+    rounds.forEach(function(round) {
+      var matches = round.matches || [];
+      matches.forEach(function(match) {
+        var matchDate = (match.date||'').slice(0,10);
+        if(matchDate !== today) return;
+        var score = match.score;
+        if(!score) return;
+        var hg = score.ft ? parseInt(score.ft[0]) : parseInt(score.score1);
+        var ag = score.ft ? parseInt(score.ft[1]) : parseInt(score.score2);
+        if(isNaN(hg) || isNaN(ag)) return;
+        var status = match.status === 'in progress' ? 'live' : 'ft';
+        results.push({
+          homeName: (match.team1 && match.team1.name) || '',
+          awayName: (match.team2 && match.team2.name) || '',
+          homeShort: (match.team1 && match.team1.code) || '',
+          awayShort: (match.team2 && match.team2.code) || '',
+          homeScore: hg,
+          awayScore: ag,
+          status: status,
+          minute: match.minute || ''
+        });
+      });
+    });
+    return results.length > 0 ? results : null;
+  } catch(e) { console.log('OpenFootball hiba:', e.message); return null; }
 }
 
 // ESPN rövidítés + api-football angol név → magyar csapatnév mapping
@@ -5349,7 +5429,13 @@ var TEAM_MAP = {
   'POR':'Portugália','CRC':'Costa Rica','DEN':'Dánia','ITA':'Olaszország',
   'EGY':'Egyiptom','BEL':'Belgium','CRO':'Horvátország','ISR':'Izrael',
   'POL':'Lengyelország','JAM':'Jamaica','WAL':'Wales','SLO':'Szlovénia',
-  'TRI':'Trinidad és Tobago','UZB':'Üzbegisztán'
+  'TRI':'Trinidad és Tobago','UZB':'Üzbegisztán',
+  'ALG':'Algéria',
+  'AUT':'Ausztria','JOR':'Jordánia','IRQ':'Irak','NOR':'Norvégia',
+  'SWE':'Svédország','TUN':'Tunézia','GHA':'Ghána','NZL':'Új-Zéland',
+  'CPV':'Zöld-foki-szigetek','COD':'Kongói DK','SCO':'Skócia','HTI':'Haiti',
+  'SVK':'Szlovákia','ROU':'Románia','HUN':'Magyarország','GRE':'Görögország',
+  'VEN':'Venezuela','CHI':'Chile','PAR':'Paraguay','ECU':'Ecuador'
 };
 // Angol teljes név → magyar (api-football kompatibilitás)
 var TEAM_NAME_MAP = {
@@ -5367,8 +5453,11 @@ var TEAM_NAME_MAP = {
   'poland':'Lengyelország','jamaica':'Jamaica','wales':'Wales','slovenia':'Szlovénia',
   'trinidad and tobago':'Trinidad és Tobago','uzbekistan':'Üzbegisztán',
   'haiti':'Haiti','scotland':'Skócia','ghana':'Ghána','new zealand':'Új-Zéland',
-  'cape verde':'Zöld-foki Köztársaság','iraq':'Irak','norway':'Norvégia','jordan':'Jordánia',
-  'dr congo':'Kongói DK','congo dr':'Kongói DK','sweden':'Svédország','tunisia':'Tunézia'
+  'cape verde':'Zöld-foki-szigetek','cape verde islands':'Zöld-foki-szigetek','iraq':'Irak','norway':'Norvégia','jordan':'Jordánia',
+  'dr congo':'Kongói DK','congo dr':'Kongói DK','democratic republic of congo':'Kongói DK','sweden':'Svédország','tunisia':'Tunézia',
+  'austria':'Ausztria','algeria':'Algéria','slovakia':'Szlovákia','romania':'Románia','greece':'Görögország',
+  'venezuela':'Venezuela','chile':'Chile','trinidad & tobago':'Trinidad és Tobago',
+  'united arab emirates':'Egyesült Arab Emírségek','uae':'Egyesült Arab Emírségek'
 };
 
 function matchApiToLocal(apiResult) {
@@ -6248,6 +6337,36 @@ function toggleDayGroup(groupId, storageKey) {
     }, 80);
   }
 }
+// ===== API DEBUG =====
+async function debugApiSources() {
+  var res = document.getElementById('apiDebugResult');
+  if(!res) return;
+  res.textContent = '⏳ API-k tesztelése...';
+  var log = [];
+  var apis = [
+    {name:'api-football', fn: fetchFromApiFootball},
+    {name:'ESPN', fn: fetchFromESPN},
+    {name:'WC26.ir', fn: fetchFromWC26},
+    {name:'TheSportsDB', fn: fetchFromSportsDB},
+    {name:'OpenFootball', fn: fetchFromOpenFootball},
+  ];
+  for(var i=0; i<apis.length; i++) {
+    var api = apis[i];
+    try {
+      var r = await api.fn();
+      if(r && r.length > 0) {
+        log.push('✅ '+api.name+': '+r.length+' meccs');
+        r.forEach(function(m){ log.push('   '+m.homeName+' '+m.homeScore+':'+m.awayScore+' '+m.awayName+' ['+m.status+']'); });
+      } else {
+        log.push('❌ '+api.name+': nincs adat');
+      }
+    } catch(e) {
+      log.push('❌ '+api.name+': '+e.message);
+    }
+  }
+  res.textContent = log.join('\n');
+}
+
 // ===== JELSZÓ MIGRÁCIÓ ELLENŐRZÉS =====
 async function checkAuthMigration() {
   var res = document.getElementById('authMigrationResult');
