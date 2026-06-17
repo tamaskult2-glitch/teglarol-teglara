@@ -5283,7 +5283,13 @@ async function fetchFromApiFootball() {
 // ESPN API (tartalék 1)
 async function fetchFromESPN() {
   try {
-    var resp = await fetch(AUTO_RES_API);
+    var today = getBudapestToday().replace(/-/g,'');
+    var d = new Date();
+    d.setDate(d.getDate()-1);
+    var yesterday = d.toLocaleDateString('sv-SE',{timeZone:'Europe/Budapest'}).replace(/-/g,'');
+    // Tegnap + ma: a hajnali meccsek (01:00, 04:00 Budapest) az ESPN-ben még az előző UTC naphoz tartoznak
+    var url = AUTO_RES_API + '?dates=' + yesterday + '-' + today + '&limit=50';
+    var resp = await fetch(url);
     if(!resp.ok) return null;
     var data = await resp.json();
     if(!data || !data.events) return null;
@@ -5303,12 +5309,20 @@ async function fetchFromESPN() {
       var away = teams.find(function(t){return t.homeAway==='away';});
       if(!home || !away) return;
       var minute = isLive?(statusType==='STATUS_HALFTIME'?'Félidő':(clock||(period===1?'1. félidő':'2. félidő'))):'';
-      results.push({homeName:home.team.displayName||'',awayName:away.team.displayName||'',homeShort:home.team.abbreviation||'',awayShort:away.team.abbreviation||'',homeScore:parseInt(home.score)||0,awayScore:parseInt(away.score)||0,status:isFT?'ft':'live',minute:minute});
+      results.push({
+        homeName: home.team.displayName||'',
+        awayName: away.team.displayName||'',
+        homeShort: home.team.abbreviation||'',
+        awayShort: away.team.abbreviation||'',
+        homeScore: parseInt(home.score)||0,
+        awayScore: parseInt(away.score)||0,
+        status: isFT?'ft':'live',
+        minute: minute
+      });
     });
     return results.length > 0 ? results : null;
-  } catch(e) { return null; }
+  } catch(e) { console.log('ESPN hiba:',e.message); return null; }
 }
-
 // WorldCup26.ir API (tartalék)
 async function fetchFromWC26() {
   try {
@@ -5335,30 +5349,36 @@ async function fetchFromWC26() {
 async function fetchFromSportsDB() {
   try {
     var today = getBudapestToday();
-    var resp = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d='+today+'&s=Soccer&l=FIFA+World+Cup');
-    if(!resp.ok) return null;
-    var data = await resp.json();
-    var events = data && data.events ? data.events : [];
-    if(!events.length) return null;
+    var d = new Date(); d.setDate(d.getDate()-1);
+    var yesterday = d.toLocaleDateString('sv-SE',{timeZone:'Europe/Budapest'});
+    // Tegnap + ma (hajnali meccsek miatt)
     var results = [];
-    events.forEach(function(ev) {
-      var st = (ev.strStatus||'').toLowerCase();
-      var isLive = st==='1h'||st==='2h'||st==='ht'||st==='live'||st==='inprogress';
-      var isFT = st==='ft'||st==='aet'||st==='pen'||st==='finished';
-      if(!isLive && !isFT) return;
-      var hg = parseInt(ev.intHomeScore), ag = parseInt(ev.intAwayScore);
-      if(isNaN(hg)||isNaN(ag)) return;
-      results.push({
-        homeName: ev.strHomeTeam||'',
-        awayName: ev.strAwayTeam||'',
-        homeShort: '',
-        awayShort: '',
-        homeScore: hg,
-        awayScore: ag,
-        status: isFT?'ft':'live',
-        minute: ev.strProgress||st||''
+    var dates = [yesterday, today];
+    for(var di=0; di<dates.length; di++) {
+      var dateStr = dates[di];
+      var resp = await fetch('https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d='+dateStr+'&s=Soccer&l=FIFA+World+Cup');
+      if(!resp.ok) continue;
+      var data = await resp.json();
+      var events = data && data.events ? data.events : [];
+      events.forEach(function(ev) {
+        var st = (ev.strStatus||'').toLowerCase();
+        var isLive = st==='1h'||st==='2h'||st==='ht'||st==='live'||st==='inprogress';
+        var isFT = st==='ft'||st==='aet'||st==='pen'||st==='finished';
+        if(!isLive && !isFT) return;
+        var hg = parseInt(ev.intHomeScore), ag = parseInt(ev.intAwayScore);
+        if(isNaN(hg)||isNaN(ag)) return;
+        results.push({
+          homeName: ev.strHomeTeam||'',
+          awayName: ev.strAwayTeam||'',
+          homeShort: '',
+          awayShort: '',
+          homeScore: hg,
+          awayScore: ag,
+          status: isFT?'ft':'live',
+          minute: ev.strProgress||st||''
+        });
       });
-    });
+    }
     return results.length > 0 ? results : null;
   } catch(e) { console.log('SportsDB hiba:', e.message); return null; }
 }
