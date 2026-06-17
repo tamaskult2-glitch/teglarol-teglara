@@ -3363,6 +3363,7 @@ function renderMatches() {
             ${myTip && !cardLocked ? `<button onclick="clearTip('${m.id}')" title="Tipp törlése" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;line-height:1;margin-left:2px;transition:all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='rgba(239,68,68,0.6)'">⌫</button>` : ''}
           </div>
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildScorerRow(m.id, m) : ''}
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
@@ -3495,6 +3496,22 @@ function renderLeaderboard() {
     sc.push({u,pts,tot,pend,exact,acc});
   });
   sc.sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.tot-a.tot);
+
+  // Élő rangsorváltozás kiszámítása
+  var liveRankData = null;
+  var hasLive = Object.values(liveScores).some(function(ls){ return ls.status==='live'; });
+  if(hasLive) {
+    try {
+      var withLive = calcDayFilteredScores(true);
+      var withLiveSorted = Object.entries(withLive).sort(function(a,b){ return b[1].pts-a[1].pts||b[1].exact-a[1].exact; });
+      var withLiveRank = {};
+      withLiveSorted.forEach(function(e,i){ withLiveRank[e[0]]=i+1; });
+      var currentRank = {};
+      sc.forEach(function(s,i){ currentRank[s.u]=i+1; });
+      liveRankData = {withLiveRank:withLiveRank, currentRank:currentRank, withLive:withLive};
+    } catch(e){}
+  }
+
   const med=['🥇','🥈','🥉'];
   let html='<div class="lb-list">';
   var wb = getWeeklyMvpBukta();
@@ -3535,7 +3552,20 @@ function renderLeaderboard() {
 
   sc.forEach((s,i)=>{const me=s.u===currentUser;const adm=isHardcodeAdmin(s.u);const streak=getUserStreak(s.u);const isMvp=wb.mvp===s.u;const isBukta=wb.bukta===s.u&&wb.bukta!==wb.mvp;
   var prizeHtml = (i<3 && _prizes[i]>0) ? '<div style="font-size:11px;color:#22c55e;font-weight:700;">💰 '+ftToBankjegy(_prizes[i])+'</div>' : '';
-  html+=`<div class="lb-row r${Math.min(i+1,3)}" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${userBadges(s.u)}${isMvp?' <span title="Heti MVP" style="font-size:12px;">⭐</span>':''}${isBukta?' <span title="Heti bukta" style="font-size:12px;">💀</span>':''}${me?' 👈':''}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div>${prizeHtml}<div class="lb-sub">${s.tot} tipp · ${s.acc}% · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${streak>=3?`<span style="color:#f97316">🔥 ${streak}</span> · `:''}${s.pend} várja</div></div></div>`;});
+  // Élő rangsorváltozás nyíl
+  var liveArrow = '';
+  if(liveRankData) {
+    var oldR = i+1;
+    var newR = liveRankData.withLiveRank[s.u] || 99;
+    var diff = oldR - newR;
+    var livePts = liveRankData.withLive[s.u] ? liveRankData.withLive[s.u].pts : s.pts;
+    var ptsDiff = livePts - s.pts;
+    if(diff > 0) liveArrow = ' <span style="font-size:10px;color:#4ade80;font-weight:700;">🔼'+diff+'</span>';
+    else if(diff < 0) liveArrow = ' <span style="font-size:10px;color:#f87171;font-weight:700;">🔽'+Math.abs(diff)+'</span>';
+    else liveArrow = ' <span style="font-size:10px;color:rgba(240,244,240,0.2);">➖</span>';
+    if(ptsDiff > 0) liveArrow += '<span style="font-size:10px;color:#4ade80;"> +'+ptsDiff+'</span>';
+  }
+  html+=`<div class="lb-row r${Math.min(i+1,3)}" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${userBadges(s.u)}${isMvp?' <span title="Heti MVP" style="font-size:12px;">⭐</span>':''}${isBukta?' <span title="Heti bukta" style="font-size:12px;">💀</span>':''}${me?' 👈':''}${liveArrow}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div>${prizeHtml}<div class="lb-sub">${s.tot} tipp · ${s.acc}% · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${streak>=3?`<span style="color:#f97316">🔥 ${streak}</span> · `:''}${s.pend} várja</div></div></div>`;});
   html+='</div>';
   if(!vbMatches.some(function(m){return allResults[m.id];})) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ A VB indulása után látható a pontszám (jún. 11.)</div>';
   c.innerHTML=html;
@@ -5269,6 +5299,7 @@ var AUTO_RES_API2 = 'https://worldcup26.ir/get/games';
 var API_FOOTBALL_URL = 'https://v3.football.api-sports.io/fixtures';
 var API_FOOTBALL_KEY = 'b3d3d4e51557c6a7856be239e346e190';
 var liveScores = {};
+var matchScorers = {}; // {matchId: [{name, team, minute, isOg, isPen}]}
 
 // API-FOOTBALL (elsődleges — legmegbízhatóbb)
 async function fetchFromApiFootball() {
@@ -6416,6 +6447,101 @@ async function debugApiSources() {
   }
   res.textContent = log.join('\n');
 }
+
+// ===== GÓLSZERZŐK A MECCSKÁRTYÁN =====
+function buildScorerRow(mid, m) {
+  var scorers = matchScorers[mid];
+  if(!scorers || scorers.length === 0) return '';
+  // Csoportosítás: hazai / vendég
+  var homeS = scorers.filter(function(s){ return s.teamId === 'home'; });
+  var awayS = scorers.filter(function(s){ return s.teamId === 'away'; });
+  var fmt = function(list) {
+    return list.map(function(s) {
+      var name = s.name.split(' ').pop(); // csak vezetéknév
+      var extra = s.isOg ? ' (ög)' : s.isPen ? ' (b)' : '';
+      return '<span style="color:rgba(240,244,240,0.75);">'+name+extra+'</span> <span style="color:rgba(240,244,240,0.35);font-size:10px;">'+s.minute+'</span>';
+    }).join('  ');
+  };
+  return '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:4px 8px 6px;font-family:Oswald,sans-serif;font-size:11px;letter-spacing:0.3px;border-top:1px solid rgba(255,255,255,0.05);gap:8px;">'
+    + '<div style="flex:1;text-align:left;">' + (homeS.length ? '⚽ ' + fmt(homeS) : '') + '</div>'
+    + '<div style="flex:1;text-align:right;">' + (awayS.length ? fmt(awayS) + ' ⚽' : '') + '</div>'
+    + '</div>';
+}
+
+// ESPN event ID cache → match ID mapping
+var espnMatchIdMap = {}; // {espnEventId: matchId}
+
+async function fetchMatchScorers() {
+  try {
+    var today = getBudapestToday().replace(/-/g,'');
+    var d = new Date(); d.setDate(d.getDate()-1);
+    var yesterday = d.toLocaleDateString('sv-SE',{timeZone:'Europe/Budapest'}).replace(/-/g,'');
+    var url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+yesterday+'-'+today+'&limit=50';
+    var resp = await fetch(url);
+    if(!resp.ok) return;
+    var data = await resp.json();
+    var events = data.events || [];
+    // Fetch summaries for completed and live matches
+    var toFetch = events.filter(function(ev) {
+      var st = ev.competitions&&ev.competitions[0]&&ev.competitions[0].status&&ev.competitions[0].status.type?ev.competitions[0].status.type.name:'';
+      return st==='STATUS_IN_PROGRESS'||st==='STATUS_HALFTIME'||st==='STATUS_FULL_TIME'||st==='STATUS_FINAL';
+    });
+    // Fetch in parallel (max 6)
+    var batch = toFetch.slice(0,6);
+    var promises = batch.map(function(ev) {
+      return fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event='+ev.id)
+        .then(function(r){ return r.json(); })
+        .then(function(sum) { return {ev:ev, sum:sum}; })
+        .catch(function(){ return null; });
+    });
+    var results = await Promise.all(promises);
+    results.forEach(function(res) {
+      if(!res || !res.sum || !res.sum.keyEvents) return;
+      var ev = res.ev;
+      var comp = ev.competitions&&ev.competitions[0];
+      if(!comp) return;
+      // Match team names to find our match ID
+      var teams = comp.competitors||[];
+      var homeTeam = teams.find(function(t){return t.homeAway==='home';});
+      var awayTeam = teams.find(function(t){return t.homeAway==='away';});
+      if(!homeTeam||!awayTeam) return;
+      var homeName = homeTeam.team.displayName||'';
+      var awayName = awayTeam.team.displayName||'';
+      // Find match in our data
+      var match = ALL_MATCHES.find(function(m) {
+        var mh = m.home.toLowerCase(), ma = m.away.toLowerCase();
+        var eh = homeName.toLowerCase(), ea = awayName.toLowerCase();
+        return (teamNameToHu(eh)===mh || eh.includes(mh.substring(0,4))) &&
+               (teamNameToHu(ea)===ma || ea.includes(ma.substring(0,4)));
+      });
+      if(!match) return;
+      // Parse goals
+      var goals = [];
+      res.sum.keyEvents.forEach(function(kev) {
+        if(!kev.type || kev.type.text !== 'Goal') return;
+        var athlete = kev.participants&&kev.participants[0]&&kev.participants[0].athlete;
+        if(!athlete) return;
+        var teamId = kev.team && kev.team.id === homeTeam.team.id ? 'home' : 'away';
+        goals.push({
+          name: athlete.displayName||'',
+          minute: (kev.clock&&kev.clock.displayValue)||'',
+          teamId: teamId,
+          isOg: !!kev.ownGoal,
+          isPen: !!kev.penaltyKick
+        });
+      });
+      matchScorers[match.id] = goals;
+    });
+  } catch(e) { console.log('Scorer fetch error:', e.message); }
+}
+
+function teamNameToHu(engName) {
+  return (TEAM_NAME_MAP[engName.toLowerCase()]||'').toLowerCase();
+}
+
+// Scorer fetch indítása oldalbetöltéskor és 60 mp-enként
+setTimeout(fetchMatchScorers, 4000);
+setInterval(fetchMatchScorers, 60000);
 
 // ===== JELSZÓ MIGRÁCIÓ ELLENŐRZÉS =====
 async function checkAuthMigration() {
