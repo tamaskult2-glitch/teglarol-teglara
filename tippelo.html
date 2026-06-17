@@ -2806,8 +2806,8 @@ function buildOtherTips(mid, locked) {
     try {
       var beforeScores = calcDayFilteredScores(false);
       var withLiveScores = calcDayFilteredScores(true);
-      var beforeSorted = Object.entries(beforeScores).sort(function(a,b){ return b[1]-a[1]; });
-      var withLiveSorted = Object.entries(withLiveScores).sort(function(a,b){ return b[1]-a[1]; });
+      var beforeSorted = Object.entries(beforeScores).sort(function(a,b){ return b[1].pts-a[1].pts||b[1].exact-a[1].exact; });
+      var withLiveSorted = Object.entries(withLiveScores).sort(function(a,b){ return b[1].pts-a[1].pts||b[1].exact-a[1].exact; });
       var beforeRank = {}; beforeSorted.forEach(function(e,i){ beforeRank[e[0]]=i+1; });
       var withLiveRank = {}; withLiveSorted.forEach(function(e,i){ withLiveRank[e[0]]=i+1; });
       rankData = {beforeRank:beforeRank, withLiveRank:withLiveRank, withLiveScores:withLiveScores};
@@ -6719,8 +6719,8 @@ function showLiveStandings() {
   // Ranglista élő meccs eredményével
   var currentScores = calcDayFilteredScores(true);
 
-  var beforeSorted = Object.entries(beforeTodayScores).sort(function(a,b){ return b[1]-a[1]; });
-  var currentSorted = Object.entries(currentScores).sort(function(a,b){ return b[1]-a[1]; });
+  var beforeSorted = Object.entries(beforeTodayScores).sort(function(a,b){ return b[1].pts-a[1].pts||b[1].exact-a[1].exact; });
+  var currentSorted = Object.entries(currentScores).sort(function(a,b){ return b[1].pts-a[1].pts||b[1].exact-a[1].exact; });
 
   var beforeRank = {};
   beforeSorted.forEach(function(e,i){ beforeRank[e[0]] = i+1; });
@@ -6734,7 +6734,8 @@ function showLiveStandings() {
   html += '<div style="display:flex;flex-direction:column;gap:3px;">';
 
   currentSorted.forEach(function(e, i) {
-    var user = e[0], pts = e[1];
+    var user = e[0], data = e[1];
+    var pts = data.pts;
     var oldRank = beforeRank[user] || currentSorted.length;
     var newRank = i + 1;
     var diff = oldRank - newRank;
@@ -6743,7 +6744,7 @@ function showLiveStandings() {
     else if(diff < 0) arrow = '<span style="color:#f87171;font-weight:700;font-size:14px;">🔽'+diff+'</span>';
     else arrow = '<span style="color:rgba(240,244,240,0.25);font-size:12px;">➖</span>';
 
-    var beforePts = beforeTodayScores[user] || 0;
+    var beforePts = beforeTodayScores[user] ? beforeTodayScores[user].pts : 0;
     var gained = pts - beforePts;
     var gainedStr = gained > 0 ? '<span style="color:#4ade80;font-size:12px;font-weight:700;background:rgba(74,222,128,0.1);padding:1px 6px;border-radius:6px;">+'+gained+'</span>' : '<span style="color:rgba(240,244,240,0.2);font-size:11px;">+0</span>';
     var medal = i < 3 ? medals[i] : (i+1)+'.';
@@ -6782,14 +6783,15 @@ function showLiveStandings() {
 
 // Pontozás: includeToday=false → csak tegnap előtti meccsek, true → minden + élő
 function calcDayFilteredScores(includeLive) {
-  var scores = {};
+  var scores = {};   // {user: pts}
+  var exacts = {};   // {user: exact_count}
   var allUsers = new Set();
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
 
   vbMatches.forEach(function(m) {
     if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){ allUsers.add(u); });
   });
-  allUsers.forEach(function(u){ scores[u] = 0; });
+  allUsers.forEach(function(u){ scores[u] = 0; exacts[u] = 0; });
 
   vbMatches.forEach(function(m) {
     var hasResult = allResults[m.id];
@@ -6797,13 +6799,17 @@ function calcDayFilteredScores(includeLive) {
     var isLive = ls && ls.status === 'live';
 
     if(hasResult) {
-      // Lejátszott meccs — mindig számít (mai befejezettek is!)
+      var realSc = allScores[m.id];
       allUsers.forEach(function(u) {
         var tip = allTips[m.id] ? allTips[m.id][u] : null;
-        if(tip) scores[u] += calcMatchPoints(m, tip);
+        if(!tip) return;
+        var pts = calcMatchPoints(m, tip);
+        scores[u] += pts;
+        // Pontos eredmény számláló
+        var tipSc = getTipScore(tip);
+        if(tipSc && realSc && tipSc.h+':'+tipSc.a === realSc) exacts[u]++;
       });
     } else if(includeLive && isLive) {
-      // Élő meccs — csak ha includeLive=true
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
       if(!isNaN(hg) && !isNaN(ag)) {
         var liveOutcome = hg > ag ? '1' : hg === ag ? 'X' : '2';
@@ -6821,20 +6827,21 @@ function calcDayFilteredScores(includeLive) {
           if(outcome === liveOutcome) {
             if(tipSc && tipSc.h+':'+tipSc.a === liveScore) {
               scores[u] += 3 * mult;
+              exacts[u]++;
             } else {
-              scores[u] += 1 * mult;
-              if(tipSc) {
-                var tDiff = tipSc.h - tipSc.a;
-                var rDiff = hg - ag;
-                if(tDiff === rDiff) scores[u] += 1 * mult;
-              }
+              var lPts = 1;
+              if(tipSc) { var tD=tipSc.h-tipSc.a, rD=hg-ag; if(tD===rD) lPts=2; }
+              scores[u] += lPts * mult;
             }
           }
         });
       }
     }
   });
-  return scores;
+  // Visszaadás: {user: {pts, exact}}
+  var result = {};
+  allUsers.forEach(function(u){ result[u] = {pts: scores[u], exact: exacts[u]}; });
+  return result;
 }
 
 // ===== 3. GÓL PILLANAT KÁRTYA =====
@@ -6927,41 +6934,37 @@ function buildRaceData() {
   });
 
   // Build cumulative scores per day
-  var cumulative = {};
-  allUsers.forEach(function(u){ cumulative[u] = 0; });
+  var cumPts = {};   // {user: pts}
+  var cumExact = {}; // {user: exact count}
+  allUsers.forEach(function(u){ cumPts[u] = 0; cumExact[u] = 0; });
 
   var frames = [];
-  // Frame 0: everyone at 0
   var f0 = {};
-  allUsers.forEach(function(u){ f0[u] = 0; });
-  frames.push({ day: 'Start', label: 'Rajt 🏁', scores: Object.assign({}, f0), matches: [] });
+  allUsers.forEach(function(u){ f0[u] = {pts:0, exact:0}; });
+  frames.push({ day: 'Start', label: 'Rajt 🏁', scores: JSON.parse(JSON.stringify(f0)), matches: [] });
 
   days.forEach(function(day) {
     var dayMatches = matchesByDate[day];
     var dayDetail = [];
     dayMatches.forEach(function(m) {
       var res = allResults[m.id];
+      var realSc = allScores[m.id];
       if(!res) return;
       allUsers.forEach(function(u) {
         var tip = allTips[m.id] ? allTips[m.id][u] : null;
-        if(tip) {
-          var pts = calcMatchPoints(m, tip);
-          cumulative[u] += pts;
-        }
+        if(!tip) return;
+        cumPts[u] += calcMatchPoints(m, tip);
+        var tipSc = getTipScore(tip);
+        if(tipSc && realSc && tipSc.h+':'+tipSc.a === realSc) cumExact[u]++;
       });
-      var homeTeam = m.home || '?';
-      var awayTeam = m.away || '?';
-      dayDetail.push(homeTeam + ' vs ' + awayTeam);
+      dayDetail.push((m.home||'?') + ' vs ' + (m.away||'?'));
     });
 
     var d = new Date(day + 'T12:00:00');
     var label = d.toLocaleDateString('hu-HU', {month: 'short', day: 'numeric'});
-    frames.push({
-      day: day,
-      label: label,
-      scores: Object.assign({}, cumulative),
-      matches: dayDetail
-    });
+    var snap = {};
+    allUsers.forEach(function(u){ snap[u] = {pts: cumPts[u], exact: cumExact[u]}; });
+    frames.push({ day: day, label: label, scores: snap, matches: dayDetail });
   });
 
   return frames;
@@ -6980,14 +6983,13 @@ function renderRaceFrame(frame, maxPts, userColors) {
     detailEl.textContent = '';
   }
 
-  // Sort users by score desc
+  // Sort users by pts desc, then exact desc
   var sorted = Object.entries(frame.scores)
-    .filter(function(e){ return e[1] > 0 || frame.day === 'Start'; })
-    .sort(function(a,b){ return b[1] - a[1]; });
+    .filter(function(e){ return (e[1].pts > 0) || frame.day === 'Start'; })
+    .sort(function(a,b){ return b[1].pts - a[1].pts || b[1].exact - a[1].exact; });
 
-  // Only show users who have any tips at all
   if(frame.day !== 'Start') {
-    sorted = sorted.filter(function(e){ return e[1] > 0; });
+    sorted = sorted.filter(function(e){ return e[1].pts > 0; });
   }
 
   if(maxPts <= 0) maxPts = 1;
@@ -6995,7 +6997,7 @@ function renderRaceFrame(frame, maxPts, userColors) {
   var html = '';
   sorted.forEach(function(entry, idx) {
     var user = entry[0];
-    var pts = entry[1];
+    var pts = entry[1].pts;
     var pct = Math.max(2, (pts / maxPts) * 100);
     var color = userColors[user] || '#888';
     var medal = idx === 0 ? ' 👑' : '';
@@ -7039,7 +7041,7 @@ function startRaceAnimation() {
   // Find max points across all frames
   var maxPts = 0;
   frames.forEach(function(f) {
-    Object.values(f.scores).forEach(function(v){ if(v > maxPts) maxPts = v; });
+    Object.values(f.scores).forEach(function(v){ if(v.pts > maxPts) maxPts = v.pts; });
   });
 
   // Play animation
@@ -7088,7 +7090,7 @@ function renderGolTab() {
     var ci = 0;
     allUsersSet.forEach(function(u) { userColors[u] = raceColors[ci % raceColors.length]; ci++; });
     var maxPts = 0;
-    frames.forEach(function(f) { Object.values(f.scores).forEach(function(v){ if(v > maxPts) maxPts = v; }); });
+    frames.forEach(function(f) { Object.values(f.scores).forEach(function(v){ if(v.pts > maxPts) maxPts = v.pts; }); });
     renderRaceFrame(frames[frames.length - 1], maxPts, userColors);
     var labelEl = document.getElementById('raceDayLabel');
     if(labelEl) labelEl.textContent = '📊 Jelenlegi állás — nyomd meg a ▶ gombot!';
