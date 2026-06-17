@@ -6598,26 +6598,26 @@ async function fetchMatchScorers() {
       var scoringPlays = res.sum.scoringPlays || [];
       var eventsToProcess = keyEvents.length > 0 ? keyEvents : scoringPlays;
 
-      // Extra: ha keyEvents van de kevés gólt mutat, adjuk hozzá scoringPlays góljait is
-      if(keyEvents.length > 0 && scoringPlays.length > 0) {
+      // Extra: scoringPlays góljait is hozzáadjuk ami hiányzik keyEvents-ből
+      if(scoringPlays.length > 0) {
         var keyGoalNames = new Set();
         keyEvents.forEach(function(k){
-          var tt=(k.type&&k.type.text)||'';
-          if(tt==='Goal'||tt==='Penalty Goal'||tt==='Own Goal'||(k.type&&k.type.id)==='goal') {
+          var tt=(k.type&&k.type.text)||''; var tid=(k.type&&k.type.id)||'';
+          if(tt.startsWith('Goal')||tt==='Penalty Goal'||tt==='Own Goal'||tid==='goal'||tt.includes('Goal')) {
             var a=k.participants&&k.participants[0]&&k.participants[0].athlete;
-            if(a) keyGoalNames.add((a.displayName||'').split(' ').pop());
+            if(a) keyGoalNames.add((a.displayName||'').split(' ').pop().toLowerCase());
           }
         });
-        // scoringPlays-ből hozzáadjuk ami hiányzik
         scoringPlays.forEach(function(sp) {
-          var name=(sp.athleteName||sp.text||'').split(' ').pop();
-          if(!name||keyGoalNames.has(name)) return;
-          // Ez hiányzó gól — hozzáadjuk
+          var rawName=(sp.athleteName||sp.text||'');
+          var lastName=rawName.split(' ').pop().toLowerCase();
+          if(!rawName||keyGoalNames.has(lastName)) return;
           var teamId='home';
           if(sp.team) teamId=sp.team.id===homeTeam.team.id?'home':'away';
           else if(sp.homeAway) teamId=sp.homeAway==='home'?'home':'away';
           var minute=(sp.clock&&sp.clock.displayValue)||(sp.period&&sp.period.number?sp.period.number+'.'+'félidő':'')||'';
-          goals.push({name:sp.athleteName||sp.text||'',minute:minute,teamId:teamId,type:'goal',isOg:false,isPen:sp.penaltyKick||false});
+          goals.push({name:rawName,minute:minute,teamId:teamId,type:'goal',isOg:false,isPen:!!(sp.penaltyKick)});
+          keyGoalNames.add(lastName);
         });
       }
       eventsToProcess.forEach(function(kev) {
@@ -6625,10 +6625,10 @@ async function fetchMatchScorers() {
         var typeId = (kev.type&&kev.type.id)||'';
         // Debug: log all event types
         if(match) console.log('EVENT ['+match.id+']:', typeText, '|', typeId, '| athlete:', kev.participants&&kev.participants[0]&&kev.participants[0].athlete?kev.participants[0].athlete.displayName:'?', '| scoreValue:', kev.scoreValue, '| text:', kev.text);
-        var isGoal = typeText==='Goal'||typeText==='Penalty Goal'||typeText==='Own Goal'||typeId==='goal'||kev.scoreValue>0;
-        var isYellow = typeText==='Yellow Card'||typeId==='yellowcard';
+        var isGoal = typeText.startsWith('Goal')||typeText==='Penalty Goal'||typeText==='Own Goal'||typeId==='goal'||typeText.includes('Goal –')||typeText.includes('Goal -')||kev.scoreValue>0;
+        var isYellow = typeText==='Yellow Card'||typeId==='yellowcard'||typeId==='94';
         var isRed = typeText==='Red Card'||typeId==='redcard';
-        var isYellow2 = typeText==='Yellow Card - Second Yellow'||typeText==='Second Yellow Card'||typeId==='yellowcard2';
+        var isYellow2 = typeText.includes('Second Yellow')||typeId==='yellowcard2';
         if(!isGoal && !isYellow && !isRed && !isYellow2) return;
         var athleteName = '';
         if(kev.participants&&kev.participants[0]&&kev.participants[0].athlete) {
@@ -6744,8 +6744,8 @@ async function fetchHistoricalScorers() {
         evList.forEach(function(kev){
           var typeText=(kev.type&&kev.type.text)||'';
           var typeId=(kev.type&&kev.type.id)||'';
-          var isGoal=typeText==='Goal'||typeText==='Penalty Goal'||typeText==='Own Goal'||typeId==='goal';
-          var isYellow=typeText==='Yellow Card'||typeId==='yellowcard';
+          var isGoal=typeText.startsWith('Goal')||typeText==='Penalty Goal'||typeText==='Own Goal'||typeId==='goal'||typeText.includes('Goal –')||typeText.includes('Goal -');
+          var isYellow=typeText==='Yellow Card'||typeId==='yellowcard'||typeId==='94';
           var isRed=typeText==='Red Card'||typeId==='redcard';
           var isYellow2=typeText.includes('Second Yellow')||typeId==='yellowcard2';
           if(!isGoal&&!isYellow&&!isRed&&!isYellow2) return;
