@@ -3377,6 +3377,9 @@ function renderMatches() {
           </div>
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildScorerRow(m.id, m) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
+          ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildLiveStatsBar(m.id) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live') || (kickoffLocked&&!result)) ? buildLineupSection(m.id, m) : ''}
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
@@ -5308,6 +5311,9 @@ var API_FOOTBALL_URL = 'https://v3.football.api-sports.io/fixtures';
 var API_FOOTBALL_KEY = 'b3d3d4e51557c6a7856be239e346e190';
 var liveScores = {};
 var matchScorers = {}; // {matchId: [{name, team, minute, isOg, isPen}]}
+var liveStats = {};    // {matchId: {possession:[h,a], shots:[h,a], shotsOn:[h,a], corners:[h,a], fouls:[h,a], offsides:[h,a]}}
+var liveLineups = {};  // {matchId: {home:{formation,players,subs,coach}, away:{...}}}
+var liveEventsAll = {}; // {matchId: [{min,extra,type,detail,team,player,assist}]}
 
 // API-FOOTBALL (elsődleges — legmegbízhatóbb)
 async function fetchFromApiFootball() {
@@ -5334,7 +5340,7 @@ async function fetchFromApiFootball() {
       if(!isLive && !isFT) return;
       var elapsed = fix.fixture.status.elapsed || 0;
       var minute = isLive ? (st==='HT'?'Félidő':elapsed+"'") : '';
-      results.push({
+      var res = {
         homeName: fix.teams.home.name||'',
         awayName: fix.teams.away.name||'',
         homeShort: '',
@@ -5343,7 +5349,48 @@ async function fetchFromApiFootball() {
         awayScore: fix.goals.away!==null ? fix.goals.away : 0,
         status: isFT ? 'ft' : 'live',
         minute: minute
-      });
+      };
+      // Events (goals, cards, subs, VAR)
+      if(fix.events && fix.events.length) {
+        res.events = fix.events.map(function(ev) {
+          return {
+            min: ev.time.elapsed||0, extra: ev.time.extra||null,
+            type: (ev.type||'').toLowerCase(), detail: (ev.detail||'').toLowerCase(),
+            teamSide: ev.team && fix.teams.home && ev.team.id===fix.teams.home.id ? 'home' : 'away',
+            player: ev.player ? ev.player.name : '', assist: ev.assist ? ev.assist.name : ''
+          };
+        });
+      }
+      // Statistics
+      if(fix.statistics && fix.statistics.length >= 2) {
+        var hs = {}, as = {};
+        fix.statistics[0].statistics.forEach(function(s){ hs[s.type]=s.value; });
+        fix.statistics[1].statistics.forEach(function(s){ as[s.type]=s.value; });
+        res.stats = {
+          possession: [parseInt(hs['Ball Possession'])||0, parseInt(as['Ball Possession'])||0],
+          shots: [parseInt(hs['Total Shots'])||0, parseInt(as['Total Shots'])||0],
+          shotsOn: [parseInt(hs['Shots on Goal'])||0, parseInt(as['Shots on Goal'])||0],
+          corners: [parseInt(hs['Corner Kicks'])||0, parseInt(as['Corner Kicks'])||0],
+          fouls: [parseInt(hs['Fouls'])||0, parseInt(as['Fouls'])||0],
+          offsides: [parseInt(hs['Offsides'])||0, parseInt(as['Offsides'])||0],
+          passes: [parseInt(hs['Total passes'])||0, parseInt(as['Total passes'])||0],
+          passAcc: [parseInt(hs['Passes %'])||0, parseInt(as['Passes %'])||0]
+        };
+      }
+      // Lineups
+      if(fix.lineups && fix.lineups.length >= 2) {
+        res.lineups = {};
+        fix.lineups.forEach(function(lu, idx) {
+          var side = idx === 0 ? 'home' : 'away';
+          res.lineups[side] = {
+            formation: lu.formation || '',
+            coach: lu.coach ? lu.coach.name : '',
+            players: (lu.startXI||[]).map(function(p){ return p.player ? p.player.name : ''; }),
+            subs: (lu.substitutes||[]).map(function(p){ return p.player ? p.player.name : ''; })
+          };
+        });
+      }
+      results.push(res);
     });
     return results.length > 0 ? results : null;
   } catch(e) { console.log('API-Football fetch hiba:', e.message); return null; }
@@ -5590,6 +5637,25 @@ async function checkAutoResults() {
         // Élő eredmény mentése a kijelzéshez
         liveScores[localMatch.id] = {home: ar.homeScore, away: ar.awayScore, minute: ar.minute, status: 'live'};
         liveUpdated = true;
+        // Események, statisztikák, felállás mentése (ha van)
+        if(ar.events) {
+          liveEventsAll[localMatch.id] = ar.events;
+          // matchScorers frissítése events-ből (felülírja ESPN adatot)
+          var evGoals = ar.events.filter(function(e){ return e.type==='goal'; });
+          var evCards = ar.events.filter(function(e){ return e.type==='card'; });
+          var parsed = [];
+          evGoals.forEach(function(e){
+            parsed.push({name:e.player, teamId:e.teamSide, minute:e.min+(e.extra?'+'+e.extra:'')+"'",
+              type:'goal', isOg:e.detail.indexOf('own')>=0, isPen:e.detail.indexOf('penalty')>=0});
+          });
+          evCards.forEach(function(e){
+            var ct = e.detail.indexOf('red')>=0 ? 'red' : e.detail.indexOf('second')>=0 ? 'yellow2' : 'yellow';
+            parsed.push({name:e.player, teamId:e.teamSide, minute:e.min+(e.extra?'+'+e.extra:'')+"'", type:ct});
+          });
+          if(parsed.length>0) matchScorers[localMatch.id] = parsed;
+        }
+        if(ar.stats) liveStats[localMatch.id] = ar.stats;
+        if(ar.lineups) liveLineups[localMatch.id] = ar.lineups;
       } else if(ar.status === 'ft' && !allResults[localMatch.id] && isAdminUnlocked) {
         // Végleges eredmény mentése (csak admin)
         var h = ar.homeScore, a = ar.awayScore;
@@ -5602,6 +5668,24 @@ async function checkAutoResults() {
         autoSaved++;
         showToast('🤖 Auto: '+localMatch.home+' '+score+' '+localMatch.away);
       }
+      // Events/stats/lineups mentése FT meccsekre is (utólagos megtekintés)
+      if(ar.events && ar.events.length && !liveEventsAll[localMatch.id]) {
+        liveEventsAll[localMatch.id] = ar.events;
+        var evGoals = ar.events.filter(function(e){ return e.type==='goal'; });
+        var evCards = ar.events.filter(function(e){ return e.type==='card'; });
+        var parsed = [];
+        evGoals.forEach(function(e){
+          parsed.push({name:e.player, teamId:e.teamSide, minute:e.min+(e.extra?'+'+e.extra:'')+"'",
+            type:'goal', isOg:e.detail.indexOf('own')>=0, isPen:e.detail.indexOf('penalty')>=0});
+        });
+        evCards.forEach(function(e){
+          var ct = e.detail.indexOf('red')>=0 ? 'red' : e.detail.indexOf('second')>=0 ? 'yellow2' : 'yellow';
+          parsed.push({name:e.player, teamId:e.teamSide, minute:e.min+(e.extra?'+'+e.extra:'')+"'", type:ct});
+        });
+        if(parsed.length>0) matchScorers[localMatch.id] = parsed;
+      }
+      if(ar.stats && !liveStats[localMatch.id]) liveStats[localMatch.id] = ar.stats;
+      if(ar.lineups && !liveLineups[localMatch.id]) liveLineups[localMatch.id] = ar.lineups;
     });
 
     // Élő állapot eltávolítása ha a meccs már nem az API-ban
@@ -5735,6 +5819,10 @@ async function refreshLiveScore(mid) {
           liveScores[mid] = {home:ar.homeScore, away:ar.awayScore, minute:'Vége', status:'ft'};
           showToast('🏁 Vége: '+ar.homeScore+':'+ar.awayScore+' — rögzítés az auto rendszerre vár');
         }
+        // Events/stats/lineups mentése
+        if(ar.events) liveEventsAll[mid] = ar.events;
+        if(ar.stats) liveStats[mid] = ar.stats;
+        if(ar.lineups) liveLineups[mid] = ar.lineups;
         renderAll(); renderLiveTicker(); detectGoals();
       }
     });
@@ -6545,6 +6633,109 @@ function buildScorerRow(mid, m) {
       + '<div style="flex:1;text-align:right;">' + (awayCards.length ? fmtCards(awayCards) : '') + '</div>'
       + '</div>';
   }
+  return html;
+}
+
+// ═══ ÉLŐ STATISZTIKÁK BAR ═══
+function buildLiveStatsBar(mid) {
+  var st = liveStats[mid];
+  if(!st) return '';
+  var rows = [
+    {label:'Labdabirtoklás', h:st.possession[0], a:st.possession[1], pct:true},
+    {label:'Lövések', h:st.shots[0], a:st.shots[1]},
+    {label:'Kapura', h:st.shotsOn[0], a:st.shotsOn[1]},
+    {label:'Szögletek', h:st.corners[0], a:st.corners[1]},
+    {label:'Szabálytalanságok', h:st.fouls[0], a:st.fouls[1]}
+  ];
+  var html = '<div class="live-stats-section" style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 10px 8px;font-family:Oswald,sans-serif;font-size:11px;">';
+  html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'span\').textContent=this.nextElementSibling.style.display===\'none\'?\'▸\':\'▾\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.45);font-size:10px;letter-spacing:1px;padding-bottom:4px;"><span>▾</span> STATISZTIKÁK</div>';
+  html += '<div>';
+  rows.forEach(function(r) {
+    var total = r.h + r.a || 1;
+    var hPct = r.pct ? r.h : Math.round(r.h/total*100);
+    var aPct = r.pct ? r.a : Math.round(r.a/total*100);
+    var hW = Math.max(hPct, 5);
+    var aW = Math.max(100-hW, 5);
+    html += '<div style="display:flex;align-items:center;gap:4px;margin:3px 0;">'
+      + '<span style="width:22px;text-align:right;color:rgba(240,244,240,0.8);font-weight:600;font-size:11px;">'+(r.pct?r.h+'%':r.h)+'</span>'
+      + '<div style="flex:1;display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,0.06);gap:1px;">'
+      + '<div style="width:'+hW+'%;background:rgba(59,130,246,0.6);border-radius:3px 0 0 3px;transition:width 0.5s;"></div>'
+      + '<div style="width:'+aW+'%;background:rgba(239,68,68,0.5);border-radius:0 3px 3px 0;transition:width 0.5s;"></div>'
+      + '</div>'
+      + '<span style="width:22px;text-align:left;color:rgba(240,244,240,0.8);font-weight:600;font-size:11px;">'+(r.pct?r.a+'%':r.a)+'</span>'
+      + '</div>'
+      + '<div style="text-align:center;font-size:9px;color:rgba(240,244,240,0.3);margin:-1px 0 2px;letter-spacing:0.5px;">'+r.label+'</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+// ═══ FELÁLLÁS MEGJELENÍTÉS ═══
+function buildLineupSection(mid, m) {
+  var lu = liveLineups[mid];
+  if(!lu || (!lu.home && !lu.away)) return '';
+  var html = '<div class="lineup-section" style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 10px 8px;font-family:Oswald,sans-serif;font-size:11px;">';
+  html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'span\').textContent=this.nextElementSibling.style.display===\'none\'?\'▸\':\'▾\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.45);font-size:10px;letter-spacing:1px;padding-bottom:4px;"><span>▸</span> FELÁLLÁS</div>';
+  html += '<div style="display:none;">';
+  ['home','away'].forEach(function(side) {
+    if(!lu[side]) return;
+    var teamName = side==='home' ? (m?m.home:'Hazai') : (m?m.away:'Vendég');
+    var teamFlag = side==='home' ? (m?m.homeFlag:'') : (m?m.awayFlag:'');
+    html += '<div style="margin-bottom:8px;">';
+    html += '<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">'
+      + (teamFlag?'<span style="font-size:14px;">'+teamFlag+'</span>':'')
+      + '<span style="color:rgba(240,244,240,0.7);font-weight:600;">'+escHtml(teamName)+'</span>'
+      + (lu[side].formation?'<span style="color:rgba(245,197,24,0.6);font-size:10px;background:rgba(245,197,24,0.08);padding:1px 6px;border-radius:4px;">'+lu[side].formation+'</span>':'')
+      + '</div>';
+    // Starting XI
+    if(lu[side].players && lu[side].players.length) {
+      html += '<div style="display:flex;flex-wrap:wrap;gap:2px 6px;">';
+      lu[side].players.forEach(function(name,i) {
+        var short = name.split(' ').pop();
+        html += '<span style="color:rgba(240,244,240,0.6);font-size:10px;">'+(i+1)+'. '+short+'</span>';
+      });
+      html += '</div>';
+    }
+    // Subs (first 5 only to save space)
+    if(lu[side].subs && lu[side].subs.length) {
+      var showSubs = lu[side].subs.slice(0,5);
+      html += '<div style="margin-top:2px;"><span style="font-size:9px;color:rgba(240,244,240,0.3);">🔄 </span>';
+      html += showSubs.map(function(name){ return '<span style="color:rgba(240,244,240,0.35);font-size:9px;">'+name.split(' ').pop()+'</span>'; }).join(', ');
+      if(lu[side].subs.length > 5) html += '<span style="color:rgba(240,244,240,0.25);font-size:9px;"> +' + (lu[side].subs.length-5) + '</span>';
+      html += '</div>';
+    }
+    // Coach
+    if(lu[side].coach) {
+      html += '<div style="font-size:9px;color:rgba(240,244,240,0.3);margin-top:1px;">🧑‍💼 '+lu[side].coach+'</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+// ═══ ESEMÉNY-TIMELINE (cserék, VAR) ═══
+function buildEventTimeline(mid) {
+  var events = liveEventsAll[mid];
+  if(!events || !events.length) return '';
+  // Only show subs and VAR (goals and cards already in buildScorerRow)
+  var subs = events.filter(function(e){ return e.type==='subst'; });
+  if(subs.length === 0) return '';
+  var html = '<div style="border-top:1px solid rgba(255,255,255,0.04);padding:3px 8px 4px;font-family:Oswald,sans-serif;font-size:10px;">';
+  var homeSubs = subs.filter(function(e){ return e.teamSide==='home'; });
+  var awaySubs = subs.filter(function(e){ return e.teamSide==='away'; });
+  var fmtSub = function(s) {
+    var out = s.player ? s.player.split(' ').pop() : '?';
+    var inP = s.assist ? s.assist.split(' ').pop() : '';
+    return '<span style="color:rgba(240,244,240,0.4);">🔄 '+(inP?'<span style="color:rgba(34,197,94,0.7);">↑'+inP+'</span> ':'')+'<span style="color:rgba(239,68,68,0.6);">↓'+out+'</span></span><span style="color:rgba(240,244,240,0.2);font-size:9px;"> '+s.min+(s.extra?'+'+s.extra:'')+"'"+'</span>';
+  };
+  if(homeSubs.length || awaySubs.length) {
+    html += '<div style="display:flex;justify-content:space-between;gap:8px;">'
+      + '<div style="flex:1;text-align:left;">' + homeSubs.map(fmtSub).join(' ') + '</div>'
+      + '<div style="flex:1;text-align:right;">' + awaySubs.map(fmtSub).join(' ') + '</div>'
+      + '</div>';
+  }
+  html += '</div>';
   return html;
 }
 
