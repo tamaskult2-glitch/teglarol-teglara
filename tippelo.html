@@ -3354,6 +3354,7 @@ function renderMatches() {
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
           ${kickoffLocked&&!result&&isAdminUnlocked?'<button onclick="event.stopPropagation();refreshLiveScore(\''+m.id+'\')" style="font-size:9px;color:#4ade80;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">🔄</button>':''}
+          ${isAdminUnlocked&&(liveScores[m.id]||result)?'<span style="font-size:8px;color:rgba(240,244,240,0.2);">'+(liveEventsAll[m.id]?'📋':'')+(liveStats[m.id]?'📊':'')+(liveLineups[m.id]?'👕':'')+((!liveEventsAll[m.id]&&!liveStats[m.id]&&!liveLineups[m.id])?'⏳ADat':'')+'</span>':''}
           ${result?'<span style="font-size:9px;color:rgba(245,197,24,0.6);background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>':''}
         </div>
         ${m.title?'<div style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(245,197,24,0.5);letter-spacing:1.5px;padding:6px 0 0;">'+m.title+'</div>':''}
@@ -5398,30 +5399,34 @@ async function fetchFromApiFootball() {
       if(fix.fixture.id) fixtureIds.push(fix.fixture.id);
     });
 
-    // 2. lépés: ha nincs events adat → részletes lekérés fixture ID-kkal (1 extra hívás)
-    var needsDetail = results.some(function(r){ return !r.events && r.status === 'live'; });
-    if(needsDetail && fixtureIds.length > 0) {
-      try {
-        var idsStr = fixtureIds.join('-');
-        console.log('📊 Részletes adat lekérés:', idsStr);
-        var resp2 = await fetch(API_FOOTBALL_URL+'?ids='+idsStr, {
-          method: 'GET', headers: myHeaders, redirect: 'follow'
-        });
-        if(resp2.ok) {
-          var data2 = await resp2.json();
-          if(data2 && data2.response) {
-            data2.response.forEach(function(fix) {
-              var fid = fix.fixture.id;
+    // 2. lépés: ha nincs events adat → részletes lekérés fixture ID-kkal
+    var liveWithoutDetail = results.filter(function(r){ return !r.events && (r.status === 'live' || r.status === 'ft') && r.fixtureId; });
+    if(liveWithoutDetail.length > 0) {
+      console.log('📊 Részletes adat kell '+liveWithoutDetail.length+' meccshez');
+      for(var di=0; di<liveWithoutDetail.length; di++) {
+        try {
+          var fid = liveWithoutDetail[di].fixtureId;
+          console.log('📊 Lekérés fixture #'+fid);
+          var resp2 = await fetch(API_FOOTBALL_URL+'?id='+fid, {
+            method: 'GET', headers: myHeaders, redirect: 'follow'
+          });
+          if(resp2.ok) {
+            var data2 = await resp2.json();
+            if(data2 && data2.response && data2.response.length > 0) {
+              var fix = data2.response[0];
               var match = results.find(function(r){ return r.fixtureId === fid; });
-              if(!match) return;
-              if(fix.events && fix.events.length && !match.events) match.events = parseApiEvents(fix);
-              if(fix.statistics && fix.statistics.length >= 2 && !match.stats) match.stats = parseApiStats(fix);
-              if(fix.lineups && fix.lineups.length >= 2 && !match.lineups) match.lineups = parseApiLineups(fix);
-            });
-            console.log('✅ Részletes adat betöltve');
-          }
-        }
-      } catch(e2) { console.log('📊 Részletes adat hiba:', e2.message); }
+              if(match) {
+                if(fix.events && fix.events.length) { match.events = parseApiEvents(fix); console.log('  ✅ Events: '+fix.events.length); }
+                if(fix.statistics && fix.statistics.length >= 2) { match.stats = parseApiStats(fix); console.log('  ✅ Stats OK'); }
+                if(fix.lineups && fix.lineups.length >= 2) { match.lineups = parseApiLineups(fix); console.log('  ✅ Lineups OK'); }
+                if(!fix.events || !fix.events.length) console.log('  ⚠️ Events üres');
+                if(!fix.statistics || fix.statistics.length < 2) console.log('  ⚠️ Stats üres');
+                if(!fix.lineups || fix.lineups.length < 2) console.log('  ⚠️ Lineups üres');
+              }
+            } else { console.log('  ⚠️ Üres válasz fixture #'+fid); }
+          } else { console.log('  ❌ HTTP '+resp2.status+' fixture #'+fid); }
+        } catch(e2) { console.log('📊 Részletes adat hiba fixture #'+liveWithoutDetail[di].fixtureId+':', e2.message); }
+      }
     }
 
     return results.length > 0 ? results : null;
@@ -5711,6 +5716,7 @@ async function checkAutoResults() {
         liveUpdated = true;
         // Események, statisztikák, felállás mentése (ha van)
         if(ar.events) {
+          console.log('📋 Events betöltve: '+localMatch.id+' ('+ar.events.length+' event)');
           liveEventsAll[localMatch.id] = ar.events;
           // matchScorers frissítése events-ből (felülírja ESPN adatot)
           var evGoals = ar.events.filter(function(e){ return e.type==='goal'; });
@@ -5726,8 +5732,8 @@ async function checkAutoResults() {
           });
           if(parsed.length>0) matchScorers[localMatch.id] = parsed;
         }
-        if(ar.stats) liveStats[localMatch.id] = ar.stats;
-        if(ar.lineups) liveLineups[localMatch.id] = ar.lineups;
+        if(ar.stats) { liveStats[localMatch.id] = ar.stats; console.log('📊 Stats betöltve: '+localMatch.id); }
+        if(ar.lineups) { liveLineups[localMatch.id] = ar.lineups; console.log('👕 Lineups betöltve: '+localMatch.id); }
       } else if(ar.status === 'ft' && !allResults[localMatch.id] && isAdminUnlocked) {
         // Végleges eredmény mentése (csak admin)
         var h = ar.homeScore, a = ar.awayScore;
