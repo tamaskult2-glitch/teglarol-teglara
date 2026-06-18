@@ -3284,7 +3284,23 @@ function renderMatches() {
   // Ne rendereljünk újra ha a user épp pontos eredményt ír
   var activeEl = document.activeElement;
   if(activeEl && activeEl.id && (activeEl.id.startsWith('sh_') || activeEl.id.startsWith('sa_'))) return;
+  if(activeEl && activeEl.id && activeEl.id.startsWith('atip_')) return;
   const container=document.getElementById('matchesContainer');
+
+  // ═══ SCROLL POZÍCIÓ MEGŐRZÉS ═══
+  // Megkeressük melyik meccs kártya van a viewport közepén
+  var _savedMatchId = null;
+  var _savedOffsetFromTop = 0;
+  try {
+    var cards = container.querySelectorAll('.match-card');
+    var vpMid = window.innerHeight / 2;
+    var bestDist = Infinity;
+    cards.forEach(function(c) {
+      var r = c.getBoundingClientRect();
+      var dist = Math.abs(r.top + r.height/2 - vpMid);
+      if(dist < bestDist) { bestDist = dist; _savedMatchId = c.id; _savedOffsetFromTop = r.top; }
+    });
+  } catch(e) {}
   // BL, Foca (TEST1 + CM_ isEmob) nem jelennek meg a fő listában
   const mainMatches = ALL_MATCHES.filter(function(m){
     return m.id !== 'TEST1' && m.id !== 'BL2026'
@@ -3397,6 +3413,20 @@ function renderMatches() {
     html += '</div>'; // nap wrapper vége
   });
   container.innerHTML=html;
+
+  // ═══ SCROLL POZÍCIÓ VISSZAÁLLÍTÁS ═══
+  if(_savedMatchId) {
+    try {
+      var restoredCard = document.getElementById(_savedMatchId);
+      if(restoredCard) {
+        var newRect = restoredCard.getBoundingClientRect();
+        var drift = newRect.top - _savedOffsetFromTop;
+        if(Math.abs(drift) > 5) { // Csak ha >5px eltérés van
+          window.scrollBy({top: drift, behavior: 'instant'});
+        }
+      }
+    } catch(e) {}
+  }
 }
 
 function renderStats() {
