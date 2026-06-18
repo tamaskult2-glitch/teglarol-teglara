@@ -2851,9 +2851,10 @@ function buildOtherTips(mid, locked) {
         var liveScore = hg+':'+ag;
         if(o === liveOutcome) {
           bg = 'rgba(34,197,94,0.08)';
-          var lPts = 1;
-          if(sc && sc.h+':'+sc.a===liveScore) { lPts=3; livePtsStr=' <span style="color:#22c55e;font-size:10px;">🎯+3</span>'; }
-          else { if(sc){var tD=sc.h-sc.a,rD=hg-ag;if(tD===rD)lPts=2;} livePtsStr=' <span style="color:#22c55e;font-size:10px;">+'+lPts+'</span>'; }
+          var lMult = m ? getMatchMultiplier(m) : 1;
+          var lPts = 1 * lMult;
+          if(sc && sc.h+':'+sc.a===liveScore) { lPts=3*lMult; livePtsStr=' <span style="color:#22c55e;font-size:10px;">🎯+'+lPts+'</span>'; }
+          else { if(sc){var tD=sc.h-sc.a,rD=hg-ag;if(tD===rD)lPts=2*lMult;} livePtsStr=' <span style="color:#22c55e;font-size:10px;">+'+lPts+'</span>'; }
         } else {
           bg = 'rgba(239,68,68,0.06)';
           nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.5)';
@@ -3009,10 +3010,17 @@ function buildTippTable() {
             if(result && h!==null && a!==null) {
               rows += '<span style="font-family:Oswald,sans-serif;font-size:11px;font-weight:600;color:'+col+';opacity:0.85;white-space:nowrap;">'+h+':'+a+(isExact?' 🎯':'')+'</span>';
             }
-            if(et)  rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+etCol+';line-height:1;letter-spacing:0.5px;">⚡'+et+(etRes&&et===etRes?' +1':'')+'</span>';
-            if(pen) rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+penCol+';line-height:1;letter-spacing:0.5px;">🥅'+pen+(penRes&&pen===penRes?' +1':'')+'</span>';
-            if(isExact)  rows += '<span style="font-size:9px;color:#4ade80;line-height:1;">🎯</span>';
-            else if(isHit) rows += '<span style="font-size:9px;color:#86efac;line-height:1;">+1</span>';
+            if(et)  { var etMul = getMatchMultiplier(m); rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+etCol+';line-height:1;letter-spacing:0.5px;">⚡'+et+(etRes&&et===etRes?' +'+(1*etMul):'')+'</span>'; }
+            if(pen) { var penMul = getMatchMultiplier(m); rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+penCol+';line-height:1;letter-spacing:0.5px;">🥅'+pen+(penRes&&pen===penRes?' +'+(1*penMul):'')+'</span>'; }
+            if(result) {
+              var tipObj = tip && typeof tip==='object' ? tip : {o:tip};
+              var cellPts = calcMatchPoints(m, tipObj);
+              if(isExact) rows += '<span style="font-size:9px;color:#4ade80;line-height:1;">🎯+'+(3*getMatchMultiplier(m))+'</span>';
+              else if(isHit && cellPts > 0) {
+                var hasGD = h!==null && a!==null && score && isGoalDiffCorrect({h:parseInt(h),a:parseInt(a)}, score);
+                rows += '<span style="font-size:9px;color:'+(hasGD?'#60a5fa':'#86efac')+';line-height:1;">'+(hasGD?'📐':'')+'+'+cellPts+'</span>';
+              }
+            }
             rows += '</div></td>';
           });
 
@@ -3400,19 +3408,14 @@ function renderStats() {
       tipped++;
       if(res){
         resolved++;
+        var mPts = calcMatchPoints(m, tip);
+        pts += mPts;
         const outcome=getTipOutcome(tip);
         const tipSc=getTipScore(tip);
-        if(outcome===res){
-          correct++;
-          if(tipSc&&sc&&tipSc.h+':'+tipSc.a===sc) pts+=3;
-          else pts+=1;
-        }
-        if(m.knockout) {
-          var etRes = allEtResults[m.id];
-          if(etRes){ var etTip = getTipEt(tip); if(etTip && etTip === etRes) pts+=1; }
-          var penRes = allPenResults[m.id];
-          if(penRes){ var penTip = getTipPen(tip); if(penTip && penTip === penRes) pts+=1; }
-        }
+        // score overrides outcome for correct counting
+        var effectiveOutcome = outcome;
+        if(tipSc) { var implied = tipSc.h>tipSc.a?'1':tipSc.h===tipSc.a?'X':'2'; if(implied!==outcome) effectiveOutcome=implied; }
+        if(effectiveOutcome===res) correct++;
       }
     }
   });
