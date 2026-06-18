@@ -3394,8 +3394,8 @@ function renderMatches() {
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildScorerRow(m.id, m) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
-          ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildLiveStatsBar(m.id) : ''}
-          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live') || (kickoffLocked&&!result)) ? buildLineupSection(m.id, m) : ''}
+          ${liveStats[m.id] ? buildLiveStatsBar(m.id) : ''}
+          ${(liveLineups[m.id]) ? buildLineupSection(m.id, m) : ''}
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
@@ -5362,7 +5362,10 @@ async function fetchFromApiFootball() {
     if(!data || !data.response) return null;
     if(data.errors && Object.keys(data.errors).length > 0) { console.log('API-Football hiba:', data.errors); return null; }
     if(!data.response.length) return null;
+
+    // 1. lépés: alap eredmények + fixture ID-k gyűjtése
     var results = [];
+    var fixtureIds = [];
     data.response.forEach(function(fix) {
       var st = fix.fixture && fix.fixture.status ? fix.fixture.status.short : '';
       var isLive = st==='1H'||st==='2H'||st==='HT'||st==='ET'||st==='P'||st==='BT';
@@ -5378,52 +5381,91 @@ async function fetchFromApiFootball() {
         homeScore: fix.goals.home!==null ? fix.goals.home : 0,
         awayScore: fix.goals.away!==null ? fix.goals.away : 0,
         status: isFT ? 'ft' : 'live',
-        minute: minute
+        minute: minute,
+        fixtureId: fix.fixture.id
       };
-      // Events (goals, cards, subs, VAR)
+      // Ha a lista-válasz tartalmaz events/stats/lineups adatot, rögtön kinyerjük
       if(fix.events && fix.events.length) {
-        res.events = fix.events.map(function(ev) {
-          return {
-            min: ev.time.elapsed||0, extra: ev.time.extra||null,
-            type: (ev.type||'').toLowerCase(), detail: (ev.detail||'').toLowerCase(),
-            teamSide: ev.team && fix.teams.home && ev.team.id===fix.teams.home.id ? 'home' : 'away',
-            player: ev.player ? ev.player.name : '', assist: ev.assist ? ev.assist.name : ''
-          };
-        });
+        res.events = parseApiEvents(fix);
       }
-      // Statistics
       if(fix.statistics && fix.statistics.length >= 2) {
-        var hs = {}, as = {};
-        fix.statistics[0].statistics.forEach(function(s){ hs[s.type]=s.value; });
-        fix.statistics[1].statistics.forEach(function(s){ as[s.type]=s.value; });
-        res.stats = {
-          possession: [parseInt(hs['Ball Possession'])||0, parseInt(as['Ball Possession'])||0],
-          shots: [parseInt(hs['Total Shots'])||0, parseInt(as['Total Shots'])||0],
-          shotsOn: [parseInt(hs['Shots on Goal'])||0, parseInt(as['Shots on Goal'])||0],
-          corners: [parseInt(hs['Corner Kicks'])||0, parseInt(as['Corner Kicks'])||0],
-          fouls: [parseInt(hs['Fouls'])||0, parseInt(as['Fouls'])||0],
-          offsides: [parseInt(hs['Offsides'])||0, parseInt(as['Offsides'])||0],
-          passes: [parseInt(hs['Total passes'])||0, parseInt(as['Total passes'])||0],
-          passAcc: [parseInt(hs['Passes %'])||0, parseInt(as['Passes %'])||0]
-        };
+        res.stats = parseApiStats(fix);
       }
-      // Lineups
       if(fix.lineups && fix.lineups.length >= 2) {
-        res.lineups = {};
-        fix.lineups.forEach(function(lu, idx) {
-          var side = idx === 0 ? 'home' : 'away';
-          res.lineups[side] = {
-            formation: lu.formation || '',
-            coach: lu.coach ? lu.coach.name : '',
-            players: (lu.startXI||[]).map(function(p){ return p.player ? p.player.name : ''; }),
-            subs: (lu.substitutes||[]).map(function(p){ return p.player ? p.player.name : ''; })
-          };
-        });
+        res.lineups = parseApiLineups(fix);
       }
       results.push(res);
+      if(fix.fixture.id) fixtureIds.push(fix.fixture.id);
     });
+
+    // 2. lépés: ha nincs events adat → részletes lekérés fixture ID-kkal (1 extra hívás)
+    var needsDetail = results.some(function(r){ return !r.events && r.status === 'live'; });
+    if(needsDetail && fixtureIds.length > 0) {
+      try {
+        var idsStr = fixtureIds.join('-');
+        console.log('📊 Részletes adat lekérés:', idsStr);
+        var resp2 = await fetch(API_FOOTBALL_URL+'?ids='+idsStr, {
+          method: 'GET', headers: myHeaders, redirect: 'follow'
+        });
+        if(resp2.ok) {
+          var data2 = await resp2.json();
+          if(data2 && data2.response) {
+            data2.response.forEach(function(fix) {
+              var fid = fix.fixture.id;
+              var match = results.find(function(r){ return r.fixtureId === fid; });
+              if(!match) return;
+              if(fix.events && fix.events.length && !match.events) match.events = parseApiEvents(fix);
+              if(fix.statistics && fix.statistics.length >= 2 && !match.stats) match.stats = parseApiStats(fix);
+              if(fix.lineups && fix.lineups.length >= 2 && !match.lineups) match.lineups = parseApiLineups(fix);
+            });
+            console.log('✅ Részletes adat betöltve');
+          }
+        }
+      } catch(e2) { console.log('📊 Részletes adat hiba:', e2.message); }
+    }
+
     return results.length > 0 ? results : null;
   } catch(e) { console.log('API-Football fetch hiba:', e.message); return null; }
+}
+
+// API-Football válasz parser segédfüggvények
+function parseApiEvents(fix) {
+  return fix.events.map(function(ev) {
+    return {
+      min: ev.time.elapsed||0, extra: ev.time.extra||null,
+      type: (ev.type||'').toLowerCase(), detail: (ev.detail||'').toLowerCase(),
+      teamSide: ev.team && fix.teams.home && ev.team.id===fix.teams.home.id ? 'home' : 'away',
+      player: ev.player ? ev.player.name : '', assist: ev.assist ? ev.assist.name : ''
+    };
+  });
+}
+function parseApiStats(fix) {
+  var hs = {}, as = {};
+  fix.statistics[0].statistics.forEach(function(s){ hs[s.type]=s.value; });
+  fix.statistics[1].statistics.forEach(function(s){ as[s.type]=s.value; });
+  return {
+    possession: [parseInt(hs['Ball Possession'])||0, parseInt(as['Ball Possession'])||0],
+    shots: [parseInt(hs['Total Shots'])||0, parseInt(as['Total Shots'])||0],
+    shotsOn: [parseInt(hs['Shots on Goal'])||0, parseInt(as['Shots on Goal'])||0],
+    corners: [parseInt(hs['Corner Kicks'])||0, parseInt(as['Corner Kicks'])||0],
+    fouls: [parseInt(hs['Fouls'])||0, parseInt(as['Fouls'])||0],
+    offsides: [parseInt(hs['Offsides'])||0, parseInt(as['Offsides'])||0],
+    passes: [parseInt(hs['Total passes'])||0, parseInt(as['Total passes'])||0],
+    passAcc: [parseInt(hs['Passes %'])||0, parseInt(as['Passes %'])||0]
+  };
+}
+function parseApiLineups(fix) {
+  var lu = {};
+  fix.lineups.forEach(function(l, idx) {
+    var side = idx === 0 ? 'home' : 'away';
+    lu[side] = {
+      formation: l.formation || '',
+      coach: l.coach ? l.coach.name : '',
+      players: (l.startXI||[]).map(function(p){ return p.player ? p.player.name : ''; }),
+      subs: (l.substitutes||[]).map(function(p){ return p.player ? p.player.name : ''; })
+    };
+  });
+  return lu;
 }
 
 // ESPN API (tartalék 1)
