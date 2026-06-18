@@ -1157,6 +1157,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.1</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -3354,6 +3355,7 @@ function renderMatches() {
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
           ${kickoffLocked&&!result&&isAdminUnlocked?'<button onclick="event.stopPropagation();refreshLiveScore(\''+m.id+'\')" style="font-size:9px;color:#4ade80;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">🔄</button>':''}
+          ${kickoffLocked&&isAdminUnlocked?'<button onclick="event.stopPropagation();testDetailFetch(\''+m.id+'\')" style="font-size:9px;color:#60a5fa;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">📊</button>':''}
           ${isAdminUnlocked&&(liveScores[m.id]||result)?'<span style="font-size:8px;color:rgba(240,244,240,0.2);">'+(liveEventsAll[m.id]?'📋':'')+(liveStats[m.id]?'📊':'')+(liveLineups[m.id]?'👕':'')+((!liveEventsAll[m.id]&&!liveStats[m.id]&&!liveLineups[m.id])?'⏳ADat':'')+'</span>':''}
           ${result?'<span style="font-size:9px;color:rgba(245,197,24,0.6);background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>':''}
         </div>
@@ -5820,6 +5822,80 @@ async function submitAutoResult(mid) {
 }
 var autoResInterval = setInterval(checkAutoResults, 120000); // 2 percenként
 setTimeout(checkAutoResults, 15000); // első: 15mp
+
+// ═══ ADMIN: Részletes adat teszt (közvetlen API hívás) ═══
+async function testDetailFetch(mid) {
+  showToast('📊 Adat lekérés...');
+  try {
+    // 1. Keressük meg a fixture ID-t az API-ban
+    var today = getBudapestToday();
+    var h = new Headers(); h.append('x-apisports-key', API_FOOTBALL_KEY);
+    var r1 = await fetch(API_FOOTBALL_URL+'?league=1&season=2026&date='+today, {method:'GET', headers:h});
+    if(!r1.ok) { showToast('❌ API HTTP '+r1.status); return; }
+    var d1 = await r1.json();
+    if(d1.errors && Object.keys(d1.errors).length) { showToast('❌ API hiba: '+JSON.stringify(d1.errors)); return; }
+    showToast('✅ Lista: '+d1.response.length+' meccs, maradék: '+(d1.paging?d1.paging.current:'')+'/'+((d1.errors&&d1.errors.rateLimit)||'?'));
+    
+    // 2. Keressük meg a mi meccsünket
+    var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+    if(!m) { showToast('❌ Match nem talált: '+mid); return; }
+    var fix = null;
+    d1.response.forEach(function(f) {
+      var hn = resolveTeamName(f.teams.home.name, '');
+      var an = resolveTeamName(f.teams.away.name, '');
+      if((hn===m.home||f.teams.home.name.indexOf(m.home)>=0||m.home.indexOf(hn)>=0) && 
+         (an===m.away||f.teams.away.name.indexOf(m.away)>=0||m.away.indexOf(an)>=0)) fix = f;
+    });
+    if(!fix) { showToast('⚠️ Meccs nincs az API-ban: '+m.home+' vs '+m.away); return; }
+    
+    var fid = fix.fixture.id;
+    showToast('🔍 Fixture #'+fid+' — részletek lekérése...');
+    
+    // Ellenőrizzük: az alapválasz tartalmaz-e eventeket
+    var hasEvents1 = fix.events && fix.events.length > 0;
+    var hasStats1 = fix.statistics && fix.statistics.length >= 2;
+    var hasLineups1 = fix.lineups && fix.lineups.length >= 2;
+    
+    if(hasEvents1 || hasStats1 || hasLineups1) {
+      showToast('📋 Lista TARTALMAZ: '+(hasEvents1?'events('+fix.events.length+') ':' ')+(hasStats1?'stats ':'')+(hasLineups1?'lineups':''));
+      // Rögtön mentjük
+      if(hasEvents1) { liveEventsAll[mid] = parseApiEvents(fix); matchScorers[mid] = parseEventsToScorers(parseApiEvents(fix)); }
+      if(hasStats1) liveStats[mid] = parseApiStats(fix);
+      if(hasLineups1) liveLineups[mid] = parseApiLineups(fix);
+      renderAll();
+      return;
+    }
+    
+    // 3. Külön hívás a fixture ID-val
+    var r2 = await fetch(API_FOOTBALL_URL+'?id='+fid, {method:'GET', headers:h});
+    if(!r2.ok) { showToast('❌ Részlet HTTP '+r2.status); return; }
+    var d2 = await r2.json();
+    if(!d2.response || !d2.response.length) { showToast('⚠️ Üres részlet válasz'); return; }
+    var fx = d2.response[0];
+    var hasE = fx.events && fx.events.length > 0;
+    var hasS = fx.statistics && fx.statistics.length >= 2;
+    var hasL = fx.lineups && fx.lineups.length >= 2;
+    showToast('📊 Részlet: '+(hasE?'events('+fx.events.length+') ':'❌events ')+(hasS?'stats ':'❌stats ')+(hasL?'lineups':'❌lineups'));
+    
+    if(hasE) { liveEventsAll[mid] = parseApiEvents(fx); matchScorers[mid] = parseEventsToScorers(parseApiEvents(fx)); }
+    if(hasS) liveStats[mid] = parseApiStats(fx);
+    if(hasL) liveLineups[mid] = parseApiLineups(fx);
+    renderAll();
+  } catch(e) { showToast('❌ Hiba: '+e.message); }
+}
+
+function parseEventsToScorers(events) {
+  var parsed = [];
+  events.filter(function(e){ return e.type==='goal'; }).forEach(function(e){
+    parsed.push({name:e.player, teamId:e.teamSide, minute:e.min+(e.extra?'+'+e.extra:'')+"'",
+      type:'goal', isOg:e.detail.indexOf('own')>=0, isPen:e.detail.indexOf('penalty')>=0});
+  });
+  events.filter(function(e){ return e.type==='card'; }).forEach(function(e){
+    var ct = e.detail.indexOf('red')>=0 ? 'red' : e.detail.indexOf('second')>=0 ? 'yellow2' : 'yellow';
+    parsed.push({name:e.player, teamId:e.teamSide, minute:e.min+(e.extra?'+'+e.extra:'')+"'", type:ct});
+  });
+  return parsed;
+}
 
 // ÉLŐ TICKER
 function renderLiveTicker() {
