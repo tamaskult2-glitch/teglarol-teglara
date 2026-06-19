@@ -1157,7 +1157,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.2</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.3</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -3396,12 +3396,12 @@ function renderMatches() {
           </div>
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildScorerRow(m.id, m) : ''}
-          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
-          ${liveStats[m.id] ? buildLiveStatsBar(m.id) : ''}
-          ${(liveLineups[m.id]) ? buildLineupSection(m.id, m) : ''}
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
+          ${liveStats[m.id] ? buildLiveStatsBar(m.id) : ''}
+          ${(liveLineups[m.id]) ? buildLineupSection(m.id, m) : ''}
           ${liveScores[m.id]&&liveScores[m.id].status==='live'?`<div class="live-react-bar" id="lrb_${m.id}" style="display:flex;gap:4px;justify-content:center;padding:8px 0 4px;flex-wrap:wrap;">
             <button onclick="sendReaction('${m.id}','⚽')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">⚽</button>
             <button onclick="sendReaction('${m.id}','😱')" style="font-size:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 10px;cursor:pointer;transition:transform 0.1s;" ontouchstart="this.style.transform='scale(1.3)'" ontouchend="this.style.transform='scale(1)'">😱</button>
@@ -5828,17 +5828,14 @@ async function testDetailFetch(mid) {
   showToast('📊 ESPN adat lekérés...');
   try {
     var m = ALL_MATCHES.find(function(x){return x.id===mid;});
-    if(!m) { showToast('❌ Match: '+mid); return; }
-    // 1. ESPN scoreboard → event ID keresés
+    if(!m) { alert('❌ Match: '+mid); return; }
     var today = getBudapestToday().replace(/-/g,'');
     var d = new Date(); d.setDate(d.getDate()-1);
     var yesterday = d.toLocaleDateString('sv-SE',{timeZone:'Europe/Budapest'}).replace(/-/g,'');
     var r1 = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+yesterday+'-'+today+'&limit=50');
-    if(!r1.ok) { showToast('❌ ESPN HTTP '+r1.status); return; }
+    if(!r1.ok) { alert('❌ ESPN HTTP '+r1.status); return; }
     var d1 = await r1.json();
     var events = d1.events || [];
-    showToast('✅ ESPN: '+events.length+' meccs');
-    // Keresd meg a mi meccsünket
     var espnEvent = null;
     events.forEach(function(ev) {
       var comp = ev.competitions&&ev.competitions[0]; if(!comp) return;
@@ -5851,18 +5848,53 @@ async function testDetailFetch(mid) {
       if((huH===m.home.toLowerCase() || eh.includes(m.home.toLowerCase().substring(0,4))) &&
          (huA===m.away.toLowerCase() || ea.includes(m.away.toLowerCase().substring(0,4)))) espnEvent = ev;
     });
-    if(!espnEvent) { showToast('⚠️ Meccs nem talált: '+m.home+' vs '+m.away); return; }
-    showToast('🔍 ESPN event #'+espnEvent.id+' — summary...');
-    // 2. Summary hívás
+    if(!espnEvent) { alert('⚠️ Meccs nem talált ESPN-ben\n\nKereset: '+m.home+' vs '+m.away+'\n\nESPN meccsek:\n'+events.map(function(e){var c=e.competitions[0];var ts=c.competitors;return ts.map(function(t){return t.team.displayName;}).join(' vs ');}).join('\n')); return; }
+    
     var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event='+espnEvent.id);
-    if(!r2.ok) { showToast('❌ Summary HTTP '+r2.status); return; }
+    if(!r2.ok) { alert('❌ Summary HTTP '+r2.status); return; }
     var sum = await r2.json();
-    var hasBS = sum.boxscore && sum.boxscore.teams && sum.boxscore.teams.length >= 2;
-    var hasRoster = sum.rosters && sum.rosters.length >= 2;
-    var hasKE = sum.keyEvents && sum.keyEvents.length > 0;
-    showToast('📊 '+(hasBS?'✅Stats ':'❌Stats ')+(hasRoster?'✅Lineups ':'❌Lineups ')+(hasKE?'✅Events('+sum.keyEvents.length+')':'❌Events'));
-    // 3. Parse és mentés
-    if(hasBS) {
+    
+    // Dump: mi van a válaszban?
+    var keys = Object.keys(sum);
+    var info = '📊 ESPN Summary válasz\n\nEvent: #'+espnEvent.id+'\n\nTop-level kulcsok:\n'+keys.join(', ')+'\n\n';
+    
+    if(sum.boxscore) {
+      info += '✅ BOXSCORE van!\n';
+      if(sum.boxscore.teams) {
+        info += '  Teams: '+sum.boxscore.teams.length+'\n';
+        sum.boxscore.teams.forEach(function(t,i) {
+          info += '  Team'+i+': '+(t.team?t.team.displayName:'?')+'\n';
+          info += '  Stats: '+(t.statistics?t.statistics.length:0)+'\n';
+          if(t.statistics) {
+            info += '  Names: '+t.statistics.slice(0,8).map(function(s){return s.name+'='+s.displayValue;}).join(', ')+'\n';
+          }
+        });
+      }
+    } else { info += '❌ boxscore NINCS\n'; }
+    
+    if(sum.rosters) {
+      info += '\n✅ ROSTERS van! ('+sum.rosters.length+')\n';
+      sum.rosters.forEach(function(r,i) {
+        info += '  Team'+i+': '+(r.team?r.team.displayName:'?')+' | formation: '+(r.formation||'?')+'\n';
+        info += '  Roster: '+(r.roster?r.roster.length:0)+' játékos\n';
+        if(r.roster && r.roster.length>0) {
+          info += '  Starters: '+r.roster.filter(function(p){return p.starter;}).length+'\n';
+        }
+      });
+    } else { info += '\n❌ rosters NINCS\n'; }
+    
+    if(sum.keyEvents) { info += '\n✅ keyEvents: '+sum.keyEvents.length+'\n'; }
+    else { info += '\n❌ keyEvents NINCS\n'; }
+    
+    if(sum.commentary) { info += '✅ commentary: '+sum.commentary.length+'\n'; }
+    if(sum.plays) { info += '✅ plays: '+sum.plays.length+'\n'; }
+    if(sum.statistics) { info += '✅ statistics: '+JSON.stringify(Object.keys(sum.statistics)).substring(0,100)+'\n'; }
+    if(sum.header) { info += '✅ header van\n'; }
+    
+    alert(info);
+    
+    // Ha van adat, mentsük
+    if(sum.boxscore && sum.boxscore.teams && sum.boxscore.teams.length >= 2) {
       var comp = espnEvent.competitions[0];
       var homeTeam = comp.competitors.find(function(t){return t.homeAway==='home';});
       var getStat = function(team, name) {
@@ -5880,9 +5912,8 @@ async function testDetailFetch(mid) {
         offsides: [getStat(ht,'offsides'), getStat(at,'offsides')],
         passes: [0,0], passAcc: [0,0]
       };
-      showToast('📊 Stats mentve! Birtok: '+liveStats[mid].possession[0]+'% - '+liveStats[mid].possession[1]+'%');
     }
-    if(hasRoster) {
+    if(sum.rosters && sum.rosters.length >= 2) {
       var lu = {};
       var comp2 = espnEvent.competitions[0];
       var homeTeam2 = comp2.competitors.find(function(t){return t.homeAway==='home';});
@@ -5898,11 +5929,24 @@ async function testDetailFetch(mid) {
         };
       });
       liveLineups[mid] = lu;
-      showToast('👕 Lineups mentve! '+((lu.home?lu.home.formation:'?')+' vs '+(lu.away?lu.away.formation:'?')));
+    }
+    if(sum.keyEvents && sum.keyEvents.length > 0) {
+      var comp3 = espnEvent.competitions[0];
+      var homeTeam3 = comp3.competitors.find(function(t){return t.homeAway==='home';});
+      liveEventsAll[mid] = sum.keyEvents.map(function(kev) {
+        var typeText = (kev.type&&kev.type.text)||'';
+        var teamSide = 'home';
+        if(kev.team) teamSide = kev.team.id === homeTeam3.team.id ? 'home' : 'away';
+        var player = kev.participants&&kev.participants[0]&&kev.participants[0].athlete ? kev.participants[0].athlete.displayName : '';
+        var assist = kev.participants&&kev.participants[1]&&kev.participants[1].athlete ? kev.participants[1].athlete.displayName : '';
+        var minute = (kev.clock&&kev.clock.displayValue)||'';
+        var type = typeText.includes('Goal')?'goal':typeText.includes('Card')?'card':typeText.includes('Substitution')?'subst':'other';
+        return {min:parseInt(minute)||0, extra:null, type:type, detail:typeText.toLowerCase(), teamSide:teamSide, player:player, assist:assist};
+      });
     }
     renderAll();
-    showToast('✅ Kész! Görgess a meccshez!');
-  } catch(e) { showToast('❌ Hiba: '+e.message); }
+    showToast('✅ Kész!');
+  } catch(e) { alert('❌ HIBA:\n'+e.message+'\n\n'+e.stack); }
 }
 
 function parseEventsToScorers(events) {
