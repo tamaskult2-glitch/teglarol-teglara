@@ -1157,7 +1157,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.3</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.4</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -5897,21 +5897,27 @@ async function testDetailFetch(mid) {
     if(sum.boxscore && sum.boxscore.teams && sum.boxscore.teams.length >= 2) {
       var comp = espnEvent.competitions[0];
       var homeTeam = comp.competitors.find(function(t){return t.homeAway==='home';});
-      var getStat = function(team, name) {
-        var st = (team.statistics||[]).find(function(s){ return s.name===name; });
-        return st ? (parseFloat(st.displayValue)||0) : 0;
+      var getStat = function(team, names) {
+        if(typeof names === 'string') names = [names];
+        for(var ni=0;ni<names.length;ni++) {
+          var st = (team.statistics||[]).find(function(s){ return s.name===names[ni]||s.label===names[ni]; });
+          if(st) return parseFloat(st.displayValue)||0;
+        }
+        return 0;
       };
       var ht = sum.boxscore.teams[0], at = sum.boxscore.teams[1];
       if(ht.team && at.team && homeTeam && at.team.id === homeTeam.team.id) { var tmp=ht; ht=at; at=tmp; }
       liveStats[mid] = {
-        possession: [Math.round(getStat(ht,'possessionPct')), Math.round(getStat(at,'possessionPct'))],
-        shots: [getStat(ht,'totalShots'), getStat(at,'totalShots')],
-        shotsOn: [getStat(ht,'shotsOnTarget'), getStat(at,'shotsOnTarget')],
-        corners: [getStat(ht,'cornerKicks'), getStat(at,'cornerKicks')],
-        fouls: [getStat(ht,'fouls'), getStat(at,'fouls')],
-        offsides: [getStat(ht,'offsides'), getStat(at,'offsides')],
+        possession: [Math.round(getStat(ht,['possessionPct','possession'])), Math.round(getStat(at,['possessionPct','possession']))],
+        shots: [getStat(ht,['totalShots','shots']), getStat(at,['totalShots','shots'])],
+        shotsOn: [getStat(ht,['shotsOnTarget','shotsSaved','shotsOnGoal']), getStat(at,['shotsOnTarget','shotsSaved','shotsOnGoal'])],
+        corners: [getStat(ht,['cornerKicks','corners']), getStat(at,['cornerKicks','corners'])],
+        fouls: [getStat(ht,['fouls','foulsConceded','foulsCommitted','wonFouls']), getStat(at,['fouls','foulsConceded','foulsCommitted','wonFouls'])],
+        offsides: [getStat(ht,['offsides']), getStat(at,['offsides'])],
         passes: [0,0], passAcc: [0,0]
       };
+      // Dump all stat names for debugging
+      alert('📊 HOME stats:\n'+((ht.statistics||[]).map(function(s){return s.name+'='+s.displayValue;}).join('\n'))+'\n\n📊 AWAY stats:\n'+((at.statistics||[]).map(function(s){return s.name+'='+s.displayValue;}).join('\n')));
     }
     if(sum.rosters && sum.rosters.length >= 2) {
       var lu = {};
@@ -7073,23 +7079,31 @@ async function fetchMatchScorers() {
       try {
         var bs = res.sum.boxscore;
         if(bs && bs.teams && bs.teams.length >= 2) {
-          var getStat = function(team, name) {
-            var st = (team.statistics||[]).find(function(s){ return s.name===name; });
-            return st ? (parseFloat(st.displayValue)||0) : 0;
+          var getStat = function(team, names) {
+            if(typeof names === 'string') names = [names];
+            for(var ni=0;ni<names.length;ni++) {
+              var st = (team.statistics||[]).find(function(s){ return s.name===names[ni]||s.label===names[ni]; });
+              if(st) return parseFloat(st.displayValue)||0;
+            }
+            return 0;
           };
           var ht = bs.teams[0], at = bs.teams[1];
           // Detect which is home/away
           if(ht.team && at.team && at.team.id === homeTeam.team.id) { var tmp=ht; ht=at; at=tmp; }
           liveStats[match.id] = {
-            possession: [Math.round(getStat(ht,'possessionPct')), Math.round(getStat(at,'possessionPct'))],
-            shots: [getStat(ht,'totalShots'), getStat(at,'totalShots')],
-            shotsOn: [getStat(ht,'shotsOnTarget'), getStat(at,'shotsOnTarget')],
-            corners: [getStat(ht,'cornerKicks'), getStat(at,'cornerKicks')],
-            fouls: [getStat(ht,'fouls'), getStat(at,'fouls')],
-            offsides: [getStat(ht,'offsides'), getStat(at,'offsides')],
-            passes: [getStat(ht,'totalPasses')||getStat(ht,'accuratePasses'), getStat(at,'totalPasses')||getStat(at,'accuratePasses')],
-            passAcc: [getStat(ht,'passAccuracy'), getStat(at,'passAccuracy')]
+            possession: [Math.round(getStat(ht,['possessionPct','possession'])), Math.round(getStat(at,['possessionPct','possession']))],
+            shots: [getStat(ht,['totalShots','shots']), getStat(at,['totalShots','shots'])],
+            shotsOn: [getStat(ht,['shotsOnTarget','shotsSaved','shotsOnGoal']), getStat(at,['shotsOnTarget','shotsSaved','shotsOnGoal'])],
+            corners: [getStat(ht,['cornerKicks','corners']), getStat(at,['cornerKicks','corners'])],
+            fouls: [getStat(ht,['fouls','foulsConceded','foulsCommitted','wonFouls']), getStat(at,['fouls','foulsConceded','foulsCommitted','wonFouls'])],
+            offsides: [getStat(ht,['offsides']), getStat(at,['offsides'])],
+            passes: [getStat(ht,['totalPasses','accuratePasses']), getStat(at,['totalPasses','accuratePasses'])],
+            passAcc: [getStat(ht,['passAccuracy']), getStat(at,['passAccuracy'])]
           };
+          // Log stat names once for debugging
+          if(bs.teams[0].statistics && bs.teams[0].statistics.length) {
+            console.log('📊 ESPN stat names:', bs.teams[0].statistics.map(function(s){return s.name+'='+s.displayValue;}).join(', '));
+          }
           console.log('📊 Stats betöltve (ESPN): '+match.id);
         }
       } catch(se) { console.log('Stats parse hiba:', se.message); }
