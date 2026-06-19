@@ -1157,7 +1157,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.4</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.5</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -5911,13 +5911,12 @@ async function testDetailFetch(mid) {
         possession: [Math.round(getStat(ht,['possessionPct','possession'])), Math.round(getStat(at,['possessionPct','possession']))],
         shots: [getStat(ht,['totalShots','shots']), getStat(at,['totalShots','shots'])],
         shotsOn: [getStat(ht,['shotsOnTarget','shotsSaved','shotsOnGoal']), getStat(at,['shotsOnTarget','shotsSaved','shotsOnGoal'])],
-        corners: [getStat(ht,['cornerKicks','corners']), getStat(at,['cornerKicks','corners'])],
+        corners: [getStat(ht,['cornerKicks','corners','wonCorners']), getStat(at,['cornerKicks','corners','wonCorners'])],
         fouls: [getStat(ht,['fouls','foulsConceded','foulsCommitted','wonFouls']), getStat(at,['fouls','foulsConceded','foulsCommitted','wonFouls'])],
         offsides: [getStat(ht,['offsides']), getStat(at,['offsides'])],
         passes: [0,0], passAcc: [0,0]
       };
-      // Dump all stat names for debugging
-      alert('📊 HOME stats:\n'+((ht.statistics||[]).map(function(s){return s.name+'='+s.displayValue;}).join('\n'))+'\n\n📊 AWAY stats:\n'+((at.statistics||[]).map(function(s){return s.name+'='+s.displayValue;}).join('\n')));
+      showToast('📊 Stats mentve! Birtok: '+liveStats[mid].possession[0]+'%-'+liveStats[mid].possession[1]+'% | Szögletek: '+liveStats[mid].corners[0]+'-'+liveStats[mid].corners[1]+' | Szabtalan: '+liveStats[mid].fouls[0]+'-'+liveStats[mid].fouls[1]);
     }
     if(sum.rosters && sum.rosters.length >= 2) {
       var lu = {};
@@ -7094,11 +7093,11 @@ async function fetchMatchScorers() {
             possession: [Math.round(getStat(ht,['possessionPct','possession'])), Math.round(getStat(at,['possessionPct','possession']))],
             shots: [getStat(ht,['totalShots','shots']), getStat(at,['totalShots','shots'])],
             shotsOn: [getStat(ht,['shotsOnTarget','shotsSaved','shotsOnGoal']), getStat(at,['shotsOnTarget','shotsSaved','shotsOnGoal'])],
-            corners: [getStat(ht,['cornerKicks','corners']), getStat(at,['cornerKicks','corners'])],
+            corners: [getStat(ht,['cornerKicks','corners','wonCorners']), getStat(at,['cornerKicks','corners','wonCorners'])],
             fouls: [getStat(ht,['fouls','foulsConceded','foulsCommitted','wonFouls']), getStat(at,['fouls','foulsConceded','foulsCommitted','wonFouls'])],
             offsides: [getStat(ht,['offsides']), getStat(at,['offsides'])],
             passes: [getStat(ht,['totalPasses','accuratePasses']), getStat(at,['totalPasses','accuratePasses'])],
-            passAcc: [getStat(ht,['passAccuracy']), getStat(at,['passAccuracy'])]
+            passAcc: [getStat(ht,['passAccuracy','passPct']), getStat(at,['passAccuracy','passPct'])]
           };
           // Log stat names once for debugging
           if(bs.teams[0].statistics && bs.teams[0].statistics.length) {
