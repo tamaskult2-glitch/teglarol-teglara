@@ -1159,7 +1159,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v3.1</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v3.2</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -6964,7 +6964,8 @@ function buildLineupSection(mid, m) {
     if(lu[side].players && lu[side].players.length) {
       html += '<div style="display:flex;flex-wrap:wrap;gap:2px 6px;">';
       lu[side].players.forEach(function(name,i) {
-        var short = name.split(' ').pop();
+        var short = name ? name.split(' ').pop() : '?';
+        if(!short) short = '?';
         html += '<span style="color:rgba(240,244,240,0.6);font-size:10px;">'+(i+1)+'. '+short+'</span>';
       });
       html += '</div>';
@@ -6998,8 +6999,9 @@ function buildEventTimeline(mid) {
   var homeSubs = subs.filter(function(e){ return e.teamSide==='home'; });
   var awaySubs = subs.filter(function(e){ return e.teamSide==='away'; });
   var fmtSub = function(s) {
-    var out = s.player ? s.player.split(' ').pop() : '?';
-    var inP = s.assist ? s.assist.split(' ').pop() : '';
+    // ESPN: player=bejövő (participants[0]), assist=kimenő (participants[1])
+    var inP = s.player ? s.player.split(' ').pop() : '';
+    var out = s.assist ? s.assist.split(' ').pop() : '?';
     return '<span style="color:rgba(240,244,240,0.4);">🔄 '+(inP?'<span style="color:rgba(34,197,94,0.7);">↑'+inP+'</span> ':'')+'<span style="color:rgba(239,68,68,0.6);">↓'+out+'</span></span><span style="color:rgba(240,244,240,0.2);font-size:9px;"> '+s.min+(s.extra?'+'+s.extra:'')+"'"+'</span>';
   };
   if(homeSubs.length || awaySubs.length) {
