@@ -1159,7 +1159,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.9</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v3.1</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -3429,13 +3429,13 @@ function renderMatches() {
           </div>
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildScorerRow(m.id, m) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildTimelineStrip(m.id) : ''}
           ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildMomentumBar(m.id) : ''}
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
           ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildCommentaryTicker(m.id) : ''}
-          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) && !liveCommentary[m.id] ? buildEventTimeline(m.id) : ''}
           ${liveStats[m.id] ? buildLiveStatsBar(m.id) : ''}
           ${(liveLineups[m.id]) ? buildLineupSection(m.id, m) : ''}
           ${liveScores[m.id]&&liveScores[m.id].status==='live'?`<div class="live-react-bar" id="lrb_${m.id}" style="display:flex;gap:4px;justify-content:center;padding:8px 0 4px;flex-wrap:wrap;">
@@ -5387,6 +5387,7 @@ var liveStats = {};    // {matchId: {possession:[h,a], shots:[h,a], shotsOn:[h,a
 var liveLineups = {};  // {matchId: {home:{formation,players,subs,coach}, away:{...}}}
 var liveEventsAll = {}; // {matchId: [{min,extra,type,detail,team,player,assist}]}
 var liveCommentary = {}; // {matchId: [{time,text,team}]}
+var panelStates = {};   // {matchId_stats: true/false, matchId_lineup: true/false}
 
 // API-FOOTBALL (elsődleges — legmegbízhatóbb)
 async function fetchFromApiFootball() {
@@ -6918,8 +6919,9 @@ function buildLiveStatsBar(mid) {
     {label:'Szabálytalanságok', h:st.fouls[0], a:st.fouls[1]}
   ];
   var html = '<div class="live-stats-section" style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 10px 8px;font-family:Oswald,sans-serif;font-size:11px;">';
-  html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'span\').textContent=this.nextElementSibling.style.display===\'none\'?\'▸\':\'▾\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.45);font-size:10px;letter-spacing:1px;padding-bottom:4px;"><span>▾</span> STATISZTIKÁK</div>';
-  html += '<div>';
+  var isOpen = panelStates[mid+'_stats'];
+  html += '<div onclick="panelStates[\''+mid+'_stats\']=!panelStates[\''+mid+'_stats\'];this.nextElementSibling.style.display=panelStates[\''+mid+'_stats\']?\'block\':\'none\';this.querySelector(\'span\').textContent=panelStates[\''+mid+'_stats\']?\'▾\':\'▸\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.45);font-size:10px;letter-spacing:1px;padding-bottom:4px;"><span>'+(isOpen?'▾':'▸')+'</span> STATISZTIKÁK</div>';
+  html += '<div style="'+(isOpen?'':'display:none;')+'">';
   rows.forEach(function(r) {
     var total = r.h + r.a || 1;
     var hPct = r.pct ? r.h : Math.round(r.h/total*100);
@@ -6945,8 +6947,9 @@ function buildLineupSection(mid, m) {
   var lu = liveLineups[mid];
   if(!lu || (!lu.home && !lu.away)) return '';
   var html = '<div class="lineup-section" style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 10px 8px;font-family:Oswald,sans-serif;font-size:11px;">';
-  html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'span\').textContent=this.nextElementSibling.style.display===\'none\'?\'▸\':\'▾\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.45);font-size:10px;letter-spacing:1px;padding-bottom:4px;"><span>▸</span> FELÁLLÁS</div>';
-  html += '<div style="display:none;">';
+  var isOpen = panelStates[mid+'_lineup'];
+  html += '<div onclick="panelStates[\''+mid+'_lineup\']=!panelStates[\''+mid+'_lineup\'];this.nextElementSibling.style.display=panelStates[\''+mid+'_lineup\']?\'block\':\'none\';this.querySelector(\'span\').textContent=panelStates[\''+mid+'_lineup\']?\'▾\':\'▸\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.45);font-size:10px;letter-spacing:1px;padding-bottom:4px;"><span>'+(isOpen?'▾':'▸')+'</span> FELÁLLÁS</div>';
+  html += '<div style="'+(isOpen?'':'display:none;')+'">';
   ['home','away'].forEach(function(side) {
     if(!lu[side]) return;
     var teamName = side==='home' ? (m?m.home:'Hazai') : (m?m.away:'Vendég');
