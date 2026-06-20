@@ -27,6 +27,8 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 header{position:relative;overflow:hidden;text-align:center;padding:32px 20px 24px;z-index:1;border-bottom:1px solid rgba(245,197,24,0.12);background:linear-gradient(180deg,rgba(0,0,0,0.45) 0%,transparent 100%);}
 .trophy-icon{font-size:46px;margin-bottom:6px;filter:drop-shadow(0 0 14px var(--gold));animation:pulse 3s ease-in-out infinite;}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes pulse-h{0%,100%{opacity:0.5}50%{opacity:0.8}}
+@keyframes pulse-a{0%,100%{opacity:0.4}50%{opacity:0.7}}
 /* Bajnokok fala – dekoratív háttér */
 .wc-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
   -webkit-mask-image:radial-gradient(ellipse 62% 72% at 50% 44%,transparent 38%,#000 92%);
@@ -1157,7 +1159,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.5</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.8</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -1199,6 +1201,7 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')" id="navAdmin" style="display:none">🔐 Admin</button>
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
+  <button class="nav-tab" id="navOtletek" onclick="showTab('otletek')">💡</button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">📊 VB <span id="golNewBadge" style="background:#4ade80;color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
 </div>
@@ -1638,6 +1641,39 @@ footer a:hover{color:var(--gold);}
     </div>
   </div>
 
+  <!-- ÖTLETEK TAB -->
+  <div id="tab-otletek" style="display:none;">
+    <div class="section-header" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;">
+      <h2>💡 Mit fejlesszünk?</h2>
+      <button onclick="otletekOpenAdd()" style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">
+        + ÚJ ÖTLET
+      </button>
+    </div>
+    <div style="font-size:12px;color:rgba(240,244,240,0.4);margin:4px 0 12px;font-family:Oswald,sans-serif;">Szavazz a featúrákra amiket szeretnél · Bárki hozzáadhat újat</div>
+
+    <!-- Szűrők -->
+    <div style="display:flex;gap:6px;margin:8px 0 12px;flex-wrap:wrap;" id="otletekFilters">
+      <button class="opl-filter-btn active" onclick="otletekFilter('all',this)">Mind</button>
+      <button class="opl-filter-btn" onclick="otletekFilter('new',this)">🟡 Új</button>
+      <button class="opl-filter-btn" onclick="otletekFilter('progress',this)">🔵 Fejlesztés</button>
+      <button class="opl-filter-btn" onclick="otletekFilter('done',this)">✅ Kész</button>
+    </div>
+
+    <!-- Új ötlet form (rejtett) -->
+    <div id="otletekAddForm" style="display:none;background:var(--card);border:1px solid var(--gold-border);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <div style="font-family:Oswald,sans-serif;font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px;">💡 Új fejlesztési ötlet</div>
+      <input id="otletekInpTitle" placeholder="Cím (pl. Push értesítés)" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);font-family:Oswald,sans-serif;font-size:14px;margin-bottom:8px;">
+      <textarea id="otletekInpDesc" rows="3" placeholder="Leírás — mit csinálna pontosan?" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);font-family:inherit;font-size:13px;resize:vertical;margin-bottom:10px;"></textarea>
+      <div style="display:flex;gap:8px;">
+        <button onclick="otletekSubmit()" style="flex:1;padding:10px;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);color:#4ade80;border-radius:8px;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✅ Beküldés</button>
+        <button onclick="document.getElementById('otletekAddForm').style.display='none'" style="padding:10px 16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.7);border-radius:8px;font-family:Oswald,sans-serif;font-size:13px;cursor:pointer;">✕</button>
+      </div>
+    </div>
+
+    <!-- Lista -->
+    <div id="otletekList"></div>
+  </div>
+
 
 </div>
 
@@ -1687,7 +1723,7 @@ const ALL_MATCHES = [
   {id:"E3",group:"E",huDate:"2026-06-20",huTime:"22:00",home:"Németország",homeFlag:"🇩🇪",away:"Elefántcsontpart",awayFlag:"🇨🇮",venue:"Toronto"},
   {id:"G3",group:"G",huDate:"2026-06-21",huTime:"21:00",home:"Belgium",homeFlag:"🇧🇪",away:"Irán",awayFlag:"🇮🇷",venue:"Guadalajara"},
   {id:"F3",group:"F",huDate:"2026-06-20",huTime:"19:00",home:"Hollandia",homeFlag:"🇳🇱",away:"Svédország",awayFlag:"🇸🇪",venue:"Atlanta"},
-  {id:"C4",group:"C",huDate:"2026-06-20",huTime:"03:00",home:"Brazília",homeFlag:"🇧🇷",away:"Haiti",awayFlag:"🇭🇹",venue:"Philadelphia"},
+  {id:"C4",group:"C",huDate:"2026-06-20",huTime:"02:30",home:"Brazília",homeFlag:"🇧🇷",away:"Haiti",awayFlag:"🇭🇹",venue:"Philadelphia"},
   {id:"F4",group:"F",huDate:"2026-06-21",huTime:"06:00",home:"Tunézia",homeFlag:"🇹🇳",away:"Japán",awayFlag:"🇯🇵",venue:"Kansas City"},
   {id:"D4",group:"D",huDate:"2026-06-20",huTime:"06:00",home:"Törökország",homeFlag:"🇹🇷",away:"Paraguay",awayFlag:"🇵🇾",venue:"San Francisco"},
   {id:"G4",group:"G",huDate:"2026-06-22",huTime:"03:00",home:"Új-Zéland",homeFlag:"🇳🇿",away:"Egyiptom",awayFlag:"🇪🇬",venue:"Vancouver"},
@@ -2451,7 +2487,7 @@ async function clearTip(mid) {
 
 function showTab(t) {
   activeTab=t;
-  ['meccsek','tippek','ranglista','admin','opl','bet','kozos','gol'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
+  ['meccsek','tippek','ranglista','admin','opl','bet','kozos','gol','otletek'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
@@ -2463,14 +2499,11 @@ function showTab(t) {
   if(t !== 'meccsek') { _navLastId = null; _navPhase = 0; }
   if(t==='kozos') { loadWatchParty(); loadFeaturePoll(); }
   if(t==='gol') renderGolTab();
-  // Scroll: nav-tabs tetejére görget (content a sticky nav alatt jelenik meg)
-  setTimeout(function(){
-    var navEl = document.querySelector('.nav-tabs');
-    if(navEl) {
-      var navTop = navEl.offsetTop;
-      window.scrollTo({top: navTop, behavior: 'smooth'});
-    }
-  }, 80);
+  if(t==='otletek') otletekLoad();
+  // Scroll: tab tetejére görget
+  if(t !== 'meccsek') {
+    window.scrollTo({top: 0, behavior: 'instant'});
+  }
   try { renderMatchdayBanner(); } catch(e){}
 }
 
@@ -3330,7 +3363,7 @@ function renderMatches() {
       const score=allScores[m.id]||null;
       const myTip=currentUser&&allTips[m.id]?(allTips[m.id][fbSafeName(currentUser)]||null):null;
       // Időzár: kickoff után nem lehet tippelni
-      const kickoffLocked = isKickoffPassed(m.huDate, m.huTime);
+      const kickoffLocked = isKickoffPassed(m.huDate, m.huTime) || !!(liveScores[m.id] && (liveScores[m.id].status === 'live' || liveScores[m.id].status === 'ft'));
       const tips=allTips[m.id]||{};
       const cnt={'1':0,'X':0,'2':0};
       Object.values(tips).forEach(t=>{var o=getTipOutcome(t);if(cnt[o]!==undefined)cnt[o]++;});
@@ -3396,9 +3429,12 @@ function renderMatches() {
           </div>
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildScorerRow(m.id, m) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildTimelineStrip(m.id) : ''}
+          ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildMomentumBar(m.id) : ''}
           </div>
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
+          ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildCommentaryTicker(m.id) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
           ${liveStats[m.id] ? buildLiveStatsBar(m.id) : ''}
           ${(liveLineups[m.id]) ? buildLineupSection(m.id, m) : ''}
@@ -4757,7 +4793,7 @@ function renderEmobMatches() {
       var score = allScores[m.id]||null;
       var myTip = currentUser && allTips[m.id] ? allTips[m.id][fbSafeName(currentUser)] : null;
       var myOut = getTipOutcome(myTip);
-      var kickoffLocked = isKickoffPassed(m.huDate, m.huTime);
+      var kickoffLocked = isKickoffPassed(m.huDate, m.huTime) || !!(liveScores[m.id] && (liveScores[m.id].status === 'live' || liveScores[m.id].status === 'ft'));
       var cardLocked = result || kickoffLocked;
       var tips = allTips[m.id]||{};
       var cnt = {'1':0,'X':0,'2':0};
@@ -5347,6 +5383,7 @@ var matchScorers = {}; // {matchId: [{name, team, minute, isOg, isPen}]}
 var liveStats = {};    // {matchId: {possession:[h,a], shots:[h,a], shotsOn:[h,a], corners:[h,a], fouls:[h,a], offsides:[h,a]}}
 var liveLineups = {};  // {matchId: {home:{formation,players,subs,coach}, away:{...}}}
 var liveEventsAll = {}; // {matchId: [{min,extra,type,detail,team,player,assist}]}
+var liveCommentary = {}; // {matchId: [{time,text,team}]}
 
 // API-FOOTBALL (elsődleges — legmegbízhatóbb)
 async function fetchFromApiFootball() {
@@ -5947,6 +5984,12 @@ async function testDetailFetch(mid) {
         var minute = (kev.clock&&kev.clock.displayValue)||'';
         var type = typeText.includes('Goal')?'goal':typeText.includes('Card')?'card':typeText.includes('Substitution')?'subst':'other';
         return {min:parseInt(minute)||0, extra:null, type:type, detail:typeText.toLowerCase(), teamSide:teamSide, player:player, assist:assist};
+      });
+    }
+    // Commentary
+    if(sum.commentary && sum.commentary.length > 0) {
+      liveCommentary[mid] = sum.commentary.slice(0, 15).map(function(c) {
+        return {time:(c.time&&c.time.displayValue)||'', text:c.text||c.shortText||'', highlight:!!(c.type&&(c.type.text||'').match(/goal|card|substitution|var/i))};
       });
     }
     renderAll();
@@ -6963,7 +7006,120 @@ function buildEventTimeline(mid) {
   return html;
 }
 
-// ESPN event ID cache → match ID mapping
+// ═══ 1. SZÖVEGES ÉLŐ KÖZVETÍTÉS (Commentary ticker) ═══
+function buildCommentaryTicker(mid) {
+  var cmts = liveCommentary[mid];
+  if(!cmts || !cmts.length) return '';
+  var show = cmts.slice(0, 4);
+  var html = '<div onclick="this.querySelector(\'.cmt-full\').style.display=this.querySelector(\'.cmt-full\').style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.cmt-arrow\').textContent=this.querySelector(\'.cmt-full\').style.display===\'none\'?\'▸\':\'▾\'" style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 10px 4px;cursor:pointer;">';
+  html += '<div style="display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.4);font-size:10px;font-family:Oswald,sans-serif;letter-spacing:0.8px;margin-bottom:4px;"><span class="cmt-arrow">▾</span> ÉLŐ KÖZVETÍTÉS</div>';
+  html += '<div class="cmt-full">';
+  html += '<div style="border-left:2px solid rgba(245,197,24,0.3);padding-left:8px;">';
+  show.forEach(function(c, i) {
+    var isHighlight = c.highlight;
+    html += '<div style="padding:2px 0;font-size:11px;font-family:Oswald,sans-serif;'+(i===0?'color:rgba(240,244,240,0.85);':'color:rgba(240,244,240,0.45);')+'">';
+    html += '<span style="color:rgba(245,197,24,'+(i===0?'0.7':'0.35')+');font-size:10px;min-width:26px;display:inline-block;">'+(c.time||'')+'</span> ';
+    if(isHighlight) html += '<span style="color:#4ade80;font-weight:700;">';
+    html += escHtml(c.text.length > 80 ? c.text.substring(0, 78) + '…' : c.text);
+    if(isHighlight) html += '</span>';
+    html += '</div>';
+  });
+  html += '</div></div></div>';
+  return html;
+}
+
+// ═══ 3. MOMENTUM / NYOMÁS INDIKÁTOR ═══
+function buildMomentumBar(mid) {
+  var st = liveStats[mid];
+  if(!st) return '';
+  var hPoss = st.possession[0] || 50;
+  var aPoss = st.possession[1] || 50;
+  var hShots = st.shots[0] || 0, aShots = st.shots[1] || 0;
+  var hCorners = st.corners[0] || 0, aCorners = st.corners[1] || 0;
+  // Momentum score: 60% possession + 25% shots + 15% corners
+  var totalShots = Math.max(hShots + aShots, 1);
+  var totalCorners = Math.max(hCorners + aCorners, 1);
+  var hMomentum = Math.round(hPoss * 0.6 + (hShots / totalShots * 100) * 0.25 + (hCorners / totalCorners * 100) * 0.15);
+  var aMomentum = 100 - hMomentum;
+  hMomentum = Math.max(hMomentum, 8);
+  aMomentum = Math.max(aMomentum, 8);
+  var dominantSide = hMomentum > 55 ? 'home' : aMomentum > 55 ? 'away' : 'even';
+  var html = '<div style="padding:4px 10px 6px;">';
+  html += '<div style="display:flex;justify-content:space-between;font-size:9px;font-family:Oswald,sans-serif;color:rgba(240,244,240,0.35);margin-bottom:2px;">';
+  html += '<span style="'+(dominantSide==='home'?'color:rgba(59,130,246,0.8);':'')+'">'+hPoss+'%</span>';
+  html += '<span style="font-size:8px;letter-spacing:1px;">NYOMÁS</span>';
+  html += '<span style="'+(dominantSide==='away'?'color:rgba(239,68,68,0.8);':'')+'">'+aPoss+'%</span>';
+  html += '</div>';
+  html += '<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px;">';
+  html += '<div style="width:'+hMomentum+'%;background:rgba(59,130,246,0.5);border-radius:3px 0 0 3px;transition:width 1s ease;'+(dominantSide==='home'?'animation:pulse-h 2s infinite;':'')+'"></div>';
+  html += '<div style="width:'+aMomentum+'%;background:rgba(239,68,68,0.4);border-radius:0 3px 3px 0;transition:width 1s ease;'+(dominantSide==='away'?'animation:pulse-a 2s infinite;':'')+'"></div>';
+  html += '</div>';
+  // Részletek egy sorban
+  html += '<div style="display:flex;justify-content:space-between;font-size:8px;font-family:Oswald,sans-serif;color:rgba(240,244,240,0.2);margin-top:2px;">';
+  html += '<span>'+hShots+' löv · '+hCorners+' szögl</span>';
+  html += '<span>'+aShots+' löv · '+aCorners+' szögl</span>';
+  html += '</div></div>';
+  return html;
+}
+
+// ═══ 4. IDŐVONAL CSÍK (90 perces sáv) ═══
+function buildTimelineStrip(mid) {
+  var scorers = matchScorers[mid];
+  var events = liveEventsAll[mid];
+  if((!scorers || !scorers.length) && (!events || !events.length)) return '';
+  // Merge events
+  var allEvs = [];
+  if(scorers) {
+    scorers.forEach(function(s) {
+      var min = parseInt(s.minute) || 0;
+      if(min <= 0) return;
+      allEvs.push({min: min, type: s.type, side: s.teamId, name: (s.name||'').split(' ').pop()});
+    });
+  }
+  if(events) {
+    events.filter(function(e){ return e.type === 'subst'; }).forEach(function(e) {
+      if(e.min <= 0) return;
+      allEvs.push({min: e.min, type: 'subst', side: e.teamSide, name: ''});
+    });
+  }
+  if(allEvs.length === 0) return '';
+  // Elapsed time
+  var ls = liveScores[mid];
+  var elapsed = 90;
+  if(ls && ls.status === 'live' && ls.minute) {
+    var m = parseInt(ls.minute);
+    if(m > 0) elapsed = m;
+  }
+  var totalWidth = Math.max(elapsed, 90);
+
+  var html = '<div style="padding:4px 10px 8px;">';
+  html += '<div style="position:relative;height:24px;">';
+  // Background track
+  html += '<div style="position:absolute;top:10px;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;"></div>';
+  // Elapsed progress
+  if(ls && ls.status === 'live') {
+    var elPct = Math.min(Math.round(elapsed / totalWidth * 100), 100);
+    html += '<div style="position:absolute;top:10px;left:0;width:'+elPct+'%;height:3px;background:rgba(74,222,128,0.2);border-radius:2px;"></div>';
+  }
+  // HT marker
+  html += '<div style="position:absolute;top:7px;left:50%;width:1px;height:9px;background:rgba(255,255,255,0.1);"></div>';
+  // Events
+  allEvs.forEach(function(ev) {
+    var pct = Math.min(Math.round(ev.min / totalWidth * 100), 98);
+    var icon = '⚽';
+    var yOff = ev.side === 'home' ? '0px' : '14px';
+    if(ev.type === 'yellow') { icon = '🟨'; }
+    else if(ev.type === 'red' || ev.type === 'yellow2') { icon = '🟥'; }
+    else if(ev.type === 'subst') { icon = '🔄'; }
+    html += '<div style="position:absolute;left:'+pct+'%;top:'+yOff+';font-size:'+(ev.type==='goal'?'9px':'7px')+';transform:translateX(-50%);" title="'+ev.name+' '+ev.min+"'"+'">' + icon + '</div>';
+  });
+  // Time labels
+  html += '<div style="position:absolute;top:16px;left:0;font-size:7px;color:rgba(240,244,240,0.15);font-family:Oswald,sans-serif;">0\'</div>';
+  html += '<div style="position:absolute;top:16px;left:48%;font-size:7px;color:rgba(240,244,240,0.15);font-family:Oswald,sans-serif;">FI</div>';
+  html += '<div style="position:absolute;top:16px;right:0;font-size:7px;color:rgba(240,244,240,0.15);font-family:Oswald,sans-serif;">90\'</div>';
+  html += '</div></div>';
+  return html;
+}
 var espnMatchIdMap = {}; // {espnEventId: matchId}
 
 async function fetchMatchScorers() {
@@ -7152,6 +7308,21 @@ async function fetchMatchScorers() {
           liveEventsAll[match.id] = allEvs;
         }
       } catch(ee) { console.log('Events parse hiba:', ee.message); }
+
+      // ═══ ESPN COMMENTARY → liveCommentary ═══
+      try {
+        var cmts = res.sum.commentary;
+        if(cmts && cmts.length > 0) {
+          liveCommentary[match.id] = cmts.slice(0, 15).map(function(c) {
+            return {
+              time: (c.time&&c.time.displayValue)||'',
+              text: c.text||c.shortText||'',
+              highlight: !!(c.type&&(c.type.text||'').match(/goal|card|substitution|var/i))
+            };
+          });
+          console.log('💬 Commentary betöltve: '+match.id+' ('+cmts.length+' entry)');
+        }
+      } catch(ce) { console.log('Commentary parse hiba:', ce.message); }
     });
     // Re-render match cards if any scorer data changed
     if(changed) {
@@ -7446,7 +7617,201 @@ async function voteFeature(fid) {
   }
 }
 
-// ===== VB STATS SUB-NAV =====
+// ===== 💡 ÖTLETEK TAB =====
+var otletekData = {};
+var otletekFilterVal = 'all';
+
+async function otletekLoad() {
+  var container = document.getElementById('otletekList');
+  if(!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(240,244,240,0.35);">⏳ Betöltés…</div>';
+  try {
+    otletekData = await fbGet('featureIdeas') || {};
+    // Seed: ha üres, feltöltjük a FEATURE_OPTIONS-ból
+    if(Object.keys(otletekData).length === 0) {
+      var existing = await fbGet('featurePoll') || {};
+      FEATURE_OPTIONS.forEach(function(f) {
+        var id = 'seed_'+f.id;
+        var votes = {};
+        Object.keys(existing).forEach(function(user) {
+          if(existing[user][f.id]) votes[user] = true;
+        });
+        otletekData[id] = {title:f.title, desc:f.desc, emoji:f.emoji, user:'KULT', date:'2026-06-14', status:'new', votes:votes};
+      });
+      await fbSet('featureIdeas', otletekData);
+    }
+    otletekRender();
+  } catch(e) {
+    container.innerHTML = '<div style="color:#f87171;padding:12px;">❌ '+e.message+'</div>';
+  }
+}
+
+function otletekRender() {
+  var container = document.getElementById('otletekList');
+  if(!container) return;
+  var items = Object.entries(otletekData);
+  // Szűrés
+  if(otletekFilterVal !== 'all') {
+    items = items.filter(function(e){ return e[1].status === otletekFilterVal; });
+  }
+  // Szavazat szerint rendezés (legtöbb elöl)
+  items.sort(function(a,b) {
+    var va = Object.keys(a[1].votes||{}).length;
+    var vb = Object.keys(b[1].votes||{}).length;
+    if(va !== vb) return vb - va;
+    return (b[1].date||'').localeCompare(a[1].date||'');
+  });
+
+  var safe = currentUser ? fbSafeName(currentUser) : '';
+  var html = '';
+  var statusMap = {new:'🟡 Új', progress:'🔵 Fejlesztés alatt', done:'✅ Kész', rejected:'❌ Elutasítva'};
+  var statusColors = {new:'rgba(245,197,24,0.15)', progress:'rgba(59,130,246,0.15)', done:'rgba(74,222,128,0.15)', rejected:'rgba(239,68,68,0.1)'};
+
+  items.forEach(function(entry) {
+    var id = entry[0], it = entry[1];
+    var votes = it.votes||{};
+    var voteCount = Object.keys(votes).length;
+    var iVoted = safe && votes[safe];
+    var status = it.status||'new';
+    var emoji = it.emoji||'💡';
+
+    html += '<div style="background:var(--card);border:1px solid '+(iVoted?'rgba(245,197,24,0.35)':'var(--card-border)')+';border-radius:12px;padding:14px;margin-bottom:10px;'+(status==='done'?'opacity:0.7;':'')+(status==='rejected'?'opacity:0.5;':'')+'">';
+    // Header
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">';
+    html += '<div style="flex:1;">';
+    html += '<span style="font-size:18px;margin-right:4px;">'+emoji+'</span>';
+    html += '<span style="font-family:Oswald,sans-serif;font-size:15px;font-weight:700;color:'+(status==='done'?'rgba(74,222,128,0.8)':'rgba(240,244,240,0.9)')+';letter-spacing:0.3px;">'+escHtml(it.title)+'</span>';
+    html += '</div>';
+    html += '<span style="font-size:10px;padding:2px 8px;border-radius:6px;background:'+statusColors[status]+';font-family:Oswald,sans-serif;white-space:nowrap;">'+statusMap[status]+'</span>';
+    html += '</div>';
+    // Leírás
+    html += '<div style="font-size:12px;color:rgba(240,244,240,0.55);line-height:1.6;margin-bottom:8px;">'+escHtml(it.desc)+'</div>';
+    // Meta sor
+    html += '<div style="display:flex;align-items:center;gap:8px;font-size:10px;color:rgba(240,244,240,0.3);margin-bottom:8px;">';
+    html += '<span>👤 '+(it.user||'?')+'</span>';
+    html += '<span>📅 '+(it.date||'')+'</span>';
+    // Szavazók listája
+    if(voteCount > 0) {
+      var voterNames = Object.keys(votes).map(function(v){ return v.replace(/_/g,' '); }).join(', ');
+      html += '<span title="'+voterNames+'">👥 '+voteCount+' szavazat</span>';
+    }
+    html += '</div>';
+    // Progress bar
+    var maxV = Math.max(1, Math.max.apply(null, Object.values(otletekData).map(function(x){return Object.keys(x.votes||{}).length;})));
+    var barW = Math.round((voteCount / maxV) * 100);
+    html += '<div style="height:5px;border-radius:99px;background:rgba(255,255,255,0.06);margin-bottom:10px;">';
+    html += '<div style="height:100%;border-radius:99px;width:'+barW+'%;background:'+(iVoted?'var(--gold)':'rgba(74,222,128,0.5)')+';transition:width 0.5s;"></div>';
+    html += '</div>';
+    // Gombok sor
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+    // Szavazás gomb
+    if(status !== 'done' && status !== 'rejected') {
+      html += '<button onclick="otletekVote(\''+id+'\')" style="flex:1;padding:8px;border-radius:8px;border:1px solid '+(iVoted?'rgba(245,197,24,0.4)':'rgba(74,222,128,0.25)')+';background:'+(iVoted?'rgba(245,197,24,0.1)':'rgba(74,222,128,0.06)')+';color:'+(iVoted?'var(--gold)':'#4ade80')+';font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">'
+        + (iVoted ? '✓ Szavaztam ('+voteCount+')' : '👍 Ezt akarom! ('+voteCount+')')
+        + '</button>';
+    } else {
+      html += '<span style="flex:1;padding:8px;text-align:center;font-size:12px;color:rgba(240,244,240,0.3);font-family:Oswald,sans-serif;">'+voteCount+' szavazat</span>';
+    }
+    // Admin gombok
+    if(isAdminUnlocked) {
+      html += '<select onchange="otletekSetStatus(\''+id+'\',this.value)" style="padding:6px 8px;border-radius:6px;border:1px solid var(--card-border);background:rgba(255,255,255,0.04);color:var(--text);font-size:11px;font-family:Oswald,sans-serif;cursor:pointer;">';
+      ['new','progress','done','rejected'].forEach(function(s){
+        html += '<option value="'+s+'"'+(s===status?' selected':'')+'>'+statusMap[s]+'</option>';
+      });
+      html += '</select>';
+      html += '<button onclick="otletekDelete(\''+id+'\')" style="padding:6px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.06);color:rgba(239,68,68,0.6);font-size:11px;cursor:pointer;" title="Törlés">🗑</button>';
+    }
+    html += '</div></div>';
+  });
+
+  if(items.length === 0) {
+    html = '<div style="text-align:center;padding:30px;color:rgba(240,244,240,0.3);font-family:Oswald,sans-serif;">Nincs találat ebben a szűrőben</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function otletekOpenAdd() {
+  if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
+  var form = document.getElementById('otletekAddForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  if(form.style.display === 'block') document.getElementById('otletekInpTitle').focus();
+}
+
+async function otletekSubmit() {
+  if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
+  var title = document.getElementById('otletekInpTitle').value.trim();
+  var desc = document.getElementById('otletekInpDesc').value.trim();
+  if(!title) { showToast('⚠️ Adj meg címet!'); return; }
+  if(!desc) { showToast('⚠️ Adj meg leírást!'); return; }
+  try {
+    var id = 'idea_' + Date.now();
+    var safe = fbSafeName(currentUser);
+    var item = {
+      title: title,
+      desc: desc,
+      emoji: '💡',
+      user: currentUser,
+      date: getBudapestToday(),
+      status: 'new',
+      votes: {}
+    };
+    item.votes[safe] = true; // saját szavazat automatikus
+    await fbSet('featureIdeas/'+id, item);
+    showToast('✅ Ötlet beküldve!');
+    document.getElementById('otletekInpTitle').value = '';
+    document.getElementById('otletekInpDesc').value = '';
+    document.getElementById('otletekAddForm').style.display = 'none';
+    otletekLoad();
+  } catch(e) { showToast('❌ '+e.message); }
+}
+
+async function otletekVote(id) {
+  if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
+  var safe = fbSafeName(currentUser);
+  try {
+    var item = otletekData[id];
+    if(!item) return;
+    var votes = item.votes || {};
+    if(votes[safe]) {
+      await fbSet('featureIdeas/'+id+'/votes/'+safe, null); // remove
+      delete votes[safe];
+      showToast('↩️ Szavazat visszavonva');
+    } else {
+      await fbSet('featureIdeas/'+id+'/votes/'+safe, true);
+      votes[safe] = true;
+      showToast('👍 Szavazat leadva!');
+    }
+    otletekData[id].votes = votes;
+    otletekRender();
+  } catch(e) { showToast('❌ '+e.message); }
+}
+
+async function otletekSetStatus(id, status) {
+  try {
+    await fbSet('featureIdeas/'+id+'/status', status);
+    otletekData[id].status = status;
+    showToast('✅ Státusz: '+status);
+    otletekRender();
+  } catch(e) { showToast('❌ '+e.message); }
+}
+
+async function otletekDelete(id) {
+  if(!confirm('Biztosan törlöd?')) return;
+  try {
+    await fbSet('featureIdeas/'+id, null);
+    delete otletekData[id];
+    showToast('🗑 Törölve');
+    otletekRender();
+  } catch(e) { showToast('❌ '+e.message); }
+}
+
+function otletekFilter(f, btn) {
+  otletekFilterVal = f;
+  document.querySelectorAll('#otletekFilters .opl-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  otletekRender();
+}
 function showStatsSection(sec) {
   ['tabella','gollovo','verseny'].forEach(function(s){
     var el = document.getElementById('statsSec' + s.charAt(0).toUpperCase() + s.slice(1));
