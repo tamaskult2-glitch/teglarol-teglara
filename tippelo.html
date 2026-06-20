@@ -1159,7 +1159,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.8</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v2.9</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -3435,7 +3435,7 @@ function renderMatches() {
           ${buildScoreRow(m.id, myTip, result, allScores[m.id], cardLocked)}${buildOtherTips(m.id, cardLocked)}
           ${isKnockoutMatch(m) ? buildKnockoutRows(m, myTip, result, kickoffLocked) : ''}
           ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildCommentaryTicker(m.id) : ''}
-          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) && !liveCommentary[m.id] ? buildEventTimeline(m.id) : ''}
           ${liveStats[m.id] ? buildLiveStatsBar(m.id) : ''}
           ${(liveLineups[m.id]) ? buildLineupSection(m.id, m) : ''}
           ${liveScores[m.id]&&liveScores[m.id].status==='live'?`<div class="live-react-bar" id="lrb_${m.id}" style="display:flex;gap:4px;justify-content:center;padding:8px 0 4px;flex-wrap:wrap;">
@@ -3466,6 +3466,9 @@ function renderMatches() {
       }
     } catch(e) {}
   }
+  // ═══ KERESÉS ÚJRA-ALKALMAZÁS ═══
+  var sq = document.getElementById('matchSearch');
+  if(sq && sq.value.trim()) filterMatches();
 }
 
 function renderStats() {
@@ -5988,7 +5991,7 @@ async function testDetailFetch(mid) {
     }
     // Commentary
     if(sum.commentary && sum.commentary.length > 0) {
-      liveCommentary[mid] = sum.commentary.slice(0, 15).map(function(c) {
+      liveCommentary[mid] = sum.commentary.slice(-15).reverse().map(function(c) {
         return {time:(c.time&&c.time.displayValue)||'', text:c.text||c.shortText||'', highlight:!!(c.type&&(c.type.text||'').match(/goal|card|substitution|var/i))};
       });
     }
@@ -7313,7 +7316,7 @@ async function fetchMatchScorers() {
       try {
         var cmts = res.sum.commentary;
         if(cmts && cmts.length > 0) {
-          liveCommentary[match.id] = cmts.slice(0, 15).map(function(c) {
+          liveCommentary[match.id] = cmts.slice(-15).reverse().map(function(c) {
             return {
               time: (c.time&&c.time.displayValue)||'',
               text: c.text||c.shortText||'',
