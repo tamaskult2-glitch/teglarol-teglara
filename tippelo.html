@@ -968,6 +968,15 @@ footer a:hover{color:var(--gold);}
               💀 <b>Heti bukta</b> — az adott hét legkevesebb pontot szerző tippelője<br>
               💰 <b>Nyeremény</b> — az 1-3. helyezett várható nyereménye
             </div>
+            <div style="margin-top:12px;padding:10px 12px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.15);border-radius:8px;">
+              <b style="color:rgba(245,197,24,0.85);font-size:13px;">🏆 Rangsorolási szabályzat</b>
+              <div style="font-size:12px;color:rgba(240,244,240,0.65);line-height:1.7;margin-top:6px;">
+                Azonos pontszám esetén a következő tiebreaker sorrend dönt:<br>
+                <b>1.</b> 🎯 <b>Pontos góleredmények száma</b> — több pontos tipp = előrébb<br>
+                <b>2.</b> 📊 <b>Tippelési arány</b> — több leadott tipp = előrébb<br>
+                <b>3.</b> 📅 <b>Regisztráció ideje</b> — korábbi regisztráció = előrébb
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1159,7 +1168,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v3.2</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v3.5</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -2877,7 +2886,7 @@ function buildOtherTips(mid, locked) {
 
     if(result && pts !== null) {
       if(pts > 0) { bg = 'rgba(34,197,94,0.1)'; }
-      else { bg = 'rgba(239,68,68,0.06)'; nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.5)'; }
+      else { bg = 'rgba(239,68,68,0.06)'; nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.7)'; }
     } else if(isLive && !result) {
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
       if(!isNaN(hg) && !isNaN(ag)) {
@@ -2891,7 +2900,7 @@ function buildOtherTips(mid, locked) {
           else { if(sc){var tD=sc.h-sc.a,rD=hg-ag;if(tD===rD)lPts=2*lMult;} livePtsStr=' <span style="color:#22c55e;font-size:10px;">+'+lPts+'</span>'; }
         } else {
           bg = 'rgba(239,68,68,0.06)';
-          nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.5)';
+          nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.7)';
           livePtsStr = ' <span style="color:rgba(239,68,68,0.4);font-size:10px;">+0</span>';
         }
         if(rankData) {
@@ -2906,11 +2915,11 @@ function buildOtherTips(mid, locked) {
     }
     var meBorder = isMe ? 'border:1px solid rgba(245,197,24,0.3);' : '';
     var meFw = isMe ? 'font-weight:700;' : '';
-    html += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;background:'+bg+';'+meBorder+'font-family:Oswald,sans-serif;font-size:11px;">'
+    html += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;background:'+bg+';'+meBorder+'font-family:Oswald,sans-serif;font-size:12px;">'
       +rankStr
       +'<span style="color:'+nameClr+';'+meFw+'">'+escHtml(u.substring(0,8))+'</span>'
-      +' <b style="color:rgba(240,244,240,0.7);">'+tipStr+'</b>'
-      +(pts!==null&&pts>0?' <span style="color:#22c55e;font-size:10px;">+'+pts+'</span>':'')
+      +' <b style="color:rgba(240,244,240,0.85);">'+tipStr+'</b>'
+      +(pts!==null&&pts>0?' <span style="color:#22c55e;font-size:11px;font-weight:700;">+'+pts+'</span>':'')
       +livePtsStr
       +'</span>';
   });
@@ -4506,7 +4515,7 @@ async function sendDaySummary() {
       if(sc&&rs&&sc.h+':'+sc.a===rs) users[u].exact++;
     });
   });
-  var sorted = Object.entries(users).sort(function(a,b){ return b[1].pts-a[1].pts; });
+  var sorted = Object.entries(users).sort(function(a,b){ return b[1].pts-a[1].pts || b[1].exact-a[1].exact; });
   var leader = sorted.length ? sorted[0] : null;
   var todayExact = [];
   todayMatches.forEach(function(m){
@@ -4527,16 +4536,18 @@ async function sendDaySummary() {
   var p2 = Math.round(pool * 0.3);
   var p3 = Math.round(pool * 0.2);
 
-  // Mai napi pontok külön
+  // Mai napi pontok + pontos eredmények külön
   var todayPts = {};
   todayMatches.forEach(function(m){
     if(!allTips[m.id]) return;
     Object.keys(allTips[m.id]).forEach(function(u){
-      if(!todayPts[u]) todayPts[u] = 0;
-      todayPts[u] += calcMatchPoints(m, allTips[m.id][u]);
+      if(!todayPts[u]) todayPts[u] = {pts:0, exact:0};
+      todayPts[u].pts += calcMatchPoints(m, allTips[m.id][u]);
+      var sc=getTipScore(allTips[m.id][u]),rs=allScores[m.id];
+      if(sc&&rs&&sc.h+':'+sc.a===rs) todayPts[u].exact++;
     });
   });
-  var todaySorted = Object.entries(todayPts).sort(function(a,b){ return b[1]-a[1]; });
+  var todaySorted = Object.entries(todayPts).sort(function(a,b){ return b[1].pts-a[1].pts || b[1].exact-a[1].exact; });
 
   // Nyeremény számítás az összefoglalóhoz
   var _opts2 = [500,1000,5000,10000], _oc2 = {};
@@ -4550,13 +4561,13 @@ async function sendDaySummary() {
 
   var msg = '📊 Napi összefoglaló ('+today+')\n⚽ '+todayMatches.length+' meccs zárult ma.\n\n'
     +'📅 MAI NAP TOP 3:\n'
-    +(todaySorted.length>=1?'🥇 '+todaySorted[0][0]+' — '+todaySorted[0][1]+' pont\n':'')
-    +(todaySorted.length>=2?'🥈 '+todaySorted[1][0]+' — '+todaySorted[1][1]+' pont\n':'')
-    +(todaySorted.length>=3?'🥉 '+todaySorted[2][0]+' — '+todaySorted[2][1]+' pont\n':'')
+    +(todaySorted.length>=1?'🥇 '+todaySorted[0][0]+' — '+todaySorted[0][1].pts+' pont'+(todaySorted[0][1].exact?' (🎯×'+todaySorted[0][1].exact+')':'')+'\n':'')
+    +(todaySorted.length>=2?'🥈 '+todaySorted[1][0]+' — '+todaySorted[1][1].pts+' pont'+(todaySorted[1][1].exact?' (🎯×'+todaySorted[1][1].exact+')':'')+'\n':'')
+    +(todaySorted.length>=3?'🥉 '+todaySorted[2][0]+' — '+todaySorted[2][1].pts+' pont'+(todaySorted[2][1].exact?' (🎯×'+todaySorted[2][1].exact+')':'')+'\n':'')
     +'\n🏆 ÖSSZESÍTETT RANGLISTA:\n'
-    +(sorted.length>=1?'🥇 '+sorted[0][0]+' — '+sorted[0][1].pts+' pont'+(_pr[0]>0?' → 💰 '+_pr[0].toLocaleString('hu')+' Ft':'')+'\n':'')
-    +(sorted.length>=2?'🥈 '+sorted[1][0]+' — '+sorted[1][1].pts+' pont'+(_pr[1]>0?' → 💰 '+_pr[1].toLocaleString('hu')+' Ft':'')+'\n':'')
-    +(sorted.length>=3?'🥉 '+sorted[2][0]+' — '+sorted[2][1].pts+' pont'+(_pr[2]>0?' → 💰 '+_pr[2].toLocaleString('hu')+' Ft':'')+'\n':'')
+    +(sorted.length>=1?'🥇 '+sorted[0][0]+' — '+sorted[0][1].pts+' pont (🎯×'+sorted[0][1].exact+')'+(_pr[0]>0?' → 💰 '+_pr[0].toLocaleString('hu')+' Ft':'')+'\n':'')
+    +(sorted.length>=2?'🥈 '+sorted[1][0]+' — '+sorted[1][1].pts+' pont (🎯×'+sorted[1][1].exact+')'+(_pr[1]>0?' → 💰 '+_pr[1].toLocaleString('hu')+' Ft':'')+'\n':'')
+    +(sorted.length>=3?'🥉 '+sorted[2][0]+' — '+sorted[2][1].pts+' pont (🎯×'+sorted[2][1].exact+')'+(_pr[2]>0?' → 💰 '+_pr[2].toLocaleString('hu')+' Ft':'')+'\n':'')
     +'\n'
     +(todayExact.length?'🎯 Pontos tipp ma: '+[...new Set(todayExact)].join(', ')+'\n':'')
     +'Tippelj tovább! 💪';
@@ -5235,7 +5246,7 @@ function pmRenderAdminChat() {
       +'<div style="max-width:85%;padding:7px 11px;border-radius:'+(isAdmin?'10px 10px 2px 10px':'10px 10px 10px 2px')+';background:'+(isAdmin?'rgba(245,197,24,0.15)':'rgba(255,255,255,0.06)')+';border:1px solid '+(isAdmin?'rgba(245,197,24,0.2)':'rgba(255,255,255,0.08)')+';word-break:break-word;">'
       +'<div style="font-size:12px;color:'+(isAdmin?'var(--gold)':'rgba(240,244,240,0.7)')+';">'+escHtml(m.text)+'</div>'
       +'</div>'
-      +'<div style="font-size:9px;color:rgba(240,244,240,0.2);margin-top:1px;">'+escHtml(m.from)+' · '+(m.ts?new Date(m.ts).toLocaleString('hu-HU',{timeZone:'Europe/Budapest',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'')+'</div>'
+      +'<div style="font-size:11px;color:rgba(240,244,240,0.45);margin-top:2px;">'+escHtml(m.from)+' · '+(m.ts?new Date(m.ts).toLocaleString('hu-HU',{timeZone:'Europe/Budapest',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'')+'</div>'
       +'</div>';
   }).join('');
   area.scrollTop = area.scrollHeight;
@@ -6877,7 +6888,7 @@ function buildScorerRow(mid, m) {
     return list.map(function(s) {
       var name = s.name.split(' ').pop();
       var extra = s.isOg ? ' (ög)' : s.isPen ? ' (b)' : '';
-      return '<span style="color:rgba(240,244,240,0.8);">⚽ '+name+extra+'</span><span style="color:rgba(240,244,240,0.3);font-size:10px;"> '+s.minute+'</span>';
+      return '<span style="color:rgba(240,244,240,0.95);">⚽ '+name+extra+'</span><span style="color:rgba(240,244,240,0.5);font-size:11px;"> '+s.minute+'</span>';
     }).join('  ');
   };
 
@@ -6885,14 +6896,14 @@ function buildScorerRow(mid, m) {
     return list.map(function(s) {
       var name = s.name.split(' ').pop();
       var icon = s.type==='red' ? '🟥' : s.type==='yellow2' ? '🟨🟥' : '🟨';
-      return '<span style="color:rgba(240,244,240,0.65);">'+icon+' '+name+'</span><span style="color:rgba(240,244,240,0.3);font-size:10px;"> '+s.minute+'</span>';
+      return '<span style="color:rgba(240,244,240,0.65);">'+icon+' '+name+'</span><span style="color:rgba(240,244,240,0.5);font-size:11px;"> '+s.minute+'</span>';
     }).join('  ');
   };
 
   var html = '';
   // Goals row
   if(goals.length > 0) {
-    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:4px 8px 2px;font-family:Oswald,sans-serif;font-size:11px;letter-spacing:0.3px;border-top:1px solid rgba(255,255,255,0.05);gap:8px;">'
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:4px 8px 2px;font-family:Oswald,sans-serif;font-size:12px;letter-spacing:0.3px;border-top:1px solid rgba(255,255,255,0.05);gap:8px;">'
       + '<div style="flex:1;text-align:left;">' + (homeGoals.length ? fmtGoals(homeGoals) : '') + '</div>'
       + '<div style="flex:1;text-align:right;">' + (awayGoals.length ? fmtGoals(awayGoals) : '') + '</div>'
       + '</div>';
@@ -6920,7 +6931,7 @@ function buildLiveStatsBar(mid) {
   ];
   var html = '<div class="live-stats-section" style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 10px 8px;font-family:Oswald,sans-serif;font-size:11px;">';
   var isOpen = panelStates[mid+'_stats'];
-  html += '<div onclick="panelStates[\''+mid+'_stats\']=!panelStates[\''+mid+'_stats\'];this.nextElementSibling.style.display=panelStates[\''+mid+'_stats\']?\'block\':\'none\';this.querySelector(\'span\').textContent=panelStates[\''+mid+'_stats\']?\'▾\':\'▸\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.45);font-size:10px;letter-spacing:1px;padding-bottom:4px;"><span>'+(isOpen?'▾':'▸')+'</span> STATISZTIKÁK</div>';
+  html += '<div onclick="panelStates[\''+mid+'_stats\']=!panelStates[\''+mid+'_stats\'];this.nextElementSibling.style.display=panelStates[\''+mid+'_stats\']?\'block\':\'none\';this.querySelector(\'span\').textContent=panelStates[\''+mid+'_stats\']?\'▾\':\'▸\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.6);font-size:12px;letter-spacing:1px;padding-bottom:5px;"><span>'+(isOpen?'▾':'▸')+'</span> STATISZTIKÁK</div>';
   html += '<div style="'+(isOpen?'':'display:none;')+'">';
   rows.forEach(function(r) {
     var total = r.h + r.a || 1;
@@ -6929,14 +6940,14 @@ function buildLiveStatsBar(mid) {
     var hW = Math.max(hPct, 5);
     var aW = Math.max(100-hW, 5);
     html += '<div style="display:flex;align-items:center;gap:4px;margin:3px 0;">'
-      + '<span style="width:22px;text-align:right;color:rgba(240,244,240,0.8);font-weight:600;font-size:11px;">'+(r.pct?r.h+'%':r.h)+'</span>'
+      + '<span style="width:22px;text-align:right;color:rgba(240,244,240,0.9);font-weight:700;font-size:12px;">'+(r.pct?r.h+'%':r.h)+'</span>'
       + '<div style="flex:1;display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,0.06);gap:1px;">'
       + '<div style="width:'+hW+'%;background:rgba(59,130,246,0.6);border-radius:3px 0 0 3px;transition:width 0.5s;"></div>'
       + '<div style="width:'+aW+'%;background:rgba(239,68,68,0.5);border-radius:0 3px 3px 0;transition:width 0.5s;"></div>'
       + '</div>'
-      + '<span style="width:22px;text-align:left;color:rgba(240,244,240,0.8);font-weight:600;font-size:11px;">'+(r.pct?r.a+'%':r.a)+'</span>'
+      + '<span style="width:22px;text-align:left;color:rgba(240,244,240,0.9);font-weight:700;font-size:12px;">'+(r.pct?r.a+'%':r.a)+'</span>'
       + '</div>'
-      + '<div style="text-align:center;font-size:9px;color:rgba(240,244,240,0.3);margin:-1px 0 2px;letter-spacing:0.5px;">'+r.label+'</div>';
+      + '<div style="text-align:center;font-size:10px;color:rgba(240,244,240,0.45);margin:0 0 3px;letter-spacing:0.5px;">'+r.label+'</div>';
   });
   html += '</div></div>';
   return html;
@@ -6948,7 +6959,7 @@ function buildLineupSection(mid, m) {
   if(!lu || (!lu.home && !lu.away)) return '';
   var html = '<div class="lineup-section" style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 10px 8px;font-family:Oswald,sans-serif;font-size:11px;">';
   var isOpen = panelStates[mid+'_lineup'];
-  html += '<div onclick="panelStates[\''+mid+'_lineup\']=!panelStates[\''+mid+'_lineup\'];this.nextElementSibling.style.display=panelStates[\''+mid+'_lineup\']?\'block\':\'none\';this.querySelector(\'span\').textContent=panelStates[\''+mid+'_lineup\']?\'▾\':\'▸\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.45);font-size:10px;letter-spacing:1px;padding-bottom:4px;"><span>'+(isOpen?'▾':'▸')+'</span> FELÁLLÁS</div>';
+  html += '<div onclick="panelStates[\''+mid+'_lineup\']=!panelStates[\''+mid+'_lineup\'];this.nextElementSibling.style.display=panelStates[\''+mid+'_lineup\']?\'block\':\'none\';this.querySelector(\'span\').textContent=panelStates[\''+mid+'_lineup\']?\'▾\':\'▸\'" style="cursor:pointer;display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.6);font-size:12px;letter-spacing:1px;padding-bottom:5px;"><span>'+(isOpen?'▾':'▸')+'</span> FELÁLLÁS</div>';
   html += '<div style="'+(isOpen?'':'display:none;')+'">';
   ['home','away'].forEach(function(side) {
     if(!lu[side]) return;
@@ -6966,7 +6977,7 @@ function buildLineupSection(mid, m) {
       lu[side].players.forEach(function(name,i) {
         var short = name ? name.split(' ').pop() : '?';
         if(!short) short = '?';
-        html += '<span style="color:rgba(240,244,240,0.6);font-size:10px;">'+(i+1)+'. '+short+'</span>';
+        html += '<span style="color:rgba(240,244,240,0.75);font-size:11px;">'+(i+1)+'. '+short+'</span>';
       });
       html += '</div>';
     }
@@ -6974,7 +6985,7 @@ function buildLineupSection(mid, m) {
     if(lu[side].subs && lu[side].subs.length) {
       var showSubs = lu[side].subs.slice(0,5);
       html += '<div style="margin-top:2px;"><span style="font-size:9px;color:rgba(240,244,240,0.3);">🔄 </span>';
-      html += showSubs.map(function(name){ return '<span style="color:rgba(240,244,240,0.35);font-size:9px;">'+name.split(' ').pop()+'</span>'; }).join(', ');
+      html += showSubs.map(function(name){ return '<span style="color:rgba(240,244,240,0.5);font-size:10px;">'+name.split(' ').pop()+'</span>'; }).join(', ');
       if(lu[side].subs.length > 5) html += '<span style="color:rgba(240,244,240,0.25);font-size:9px;"> +' + (lu[side].subs.length-5) + '</span>';
       html += '</div>';
     }
@@ -6995,14 +7006,14 @@ function buildEventTimeline(mid) {
   // Only show subs and VAR (goals and cards already in buildScorerRow)
   var subs = events.filter(function(e){ return e.type==='subst'; });
   if(subs.length === 0) return '';
-  var html = '<div style="border-top:1px solid rgba(255,255,255,0.04);padding:3px 8px 4px;font-family:Oswald,sans-serif;font-size:10px;">';
+  var html = '<div style="border-top:1px solid rgba(255,255,255,0.06);padding:4px 8px 6px;font-family:Oswald,sans-serif;font-size:12px;">';
   var homeSubs = subs.filter(function(e){ return e.teamSide==='home'; });
   var awaySubs = subs.filter(function(e){ return e.teamSide==='away'; });
   var fmtSub = function(s) {
     // ESPN: player=bejövő (participants[0]), assist=kimenő (participants[1])
     var inP = s.player ? s.player.split(' ').pop() : '';
     var out = s.assist ? s.assist.split(' ').pop() : '?';
-    return '<span style="color:rgba(240,244,240,0.4);">🔄 '+(inP?'<span style="color:rgba(34,197,94,0.7);">↑'+inP+'</span> ':'')+'<span style="color:rgba(239,68,68,0.6);">↓'+out+'</span></span><span style="color:rgba(240,244,240,0.2);font-size:9px;"> '+s.min+(s.extra?'+'+s.extra:'')+"'"+'</span>';
+    return '<span style="color:rgba(240,244,240,0.4);">🔄 '+(inP?'<span style="color:rgba(34,197,94,0.9);">↑'+inP+'</span> ':'')+'<span style="color:rgba(239,68,68,0.8);">↓'+out+'</span></span><span style="color:rgba(240,244,240,0.2);font-size:9px;"> '+s.min+(s.extra?'+'+s.extra:'')+"'"+'</span>';
   };
   if(homeSubs.length || awaySubs.length) {
     html += '<div style="display:flex;justify-content:space-between;gap:8px;">'
@@ -7020,7 +7031,7 @@ function buildCommentaryTicker(mid) {
   if(!cmts || !cmts.length) return '';
   var show = cmts.slice(0, 4);
   var html = '<div onclick="this.querySelector(\'.cmt-full\').style.display=this.querySelector(\'.cmt-full\').style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.cmt-arrow\').textContent=this.querySelector(\'.cmt-full\').style.display===\'none\'?\'▸\':\'▾\'" style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 10px 4px;cursor:pointer;">';
-  html += '<div style="display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.4);font-size:10px;font-family:Oswald,sans-serif;letter-spacing:0.8px;margin-bottom:4px;"><span class="cmt-arrow">▾</span> ÉLŐ KÖZVETÍTÉS</div>';
+  html += '<div style="display:flex;align-items:center;gap:4px;color:rgba(240,244,240,0.6);font-size:12px;font-family:Oswald,sans-serif;letter-spacing:0.8px;margin-bottom:6px;"><span class="cmt-arrow">▾</span> ÉLŐ KÖZVETÍTÉS</div>';
   html += '<div class="cmt-full">';
   html += '<div style="border-left:2px solid rgba(245,197,24,0.3);padding-left:8px;">';
   show.forEach(function(c, i) {
