@@ -539,7 +539,7 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 .lb-list{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
 .lb-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:12px 16px;transition:box-shadow 0.12s;}
 @media(hover:hover){.lb-row:hover{box-shadow:2px 0 0 0 var(--gold) inset;}}
-.lb-rank{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:rgba(240,244,240,0.18);width:30px;flex-shrink:0;text-align:center;}
+.lb-rank{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:rgba(240,244,240,0.6);width:30px;flex-shrink:0;text-align:center;}
 .lb-row.r1 .lb-rank{color:var(--gold);}
 .lb-row.r2 .lb-rank{color:#adb5bd;}
 .lb-row.r3 .lb-rank{color:#cd7f32;}
@@ -855,7 +855,7 @@ footer a:hover{color:var(--gold);}
     <!-- Admin fiók visszaállítás -->
     <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.07);padding-top:12px;">
       <span onclick="document.getElementById('adminRecoveryPanel').style.display=document.getElementById('adminRecoveryPanel').style.display==='none'?'block':'none'"
-        style="font-size:11px;color:rgba(240,244,240,0.25);cursor:pointer;letter-spacing:0.5px;">🔑 Elfelejtett fiók / Admin visszaállítás</span>
+        style="font-size:11px;color:rgba(240,244,240,0.55);cursor:pointer;letter-spacing:0.5px;">🔑 Elfelejtett fiók / Admin visszaállítás</span>
       <div id="adminRecoveryPanel" style="display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(245,197,24,0.2);border-radius:10px;">
         <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;letter-spacing:0.5px;">Admin azonosítás szükséges</div>
         <input type="password" id="recoveryAdminPw" placeholder="Admin jelszó"
@@ -1008,11 +1008,11 @@ footer a:hover{color:var(--gold);}
       <div class="ob-step">
         <div class="ob-step-icon">📋</div>
         <div class="ob-step-body">
-          <div class="ob-step-title">Tippek, Ranglista, Chat</div>
+          <div class="ob-step-title">Tippek, Ranglista, OPL</div>
           <div class="ob-step-desc">
             <b>📋 Tippek</b> — az eredmény kihirdetése után látod ki mire mit tippelt. PRO támogatók mások tippjeit előre is látják.<br>
             <b>🏅 Ranglista</b> — pontszám szerint rendezve, ki áll az élen.<br>
-            <b>💬 Chat</b> — kommentelheted az aktuális meccseket (jobb alsó 💬 gomb).
+            <b>📌 OPL</b> — itt javasolhatsz új funkciókat az alkalmazáshoz, és szavazhatsz mások ötleteire.
           </div>
         </div>
       </div>
@@ -1103,9 +1103,9 @@ footer a:hover{color:var(--gold);}
     <!-- QR -->
     <div style="margin-top:16px;">
       <div id="sup-qr-tipp" style="display:inline-block;border-radius:10px;border:3px solid var(--gold);padding:6px;background:white;"></div>
-      <div style="font-size:9px;color:rgba(240,244,240,0.25);letter-spacing:1px;text-transform:uppercase;margin-top:6px;">revolut.me/tamsd0pex</div>
+      <div style="font-size:9px;color:rgba(240,244,240,0.5);letter-spacing:1px;text-transform:uppercase;margin-top:6px;">revolut.me/tamsd0pex</div>
     </div>
-    <div style="font-size:11px;color:rgba(240,244,240,0.2);margin-top:16px;line-height:1.5;">Köszönjük! 🙏 Minden forint segít.</div>
+    <div style="font-size:11px;color:rgba(240,244,240,0.5);margin-top:16px;line-height:1.5;">Köszönjük! 🙏 Minden forint segít.</div>
   </div>
 </div>
 
@@ -3037,7 +3037,7 @@ function buildTippTable() {
             var etRes  = allEtResults[m.id]  || null;
             var penRes = allPenResults[m.id] || null;
 
-            if(!o) { rows += '<td style="text-align:center;padding:8px 6px;color:rgba(255,255,255,0.15);">–</td>'; return; }
+            if(!o) { rows += '<td style="text-align:center;padding:8px 6px;color:rgba(255,255,255,0.3);">–</td>'; return; }
 
             // Nem saját tipp ÉS nincs még eredmény → csak ✓ jelzés
             if(!isMe && !result) {
@@ -3605,8 +3605,10 @@ function renderLeaderboard() {
 
   // Élő rangsorváltozás kiszámítása
   var liveRankData = null;
+  var rankChangeMode = null;
   var hasLive = Object.values(liveScores).some(function(ls){ return ls.status==='live'; });
   if(hasLive) {
+    rankChangeMode = 'live';
     try {
       var withLive = calcDayFilteredScores(true);
       var withLiveSorted = Object.entries(withLive).sort(function(a,b){ return b[1].pts-a[1].pts||b[1].exact-a[1].exact; });
@@ -3615,6 +3617,34 @@ function renderLeaderboard() {
       var currentRank = {};
       sc.forEach(function(s,i){ currentRank[s.u]=i+1; });
       liveRankData = {withLiveRank:withLiveRank, currentRank:currentRank, withLive:withLive};
+    } catch(e){}
+  } else {
+    // Nincs élő meccs: az utolsó lejátszott meccs okozta elmozdulást mutatjuk
+    try {
+      var playedMatches = vbMatches.filter(function(m){ return allResults[m.id]; });
+      if(playedMatches.length) {
+        playedMatches.sort(function(a,b){ return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime); });
+        var lastMatch = playedMatches[0];
+        var beforeScores = {}, beforeExact = {};
+        users.forEach(function(u){ beforeScores[u]=0; beforeExact[u]=0; });
+        vbMatches.forEach(function(m){
+          if(m.id === lastMatch.id) return; // az utolsó meccset kihagyjuk, hogy az "előtte" állapotot kapjuk
+          if(!allResults[m.id]) return;
+          var realSc = allScores[m.id];
+          users.forEach(function(u){
+            var tip = allTips[m.id] ? allTips[m.id][u] : null;
+            if(!tip) return;
+            beforeScores[u] += calcMatchPoints(m, tip);
+            var tipSc = getTipScore(tip);
+            if(tipSc && realSc && tipSc.h+':'+tipSc.a===realSc) beforeExact[u]++;
+          });
+        });
+        var beforeSorted = Object.entries(beforeScores).sort(function(a,b){ return b[1]-a[1] || beforeExact[b[0]]-beforeExact[a[0]]; });
+        var beforeRank = {};
+        beforeSorted.forEach(function(e,i){ beforeRank[e[0]]=i+1; });
+        rankChangeMode = 'last';
+        liveRankData = {beforeRank:beforeRank, beforeScores:beforeScores, lastMatch:lastMatch};
+      }
     } catch(e){}
   }
 
@@ -3658,20 +3688,31 @@ function renderLeaderboard() {
 
   sc.forEach((s,i)=>{const me=s.u===currentUser;const adm=isHardcodeAdmin(s.u);const streak=getUserStreak(s.u);const isMvp=wb.mvp===s.u;const isBukta=wb.bukta===s.u&&wb.bukta!==wb.mvp;
   var prizeHtml = (i<3 && _prizes[i]>0) ? '<div style="font-size:11px;color:#22c55e;font-weight:700;">💰 '+ftToBankjegy(_prizes[i])+'</div>' : '';
-  // Élő rangsorváltozás nyíl
+  // Élő / utolsó meccs rangsorváltozás nyíl
   var liveArrow = '';
-  if(liveRankData) {
+  if(liveRankData && rankChangeMode === 'live') {
     var oldR = i+1;
     var newR = liveRankData.withLiveRank[s.u] || 99;
     var diff = oldR - newR;
     var livePts = liveRankData.withLive[s.u] ? liveRankData.withLive[s.u].pts : s.pts;
     var ptsDiff = livePts - s.pts;
-    if(diff > 0) liveArrow = ' <span style="font-size:10px;color:#4ade80;font-weight:700;">🔼'+diff+'</span>';
-    else if(diff < 0) liveArrow = ' <span style="font-size:10px;color:#f87171;font-weight:700;">🔽'+Math.abs(diff)+'</span>';
-    else liveArrow = ' <span style="font-size:10px;color:rgba(240,244,240,0.2);">➖</span>';
+    if(diff > 0) liveArrow = ' <span title="Élő meccs hatása" style="font-size:10px;color:#4ade80;font-weight:700;">🔼'+diff+'</span>';
+    else if(diff < 0) liveArrow = ' <span title="Élő meccs hatása" style="font-size:10px;color:#f87171;font-weight:700;">🔽'+Math.abs(diff)+'</span>';
+    else liveArrow = ' <span title="Élő meccs hatása" style="font-size:10px;color:rgba(240,244,240,0.55);font-weight:700;">➖</span>';
     if(ptsDiff > 0) liveArrow += '<span style="font-size:10px;color:#4ade80;"> +'+ptsDiff+'</span>';
+  } else if(liveRankData && rankChangeMode === 'last') {
+    var oldR2 = liveRankData.beforeRank[s.u] || 99;
+    var newR2 = i+1;
+    var diff2 = oldR2 - newR2;
+    var beforePts = liveRankData.beforeScores[s.u] || 0;
+    var ptsDiff2 = s.pts - beforePts;
+    var lmTitle = 'Utolsó meccs hatása: ' + (liveRankData.lastMatch.home||'') + ' - ' + (liveRankData.lastMatch.away||'');
+    if(diff2 > 0) liveArrow = ' <span title="'+lmTitle+'" style="font-size:10px;color:#4ade80;font-weight:700;">🔼'+diff2+'</span>';
+    else if(diff2 < 0) liveArrow = ' <span title="'+lmTitle+'" style="font-size:10px;color:#f87171;font-weight:700;">🔽'+Math.abs(diff2)+'</span>';
+    else liveArrow = ' <span title="'+lmTitle+'" style="font-size:10px;color:rgba(240,244,240,0.55);font-weight:700;">➖</span>';
+    if(ptsDiff2 > 0) liveArrow += '<span style="font-size:10px;color:#4ade80;"> +'+ptsDiff2+'</span>';
   }
-  html+=`<div class="lb-row r${Math.min(i+1,3)}" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}">${s.u}${userBadges(s.u)}${isMvp?' <span title="Heti MVP" style="font-size:12px;">⭐</span>':''}${isBukta?' <span title="Heti bukta" style="font-size:12px;">💀</span>':''}${me?' 👈':''}${liveArrow}</span><div class="lb-score-col"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div>${prizeHtml}<div class="lb-sub">${s.tot} tipp · ${s.acc}% · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${streak>=3?`<span style="color:#f97316">🔥 ${streak}</span> · `:''}${s.pend} várja</div></div></div>`;});
+  html+=`<div class="lb-row r${Math.min(i+1,3)}" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;${me?'border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.07)':''}"><span class="lb-rank" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;">${s.u}${userBadges(s.u)}${isMvp?' <span title="Heti MVP" style="font-size:12px;">⭐</span>':''}${isBukta?' <span title="Heti bukta" style="font-size:12px;">💀</span>':''}${me?' 👈':''}${liveArrow}</span><div class="lb-score-col" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.5">pt</span></div>${prizeHtml}<div class="lb-sub">${s.tot} tipp · ${s.acc}% · ${s.exact>0?`<span style="color:#fbbf24">🎯 ${s.exact} pontos</span> · `:''}${streak>=3?`<span style="color:#f97316">🔥 ${streak}</span> · `:''}${s.pend} várja</div></div></div>`;});
   html+='</div>';
   if(!vbMatches.some(function(m){return allResults[m.id];})) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ A VB indulása után látható a pontszám (jún. 11.)</div>';
   c.innerHTML=html;
@@ -3959,10 +4000,10 @@ function renderAdminUsers() {
       +'<span style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(240,244,240,0.3);min-width:22px;text-align:right;">'+(idx+1)+'.</span>'
       +'<span style="font-family:Oswald,sans-serif;font-size:13px;color:'+(tipped?'rgba(240,244,240,0.9)':'rgba(240,244,240,0.4)')+';flex:1;">'+escHtml(name)+userBadges(safe)+'</span>'
       +'<span style="font-size:11px;color:rgba(240,244,240,0.3);">'+(tipped?tipCount+' tipp':'–')+'</span>'
-      +'<span style="font-size:10px;color:rgba(240,244,240,0.2);" title="* = első tipp dátuma">'+(joined||'?')+'</span>'
+      +'<span style="font-size:10px;color:rgba(240,244,240,0.45);" title="* = első tipp dátuma">'+(joined||'?')+'</span>'
       +'</div>';
   }).join('')
-  + '<div style="font-size:10px;color:rgba(240,244,240,0.2);margin-top:6px;">* = első tipp dátuma (nincs Firebase regisztrációs adat)</div>';
+  + '<div style="font-size:10px;color:rgba(240,244,240,0.45);margin-top:6px;">* = első tipp dátuma (nincs Firebase regisztrációs adat)</div>';
 }
 
 function resetMusicWelcome() {
@@ -4635,12 +4676,24 @@ function showPointsBreakdown(safeName) {
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
   // Legújabb meccs felül
   vbMatches.sort(function(a,b){ return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime); });
-  var totalPts = 0, html = '';
+  var totalPts = 0, html = '', playedCount = 0, tippedCount = 0;
   vbMatches.forEach(function(m) {
     var res = allResults[m.id];
     if(!res) return;
+    playedCount++;
     var tip = allTips[m.id] && allTips[m.id][safeName];
-    if(!tip) return;
+    if(!tip) {
+      // Nem tippelt erre a meccsre – mégis megjelenik a kronológiai listában
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-family:Oswald,sans-serif;opacity:0.5;">';
+      html += '<span style="font-size:14px;min-width:20px;">➖</span>';
+      html += '<span style="flex:1;font-size:13px;color:rgba(240,244,240,0.5);">'+escHtml(m.homeFlag||'')+' '+(m.home||m.id).substring(0,12)+' vs '+(m.away||'?').substring(0,12)+' '+escHtml(m.awayFlag||'')+'</span>';
+      html += '<span style="font-size:12px;color:rgba(240,244,240,0.4);min-width:35px;text-align:center;">–</span>';
+      html += '<span style="font-size:12px;color:rgba(240,244,240,0.4);min-width:35px;text-align:center;">'+(allScores[m.id]||res)+'</span>';
+      html += '<span style="font-size:14px;min-width:32px;text-align:right;color:rgba(240,244,240,0.45);">+0</span>';
+      html += '</div>';
+      return;
+    }
+    tippedCount++;
     var outcome = getTipOutcome(tip);
     var tipSc = getTipScore(tip);
     // Védelmi: ha score ellentmond az outcome-nak, score a mérvadó
@@ -4667,7 +4720,10 @@ function showPointsBreakdown(safeName) {
   });
   if(!html) html = '<div style="text-align:center;padding:20px;color:rgba(240,244,240,0.3);">Még nincs lezárt meccs</div>';
   if(totalEl) totalEl.textContent = totalPts + ' pont';
-  content.innerHTML = '<div style="display:flex;gap:8px;padding:4px 0 8px;font-size:11px;color:rgba(240,244,240,0.3);border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:4px;font-family:Oswald,sans-serif;"><span style="min-width:20px;"></span><span style="flex:1;">Meccs</span><span style="min-width:35px;text-align:center;">Tipp</span><span style="min-width:35px;text-align:center;">Ered.</span><span style="min-width:32px;text-align:right;">Pont</span></div>' + html;
+  var coverageHtml = playedCount > 0
+    ? '<div style="font-size:12px;color:rgba(240,244,240,0.4);padding:0 0 8px;font-family:Oswald,sans-serif;">'+tippedCount+'/'+playedCount+' lejátszott meccsre tippelt'+(tippedCount<playedCount?' <span style="color:rgba(239,68,68,0.6);">('+(playedCount-tippedCount)+' kimaradt)</span>':'')+'</div>'
+    : '';
+  content.innerHTML = coverageHtml + '<div style="display:flex;gap:8px;padding:4px 0 8px;font-size:11px;color:rgba(240,244,240,0.3);border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:4px;font-family:Oswald,sans-serif;"><span style="min-width:20px;"></span><span style="flex:1;">Meccs</span><span style="min-width:35px;text-align:center;">Tipp</span><span style="min-width:35px;text-align:center;">Ered.</span><span style="min-width:32px;text-align:right;">Pont</span></div>' + html;
   popup.style.display = 'flex';
 }
 
@@ -5121,7 +5177,7 @@ function renderVbPoll() {
     return '<div class="vb-result-row"><span class="vb-result-label">'+e[0]+'</span>'
       +'<div class="vb-result-bar-bg"><div class="vb-result-bar" style="width:'+pct+'%"></div></div>'
       +'<span class="vb-result-cnt">'+e[1]+'</span></div>';
-  }).join('') || '<span style="font-size:11px;color:rgba(240,244,240,0.25);">Még nincs szavazat</span>';
+  }).join('') || '<span style="font-size:11px;color:rgba(240,244,240,0.45);">Még nincs szavazat</span>';
   var scorerMyEl = document.getElementById('vbScorerMy');
   if(scorerMyEl) scorerMyEl.innerHTML = locked
     ? (myScorer ? '⚽ '+escHtml(myScorer)+' · ⏰ Szavazás lezárva' : '⏰ Szavazás lezárult')
@@ -5154,7 +5210,7 @@ function renderVbPoll() {
     return '<div class="vb-result-row"><span class="vb-result-label">'+escHtml(displayName)+'</span>'
       +'<div class="vb-result-bar-bg"><div class="vb-result-bar" style="width:'+pct+'%"></div></div>'
       +'<span class="vb-result-cnt">'+e[1]+'</span></div>';
-  }).join('') || '<span style="font-size:11px;color:rgba(240,244,240,0.25);">Még nincs szavazat</span>';
+  }).join('') || '<span style="font-size:11px;color:rgba(240,244,240,0.45);">Még nincs szavazat</span>';
 
   // Módosítás gomb (compact módban, nem lezárva)
   var modBtnId = 'vbPollModifyBtn';
@@ -5251,7 +5307,7 @@ function pmRenderAdminChat() {
     });
   }
   if(!msgs.length) {
-    area.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.25);font-style:italic;">Még nincs üzenet</div>';
+    area.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.45);font-style:italic;">Még nincs üzenet</div>';
     return;
   }
   area.innerHTML = msgs.map(function(m){
@@ -6177,7 +6233,7 @@ async function inviteLoadList() {
   if(!el) return;
   try {
     var data = await fbGet('invites');
-    if(!data) { el.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.25);font-style:italic;">Még nincs meghívó</div>'; return; }
+    if(!data) { el.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.45);font-style:italic;">Még nincs meghívó</div>'; return; }
     var baseUrl = window.location.origin + window.location.pathname;
     var html = '';
     Object.keys(data).sort(function(a,b){
@@ -6190,7 +6246,7 @@ async function inviteLoadList() {
         +'<div style="display:flex;align-items:center;gap:8px;">'
         +'<span style="font-size:13px;">'+(used?'✅':'🔗')+'</span>'
         +'<span style="font-family:Oswald,sans-serif;font-size:12px;color:'+(used?'rgba(240,244,240,0.35)':'var(--gold)')+';flex:1;font-weight:700;">'+(inv.note||'(nincs megjegyzés)')+'</span>'
-        +'<span style="font-size:10px;color:rgba(240,244,240,0.25);">'+inv.createdAt+'</span>'
+        +'<span style="font-size:10px;color:rgba(240,244,240,0.45);">'+inv.createdAt+'</span>'
         +(used?'':'<button onclick="inviteCopy(\''+link+'\')" style="background:none;border:1px solid rgba(245,197,24,0.3);color:var(--gold);padding:3px 8px;border-radius:6px;font-size:10px;font-family:Oswald,sans-serif;cursor:pointer;">📋 Másol</button>')
         +'<button onclick="inviteDelete(\''+token+'\')" style="background:none;border:none;color:rgba(239,68,68,0.4);font-size:12px;cursor:pointer;padding:3px;">✕</button>'
         +'</div>';
@@ -6281,14 +6337,14 @@ async function inviteLoadRequests() {
   if(!el) return;
   try {
     var data = await fbGet('inviteRequests');
-    if(!data) { el.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.2);font-style:italic;">Nincs beérkezett kérés</div>'; return; }
+    if(!data) { el.innerHTML = '<div style="font-size:11px;color:rgba(240,244,240,0.45);font-style:italic;">Nincs beérkezett kérés</div>'; return; }
     var entries = Object.entries(data).sort(function(a,b){ return (b[1].ts||0)-(a[1].ts||0); });
     el.innerHTML = entries.map(function(e){
       var key=e[0], r=e[1];
       return '<div style="padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid rgba(245,197,24,0.15);background:rgba(245,197,24,0.04);">'
         +'<div style="display:flex;align-items:center;gap:6px;">'
         +'<span style="font-family:Oswald,sans-serif;font-size:12px;color:var(--gold);font-weight:700;flex:1;">'+escHtml(r.name||'?')+'</span>'
-        +'<span style="font-size:10px;color:rgba(240,244,240,0.25);">'+(r.date||'')+'</span>'
+        +'<span style="font-size:10px;color:rgba(240,244,240,0.45);">'+(r.date||'')+'</span>'
         +'<button onclick="inviteDeleteReq(\''+key+'\')" style="background:none;border:none;color:rgba(239,68,68,0.4);font-size:12px;cursor:pointer;">✕</button>'
         +'</div>'
         +'<div style="font-size:11px;color:rgba(240,244,240,0.45);margin-top:2px;">📧 '+escHtml(r.contact||'')+' · 🤝 '+escHtml(r.connection||'')+'</div>'
@@ -6469,7 +6525,7 @@ function oplRender() {
       +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
       +'<span style="font-family:Oswald,sans-serif;font-size:11px;font-weight:700;" class="'+oplStatusClass(item.status)+'">'+oplStatusLabel(item.status)+'</span>'
       +(item.user?'<span style="font-size:11px;color:rgba(240,244,240,0.4);">👤 '+escHtml(item.user)+'</span>':'')
-      +'<span style="font-size:10px;color:rgba(240,244,240,0.25);">'+item.date+'</span>'
+      +'<span style="font-size:10px;color:rgba(240,244,240,0.45);">'+item.date+'</span>'
       // Komment gomb
       +'<button onclick="oplToggleCmt('+item.id+')" style="background:none;border:none;color:rgba(240,244,240,0.35);cursor:pointer;padding:3px 5px;border-radius:5px;font-size:12px;font-family:Oswald,sans-serif;display:flex;align-items:center;gap:3px;" title="Hozzászólások">'
       +'💬 <span style="font-size:10px;color:rgba(245,197,24,'+(cmtCount?'0.6':'0.25')+');">'+cmtCount+'</span></button>'
@@ -6489,12 +6545,12 @@ function oplRender() {
         html += '<div style="display:flex;gap:6px;margin-bottom:6px;align-items:flex-start;">'
           +'<span style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(245,197,24,0.5);flex-shrink:0;">'+escHtml(c.user||'?')+'</span>'
           +'<span style="font-size:12px;color:rgba(240,244,240,0.65);line-height:1.4;flex:1;word-break:break-word;">'+escHtml(c.text)+'</span>'
-          +'<span style="font-size:9px;color:rgba(240,244,240,0.2);flex-shrink:0;white-space:nowrap;">'+(c.date||'')+'</span>'
+          +'<span style="font-size:9px;color:rgba(240,244,240,0.45);flex-shrink:0;white-space:nowrap;">'+(c.date||'')+'</span>'
           +(isAdmin?'<button onclick="oplDelCmt('+item.id+','+ci+')" style="background:none;border:none;color:rgba(239,68,68,0.3);cursor:pointer;font-size:10px;padding:0 2px;flex-shrink:0;" title="Törlés">✕</button>':'')
           +'</div>';
       });
     } else {
-      html += '<div style="font-size:11px;color:rgba(240,244,240,0.2);margin-bottom:6px;font-style:italic;">Még nincs hozzászólás</div>';
+      html += '<div style="font-size:11px;color:rgba(240,244,240,0.45);margin-bottom:6px;font-style:italic;">Még nincs hozzászólás</div>';
     }
     // Új komment input
     if(currentUser) {
@@ -7027,7 +7083,7 @@ function buildEventTimeline(mid) {
     // ESPN: player=bejövő (participants[0]), assist=kimenő (participants[1])
     var inP = s.player ? s.player.split(' ').pop() : '';
     var out = s.assist ? s.assist.split(' ').pop() : '?';
-    return '<span style="color:rgba(240,244,240,0.4);">🔄 '+(inP?'<span style="color:rgba(34,197,94,0.9);">↑'+inP+'</span> ':'')+'<span style="color:rgba(239,68,68,0.8);">↓'+out+'</span></span><span style="color:rgba(240,244,240,0.2);font-size:9px;"> '+s.min+(s.extra?'+'+s.extra:'')+"'"+'</span>';
+    return '<span style="color:rgba(240,244,240,0.4);">🔄 '+(inP?'<span style="color:rgba(34,197,94,0.9);">↑'+inP+'</span> ':'')+'<span style="color:rgba(239,68,68,0.8);">↓'+out+'</span></span><span style="color:rgba(240,244,240,0.5);font-size:9px;"> '+s.min+(s.extra?'+'+s.extra:'')+"'"+'</span>';
   };
   if(homeSubs.length || awaySubs.length) {
     html += '<div style="display:flex;justify-content:space-between;gap:8px;">'
@@ -8036,7 +8092,7 @@ function displayScorers(list, container) {
       + '<td style="text-align:center;font-weight:700;color:var(--gold);font-family:Oswald,sans-serif;font-size:15px;">' + s.goals + '</td></tr>';
   });
   html += '</table>';
-  html += '<div style="text-align:right;font-size:10px;color:rgba(240,244,240,0.25);margin-top:8px;">Forrás: ESPN · Frissítve: ' + new Date().toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'}) + '</div>';
+  html += '<div style="text-align:right;font-size:10px;color:rgba(240,244,240,0.45);margin-top:8px;">Forrás: ESPN · Frissítve: ' + new Date().toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'}) + '</div>';
   container.innerHTML = html;
 }
 
@@ -8152,11 +8208,11 @@ function showLiveStandings() {
     var arrow;
     if(diff > 0) arrow = '<span style="color:#4ade80;font-weight:700;font-size:14px;">🔼+'+diff+'</span>';
     else if(diff < 0) arrow = '<span style="color:#f87171;font-weight:700;font-size:14px;">🔽'+diff+'</span>';
-    else arrow = '<span style="color:rgba(240,244,240,0.25);font-size:12px;">➖</span>';
+    else arrow = '<span style="color:rgba(240,244,240,0.55);font-size:12px;font-weight:700;">➖</span>';
 
     var beforePts = beforeTodayScores[user] ? beforeTodayScores[user].pts : 0;
     var gained = pts - beforePts;
-    var gainedStr = gained > 0 ? '<span style="color:#4ade80;font-size:12px;font-weight:700;background:rgba(74,222,128,0.1);padding:1px 6px;border-radius:6px;">+'+gained+'</span>' : '<span style="color:rgba(240,244,240,0.2);font-size:11px;">+0</span>';
+    var gainedStr = gained > 0 ? '<span style="color:#4ade80;font-size:12px;font-weight:700;background:rgba(74,222,128,0.1);padding:1px 6px;border-radius:6px;">+'+gained+'</span>' : '<span style="color:rgba(240,244,240,0.45);font-size:11px;">+0</span>';
     var medal = i < 3 ? medals[i] : (i+1)+'.';
     var isMine = currentUser && user === fbSafeName(currentUser);
     var rowBg = '';
