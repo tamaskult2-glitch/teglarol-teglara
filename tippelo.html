@@ -1168,7 +1168,7 @@ footer a:hover{color:var(--gold);}
   <p>MÉXICO · CANADA · USA · JÚN 11 – JÚL 19</p>
   <div id="vbCountdown" style="margin:8px auto 4px;display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;"></div>
   <span class="header-badge">„GÓLSZAGLÓ" BAJNOKSÁG</span>
-  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v3.6</span>
+  <span style="font-size:8px;color:rgba(240,244,240,0.15);position:absolute;right:8px;bottom:2px;" id="appVer">v3.7</span>
   <div style="margin-top:10px;">
     
   </div>
@@ -2978,9 +2978,14 @@ function buildTippTable() {
           return;
         }
 
-        // Meccsek ahol van tipp - kronológiai sorrend (ALL_MATCHES már rendezett)
+        // Meccsek ahol van tipp - kronológiai sorrend
+        var sortedMatches = ALL_MATCHES.slice().sort(function(a,b) {
+          var da = a.huDate + ' ' + a.huTime;
+          var db = b.huDate + ' ' + b.huTime;
+          return da.localeCompare(db);
+        });
         var rows = '';
-        ALL_MATCHES.forEach(function(m) {
+        sortedMatches.forEach(function(m) {
           var mt = t[m.id];
           if(!mt) return;
           // BL és Foca meccsek kihagyása
