@@ -1548,13 +1548,6 @@ footer a:hover{color:var(--gold);}
     <div style="font-size:15px;color:rgba(240,244,240,0.55);margin-bottom:6px;">Szavazz melyik kieséses meccsre jönnél el közösen nézni — és hová! 🍻⚽</div>
     <div style="font-family:'Oswald',sans-serif;font-size:17px;color:var(--gold);font-style:italic;text-align:center;padding:10px 0 14px;letter-spacing:0.5px;opacity:0.8;">„Együtt szurkolni — dupla élmény!"</div>
     <div id="kozosContainer"></div>
-
-    <!-- FEJLESZTÉSI SZAVAZÁS -->
-    <div style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;">
-      <div class="section-header"><h2>🗳️ Mit fejlesszünk?</h2></div>
-      <div style="font-size:14px;color:rgba(240,244,240,0.55);margin-bottom:14px;">Szavazz melyik újítást szeretnéd leginkább! Több opciót is választhatsz. 👇</div>
-      <div id="featurePollContainer"></div>
-    </div>
   </div>
 
   <!-- VB STATS TAB -->
@@ -1924,6 +1917,7 @@ function safePollChat() {} // chat eltávolítva
 
 safePollData();
 safePollChat();
+migrateFeaturePollVotesOnce();
 setInterval(safePollData, POLL_MS);
 setInterval(safePollChat, 5000);
 
@@ -2506,7 +2500,7 @@ function showTab(t) {
   if(t==='bl') renderBLTab();
   if(t==='bet') loadBetPoll();
   if(t !== 'meccsek') { _navLastId = null; _navPhase = 0; }
-  if(t==='kozos') { loadWatchParty(); loadFeaturePoll(); }
+  if(t==='kozos') { loadWatchParty(); }
   if(t==='gol') renderGolTab();
   if(t==='otletek') otletekLoad();
   // Scroll: tab tetejére görget
@@ -6394,10 +6388,14 @@ function updateInviteStatus() {
 }
 
 // ===== MECCS KERESŐ =====
+function _normSearchStr(s) {
+  return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
 function filterMatches() {
-  var q = (document.getElementById('matchSearch').value||'').trim().toLowerCase();
+  var qRaw = (document.getElementById('matchSearch').value||'').trim();
+  var q = _normSearchStr(qRaw);
   var clearBtn = document.getElementById('matchSearchClear');
-  if(clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+  if(clearBtn) clearBtn.style.display = qRaw ? 'block' : 'none';
 
   var container = document.getElementById('matchesContainer');
   if(!container) return;
@@ -6415,13 +6413,31 @@ function filterMatches() {
     return;
   }
 
+  // Találati halmaz a valós meccs-adatok alapján (csapatnév-kezdet, csoport, helyszín, dátum)
+  // — NEM a kártya teljes (rejtett tartalmat is tartalmazó) szövegéből keresünk!
+  var matchedIds = {};
+  ALL_MATCHES.forEach(function(m) {
+    var homeWords = _normSearchStr(m.home).split(/[\s-]+/);
+    var awayWords = _normSearchStr(m.away).split(/[\s-]+/);
+    var groupN = _normSearchStr(m.group);
+    var venueN = _normSearchStr(m.venue);
+    var dateN = _normSearchStr((m.huDate||'') + ' ' + (m.huTime||''));
+    var hit =
+      homeWords.some(function(w){ return w.length && w.indexOf(q) === 0; }) ||
+      awayWords.some(function(w){ return w.length && w.indexOf(q) === 0; }) ||
+      (groupN && groupN === q) ||
+      (venueN && venueN.indexOf(q) >= 0) ||
+      (dateN.indexOf(q) >= 0);
+    if(hit) matchedIds[m.id] = true;
+  });
+
   // Minden dg_ div átfésülése
   container.querySelectorAll('[id^="dg_"]').forEach(function(dg) {
     var cards = dg.querySelectorAll('.match-card');
     var anyVisible = false;
     cards.forEach(function(card) {
-      var text = (card.textContent||'').toLowerCase();
-      var show = text.indexOf(q) >= 0;
+      var mid = card.id.replace(/^mc_/, '');
+      var show = !!matchedIds[mid];
       card.style.display = show ? '' : 'none';
       if(show) anyVisible = true;
     });
@@ -7626,83 +7642,41 @@ var FEATURE_OPTIONS = [
   }
 ];
 
-async function loadFeaturePoll() {
-  var container = document.getElementById('featurePollContainer');
-  if(!container) return;
-  container.innerHTML = '<div style="text-align:center;padding:12px;color:rgba(240,244,240,0.35);">⏳ Szavazatok betöltése…</div>';
-
+// ===== EGYSZERI MIGRÁCIÓ: régi "Közös" alatti featurePoll szavazatok → Ötletek (featureIdeas) =====
+var _featurePollMigrationChecked = false;
+async function migrateFeaturePollVotesOnce() {
+  if(_featurePollMigrationChecked) return;
+  _featurePollMigrationChecked = true;
   try {
-    var votes = await fbGet('featurePoll') || {};
-    var safe = currentUser ? fbSafeName(currentUser) : null;
-    var myVotes = safe && votes[safe] ? votes[safe] : {};
-
-    // Összesített szavazatok
-    var totals = {};
-    FEATURE_OPTIONS.forEach(function(f){ totals[f.id] = 0; });
-    Object.values(votes).forEach(function(userVotes) {
-      Object.keys(userVotes).forEach(function(fid) {
-        if(userVotes[fid] && totals[fid] !== undefined) totals[fid]++;
+    var already = await fbGet('featurePollMigrated');
+    if(already) return;
+    var oldVotes = await fbGet('featurePoll') || {};
+    if(Object.keys(oldVotes).length === 0) {
+      await fbSet('featurePollMigrated', true);
+      return;
+    }
+    var ideas = await fbGet('featureIdeas') || {};
+    var changed = false;
+    FEATURE_OPTIONS.forEach(function(f) {
+      var targetId = 'seed_' + f.id;
+      if(!ideas[targetId]) {
+        ideas[targetId] = {title:f.title, desc:f.desc, emoji:f.emoji, user:'KULT', date:'2026-06-14', status:'new', votes:{}};
+        changed = true;
+      }
+      if(!ideas[targetId].votes) ideas[targetId].votes = {};
+      Object.keys(oldVotes).forEach(function(user) {
+        if(oldVotes[user] && oldVotes[user][f.id] && !ideas[targetId].votes[user]) {
+          ideas[targetId].votes[user] = true;
+          changed = true;
+        }
       });
     });
-
-    var voterCount = Object.keys(votes).length;
-    var maxVotes = Math.max(1, Math.max.apply(null, Object.values(totals)));
-
-    var html = '';
-    FEATURE_OPTIONS.forEach(function(f) {
-      var voted = myVotes[f.id];
-      var count = totals[f.id];
-      var pct = Math.round((count / Math.max(voterCount, 1)) * 100);
-      var barW = Math.round((count / maxVotes) * 100);
-
-      html += '<div style="background:var(--card);border:1px solid '+(voted?'rgba(245,197,24,0.3)':'var(--card-border)')+';border-radius:12px;padding:14px;margin-bottom:10px;">'
-        // Header sor
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">'
-        + '<div style="flex:1;">'
-        + '<span style="font-size:20px;margin-right:6px;">'+f.emoji+'</span>'
-        + '<span style="font-family:Oswald,sans-serif;font-size:15px;font-weight:700;color:'+(voted?'var(--gold)':'rgba(240,244,240,0.9)')+';letter-spacing:0.5px;">'+f.title+'</span>'
-        + (voted ? ' <span style="font-size:10px;background:rgba(245,197,24,0.15);color:var(--gold);padding:1px 6px;border-radius:6px;font-family:Oswald,sans-serif;">✓ Szavaztam</span>' : '')
-        + '</div>'
-        + '<span style="font-family:Oswald,sans-serif;font-size:13px;color:rgba(240,244,240,0.4);white-space:nowrap;">'+count+' szavazat</span>'
-        + '</div>'
-        // Leírás
-        + '<div style="font-size:12px;color:rgba(240,244,240,0.55);line-height:1.6;margin-bottom:10px;">'+f.desc+'</div>'
-        // Progress bar
-        + '<div style="height:6px;border-radius:99px;background:rgba(255,255,255,0.06);margin-bottom:10px;">'
-        + '<div style="height:100%;border-radius:99px;width:'+barW+'%;background:'+(voted?'var(--gold)':'rgba(74,222,128,0.5)')+';transition:width 0.5s ease;"></div>'
-        + '</div>'
-        // Szavazás gomb
-        + '<button onclick="voteFeature(\''+f.id+'\')" style="width:100%;padding:8px;border-radius:8px;border:1px solid '+(voted?'rgba(245,197,24,0.4)':'rgba(74,222,128,0.25)')+';background:'+(voted?'rgba(245,197,24,0.1)':'rgba(74,222,128,0.06)')+';color:'+(voted?'var(--gold)':'#4ade80')+';font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">'
-        + (voted ? '✓ Visszavon' : '👍 Ezt akarom!')
-        + '</button>'
-        + '</div>';
-    });
-
-    // Összesítő
-    html += '<div style="text-align:center;font-size:12px;color:rgba(240,244,240,0.35);margin-top:8px;">'+voterCount+'/21 szavazott · Több opciót is választhatsz</div>';
-
-    container.innerHTML = html;
-  } catch(e) {
-    container.innerHTML = '<div style="color:#f87171;padding:12px;">❌ Hiba: '+e.message+'</div>';
-  }
-}
-
-async function voteFeature(fid) {
-  if(!currentUser) { showToast('⚠️ Jelentkezz be a szavazáshoz!'); return; }
-  var safe = fbSafeName(currentUser);
-  try {
-    var votes = await fbGet('featurePoll') || {};
-    var myVotes = votes[safe] || {};
-    if(myVotes[fid]) {
-      delete myVotes[fid]; // visszavon
-    } else {
-      myVotes[fid] = true; // szavaz
+    if(changed) {
+      await fbSet('featureIdeas', ideas);
     }
-    await fbSet('featurePoll/'+safe, myVotes);
-    showToast(myVotes[fid] ? '👍 Szavazat leadva!' : '↩️ Szavazat visszavonva');
-    loadFeaturePoll();
+    await fbSet('featurePollMigrated', true);
   } catch(e) {
-    showToast('❌ Hiba: '+e.message);
+    _featurePollMigrationChecked = false; // hiba esetén legközelebb újrapróbálja
   }
 }
 
