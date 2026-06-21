@@ -2870,6 +2870,7 @@ function buildOtherTips(mid, locked) {
     } catch(e){}
   }
 
+  var realScoreStr = allScores[mid];
   var html = '<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">';
   html += '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
   allEntries.forEach(function(e){
@@ -2882,11 +2883,18 @@ function buildOtherTips(mid, locked) {
     var tipStr = sc ? sc.h+':'+sc.a : (o||'?');
     var bg = 'rgba(255,255,255,0.04)';
     var nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.85)';
-    var livePtsStr = '', rankStr = '';
+    var livePtsStr = '', rankStr = '', ptsStr = '';
 
     if(result && pts !== null) {
-      if(pts > 0) { bg = 'rgba(34,197,94,0.1)'; }
-      else { bg = 'rgba(239,68,68,0.06)'; nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.7)'; }
+      var isExactR = !!(sc && realScoreStr && (sc.h+':'+sc.a === realScoreStr));
+      var isGDR = !isExactR && o===result && sc && realScoreStr && isGoalDiffCorrect(sc, realScoreStr);
+      var isCorrectR = o===result && !isExactR && !isGDR;
+      var icon, ptsColor;
+      if(isExactR) { bg='rgba(34,197,94,0.12)'; icon='🎯'; ptsColor='#4ade80'; }
+      else if(isGDR) { bg='rgba(59,130,246,0.12)'; icon='📐'; ptsColor='#60a5fa'; }
+      else if(isCorrectR) { bg='rgba(245,197,24,0.12)'; icon='🟡'; ptsColor='var(--gold)'; }
+      else { bg='rgba(239,68,68,0.08)'; nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.6)'; icon='❌'; ptsColor='rgba(239,68,68,0.75)'; }
+      ptsStr = ' <span style="color:'+ptsColor+';font-size:11px;font-weight:700;">'+icon+' +'+pts+'</span>';
     } else if(isLive && !result) {
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
       if(!isNaN(hg) && !isNaN(ag)) {
@@ -2895,13 +2903,14 @@ function buildOtherTips(mid, locked) {
         if(o === liveOutcome) {
           bg = 'rgba(34,197,94,0.08)';
           var lMult = m ? getMatchMultiplier(m) : 1;
-          var lPts = 1 * lMult;
-          if(sc && sc.h+':'+sc.a===liveScore) { lPts=3*lMult; livePtsStr=' <span style="color:#22c55e;font-size:10px;">🎯+'+lPts+'</span>'; }
-          else { if(sc){var tD=sc.h-sc.a,rD=hg-ag;if(tD===rD)lPts=2*lMult;} livePtsStr=' <span style="color:#22c55e;font-size:10px;">+'+lPts+'</span>'; }
+          var lPts = 1 * lMult, lIcon = '🟡', lColor = 'var(--gold)';
+          if(sc && sc.h+':'+sc.a===liveScore) { lPts=3*lMult; lIcon='🎯'; lColor='#22c55e'; }
+          else if(sc){ var tD=sc.h-sc.a,rD=hg-ag; if(tD===rD){ lPts=2*lMult; lIcon='📐'; lColor='#60a5fa'; } }
+          livePtsStr = ' <span style="color:'+lColor+';font-size:10px;">'+lIcon+' +'+lPts+'</span>';
         } else {
           bg = 'rgba(239,68,68,0.06)';
           nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.7)';
-          livePtsStr = ' <span style="color:rgba(239,68,68,0.4);font-size:10px;">+0</span>';
+          livePtsStr = ' <span style="color:rgba(239,68,68,0.6);font-size:10px;">❌ +0</span>';
         }
         if(rankData) {
           var oldR = rankData.beforeRank[u]||99;
@@ -2919,7 +2928,7 @@ function buildOtherTips(mid, locked) {
       +rankStr
       +'<span style="color:'+nameClr+';'+meFw+'">'+escHtml(u.substring(0,8))+'</span>'
       +' <b style="color:rgba(240,244,240,0.85);">'+tipStr+'</b>'
-      +(pts!==null&&pts>0?' <span style="color:#22c55e;font-size:11px;font-weight:700;">+'+pts+'</span>':'')
+      +ptsStr
       +livePtsStr
       +'</span>';
   });
