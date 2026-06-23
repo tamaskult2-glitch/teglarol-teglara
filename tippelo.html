@@ -1443,6 +1443,30 @@ footer a:hover{color:var(--gold);}
       </div>
     </div>
 
+    <!-- TIPP TÖRLÉSE (ADMIN) -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.2);border-radius:10px;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);letter-spacing:1px;">🗑️ TIPP TÖRLÉSE</span></div>
+      <div class="adm-collapse-body">
+        <div style="font-size:12px;color:rgba(240,244,240,0.5);margin-bottom:10px;">Felhasználó tippjének teljes törlése egy adott meccsről (pl. hibás dupla tipp esetén).</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div>
+            <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">FELHASZNÁLÓ</div>
+            <select id="admDelTipUser" onchange="admDelTipPreview()" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.25);background:rgba(0,0,0,0.3);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+              <option value="">— válassz felhasználót —</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">MECCS</div>
+            <select id="admDelTipMatch" onchange="admDelTipPreview()" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.25);background:rgba(0,0,0,0.3);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+              <option value="">— válassz meccset —</option>
+            </select>
+          </div>
+          <div id="admDelTipPreview" style="display:none;padding:8px 10px;background:rgba(0,0,0,0.2);border-radius:8px;font-family:Oswald,sans-serif;font-size:13px;color:rgba(240,244,240,0.7);"></div>
+          <button onclick="adminDeleteTip()" style="padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.12);color:#f87171;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🗑️ TIPP TÖRLÉSE</button>
+        </div>
+      </div>
+    </div>
+
     <!-- EREDMÉNY RÖGZÍTÉS -->
     <div style="margin-bottom:12px;padding:10px 14px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);border-radius:10px;">
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">⚙️ EREDMÉNY RÖGZÍTÉS</span></div>
@@ -1988,7 +2012,80 @@ function buildTipDistBar(cnt, total, result) {
     +'</div>';
 }
 
-// ===== ADMIN SZEKCIÓK ÖSSZECSUKÁSA =====
+// ===== ADMIN: TIPP TÖRLÉSE =====
+function populateAdmDelTip() {
+  var userSel  = document.getElementById('admDelTipUser');
+  var matchSel = document.getElementById('admDelTipMatch');
+  if(!userSel || !matchSel) return;
+
+  // Felhasználók
+  var users = Object.keys(allTips).reduce(function(set, mid) {
+    Object.keys(allTips[mid]||{}).forEach(function(u){ set[u]=true; });
+    return set;
+  }, {});
+  var curUser = userSel.value;
+  userSel.innerHTML = '<option value="">— válassz felhasználót —</option>';
+  Object.keys(users).sort().forEach(function(u) {
+    var opt = document.createElement('option');
+    opt.value = u; opt.textContent = u;
+    if(u === curUser) opt.selected = true;
+    userSel.appendChild(opt);
+  });
+
+  // Meccsek (csak VB meccsek ahol valakinek van tippje)
+  var curMatch = matchSel.value;
+  matchSel.innerHTML = '<option value="">— válassz meccset —</option>';
+  var vbM = ALL_MATCHES.filter(isVbMatch);
+  vbM.sort(function(a,b){ return (a.huDate+a.huTime).localeCompare(b.huDate+b.huTime); });
+  vbM.forEach(function(m) {
+    if(!allTips[m.id]) return;
+    var opt = document.createElement('option');
+    opt.value = m.id;
+    var res = allResults[m.id] ? ' (' + (allScores[m.id]||allResults[m.id]) + ')' : '';
+    opt.textContent = (m.homeFlag||'') + ' ' + (m.home||m.id) + ' vs ' + (m.away||'?') + ' ' + (m.awayFlag||'') + res + ' · ' + (m.huDate||'');
+    if(m.id === curMatch) opt.selected = true;
+    matchSel.appendChild(opt);
+  });
+
+  admDelTipPreview();
+}
+
+function admDelTipPreview() {
+  var u   = (document.getElementById('admDelTipUser')||{}).value;
+  var mid = (document.getElementById('admDelTipMatch')||{}).value;
+  var box = document.getElementById('admDelTipPreview');
+  if(!box) return;
+  if(!u || !mid) { box.style.display='none'; return; }
+  var tip = allTips[mid] && allTips[mid][u];
+  if(!tip) { box.style.display='block'; box.innerHTML='<span style="color:rgba(239,68,68,0.6);">⚠️ Ennek a usernek nincs tippje erre a meccsre</span>'; return; }
+  var sc = getTipScore(tip);
+  var ou = getTipOutcome(tip);
+  var tipStr = sc ? sc.h+':'+sc.a+' ('+ou+')' : (ou||JSON.stringify(tip));
+  box.style.display='block';
+  box.innerHTML='Jelenlegi tipp: <b style="color:var(--gold);">' + tipStr + '</b> — törlés után <b style="color:#f87171;">visszaállíthatatlan!</b>';
+}
+
+async function adminDeleteTip() {
+  var u   = (document.getElementById('admDelTipUser')||{}).value;
+  var mid = (document.getElementById('admDelTipMatch')||{}).value;
+  if(!u || !mid) { showToast('⚠️ Válassz felhasználót és meccset!'); return; }
+  var tip = allTips[mid] && allTips[mid][u];
+  if(!tip) { showToast('⚠️ Nincs tipp törölni!'); return; }
+  var sc = getTipScore(tip); var ou = getTipOutcome(tip);
+  var tipStr = sc ? sc.h+':'+sc.a : (ou||'?');
+  if(!confirm('Biztosan törlöd ' + u + ' tippjét (' + tipStr + ')?')) return;
+  try {
+    await fbDel('tips/'+mid+'/'+u);
+    showToast('✅ Tipp törölve: ' + u + ' · ' + tipStr);
+    await pollData();
+    renderAll();
+    admDelTipPreview();
+  } catch(e) {
+    showToast('❌ Hiba: ' + e.message);
+  }
+}
+
+
 function toggleAdmSec(hdr) {
   hdr.classList.toggle('open');
   var body = hdr.nextElementSibling;
@@ -2549,7 +2646,7 @@ function showTab(t) {
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
-  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); }
+  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); populateAdmDelTip(); }
   if(t==='opl') oplLoad();
   if(t==='emob') renderEmobTab();
   if(t==='bl') renderBLTab();
