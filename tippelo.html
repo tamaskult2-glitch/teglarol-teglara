@@ -8327,15 +8327,32 @@ function renderGroupTables() {
 var cachedScorers = null;
 var scorersFetchedAt = 0;
 
-async function renderTopScorers() {
+async function renderTopScorers(forceRefresh) {
   var container = document.getElementById('topScorersContainer');
   if(!container) return;
   container.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(240,244,240,0.4);">⏳ Góllövők betöltése ESPN-ből…</div>';
 
-  // Cache: 5 percig ne kérdezze újra
-  if(cachedScorers && (Date.now() - scorersFetchedAt < 300000)) {
+  // Cache: 5 percig ne kérdezze újra (kézi frissítésnél átugorja)
+  if(!forceRefresh && cachedScorers && (Date.now() - scorersFetchedAt < 300000)) {
     displayScorers(cachedScorers, container);
     return;
+  }
+
+  // Gól-típus nevekre illesztő set (ESPN API nem konzisztens)
+  var GOAL_TYPES = {
+    'goal': true, 'penalty': true, 'header': true,
+    'freekick': true, 'free kick': true, 'penalty goal': true,
+    'header goal': true, 'volley': true, 'chip': true,
+    'tap-in': true, 'tap in': true
+  };
+  function isGoalType(typeText) {
+    if(!typeText) return false;
+    var t = typeText.toLowerCase().trim();
+    if(GOAL_TYPES[t]) return true;
+    // ESPN néha "Goal (Penalty)" formátumban adja vissza
+    if(t.indexOf('goal') !== -1) return true;
+    if(t.indexOf('penalty') !== -1 && t.indexOf('missed') === -1 && t.indexOf('saved') === -1) return true;
+    return false;
   }
 
   try {
@@ -8355,7 +8372,15 @@ async function renderTopScorers() {
     container.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(240,244,240,0.4);">⏳ ' + completedEvents.length + ' meccs adatainak betöltése…</div>';
 
     // 2. Summary fetch minden befejezett meccshez (párhuzamosan, max 5 egyszerre)
-    var goalMap = {}; // {playerName: {name, team, flag, goals, teamLogo}}
+    var goalMap = {}; // {key: {name, team, flag, goals, teamLogo}}
+
+    function addGoal(athleteName, teamName, teamLogo, teamAbbr) {
+      if(!athleteName) return;
+      var key = athleteName + '_' + (teamAbbr || teamName || '');
+      if(!goalMap[key]) goalMap[key] = {name: athleteName, team: teamName, abbr: teamAbbr, logo: teamLogo, goals: 0};
+      goalMap[key].goals++;
+    }
+
     var batchSize = 5;
     for(var b = 0; b < completedEvents.length; b += batchSize) {
       var batch = completedEvents.slice(b, b + batchSize);
@@ -8365,19 +8390,63 @@ async function renderTopScorers() {
       });
       var results = await Promise.all(promises);
       results.forEach(function(summary) {
-        if(!summary || !summary.keyEvents) return;
-        summary.keyEvents.forEach(function(ev) {
-          if(!ev.type || ev.type.text !== 'Goal') return;
-          if(ev.ownGoal) return; // öngólok nem számítanak
-          var athleteName = ev.participants && ev.participants[0] && ev.participants[0].athlete ? ev.participants[0].athlete.displayName : null;
-          if(!athleteName) return;
-          var teamName = ev.team ? ev.team.displayName : '';
-          var teamLogo = ev.team ? ev.team.logo : '';
-          var teamAbbr = ev.team ? ev.team.abbreviation : '';
-          var key = athleteName + '_' + teamAbbr;
-          if(!goalMap[key]) goalMap[key] = {name: athleteName, team: teamName, abbr: teamAbbr, logo: teamLogo, goals: 0};
-          goalMap[key].goals++;
-        });
+        if(!summary) return;
+
+        // A) keyEvents alapján (fő forrás)
+        var keyGoals = new Set(); // event ID-k amiket már bedolgoztunk
+        if(summary.keyEvents) {
+          summary.keyEvents.forEach(function(ev) {
+            var typeText = (ev.type && ev.type.text) || (ev.type && ev.type.id) || '';
+            if(!isGoalType(typeText)) return;
+            if(ev.ownGoal) return;
+            var scoringPlayId = ev.id || ev.playId;
+            if(scoringPlayId) keyGoals.add(scoringPlayId);
+            var athleteName = ev.participants && ev.participants[0] && ev.participants[0].athlete
+              ? (ev.participants[0].athlete.displayName || ev.participants[0].athlete.shortName)
+              : null;
+            var teamName = ev.team ? ev.team.displayName : '';
+            var teamLogo = ev.team ? (ev.team.logo || ev.team.logos && ev.team.logos[0] && ev.team.logos[0].href || '') : '';
+            var teamAbbr = ev.team ? ev.team.abbreviation : '';
+            addGoal(athleteName, teamName, teamLogo, teamAbbr);
+          });
+        }
+
+        // B) scoring plays fallback (ha keyEvents hiányos)
+        if(summary.scoring) {
+          summary.scoring.forEach(function(play) {
+            var playId = play.id || play.playId;
+            if(playId && keyGoals.has(playId)) return; // már megszámoltuk
+            var typeText = (play.type && play.type.text) || '';
+            if(!isGoalType(typeText)) return;
+            if(play.ownGoal) return;
+            var athleteName = play.athletes && play.athletes[0]
+              ? (play.athletes[0].displayName || play.athletes[0].shortName)
+              : (play.scorerName || null);
+            var teamName = play.team ? play.team.displayName : '';
+            var teamLogo = play.team ? (play.team.logo || '') : '';
+            var teamAbbr = play.team ? play.team.abbreviation : '';
+            addGoal(athleteName, teamName, teamLogo, teamAbbr);
+          });
+        }
+
+        // C) plays tömb (részletesebb, ESPN néha csak itt listázza)
+        if(summary.plays) {
+          summary.plays.forEach(function(play) {
+            var playId = play.id;
+            if(playId && keyGoals.has(playId)) return;
+            var typeText = (play.type && play.type.text) || '';
+            if(!isGoalType(typeText)) return;
+            if(play.scoringPlay !== true) return; // csak ténylegesen gólnak jelölt
+            if(play.ownGoal) return;
+            var athleteName = play.participants && play.participants[0] && play.participants[0].athlete
+              ? (play.participants[0].athlete.displayName || play.participants[0].athlete.shortName)
+              : null;
+            var teamName = play.team ? play.team.displayName : '';
+            var teamLogo = play.team ? (play.team.logo || '') : '';
+            var teamAbbr = play.team ? play.team.abbreviation : '';
+            addGoal(athleteName, teamName, teamLogo, teamAbbr);
+          });
+        }
       });
     }
 
@@ -8427,7 +8496,10 @@ function displayScorers(list, container) {
       + '<td style="text-align:center;font-weight:700;color:var(--gold);font-family:Oswald,sans-serif;font-size:15px;">' + s.goals + '</td></tr>';
   });
   html += '</table>';
-  html += '<div style="text-align:right;font-size:10px;color:rgba(240,244,240,0.45);margin-top:8px;">Forrás: ESPN · Frissítve: ' + new Date().toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'}) + '</div>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">'
+    + '<div style="font-size:11px;color:rgba(240,244,240,0.45);">Forrás: ESPN · Frissítve: ' + new Date().toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'}) + '</div>'
+    + '<button onclick="cachedScorers=null;renderTopScorers(true);" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(240,244,240,0.6);cursor:pointer;font-family:Oswald,sans-serif;letter-spacing:0.5px;">🔄 Frissítés</button>'
+    + '</div>';
   container.innerHTML = html;
 }
 
