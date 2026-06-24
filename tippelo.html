@@ -7725,14 +7725,14 @@ var NYERTESEK_MAP = {
 async function nyeremenyekLoad() {
   var list = document.getElementById('nyeremenyList');
   var addBtn = document.getElementById('nyeremenyAddBtn');
-  if(addBtn) addBtn.style.display = isAdminUnlocked ? 'flex' : 'none';
+  if(addBtn) addBtn.style.display = currentUser ? 'flex' : 'none';
   if(!list) return;
   list.innerHTML = '<div style="text-align:center;padding:32px;color:rgba(240,244,240,0.35);">⏳ Betöltés…</div>';
   try {
     var data = await fbGet('nyeremenyek') || {};
     var items = Object.entries(data).sort(function(a,b){ return (a[1].createdAt||0)-(b[1].createdAt||0); });
     if(items.length === 0) {
-      list.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.3);font-family:Oswald,sans-serif;font-size:14px;">🎁 Még nincs felajánlás<br><span style="font-size:12px;opacity:0.6;">Admin adhat hozzá felajánlásokat</span></div>';
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.3);font-family:Oswald,sans-serif;font-size:14px;">🎁 Még nincs felajánlás<br><span style="font-size:12px;opacity:0.6;">Legyél az első felajánló!</span></div>';
       return;
     }
     var byNyertes = {};
@@ -7761,12 +7761,17 @@ function nyeremenyCard(item) {
   var nyertesLabel = item.nyertes==='custom' && item.customText
     ? '✏️ '+escHtml(item.customText)
     : (NYERTESEK_MAP[item.nyertes]||item.nyertes||'');
-  var adminBtns = isAdminUnlocked
+  var mySafe = currentUser ? fbSafeName(currentUser) : null;
+  var isOwner = mySafe && item.createdBy && item.createdBy === mySafe;
+  var canEdit = isAdminUnlocked || isOwner;
+  var adminBtns = canEdit
     ? '<div style="display:flex;gap:6px;margin-top:10px;">'
       +'<button onclick="nyeremenyOpenModal(\''+item.id+'\')" style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(245,197,24,0.25);background:rgba(245,197,24,0.08);color:var(--gold);font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;">✏️ Szerk.</button>'
-      +'<button onclick="nyeremenyTorol(\''+item.id+'\')" style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.08);color:#f87171;font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;">🗑️ Törlés</button>'
+      +(canEdit ? '<button onclick="nyeremenyTorol(\''+item.id+'\',\''+escHtml(item.createdBy||'')+'\')\" style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.08);color:#f87171;font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;">🗑️ Törlés</button>' : '')
       +'</div>'
     : '';
+  var ownerLabel = item.createdBy && item.createdBy !== fbSafeName(item.felajanlo||'')
+    ? '' : '';
   return '<div style="background:var(--card);border:1px solid var(--card-border);border-radius:14px;overflow:hidden;">'
     +(item.kepBase64
       ?'<img src="'+item.kepBase64+'" style="width:100%;height:160px;object-fit:cover;display:block;" loading="lazy">'
@@ -7867,7 +7872,18 @@ async function nyeremenyMentes() {
   if(_nyeremenyKepBase64) item.kepBase64 = _nyeremenyKepBase64;
 
   if(editId) {
-    try { var old = await fbGet('nyeremenyek/'+editId); if(old && old.createdAt) item.createdAt = old.createdAt; if(old && old.kepBase64 && !_nyeremenyKepBase64) item.kepBase64 = old.kepBase64; } catch(e){}
+    try {
+      var old = await fbGet('nyeremenyek/'+editId);
+      if(old) {
+        var mySafe = currentUser ? fbSafeName(currentUser) : null;
+        if(!isAdminUnlocked && old.createdBy && old.createdBy !== mySafe) {
+          showToast('⛔ Csak a saját felajánlásodat szerkesztheted!'); return;
+        }
+        if(old.createdAt) item.createdAt = old.createdAt;
+        if(old.kepBase64 && !_nyeremenyKepBase64) item.kepBase64 = old.kepBase64;
+        item.createdBy = old.createdBy; // az eredeti feltöltő marad
+      }
+    } catch(e){}
   } else {
     item.createdAt = Date.now();
   }
@@ -7880,7 +7896,9 @@ async function nyeremenyMentes() {
   } catch(e) { showToast('❌ Mentési hiba: '+e.message); }
 }
 
-async function nyeremenyTorol(id) {
+async function nyeremenyTorol(id, createdBy) {
+  var mySafe = currentUser ? fbSafeName(currentUser) : null;
+  if(!isAdminUnlocked && mySafe !== createdBy) { showToast('⛔ Csak a saját felajánlásodat törölheted!'); return; }
   if(!confirm('Biztosan törlöd ezt a felajánlást?')) return;
   try {
     await fbDel('nyeremenyek/'+id);
