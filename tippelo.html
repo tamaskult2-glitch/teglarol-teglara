@@ -609,80 +609,166 @@ header p{margin-top:5px;font-size:12px;color:rgba(240,244,240,0.5);letter-spacin
 
 /* ===== ONBOARDING MODAL ===== */
 .onboard-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.92);
-  backdrop-filter:blur(8px);z-index:200;
-  display:flex;align-items:center;justify-content:center;padding:16px;
+  position:fixed;inset:0;background:rgba(0,0,0,0.95);
+  backdrop-filter:blur(12px);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:12px;
 }
 .onboard-box{
-  background:linear-gradient(160deg,#0d2010 0%,#0a1c0c 100%);
-  border:1px solid rgba(245,197,24,0.3);border-radius:20px;
-  max-width:400px;width:100%;max-height:88vh;
+  background:linear-gradient(145deg,#0d2010 0%,#081508 60%,#0a1c0c 100%);
+  border:1px solid rgba(245,197,24,0.25);border-radius:20px;
+  width:100%;max-width:440px;max-height:92vh;
   display:flex;flex-direction:column;overflow:hidden;
-  animation:mIn 0.3s ease-out;
+  animation:mIn 0.35s cubic-bezier(.22,.68,0,1.2);
+  box-shadow:0 40px 120px rgba(0,0,0,0.8);
 }
-@media(min-width:901px){
-  .onboard-box{max-width:820px;aspect-ratio:16/9;}
+@media(min-width:820px){
+  .onboard-box{
+    max-width:min(92vw,1300px);
+    width:min(92vw,1300px);
+    height:min(88vh,780px);
+    max-height:min(88vh,780px);
+    border-radius:24px;
+  }
 }
-.onboard-header{
-  padding:24px 24px 0;text-align:center;flex-shrink:0;
-}
-.onboard-header .ob-icon{font-size:44px;margin-bottom:8px;}
-.onboard-header h2{
-  font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;
-  color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;
-}
-.onboard-header p{font-size:12px;color:rgba(240,244,240,0.4);letter-spacing:1px;}
 
-/* Lépések */
-.onboard-steps{
-  flex:1;overflow-y:auto;padding:20px 24px;
-  display:flex;flex-direction:column;gap:14px;
+/* Desktop: kétoszlopos layout */
+.onboard-inner{
+  flex:1;overflow:hidden;display:flex;flex-direction:column;
 }
-.onboard-steps::-webkit-scrollbar{width:3px;}
-.onboard-steps::-webkit-scrollbar-thumb{background:rgba(245,197,24,0.2);border-radius:2px;}
+@media(min-width:820px){
+  .onboard-inner{ flex-direction:row; }
+}
 
-.ob-step{
-  display:flex;gap:12px;align-items:flex-start;
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
-  border-radius:12px;padding:12px 14px;
+/* ── Bal panel (sötétebb, sticky) ── */
+.ob-left{
+  padding:32px 28px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;
+  border-bottom:1px solid rgba(245,197,24,0.1);
+  background:rgba(0,0,0,0.25);
 }
-.ob-step-icon{
-  font-size:22px;flex-shrink:0;
-  width:40px;height:40px;
-  background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.2);
-  border-radius:10px;display:flex;align-items:center;justify-content:center;
+@media(min-width:820px){
+  .ob-left{
+    width:220px;border-bottom:none;border-right:1px solid rgba(245,197,24,0.1);
+    padding:40px 24px;justify-content:flex-start;
+  }
 }
-.ob-step-body{}
-.ob-step-title{
-  font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;
-  color:var(--gold);letter-spacing:0.5px;margin-bottom:4px;
+.ob-brand{
+  margin-bottom:20px;display:flex;align-items:center;gap:10px;
 }
-.ob-step-desc{font-size:12px;color:rgba(240,244,240,0.6);line-height:1.6;}
-.ob-step-desc b{color:rgba(240,244,240,0.9);}
+.ob-brand-icon{font-size:36px;line-height:1;}
+.ob-brand-title{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;line-height:1.1;}
+.ob-brand-sub{font-size:10px;color:rgba(240,244,240,0.35);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
 
-/* Pontozás táblázat */
-.ob-score-table{
-  width:100%;border-collapse:collapse;margin-top:6px;font-size:11px;
+/* Navigációs gombok a bal panelen */
+.ob-nav-btn{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+  border:none;background:transparent;color:rgba(240,244,240,0.45);
+  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.5px;
+  cursor:pointer;text-align:left;width:100%;transition:all 0.18s;
 }
-.ob-score-table td{padding:4px 8px;border-radius:4px;}
+.ob-nav-btn:hover{background:rgba(255,255,255,0.05);color:rgba(240,244,240,0.8);}
+.ob-nav-btn.active{
+  background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.25);
+  color:var(--gold);
+}
+.ob-nav-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+.ob-nav-label{flex:1;}
+.ob-nav-check{font-size:10px;color:#4ade80;margin-left:auto;opacity:0;transition:opacity 0.2s;}
+.ob-nav-btn.done .ob-nav-check{opacity:1;}
+
+/* ── Jobb panel (scrollable tartalom) ── */
+.ob-right{
+  flex:1;overflow-y:auto;padding:28px 24px;
+  scroll-behavior:smooth;
+}
+@media(min-width:820px){
+  .ob-right{ padding:44px 52px; }
+}
+.ob-right::-webkit-scrollbar{width:4px;}
+.ob-right::-webkit-scrollbar-thumb{background:rgba(245,197,24,0.2);border-radius:2px;}
+
+/* Tab tartalmak */
+.ob-tab-panel{display:none;}
+.ob-tab-panel.active{display:block;animation:fadeInFast 0.22s ease;}
+@keyframes fadeInFast{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.ob-tab-title{
+  font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;
+  color:var(--gold);letter-spacing:1px;margin-bottom:6px;
+}
+.ob-tab-sub{font-size:14px;color:rgba(240,244,240,0.45);margin-bottom:28px;line-height:1.5;}
+
+/* Tartalom blokkok */
+.ob-block{
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+  border-radius:14px;padding:18px 20px;margin-bottom:14px;
+}
+.ob-block-title{
+  font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;
+  color:rgba(240,244,240,0.9);letter-spacing:0.5px;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.ob-block-desc{font-size:13px;color:rgba(240,244,240,0.6);line-height:1.7;}
+.ob-block-desc b{color:rgba(240,244,240,0.88);}
+
+/* Pont táblázat */
+.ob-score-table{width:100%;border-collapse:collapse;font-size:13px;}
+.ob-score-table td{padding:7px 10px;border-radius:4px;}
 .ob-score-table tr:nth-child(odd) td{background:rgba(255,255,255,0.04);}
-.ob-score-table .pts{font-family:'Oswald',sans-serif;font-weight:700;color:var(--gold);text-align:right;}
+.ob-score-table .pts{font-family:'Oswald',sans-serif;font-weight:700;color:var(--gold);text-align:right;font-size:15px;}
+.ob-score-table th{font-family:'Oswald',sans-serif;font-size:10px;color:rgba(240,244,240,0.35);letter-spacing:0.8px;padding:4px 10px;text-align:left;}
 
+/* Szorzó kártyák */
+.ob-mult-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.ob-mult-card{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 10px;text-align:center;}
+.ob-mult-label{font-family:'Oswald',sans-serif;font-size:11px;color:rgba(240,244,240,0.4);letter-spacing:0.5px;margin-bottom:4px;}
+.ob-mult-num{font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;line-height:1;}
+.ob-mult-sub{font-size:10px;color:rgba(240,244,240,0.35);margin-top:3px;}
+
+/* Jelölések grid */
+.ob-badges{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ob-badge-item{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;}
+.ob-badge-icon{font-size:20px;flex-shrink:0;}
+.ob-badge-text{font-size:12px;color:rgba(240,244,240,0.6);line-height:1.4;}
+.ob-badge-text b{color:rgba(240,244,240,0.88);display:block;font-family:'Oswald',sans-serif;font-size:13px;}
+
+/* Footer */
 .onboard-footer{
   padding:16px 24px 20px;flex-shrink:0;
   border-top:1px solid rgba(255,255,255,0.07);
-  display:flex;flex-direction:column;gap:8px;align-items:center;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;
 }
+@media(min-width:820px){
+  .onboard-footer{ padding:18px 32px; }
+}
+.ob-footer-accept{display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;}
+.ob-footer-accept input{width:18px;height:18px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
+.ob-footer-accept span{font-size:13px;color:rgba(240,244,240,0.6);}
 .ob-start-btn{
-  width:100%;padding:13px;
+  padding:12px 32px;
   background:var(--gold);color:#0a1c0c;
   border:none;border-radius:10px;
   font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;
-  letter-spacing:2px;cursor:pointer;transition:background 0.2s;
+  letter-spacing:2px;cursor:pointer;transition:all 0.2s;white-space:nowrap;
 }
-.ob-start-btn:hover{background:var(--gold-dark);}
-.ob-skip{font-size:11px;color:rgba(240,244,240,0.3);cursor:pointer;text-decoration:underline;}
+.ob-start-btn:hover:not(:disabled){background:#fde047;transform:translateY(-1px);}
+.ob-skip{font-size:11px;color:rgba(240,244,240,0.3);cursor:pointer;text-decoration:underline;white-space:nowrap;}
 .ob-skip:hover{color:rgba(240,244,240,0.5);}
+
+/* Példa meccs pont badge-ek mobilon */
+@media(max-width:480px){
+  .ob-example-pts { flex-direction:column !important; align-items:flex-start !important; gap:4px !important; }
+  .ob-example-pts span { font-size:12px !important; }
+}
+
+
+/* Highlight box */
+.ob-highlight{
+  background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.2);
+  border-radius:12px;padding:14px 18px;margin-top:14px;
+}
+.ob-highlight b{color:rgba(245,197,24,0.9);}
+
 
 /* ===== NYEREMÉNY KALKULÁTOR ===== */
 .prize-modal-overlay{
@@ -884,161 +970,464 @@ footer a:hover{color:var(--gold);}
 <!-- ONBOARDING MODAL -->
 <div class="onboard-overlay" id="onboardModal">
   <div class="onboard-box">
-    <div class="onboard-header">
-      <div class="ob-icon">🏆</div>
-      <h2>FIFA 2026 Tippverseny</h2>
-      <p>„GÓLSZAGLÓ" BAJNOKSÁG · HASZNÁLATI ÚTMUTATÓ</p>
-    </div>
 
-    <div class="onboard-steps">
+    <!-- BELSŐ WRAPPER: bal panel + jobb panel -->
+    <div class="onboard-inner">
 
-      <div class="ob-step">
-        <div class="ob-step-icon">👤</div>
-        <div class="ob-step-body">
-          <div class="ob-step-title">Regisztráció / Belépés</div>
-          <div class="ob-step-desc">
-            Először adj meg egy <b>nevet</b> és egy <b>jelszót</b> — ez lesz a fiókod.<br>
-            Legközelebb ugyanezzel léphetsz be bármely eszközről.<br>
-            <b>Fontos:</b> jegyezd meg a jelszavad, nem lehet visszaállítani!
+      <!-- BAL NAVIGÁCIÓ -->
+      <div class="ob-left">
+        <div class="ob-brand">
+          <div class="ob-brand-icon">🏆</div>
+          <div>
+            <div class="ob-brand-title">Gólszagló</div>
+            <div class="ob-brand-sub">FIFA 2026 Tippverseny</div>
           </div>
         </div>
+
+        <button class="ob-nav-btn active" onclick="obShowTab(0,this)">
+          <span class="ob-nav-icon">👤</span>
+          <span class="ob-nav-label">Belépés</span>
+          <span class="ob-nav-check">✓</span>
+        </button>
+        <button class="ob-nav-btn" onclick="obShowTab(1,this)">
+          <span class="ob-nav-icon">⚽</span>
+          <span class="ob-nav-label">Tippelés</span>
+          <span class="ob-nav-check">✓</span>
+        </button>
+        <button class="ob-nav-btn" onclick="obShowTab(2,this)">
+          <span class="ob-nav-icon">📊</span>
+          <span class="ob-nav-label">Pontozás</span>
+          <span class="ob-nav-check">✓</span>
+        </button>
+        <button class="ob-nav-btn" onclick="obShowTab(3,this)">
+          <span class="ob-nav-icon">🏟️</span>
+          <span class="ob-nav-label">Kieséses szakasz</span>
+          <span class="ob-nav-check">✓</span>
+        </button>
+        <button class="ob-nav-btn" onclick="obShowTab(4,this)">
+          <span class="ob-nav-icon">🏅</span>
+          <span class="ob-nav-label">Ranglista</span>
+          <span class="ob-nav-check">✓</span>
+        </button>
+        <button class="ob-nav-btn" onclick="obShowTab(5,this)">
+          <span class="ob-nav-icon">☁️</span>
+          <span class="ob-nav-label">Fülök & adatok</span>
+          <span class="ob-nav-check">✓</span>
+        </button>
       </div>
 
-      <div class="ob-step">
-        <div class="ob-step-icon">1️⃣</div>
-        <div class="ob-step-body">
-          <div class="ob-step-title">Meccs tippelése</div>
-          <div class="ob-step-desc">
-            Minden meccshez nyomd meg az <b>1</b> (hazai győzelem), <b>X</b> (döntetlen) vagy <b>2</b> (vendég győzelem) gombot.<br>
-            A tipp azonnal mentődik. A meccs kezdetéig bármikor megváltoztatható.
-          </div>
-        </div>
-      </div>
+      <!-- JOBB TARTALOM -->
+      <div class="ob-right" id="obRight">
 
-      <div class="ob-step">
-        <div class="ob-step-icon">🎯</div>
-        <div class="ob-step-body">
-          <div class="ob-step-title">Pontos eredmény (bónusz pontok)</div>
-          <div class="ob-step-desc">
-            A <b>📐+🎯</b> mezőbe beírhatsz pontos góleredményt is (pl. <b>2:1</b>).<br>
-            Ha a gólkülönbség stimmel: <b>+1 bónusz</b> · Ha a pontos eredmény: <b>+3 pont</b>.<br>
-            Kieséses szakaszban és döntőben szorzóval számít!<br>
-            Módosításhoz egyszerűen írd át és mentsd újra — a kickoffig bármikor.
-          </div>
-        </div>
-      </div>
+        <!-- TAB 0: Belépés -->
+        <div class="ob-tab-panel active" id="ob-tab-0">
+          <div class="ob-tab-title">👤 Belépés</div>
+          <div class="ob-tab-sub">Hozz létre fiókot egyszer — aztán bármely eszközről beléphetsz.</div>
 
-      <div class="ob-step">
-        <div class="ob-step-icon">📊</div>
-        <div class="ob-step-body">
-          <div class="ob-step-title">Pontozás</div>
-          <div class="ob-step-desc">
-            <div style="font-weight:700;margin-bottom:4px;">⚽ Csoportkör (1× szorzó)</div>
-            <table class="ob-score-table">
-              <tr><td>✅ Helyes kimenetel (1/X/2)</td><td class="pts">+1 pont</td></tr>
-              <tr><td>📐 Helyes gólkülönbség</td><td class="pts">+1 pont</td></tr>
-              <tr><td>🎯 Pontos góleredmény</td><td class="pts">+3 pont</td></tr>
-              <tr><td>❌ Téves tipp</td><td class="pts">0 pont</td></tr>
-            </table>
-            <div style="font-weight:700;margin:8px 0 4px;">🏟️ Kieséses szakasz (2× szorzó)</div>
-            <table class="ob-score-table">
-              <tr><td>✅ Helyes kimenetel</td><td class="pts">+2 pont</td></tr>
-              <tr><td>📐 Helyes gólkülönbség</td><td class="pts">+2 pont</td></tr>
-              <tr><td>🎯 Pontos góleredmény</td><td class="pts">+6 pont</td></tr>
-              <tr><td>⚡ Helyes hosszabbítás</td><td class="pts">+2 pont</td></tr>
-              <tr><td>🥅 Helyes 11-es győztes</td><td class="pts">+2 pont</td></tr>
-            </table>
-            <div style="font-weight:700;margin:8px 0 4px;">🏆 Bronzmeccs + Döntő (3× szorzó)</div>
-            <table class="ob-score-table">
-              <tr><td>✅ Helyes kimenetel</td><td class="pts">+3 pont</td></tr>
-              <tr><td>📐 Helyes gólkülönbség</td><td class="pts">+3 pont</td></tr>
-              <tr><td>🎯 Pontos góleredmény</td><td class="pts">+9 pont</td></tr>
-              <tr><td>⚡ Helyes hosszabbítás</td><td class="pts">+3 pont</td></tr>
-              <tr><td>🥅 Helyes 11-es győztes</td><td class="pts">+3 pont</td></tr>
-            </table>
-            <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-top:6px;">
-              📐 A gólkülönbség bónusz akkor jár, ha a kimenetel helyes és a gólkülönbség is stimmel (pl. tipp 2:0, eredmény 3:1 = azonos gólkülönbség).<br>
-              🎯 A pontos eredmény <b>felváltja</b> a kimenetel + gólkülönbség pontot (nem halmozódik).
+          <div class="ob-block">
+            <div class="ob-block-title">🆕 Első indulás</div>
+            <div class="ob-block-desc">
+              Add meg a <b>nevedet</b> (ez jelenik meg a ranglistán) és válassz egy <b>jelszót</b>.<br>
+              A fiókod azonnal létrejön — nincs email-cím, nincs megerősítés.
             </div>
-            <div style="margin-top:10px;font-size:12px;color:rgba(240,244,240,0.5);line-height:1.6;">
-              <b style="color:rgba(240,244,240,0.7);">📊 Ranglista jelölések:</b><br>
-              🔥 <b>Sorozat</b> — egymás utáni helyes tippek száma (3-tól jelenik meg)<br>
-              🎯 <b>Pontos</b> — pontos góleredmény eltalálások száma<br>
-              ⭐ <b>Heti MVP</b> — az adott hét legtöbb pontot szerző tippelője<br>
-              💀 <b>Heti bukta</b> — az adott hét legkevesebb pontot szerző tippelője<br>
-              💰 <b>Nyeremény</b> — az 1-3. helyezett várható nyereménye
+          </div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">🔁 Visszatérés</div>
+            <div class="ob-block-desc">
+              Ugyanezzel a névvel és jelszóval léphetsz be legközelebb, akár telefonról, akár gépről.<br>
+              A böngésző megjegyzi a belépési adatokat — általában nem kell újra begépelni.
             </div>
-            <div style="margin-top:12px;padding:10px 12px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.15);border-radius:8px;">
-              <b style="color:rgba(245,197,24,0.85);font-size:13px;">🏆 Rangsorolási szabályzat</b>
-              <div style="font-size:12px;color:rgba(240,244,240,0.65);line-height:1.7;margin-top:6px;">
-                Azonos pontszám esetén a következő tiebreaker sorrend dönt:<br>
-                <b>1.</b> 🎯 <b>Pontos góleredmények száma</b> — több pontos tipp = előrébb<br>
-                <b>2.</b> 📊 <b>Tippelési arány</b> — több leadott tipp = előrébb<br>
-                <b>3.</b> 📅 <b>Regisztráció ideje</b> — korábbi regisztráció = előrébb
+          </div>
+
+          <div class="ob-highlight">
+            <div class="ob-block-desc"><b>⚠️ Fontos:</b> a jelszavadat <b>jegyezd meg</b> — nincs „elfelejtett jelszó" gomb.<br>
+            Ha elveszíted, az admin tud segíteni visszaállítani.</div>
+          </div>
+        </div>
+
+        <!-- TAB 1: Tippelés -->
+        <div class="ob-tab-panel" id="ob-tab-1">
+          <div class="ob-tab-title">⚽ Tippelés</div>
+          <div class="ob-tab-sub">Minden meccshez tippeld a végeredményt — kimenetel + pontos gólszám is megadható.</div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">1️⃣ X 2️⃣ — Kimenetel</div>
+            <div class="ob-block-desc">
+              Nyomd meg az <b>1</b> (hazai győzelem), <b>X</b> (döntetlen) vagy <b>2</b> (vendég győzelem) gombot.<br>
+              A tipp azonnal mentődik. A <b>kickoff időpontjáig</b> bármikor módosítható.
+            </div>
+          </div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">📐 🎯 Pontos gólszám (bónusz)</div>
+            <div class="ob-block-desc">
+              A <b>📐+🎯</b> mezőbe beírhatod a várt gólszámot is — pl. <b>2:1</b>.<br>
+              Ha a gólkülönbség stimmel: <b>+1 bónusz pont</b>.<br>
+              Ha a pontos gólszám stimmel: <b>+3 pont</b> (ez váltja ki a többi bónuszt).
+            </div>
+          </div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">⏰ Zárási idő</div>
+            <div class="ob-block-desc">
+              Kickoffkor a meccs <b>automatikusan zárul</b> — utána nem lehet módosítani.<br>
+              Ha lemaradsz: az adott meccsre <b>0 pont</b>, a többi meccset ez nem befolyásolja.
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Pontozás -->
+        <div class="ob-tab-panel" id="ob-tab-2">
+          <div class="ob-tab-title">📊 Pontozás</div>
+          <div class="ob-tab-sub">Alap pontok csoportkörben — szorzóval a kieséses szakaszban és a döntőben.</div>
+
+          <div class="ob-mult-cards">
+            <div class="ob-mult-card" style="border-color:rgba(74,222,128,0.2);">
+              <div class="ob-mult-label">CSOPORTKÖR</div>
+              <div class="ob-mult-num" style="color:#4ade80;">1×</div>
+              <div class="ob-mult-sub">alap szorzó</div>
+            </div>
+            <div class="ob-mult-card" style="border-color:rgba(251,191,36,0.3);">
+              <div class="ob-mult-label">KIESÉSES</div>
+              <div class="ob-mult-num" style="color:#fbbf24;">2×</div>
+              <div class="ob-mult-sub">dupla pont</div>
+            </div>
+            <div class="ob-mult-card" style="border-color:rgba(245,197,24,0.45);background:rgba(245,197,24,0.05);">
+              <div class="ob-mult-label">DÖNTŐ + BRONZ</div>
+              <div class="ob-mult-num" style="color:var(--gold);">3×</div>
+              <div class="ob-mult-sub">tripla pont</div>
+            </div>
+          </div>
+
+          <div class="ob-block">
+            <table class="ob-score-table">
+              <thead><tr><th>ESEMÉNY</th><th style="text-align:right;">1× / 2× / 3×</th></tr></thead>
+              <tbody>
+                <tr><td>❌ Téves tipp</td><td class="pts" style="color:rgba(240,244,240,0.3);">0 / 0 / 0</td></tr>
+                <tr><td>🟡 Helyes kimenetel (1/X/2)</td><td class="pts">1 / 2 / 3</td></tr>
+                <tr><td>📐 Helyes gólkülönbség</td><td class="pts">2 / 4 / 6</td></tr>
+                <tr><td>🎯 Pontos góleredmény</td><td class="pts">3 / 6 / 9</td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:12px;font-size:12px;color:rgba(240,244,240,0.4);line-height:1.6;">
+              📐 A gólkülönbség bónusz csak akkor jár, ha a kimenetel is helyes és a gólkülönbség stimmel (pl. tipp 2:0, eredmény 3:1 = ✓).<br>
+              🎯 A pontos gólszám <b>felváltja</b> a kimenetel + gólkülönbség pontot — nem halmozódik.
+            </div>
+          </div>
+
+          <!-- PÉLDA MECCS -->
+          <div style="margin-top:6px;">
+            <div style="font-family:'Oswald',sans-serif;font-size:13px;color:rgba(240,244,240,0.45);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;">📋 Példa — hány pontot ér?</div>
+
+            <!-- Meccs fejléc -->
+            <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;text-align:center;">
+              <div style="font-size:11px;color:rgba(240,244,240,0.35);letter-spacing:1px;margin-bottom:6px;font-family:'Oswald',sans-serif;">VÉGEREDMÉNY</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
+                <span style="font-size:15px;font-weight:700;color:rgba(240,244,240,0.85);">🇪🇸 Spanyolország</span>
+                <span style="font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;color:var(--gold);">3 : 1</span>
+                <span style="font-size:15px;font-weight:700;color:rgba(240,244,240,0.85);">Franciaország 🇫🇷</span>
+              </div>
+            </div>
+
+            <!-- Tipp esetek -->
+            <div style="display:flex;flex-direction:column;gap:8px;">
+
+              <!-- ❌ Rossz kimenetel -->
+              <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18);border-radius:12px;padding:12px 14px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">❌</span>
+                    <div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.8);">Tipped: <b>0:2</b> <span style="font-size:11px;color:rgba(240,244,240,0.35);">(francia győzelmet tippeltél)</span></div>
+                      <div style="font-size:12px;color:rgba(239,68,68,0.7);margin-top:2px;">Rossz kimenetel</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-shrink:0;">
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:3px 10px;color:rgba(239,68,68,0.6);">+0 pt</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:3px 10px;color:rgba(239,68,68,0.6);">+0 pt</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:3px 10px;color:rgba(239,68,68,0.6);">+0 pt</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 🟡 Helyes kimenetel -->
+              <div style="background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.2);border-radius:12px;padding:12px 14px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">🟡</span>
+                    <div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.8);">Tipped: <b>2:0</b> <span style="font-size:11px;color:rgba(240,244,240,0.35);">(spanyol győzelem, más arány)</span></div>
+                      <div style="font-size:12px;color:rgba(245,197,24,0.7);margin-top:2px;">Helyes kimenetel, de gólkülönbség nem stimmel</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-shrink:0;">
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.25);border-radius:6px;padding:3px 10px;color:var(--gold);">+1 pt</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.25);border-radius:6px;padding:3px 10px;color:var(--gold);">+2 pt</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.25);border-radius:6px;padding:3px 10px;color:var(--gold);">+3 pt</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 📐 Helyes gólkülönbség -->
+              <div style="background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.22);border-radius:12px;padding:12px 14px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">📐</span>
+                    <div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.8);">Tipped: <b>4:2</b> <span style="font-size:11px;color:rgba(240,244,240,0.35);">(+2 gólkülönbség = stimmel)</span></div>
+                      <div style="font-size:12px;color:#60a5fa;margin-top:2px;">Helyes kimenetel + helyes gólkülönbség</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-shrink:0;">
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:6px;padding:3px 10px;color:#60a5fa;">+2 pt</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:6px;padding:3px 10px;color:#60a5fa;">+4 pt</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:6px;padding:3px 10px;color:#60a5fa;">+6 pt</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 🎯 Pontos eredmény -->
+              <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:12px 14px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">🎯</span>
+                    <div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.8);">Tipped: <b>3:1</b> <span style="font-size:11px;color:rgba(240,244,240,0.35);">(pontosan eltaláltad!)</span></div>
+                      <div style="font-size:12px;color:#4ade80;margin-top:2px;">Pontos góleredmény — maximális pont 🏆</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-shrink:0;">
+                    <span style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:6px;padding:3px 10px;color:#4ade80;">+3 pt</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:6px;padding:3px 10px;color:#4ade80;">+6 pt</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:6px;padding:3px 10px;color:#4ade80;">+9 pt</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Szorzó jelmagyarázat -->
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:2px;padding-right:2px;">
+                <span style="font-size:11px;color:#4ade80;font-family:'Oswald',sans-serif;">1× Csoport</span>
+                <span style="font-size:11px;color:#fbbf24;font-family:'Oswald',sans-serif;">2× Kieséses</span>
+                <span style="font-size:11px;color:var(--gold);font-family:'Oswald',sans-serif;">3× Döntő</span>
+              </div>
+
+            </div>
+          </div>
+        </div><!-- /ob-tab-2 -->
+
+        <!-- TAB 3: Kieséses -->
+        <div class="ob-tab-panel" id="ob-tab-3">
+          <div class="ob-tab-title">🏟️ Kieséses szakasz</div>
+          <div class="ob-tab-sub">Hosszabbítás és 11-esek tippelése — extra pontokért.</div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">⚡ Hosszabbítás</div>
+            <div class="ob-block-desc">
+              Ha <b>X-et tippelsz</b> a 90 percre kieséses meccsben, megjelenik a <b>⚡ HOSSZABBÍTÁS</b> sor.<br>
+              Itt is tippelj: <b>1</b>, <b>X</b> vagy <b>2</b>.
+            </div>
+          </div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">🥅 11-esek</div>
+            <div class="ob-block-desc">
+              Ha a hosszabbításra is <b>X-et tippelsz</b>, megjelenik a <b>🥅 11-ESEK</b> sor.<br>
+              Csak <b>1</b> vagy <b>2</b> lehetséges — 11-esben nincs döntetlen.
+            </div>
+          </div>
+
+          <div class="ob-block">
+            <table class="ob-score-table">
+              <thead><tr><th>ESEMÉNY</th><th style="text-align:right;">2× / 3×</th></tr></thead>
+              <tbody>
+                <tr><td>✅ Helyes kimenetel 90'</td><td class="pts">2 / 3</td></tr>
+                <tr><td>📐 Helyes gólkülönbség 90'</td><td class="pts">4 / 6</td></tr>
+                <tr><td>🎯 Pontos góleredmény 90'</td><td class="pts">6 / 9</td></tr>
+                <tr><td>⚡ Helyes hosszabbítás győztes</td><td class="pts">2 / 3</td></tr>
+                <tr><td>🥅 Helyes 11-es győztes</td><td class="pts">2 / 3</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ob-highlight">
+            <div class="ob-block-desc"><b>⚠️ Figyelem:</b> ha visszaváltasz <b>1-re vagy 2-re</b> a 90 percnél, a hosszabbítás és 11-es tipped <b>törlődik</b>.</div>
+          </div>
+
+          <!-- PÉLDA: kieséses meccs -->
+          <div style="margin-top:14px;">
+            <div style="font-family:'Oswald',sans-serif;font-size:13px;color:rgba(240,244,240,0.45);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;">📋 Példa — negyeddöntő (2× szorzó)</div>
+
+            <!-- Meccs fejléc -->
+            <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;margin-bottom:10px;text-align:center;">
+              <div style="font-size:11px;color:rgba(240,244,240,0.35);letter-spacing:1px;margin-bottom:6px;font-family:'Oswald',sans-serif;">VÉGEREDMÉNY (90 perc után)</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+                <span style="font-size:14px;font-weight:700;color:rgba(240,244,240,0.85);">🇧🇷 Brazília</span>
+                <span style="font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;color:var(--gold);">1 : 1</span>
+                <span style="font-size:14px;font-weight:700;color:rgba(240,244,240,0.85);">Argentína 🇦🇷</span>
+              </div>
+              <div style="font-size:11px;color:rgba(240,244,240,0.35);margin-top:6px;">⚡ Hosszabbítás → 🇦🇷 Argentína nyer (2:1) · 🥅 11-esek: nem kerül rá sor</div>
+            </div>
+
+            <!-- Tipp esetek -->
+            <div style="display:flex;flex-direction:column;gap:8px;">
+
+              <!-- ❌ Rossz 90 perces tipp -->
+              <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18);border-radius:12px;padding:11px 14px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;">
+                    <span style="font-size:18px;flex-shrink:0;">❌</span>
+                    <div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:13px;color:rgba(240,244,240,0.8);">90': <b>2:0</b> (brazil győzelmet tippeltél)</div>
+                      <div style="font-size:11px;color:rgba(239,68,68,0.65);margin-top:2px;">Rossz kimenetel → 0 pont, hosszabbítás nem jelenik meg</div>
+                    </div>
+                  </div>
+                  <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:3px 10px;color:rgba(239,68,68,0.6);flex-shrink:0;">összesen: +0 pt</span>
+                </div>
+              </div>
+
+              <!-- 🟡 Helyes 90', rossz hosszabbítás -->
+              <div style="background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.18);border-radius:12px;padding:11px 14px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;">
+                    <span style="font-size:18px;flex-shrink:0;">🟡⚡</span>
+                    <div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:13px;color:rgba(240,244,240,0.8);">90': <b>X</b> · Hosszabbítás: <b>1</b> (brazilt tippelted)</div>
+                      <div style="font-size:11px;color:rgba(240,244,240,0.45);margin-top:2px;">
+                        🟡 Helyes döntetlen (90') → <b style="color:var(--gold);">+2 pt</b><br>
+                        ⚡ Rossz hosszabbítás győztes → <b style="color:rgba(239,68,68,0.6);">+0 pt</b>
+                      </div>
+                    </div>
+                  </div>
+                  <span style="font-family:'Oswald',sans-serif;font-size:13px;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.25);border-radius:6px;padding:3px 10px;color:var(--gold);flex-shrink:0;">összesen: +2 pt</span>
+                </div>
+              </div>
+
+              <!-- 🟡 + ⚡ Helyes 90' + helyes hosszabbítás -->
+              <div style="background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.22);border-radius:12px;padding:11px 14px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;">
+                    <span style="font-size:18px;flex-shrink:0;">🟡⚡</span>
+                    <div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:13px;color:rgba(240,244,240,0.8);">90': <b>X</b> · Hosszabbítás: <b>2</b> (argentin győzelem ✓)</div>
+                      <div style="font-size:11px;color:rgba(240,244,240,0.45);margin-top:2px;">
+                        🟡 Helyes döntetlen (90') → <b style="color:var(--gold);">+2 pt</b><br>
+                        ⚡ Helyes hosszabbítás győztes → <b style="color:#60a5fa;">+2 pt</b>
+                      </div>
+                    </div>
+                  </div>
+                  <span style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);border-radius:6px;padding:3px 10px;color:#60a5fa;flex-shrink:0;">összesen: +4 pt</span>
+                </div>
+              </div>
+
+              <!-- 🎯 + ⚡ Pontos 90' + helyes hosszabbítás -->
+              <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:11px 14px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;">
+                    <span style="font-size:18px;flex-shrink:0;">🎯⚡</span>
+                    <div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:13px;color:rgba(240,244,240,0.8);">90': <b>1:1</b> · Hosszabbítás: <b>2</b> (argentin ✓)</div>
+                      <div style="font-size:11px;color:rgba(240,244,240,0.45);margin-top:2px;">
+                        🎯 Pontos góleredmény (1:1) → <b style="color:#4ade80;">+6 pt</b><br>
+                        ⚡ Helyes hosszabbítás győztes → <b style="color:#4ade80;">+2 pt</b>
+                      </div>
+                    </div>
+                  </div>
+                  <span style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:6px;padding:3px 10px;color:#4ade80;flex-shrink:0;">összesen: +8 pt</span>
+                </div>
+              </div>
+
+              <!-- 11-esek külön példa -->
+              <div style="margin-top:4px;padding:10px 14px;background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.2);border-radius:12px;">
+                <div style="font-family:'Oswald',sans-serif;font-size:12px;color:rgba(168,85,247,0.8);margin-bottom:6px;letter-spacing:0.5px;">🥅 HA 11-ESEKRE KERÜL A SOR (más meccs):</div>
+                <div style="font-size:12px;color:rgba(240,244,240,0.55);line-height:1.7;">
+                  Tipped: <b style="color:rgba(240,244,240,0.8);">X</b> (90') · <b style="color:rgba(240,244,240,0.8);">X</b> (hosszabbítás) · <b style="color:rgba(240,244,240,0.8);">1</b> (11-esek) → és valóban 11-esekkel dől el, a te csapatod nyer<br>
+                  🟡 Helyes döntetlen 90' → <b style="color:var(--gold);">+2 pt</b> &nbsp;·&nbsp;
+                  ⚡ Helyes döntetlen h.h. → <b style="color:var(--gold);">+2 pt</b> &nbsp;·&nbsp;
+                  🥅 Helyes 11-es győztes → <b style="color:var(--gold);">+2 pt</b><br>
+                  <b style="color:#c084fc;">Összesen: +6 pt</b> (negyeddöntőben) vagy <b style="color:#c084fc;">+9 pt</b> (döntőben)
+                </div>
+              </div>
+
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:2px;padding-right:2px;">
+                <span style="font-size:11px;color:#fbbf24;font-family:'Oswald',sans-serif;">2× Kieséses szorzó</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="ob-step">
-        <div class="ob-step-icon">⚡</div>
-        <div class="ob-step-body">
-          <div class="ob-step-title">Hosszabbítás &amp; 11-esek</div>
-          <div class="ob-step-desc">
-            Kieséses meccseknél ha <b>X-et tippelsz</b> a 90 percre, megjelenik a <b>⚡ HOSSZABBÍTÁS</b> sor — itt is tippelhetsz 1/X/2-re.<br>
-            Ha ott is <b>X-et tippelsz</b>, megjelenik a <b>🥅 11-ESEK</b> sor (1 vagy 2 — nincs döntetlen).<br>
-            Kieséses szakaszban <b>2× szorzó</b>, döntőben <b>3× szorzó</b>!<br>
-            <b>Fontos:</b> ha visszaváltasz 1-re vagy 2-re a 90 percnél, a hosszabbítás és 11-es tipped törlődik.
+        <!-- TAB 4: Ranglista -->
+        <div class="ob-tab-panel" id="ob-tab-4">
+          <div class="ob-tab-title">🏅 Ranglista</div>
+          <div class="ob-tab-sub">Pontszám alapján — azonos pont esetén tiebreaker dönt.</div>
+
+          <div class="ob-badges">
+            <div class="ob-badge-item"><div class="ob-badge-icon">🔥</div><div class="ob-badge-text"><b>Sorozat</b>Egymás utáni helyes tippek (3-tól jelenik meg)</div></div>
+            <div class="ob-badge-item"><div class="ob-badge-icon">🎯</div><div class="ob-badge-text"><b>Pontos</b>Hány pontos góleredményt találtál el</div></div>
+            <div class="ob-badge-item"><div class="ob-badge-icon">⭐</div><div class="ob-badge-text"><b>Heti MVP</b>Adott hét legtöbb pontot szerző tippelője</div></div>
+            <div class="ob-badge-item"><div class="ob-badge-icon">💀</div><div class="ob-badge-text"><b>Heti bukta</b>Adott hét legkevesebb pontot szerző tippelője</div></div>
+            <div class="ob-badge-item"><div class="ob-badge-icon">💰</div><div class="ob-badge-text"><b>Nyeremény</b>1–3. helyezettnek járó várható összeg</div></div>
+            <div class="ob-badge-item"><div class="ob-badge-icon">🔼🔽➖</div><div class="ob-badge-text"><b>Mozgás</b>Utolsó meccs / élő meccs ranglista-változása</div></div>
+          </div>
+
+          <div class="ob-highlight" style="margin-top:14px;">
+            <div class="ob-block-title" style="font-size:13px;margin-bottom:6px;">📋 Tiebreaker sorrend</div>
+            <div class="ob-block-desc">
+              Azonos pontszám esetén:<br>
+              <b>1.</b> 🎯 Több pontos góleredmény → előrébb<br>
+              <b>2.</b> 📊 Magasabb tippelési arány → előrébb<br>
+              <b>3.</b> 📅 Korábbi regisztráció → előrébb
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="ob-step">
-        <div class="ob-step-icon">⏰</div>
-        <div class="ob-step-body">
-          <div class="ob-step-title">Zárási idő</div>
-          <div class="ob-step-desc">
-            Minden meccs a <b>kickoff időpontjában</b> zárul — utána nem lehet tippelni.<br>
-            A lezárt meccsek kártyáján <b>⏰ ZÁRVA</b> felirat jelenik meg.
+        <!-- TAB 5: Fülök & adatok -->
+        <div class="ob-tab-panel" id="ob-tab-5">
+          <div class="ob-tab-title">☁️ Fülök &amp; adatok</div>
+          <div class="ob-tab-sub">Az alkalmazás funkciói és az adatok tárolása.</div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">🗂️ Navigációs fülek</div>
+            <div class="ob-block-desc">
+              <b>⚽ Meccsek</b> — tipp leadása, élő eredmények, góllövők.<br>
+              <b>📋 Tippek</b> — ki mire tippelt (eredmény után mindenki látja; PRO előre is).<br>
+              <b>🏅 Ranglista</b> — pontszám, nyeremény, mozgás.<br>
+              <b>📺 Közös</b> — közös meccsnézés szavazása.<br>
+              <b>📌 OPL</b> — funkció-javaslatok és szavazás.<br>
+              <b>📊 VB</b> — csoportállások, góllövő lista, statisztikák.
+            </div>
+          </div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">☁️ Adatok tárolása</div>
+            <div class="ob-block-desc">
+              Tippjeid <b>szerveren</b> tárolódnak — bármely eszközről láthatók és módosíthatók.<br>
+              A böngésző csak a bejelentkezési adatokat tárolja helyileg.
+            </div>
+          </div>
+
+          <div class="ob-block">
+            <div class="ob-block-title">🔔 Push értesítők</div>
+            <div class="ob-block-desc">
+              A 🔔 gombbal bekapcsolhatod az automatikus értesítőket — <b>30 perccel kickoff előtt</b> értesítünk, akkor is ha be van zárva a böngésző.<br>
+              DND időszak is beállítható (pl. 22:00–08:00).
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="ob-step">
-        <div class="ob-step-icon">📋</div>
-        <div class="ob-step-body">
-          <div class="ob-step-title">Tippek, Ranglista, OPL</div>
-          <div class="ob-step-desc">
-            <b>📋 Tippek</b> — az eredmény kihirdetése után látod ki mire mit tippelt. PRO támogatók mások tippjeit előre is látják.<br>
-            <b>🏅 Ranglista</b> — pontszám szerint rendezve, ki áll az élen.<br>
-            <b>📌 OPL</b> — itt javasolhatsz új funkciókat az alkalmazáshoz, és szavazhatsz mások ötleteire.
-          </div>
-        </div>
-      </div>
+      </div><!-- /ob-right -->
+    </div><!-- /onboard-inner -->
 
-      <div class="ob-step">
-        <div class="ob-step-icon">☁️</div>
-        <div class="ob-step-body">
-          <div class="ob-step-title">Adatok tárolása</div>
-          <div class="ob-step-desc">
-            A tippek <b>szerveren tárolódnak</b> — bármely eszközről láthatók.<br>
-            Más telefonról, géprőlis ugyanúgy tippelhetsz — elég a <b>neved és jelszavad</b>.<br>
-            Csak a jelszavadat tárolja a böngésző — jegyezd meg, nem lehet visszaállítani!
-          </div>
-        </div>
-      </div>
-
-    </div>
-
+    <!-- FOOTER -->
     <div class="onboard-footer">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px;padding:10px 14px;border-radius:10px;border:1px solid rgba(245,197,24,0.15);background:rgba(245,197,24,0.04);">
-        <input type="checkbox" id="obAccept" onchange="document.getElementById('obStartBtn').disabled=!this.checked;document.getElementById('obStartBtn').style.opacity=this.checked?'1':'0.35'" style="width:20px;height:20px;accent-color:var(--gold);cursor:pointer;">
-        <span style="font-family:'Source Sans 3',sans-serif;font-size:13px;color:rgba(240,244,240,0.7);line-height:1.4;">Elolvastam és megértettem a pontozási szabályokat és a játék feltételeit.</span>
+      <label class="ob-footer-accept">
+        <input type="checkbox" id="obAccept" onchange="document.getElementById('obStartBtn').disabled=!this.checked;document.getElementById('obStartBtn').style.opacity=this.checked?'1':'0.35'">
+        <span>Elolvastam és megértettem a pontozási szabályokat.</span>
       </label>
-      <button class="ob-start-btn" id="obStartBtn" onclick="closeOnboard()" disabled style="opacity:0.35">ÉRTEM, KEZDJÜK! ⚽</button>
+      <button class="ob-start-btn" id="obStartBtn" onclick="closeOnboard()" disabled style="opacity:0.35">KEZDJÜK! ⚽</button>
       <span class="ob-skip" onclick="closeOnboard()">Ne mutasd újra</span>
     </div>
+
   </div>
 </div>
 
@@ -1214,6 +1603,7 @@ footer a:hover{color:var(--gold);}
   <button class="nav-tab" id="navOtletek" onclick="showTab('otletek')">💡</button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">📊 VB <span id="golNewBadge" style="background:#4ade80;color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
+  <button class="nav-tab" id="navNyeremenyek" onclick="showTab('nyeremenyek')">🎁 Nyeremények <span id="nyeremenyBadge" style="display:none;background:#4ade80;color:#0a1c0c;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
 </div>
 
 <!-- VB MOTIVÁCIÓS POPUP (jelszó migráció trigger) -->
@@ -1436,8 +1826,9 @@ footer a:hover{color:var(--gold);}
     <div style="margin-bottom:12px;padding:10px 14px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:10px;">
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">⚽ EGYEDI MECCSEK</span></div>
       <div class="adm-collapse-body">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
-          <button onclick="openCustomMatchModal(null)" style="padding:5px 12px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">+ ÚJ MECCS</button>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+          <button onclick="openCustomMatchModal(null)" style="flex:1;padding:7px 10px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">+ ÚJ MECCS</button>
+          <button onclick="createTestMatches()" style="flex:1;padding:7px 10px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);color:#c084fc;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🧪 TESZT MECCSEK (2× + 3×)</button>
         </div>
         <div id="customMatchList"></div>
       </div>
@@ -1723,6 +2114,8 @@ footer a:hover{color:var(--gold);}
 
   <!-- ÖTLETEK TAB -->
   <div id="tab-otletek" style="display:none;">
+
+
     <div class="section-header" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;">
       <h2>💡 Mit fejlesszünk?</h2>
       <button onclick="otletekOpenAdd()" style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">
@@ -1755,6 +2148,67 @@ footer a:hover{color:var(--gold);}
   </div>
 
 
+  <!-- NYEREMÉNYEK TAB -->
+  <div id="tab-nyeremenyek" style="display:none;">
+    <div class="section-header" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <h2>🎁 Nyeremény felajánlások</h2>
+      <button id="nyeremenyAddBtn" onclick="nyeremenyOpenModal()" style="display:none;align-items:center;gap:6px;padding:7px 12px;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);color:var(--gold);border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">+ FELAJÁNLÁS HOZZÁADÁSA</button>
+    </div>
+    <div style="font-size:12px;color:rgba(240,244,240,0.4);margin:4px 0 16px;font-family:Oswald,sans-serif;">Ki mit ajánlott fel a verseny nyerteseinek</div>
+    <div id="nyeremenyList"><div style="text-align:center;padding:32px;color:rgba(240,244,240,0.3);">⏳ Betöltés…</div></div>
+  </div>
+</div>
+
+<!-- NYEREMÉNY MODAL -->
+<div id="nyeremenyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:250;align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)nyeremenyCloseModal()">
+  <div style="background:#0d2010;border:1px solid rgba(245,197,24,0.3);border-radius:18px;padding:24px 20px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;position:relative;animation:mIn 0.25s ease-out;">
+    <button onclick="nyeremenyCloseModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(240,244,240,0.4);font-size:20px;cursor:pointer;">✕</button>
+    <div style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:1px;margin-bottom:16px;" id="nyeremenyModalTitle">🎁 FELAJÁNLÁS</div>
+
+    <input type="hidden" id="nyeremenyEditId">
+
+    <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">MEGNEVEZÉS *</div>
+    <input id="nyeremenyNev" placeholder="pl. Üveg szamorodni" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;">
+
+    <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">FELAJÁNLÓ *</div>
+    <input id="nyeremenyFelajanlo" placeholder="pl. Kovács András" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;">
+
+    <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">ÉRTÉK (pl. 3 500 Ft)</div>
+    <input id="nyeremenyErtek" placeholder="pl. 3 500 Ft vagy becsléssel" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;">
+
+    <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">KI KAPJA *</div>
+    <select id="nyeremenyNyertes" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:#0d2010;color:white;font-family:Oswald,sans-serif;font-size:14px;margin-bottom:10px;cursor:pointer;">
+      <option value="1">🥇 1. helyezett</option>
+      <option value="2">🥈 2. helyezett</option>
+      <option value="3">🥉 3. helyezett</option>
+      <option value="top3">🏆 Top 3 sorsolás</option>
+      <option value="exact">🎯 Legtöbb pontos tipp</option>
+      <option value="streak">🔥 Leghosszabb sorozat</option>
+      <option value="random">🎲 Teljes sorsolás (mindenki)</option>
+      <option value="custom">✏️ Egyéni (leírásban)</option>
+    </select>
+
+    <div id="nyeremenyCustomRow" style="display:none;margin-bottom:10px;">
+      <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">EGYÉNI FELTÉTEL</div>
+      <input id="nyeremenyCustomText" placeholder="pl. Aki a döntő eredményét eltalálja" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;">
+    </div>
+
+    <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">KÉP FELTÖLTÉSE (opcionális)</div>
+    <div style="border:1.5px dashed rgba(255,255,255,0.15);border-radius:10px;padding:12px;margin-bottom:10px;text-align:center;cursor:pointer;position:relative;" onclick="document.getElementById('nyeremenyKepInput').click()">
+      <input type="file" id="nyeremenyKepInput" accept="image/*" style="display:none" onchange="nyeremenyKepElonezet(this)">
+      <div id="nyeremenyKepPreview" style="display:none;margin-bottom:8px;">
+        <img id="nyeremenyKepImg" style="max-width:100%;max-height:160px;border-radius:8px;object-fit:contain;">
+        <div id="nyeremenyKepMeret" style="font-size:10px;color:rgba(240,244,240,0.35);margin-top:4px;"></div>
+      </div>
+      <div id="nyeremenyKepPlaceholder" style="color:rgba(240,244,240,0.35);font-size:13px;">📷 Kattints a kép feltöltéséhez<br><span style="font-size:11px;">JPG / PNG · max 1 MB ajánlott</span></div>
+    </div>
+    <div id="nyeremenyKepWarning" style="display:none;font-size:11px;color:#fbbf24;margin-bottom:8px;">⚠️ Nagy kép! Ajánlott 800px alá méretezni a feltöltés előtt.</div>
+
+    <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">LEÍRÁS (opcionális)</div>
+    <textarea id="nyeremenyLeiras" rows="2" placeholder="Bővebb leírás, különleges feltétel…" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:16px;"></textarea>
+
+    <button onclick="nyeremenyMentes()" style="width:100%;padding:12px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.4);color:var(--gold);border-radius:10px;font-family:Oswald,sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:1px;">💾 MENTÉS</button>
+  </div>
 </div>
 
 <script>
@@ -2085,6 +2539,19 @@ async function adminDeleteTip() {
   }
 }
 
+
+// ===== ONBOARDING TAB NAVIGATION =====
+var _obVisited = {};
+function obShowTab(idx, btn) {
+  document.querySelectorAll('.ob-tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  var panel = document.getElementById('ob-tab-' + idx);
+  if(panel) panel.classList.add('active');
+  document.querySelectorAll('.ob-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) { btn.classList.add('active'); btn.classList.add('done'); }
+  _obVisited[idx] = true;
+  var right = document.getElementById('obRight');
+  if(right) right.scrollTop = 0;
+}
 
 function toggleAdmSec(hdr) {
   hdr.classList.toggle('open');
@@ -2642,7 +3109,7 @@ async function clearTip(mid) {
 
 function showTab(t) {
   activeTab=t;
-  ['meccsek','tippek','ranglista','admin','opl','bet','kozos','gol','otletek'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
+  ['meccsek','tippek','ranglista','admin','opl','bet','kozos','gol','otletek','nyeremenyek'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
@@ -2655,6 +3122,7 @@ function showTab(t) {
   if(t==='kozos') { loadWatchParty(); }
   if(t==='gol') renderGolTab();
   if(t==='otletek') otletekLoad();
+  if(t==='nyeremenyek') nyeremenyekLoad();
   // Scroll: tab tetejére görget
   if(t !== 'meccsek') {
     window.scrollTo({top: 0, behavior: 'instant'});
@@ -7175,6 +7643,65 @@ async function saveCustomMatch() {
   showToast('✅ Meccs elmentve: '+home+' – '+away);
 }
 
+async function createTestMatches() {
+  if(!confirm('Létrehozza a két teszt meccset?\n\n• 🧪 Teszt Negyeddöntő (2× szorzó)\n• 🧪 Teszt Döntő (3× szorzó)\n\nTörölhetők az Egyedi meccsek listájából.')) return;
+  var today = getBudapestToday();
+  // Holnap (hogy ne legyen rögtön zárva)
+  var d = new Date(today);
+  d.setDate(d.getDate() + 1);
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  var nextDay = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+
+  var test2x = {
+    id: 'CM_TEST_KO_' + Date.now(),
+    group: 'Negyeddöntő',
+    huDate: nextDay,
+    huTime: '18:00',
+    home: '🧪 Teszt A',
+    homeFlag: '🧪',
+    away: '🧪 Teszt B',
+    awayFlag: '🧪',
+    venue: 'Tesztpálya',
+    title: '🧪 Teszt Kieséses (2×)',
+    knockout: true,
+    alwaysShow: true,
+    _isTest: true
+  };
+
+  var test3x = {
+    id: 'CM_TEST_FINAL_' + (Date.now() + 1),
+    group: 'Döntő',
+    huDate: nextDay,
+    huTime: '21:00',
+    home: '🏆 Teszt X',
+    homeFlag: '🏆',
+    away: '🏆 Teszt Y',
+    awayFlag: '🏆',
+    venue: 'Tesztpálya',
+    title: '🧪 Teszt Döntő (3×)',
+    knockout: true,
+    alwaysShow: true,
+    _isTest: true
+  };
+
+  // Ellenőrzés: ne duplikáljunk ha már van teszt meccs
+  var hasKO    = ALL_MATCHES.some(function(m){ return m.id && m.id.startsWith('CM_TEST_KO'); });
+  var hasFinal = ALL_MATCHES.some(function(m){ return m.id && m.id.startsWith('CM_TEST_FINAL'); });
+  if(hasKO || hasFinal) {
+    showToast('⚠️ Már van teszt meccs! Töröld előbb a régieket.');
+    return;
+  }
+
+  ALL_MATCHES.push(test2x);
+  ALL_MATCHES.push(test3x);
+  await saveCustomMatches();
+  renderCustomMatchAdmin();
+  renderAdminMatches();
+  await pollData();
+  renderAll();
+  showToast('✅ Teszt meccsek létrehozva! Szorzók: 2× és 3×');
+}
+
 async function deleteCustomMatch(id) {
   var idx = ALL_MATCHES.findIndex(function(m){return m.id===id;});
   if(idx<0) return;
@@ -7183,6 +7710,183 @@ async function deleteCustomMatch(id) {
   renderCustomMatchAdmin();
   renderAdminMatches();
   showToast('🗑️ Meccs törölve');
+}
+
+// ===== 🎁 NYEREMÉNYEK =====
+var _nyeremenyKepBase64 = null;
+
+var NYERTESEK_MAP = {
+  '1':'🥇 1. helyezett','2':'🥈 2. helyezett','3':'🥉 3. helyezett',
+  'top3':'🏆 Top 3 sorsolás','exact':'🎯 Legtöbb pontos tipp',
+  'streak':'🔥 Leghosszabb sorozat','random':'🎲 Teljes sorsolás',
+  'custom':'✏️ Egyéni feltétel'
+};
+
+async function nyeremenyekLoad() {
+  var list = document.getElementById('nyeremenyList');
+  var addBtn = document.getElementById('nyeremenyAddBtn');
+  if(addBtn) addBtn.style.display = isAdminUnlocked ? 'flex' : 'none';
+  if(!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:rgba(240,244,240,0.35);">⏳ Betöltés…</div>';
+  try {
+    var data = await fbGet('nyeremenyek') || {};
+    var items = Object.entries(data).sort(function(a,b){ return (a[1].createdAt||0)-(b[1].createdAt||0); });
+    if(items.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.3);font-family:Oswald,sans-serif;font-size:14px;">🎁 Még nincs felajánlás<br><span style="font-size:12px;opacity:0.6;">Admin adhat hozzá felajánlásokat</span></div>';
+      return;
+    }
+    var byNyertes = {};
+    items.forEach(function(e){
+      var k = e[1].nyertes || '1';
+      if(!byNyertes[k]) byNyertes[k] = [];
+      byNyertes[k].push(Object.assign({id:e[0]}, e[1]));
+    });
+    var order = ['1','2','3','top3','exact','streak','random','custom'];
+    var html = '';
+    order.forEach(function(k){
+      if(!byNyertes[k] || !byNyertes[k].length) return;
+      html += '<div style="margin-bottom:24px;">';
+      html += '<div style="font-family:Oswald,sans-serif;font-size:13px;color:rgba(240,244,240,0.5);letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.07);">'+(NYERTESEK_MAP[k]||k)+'</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:12px;">';
+      byNyertes[k].forEach(function(item){ html += nyeremenyCard(item); });
+      html += '</div></div>';
+    });
+    list.innerHTML = html;
+  } catch(e) {
+    list.innerHTML = '<div style="color:#f87171;padding:12px;text-align:center;">❌ Hiba: '+e.message+'</div>';
+  }
+}
+
+function nyeremenyCard(item) {
+  var nyertesLabel = item.nyertes==='custom' && item.customText
+    ? '✏️ '+escHtml(item.customText)
+    : (NYERTESEK_MAP[item.nyertes]||item.nyertes||'');
+  var adminBtns = isAdminUnlocked
+    ? '<div style="display:flex;gap:6px;margin-top:10px;">'
+      +'<button onclick="nyeremenyOpenModal(\''+item.id+'\')" style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(245,197,24,0.25);background:rgba(245,197,24,0.08);color:var(--gold);font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;">✏️ Szerk.</button>'
+      +'<button onclick="nyeremenyTorol(\''+item.id+'\')" style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.08);color:#f87171;font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;">🗑️ Törlés</button>'
+      +'</div>'
+    : '';
+  return '<div style="background:var(--card);border:1px solid var(--card-border);border-radius:14px;overflow:hidden;">'
+    +(item.kepBase64
+      ?'<img src="'+item.kepBase64+'" style="width:100%;height:160px;object-fit:cover;display:block;" loading="lazy">'
+      :'<div style="width:100%;height:80px;background:rgba(245,197,24,0.06);display:flex;align-items:center;justify-content:center;font-size:40px;">🎁</div>')
+    +'<div style="padding:12px 14px;">'
+    +'<div style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:2px;">'+escHtml(item.nev||'')+'</div>'
+    +'<div style="font-size:12px;color:rgba(240,244,240,0.55);margin-bottom:6px;">🙋 '+escHtml(item.felajanlo||'')+(item.ertek?' · <b style="color:rgba(240,244,240,0.8);">'+escHtml(item.ertek)+'</b>':'')+'</div>'
+    +(item.leiras?'<div style="font-size:12px;color:rgba(240,244,240,0.5);line-height:1.5;margin-bottom:6px;">'+escHtml(item.leiras)+'</div>':'')
+    +'<div style="font-size:11px;color:rgba(240,244,240,0.35);font-family:Oswald,sans-serif;">'+nyertesLabel+'</div>'
+    +adminBtns
+    +'</div></div>';
+}
+
+function nyeremenyOpenModal(id) {
+  _nyeremenyKepBase64 = null;
+  document.getElementById('nyeremenyEditId').value = id || '';
+  document.getElementById('nyeremenyNev').value = '';
+  document.getElementById('nyeremenyFelajanlo').value = '';
+  document.getElementById('nyeremenyErtek').value = '';
+  document.getElementById('nyeremenyNyertes').value = '1';
+  document.getElementById('nyeremenyCustomText').value = '';
+  document.getElementById('nyeremenyLeiras').value = '';
+  document.getElementById('nyeremenyKepPreview').style.display = 'none';
+  document.getElementById('nyeremenyKepPlaceholder').style.display = '';
+  document.getElementById('nyeremenyKepWarning').style.display = 'none';
+  document.getElementById('nyeremenyCustomRow').style.display = 'none';
+  document.getElementById('nyeremenyKepInput').value = '';
+  document.getElementById('nyeremenyModalTitle').textContent = id ? '✏️ SZERKESZTÉS' : '🎁 ÚJ FELAJÁNLÁS';
+
+  if(id) {
+    fbGet('nyeremenyek/'+id).then(function(item){
+      if(!item) return;
+      document.getElementById('nyeremenyNev').value = item.nev || '';
+      document.getElementById('nyeremenyFelajanlo').value = item.felajanlo || '';
+      document.getElementById('nyeremenyErtek').value = item.ertek || '';
+      document.getElementById('nyeremenyNyertes').value = item.nyertes || '1';
+      document.getElementById('nyeremenyCustomText').value = item.customText || '';
+      document.getElementById('nyeremenyLeiras').value = item.leiras || '';
+      document.getElementById('nyeremenyCustomRow').style.display = item.nyertes==='custom' ? '' : 'none';
+      if(item.kepBase64) {
+        _nyeremenyKepBase64 = item.kepBase64;
+        document.getElementById('nyeremenyKepImg').src = item.kepBase64;
+        document.getElementById('nyeremenyKepPreview').style.display = '';
+        document.getElementById('nyeremenyKepPlaceholder').style.display = 'none';
+      }
+    }).catch(function(){});
+  }
+  document.getElementById('nyeremenyModal').style.display = 'flex';
+}
+
+function nyeremenyCloseModal() {
+  document.getElementById('nyeremenyModal').style.display = 'none';
+}
+
+document.addEventListener('change', function(e){
+  if(e.target && e.target.id === 'nyeremenyNyertes') {
+    document.getElementById('nyeremenyCustomRow').style.display = e.target.value === 'custom' ? '' : 'none';
+  }
+});
+
+function nyeremenyKepElonezet(input) {
+  var file = input.files && input.files[0];
+  if(!file) return;
+  var warn = document.getElementById('nyeremenyKepWarning');
+  if(file.size > 5*1024*1024) { showToast('❌ Túl nagy kép! Max 5 MB.'); return; }
+  if(file.size > 1024*1024) {
+    warn.style.display = '';
+    warn.textContent = '⚠️ A kép '+Math.round(file.size/1024)+' KB — nagy méretű képek lassíthatják a betöltést. Ajánlott 800px alá méretezni.';
+  } else { warn.style.display = 'none'; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    _nyeremenyKepBase64 = ev.target.result;
+    document.getElementById('nyeremenyKepImg').src = ev.target.result;
+    document.getElementById('nyeremenyKepPreview').style.display = '';
+    document.getElementById('nyeremenyKepPlaceholder').style.display = 'none';
+    document.getElementById('nyeremenyKepMeret').textContent = Math.round(file.size/1024)+' KB · '+file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function nyeremenyMentes() {
+  var nev       = document.getElementById('nyeremenyNev').value.trim();
+  var felajanlo = document.getElementById('nyeremenyFelajanlo').value.trim();
+  var ertek     = document.getElementById('nyeremenyErtek').value.trim();
+  var nyertes   = document.getElementById('nyeremenyNyertes').value;
+  var custom    = document.getElementById('nyeremenyCustomText').value.trim();
+  var leiras    = document.getElementById('nyeremenyLeiras').value.trim();
+  var editId    = document.getElementById('nyeremenyEditId').value;
+
+  if(!nev || !felajanlo) { showToast('⚠️ Megnevezés és felajánló kötelező!'); return; }
+  if(nyertes==='custom' && !custom) { showToast('⚠️ Add meg az egyéni feltételt!'); return; }
+
+  var id = editId || ('NYR_'+Date.now());
+  var item = {nev:nev, felajanlo:felajanlo, nyertes:nyertes, createdBy:fbSafeName(currentUser||'KULT')};
+  if(ertek) item.ertek = ertek;
+  if(leiras) item.leiras = leiras;
+  if(nyertes==='custom' && custom) item.customText = custom;
+  if(_nyeremenyKepBase64) item.kepBase64 = _nyeremenyKepBase64;
+
+  if(editId) {
+    try { var old = await fbGet('nyeremenyek/'+editId); if(old && old.createdAt) item.createdAt = old.createdAt; if(old && old.kepBase64 && !_nyeremenyKepBase64) item.kepBase64 = old.kepBase64; } catch(e){}
+  } else {
+    item.createdAt = Date.now();
+  }
+
+  try {
+    await fbSet('nyeremenyek/'+id, item);
+    nyeremenyCloseModal();
+    showToast('✅ Felajánlás elmentve!');
+    nyeremenyekLoad();
+  } catch(e) { showToast('❌ Mentési hiba: '+e.message); }
+}
+
+async function nyeremenyTorol(id) {
+  if(!confirm('Biztosan törlöd ezt a felajánlást?')) return;
+  try {
+    await fbDel('nyeremenyek/'+id);
+    showToast('🗑️ Felajánlás törölve');
+    nyeremenyekLoad();
+  } catch(e) { showToast('❌ Hiba: '+e.message); }
 }
 
 // ===== BL POLL =====
