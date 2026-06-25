@@ -848,12 +848,13 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
   display:flex;align-items:center;justify-content:center;padding:12px;
 }
 .onboard-box{
-  background:linear-gradient(145deg,#0e0f12 0%,#081508 60%,#141518 100%);
-  border:1px solid rgba(0,255,135,0.25);border-radius:20px;
-  width:100%;max-width:440px;max-height:92vh;
+  background:#14151c;
+  border:1px solid rgba(0,255,135,0.2);border-radius:0;
+  width:100%;max-width:440px;
+  height:88vh;max-height:88vh;
   display:flex;flex-direction:column;overflow:hidden;
   animation:mIn 0.35s cubic-bezier(.22,.68,0,1.2);
-  box-shadow:0 40px 120px rgba(0,0,0,0.8);
+  box-shadow:0 20px 60px rgba(0,0,0,0.8);
 }
 @media(min-width:820px){
   .onboard-box{
@@ -861,64 +862,76 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
     width:min(92vw,1300px);
     height:min(88vh,780px);
     max-height:min(88vh,780px);
-    border-radius:24px;
+    border-radius:0;
   }
 }
 
 /* Desktop: kétoszlopos layout */
 .onboard-inner{
-  flex:1;overflow:hidden;display:flex;flex-direction:column;
+  flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;
 }
 @media(min-width:820px){
   .onboard-inner{ flex-direction:row; }
 }
 
-/* ── Bal panel (sötétebb, sticky) ── */
+/* ── Bal panel — mobilon vízszintes kompakt nav ── */
 .ob-left{
-  padding:32px 28px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;
+  padding:14px 16px 10px;
+  display:flex;flex-direction:row;align-items:center;gap:4px;flex-shrink:0;
   border-bottom:1px solid rgba(0,255,135,0.1);
-  background:rgba(0,0,0,0.25);
+  background:rgba(0,0,0,0.3);
+  flex-wrap:wrap;overflow-x:auto;
 }
 @media(min-width:820px){
   .ob-left{
+    flex-direction:column;align-items:stretch;flex-wrap:nowrap;
     width:220px;border-bottom:none;border-right:1px solid rgba(0,255,135,0.1);
-    padding:40px 24px;justify-content:flex-start;
+    padding:32px 20px;justify-content:flex-start;overflow-x:visible;gap:4px;
   }
 }
-.ob-brand{
-  margin-bottom:20px;display:flex;align-items:center;gap:10px;
+
+/* Brand: csak desktop */
+.ob-brand{ display:none; }
+@media(min-width:820px){
+  .ob-brand{ display:flex;margin-bottom:20px;align-items:center;gap:10px; }
 }
-.ob-brand-icon{font-size:36px;line-height:1;}
-.ob-brand-title{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;line-height:1.1;}
+.ob-brand-icon{font-size:30px;line-height:1;}
+.ob-brand-title{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;line-height:1.1;}
 .ob-brand-sub{font-size:10px;color:rgba(240,244,240,0.35);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
 
-/* Navigációs gombok a bal panelen */
+/* Navigációs gombok */
 .ob-nav-btn{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  border:none;background:transparent;color:rgba(240,244,240,0.45);
-  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.5px;
-  cursor:pointer;text-align:left;width:100%;transition:all 0.18s;
+  display:inline-flex;align-items:center;gap:6px;padding:7px 12px;
+  border-radius:0;border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.03);color:rgba(240,244,240,0.45);
+  font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:0.5px;
+  cursor:pointer;text-align:left;white-space:nowrap;transition:all 0.15s;
+  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
 }
-.ob-nav-btn:hover{background:rgba(255,255,255,0.05);color:rgba(240,244,240,0.8);}
+@media(min-width:820px){
+  .ob-nav-btn{ width:100%;padding:10px 12px;font-size:13px; }
+}
+.ob-nav-btn:hover{background:rgba(0,255,135,0.06);color:rgba(0,255,135,0.8);border-color:rgba(0,255,135,0.2);}
 .ob-nav-btn.active{
-  background:rgba(0,255,135,0.12);border:1px solid rgba(0,255,135,0.25);
+  background:rgba(0,255,135,0.15);border-color:rgba(0,255,135,0.35);
   color:var(--gold);
 }
-.ob-nav-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+.ob-nav-icon{font-size:15px;flex-shrink:0;}
+@media(min-width:820px){ .ob-nav-icon{font-size:18px;width:24px;text-align:center;} }
 .ob-nav-label{flex:1;}
-.ob-nav-check{font-size:10px;color:#39ff9d;margin-left:auto;opacity:0;transition:opacity 0.2s;}
+.ob-nav-check{font-size:10px;color:#39ff9d;margin-left:4px;opacity:0;transition:opacity 0.2s;}
 .ob-nav-btn.done .ob-nav-check{opacity:1;}
 
 /* ── Jobb panel (scrollable tartalom) ── */
 .ob-right{
-  flex:1;overflow-y:auto;padding:28px 24px;
-  scroll-behavior:smooth;
+  flex:1;overflow-y:auto;padding:18px 18px;
+  scroll-behavior:smooth;min-height:0;
 }
 @media(min-width:820px){
-  .ob-right{ padding:44px 52px; }
+  .ob-right{ padding:40px 48px; }
 }
-.ob-right::-webkit-scrollbar{width:4px;}
-.ob-right::-webkit-scrollbar-thumb{background:rgba(0,255,135,0.2);border-radius:2px;}
+.ob-right::-webkit-scrollbar{width:3px;}
+.ob-right::-webkit-scrollbar-thumb{background:rgba(0,255,135,0.25);}
 
 /* Tab tartalmak */
 .ob-tab-panel{display:none;}
@@ -1581,7 +1594,7 @@ input:focus, textarea:focus, select:focus {
               </tbody>
             </table>
             <div style="margin-top:12px;font-size:12px;color:rgba(240,244,240,0.4);line-height:1.6;">
-              📐 A gólkülönbség bónusz csak akkor jár, ha a kimenetel is helyes és a gólkülönbség stimmel (pl. tipp 2:0, eredmény 3:1 = ✓).<br>
+              📐 A gólkülönbség bónusz csak akkor jár, ha a kimenetel is helyes és a gólkülönbség stimmel (pl. tipp 4:2, eredmény 3:1 → mindkettő +2 → ✓).<br>
               🎯 A pontos gólszám <b>felváltja</b> a kimenetel + gólkülönbség pontot — nem halmozódik.
             </div>
           </div>
@@ -1627,8 +1640,8 @@ input:focus, textarea:focus, select:focus {
                   <div style="display:flex;align-items:center;gap:10px;">
                     <span style="font-size:20px;">🟡</span>
                     <div>
-                      <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.8);">Tipped: <b>2:0</b> <span style="font-size:11px;color:rgba(240,244,240,0.35);">(spanyol győzelem, más arány)</span></div>
-                      <div style="font-size:12px;color:rgba(0,255,135,0.7);margin-top:2px;">Helyes kimenetel, de gólkülönbség nem stimmel</div>
+                      <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(240,244,240,0.8);">Tipped: <b>1:0</b> <span style="font-size:11px;color:rgba(240,244,240,0.35);">(spanyol győzelem, csak +1 gólkülönbség)</span></div>
+                      <div style="font-size:12px;color:rgba(0,255,135,0.7);margin-top:2px;">Helyes kimenetel, de gólkülönbség nem stimmel (+1 ≠ +2)</div>
                     </div>
                   </div>
                   <div style="display:flex;gap:6px;flex-shrink:0;">
