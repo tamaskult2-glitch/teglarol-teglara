@@ -6274,12 +6274,16 @@ function renderEmobMatches() {
       if(result) html += '<span style="font-size:9px;color:rgba(0,255,135,0.6);background:rgba(0,255,135,0.08);border:1px solid rgba(0,255,135,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>';
       html += '</div>';
       if(m.title) html += '<div style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(0,255,135,0.5);letter-spacing:1.5px;padding:6px 0 0;">'+escHtml(m.title)+'</div>';
+      var _homeGroup = m.group || '';
+      var _awayGroup = m.group || '';
       html += '<div class="match-body"><div class="match-teams-row">';
       html += '<div class="team-blk">'+getTeamBadge(m.homeFlag||'🏭',m.home);
-      html += '<div class="tn-wrap"><span class="tn" onclick="openTeamPanel(\''+m.home.replace(/'/g,"\\'")+(m.group?'\',\''+m.group:'\'')+'\')" style="cursor:pointer;" title="'+escHtml(m.home)+' eredményei">'+escHtml(m.home)+'</span>'+(m.homeLabel?'<span class="tn-sub">'+escHtml(m.homeLabel)+'</span>':'')+'</div></div>';
+      html += '<div class="tn-wrap" onclick="event.stopPropagation();openTeamPanel(this.getAttribute(\'data-team\'),this.getAttribute(\'data-group\'))" data-team="'+escHtml(m.home)+'" data-group="'+escHtml(_homeGroup)+'" style="cursor:pointer;-webkit-tap-highlight-color:rgba(0,255,135,0.15);touch-action:manipulation;">'
+        +'<span class="tn">'+escHtml(m.home)+'</span>'+(m.homeLabel?'<span class="tn-sub">'+escHtml(m.homeLabel)+'</span>':'')+'</div></div>';
       html += '<span class="vs-block">VS</span><span class="sc-block" style="visibility:hidden">–</span>';
       html += '<div class="team-blk away-blk">'+getTeamBadge(m.awayFlag||'🏭',m.away);
-      html += '<div class="tn-wrap"><span class="tn" onclick="openTeamPanel(\''+m.away.replace(/'/g,"\\'")+(m.group?'\',\''+m.group:'\'')+'\')" style="cursor:pointer;" title="'+escHtml(m.away)+' eredményei">'+escHtml(m.away)+'</span>'+(m.awayLabel?'<span class="tn-sub">'+escHtml(m.awayLabel)+'</span>':'')+'</div></div></div>';
+      html += '<div class="tn-wrap" onclick="event.stopPropagation();openTeamPanel(this.getAttribute(\'data-team\'),this.getAttribute(\'data-group\'))" data-team="'+escHtml(m.away)+'" data-group="'+escHtml(_awayGroup)+'" style="cursor:pointer;-webkit-tap-highlight-color:rgba(0,255,135,0.15);touch-action:manipulation;">'
+        +'<span class="tn">'+escHtml(m.away)+'</span>'+(m.awayLabel?'<span class="tn-sub">'+escHtml(m.awayLabel)+'</span>':'')+'</div></div></div>';
       // Kezdők ha van
       if((m.homeLineup&&m.homeLineup.length)||(m.awayLineup&&m.awayLineup.length)){
         html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0;font-size:11px;color:rgba(240,244,240,0.45);">';
