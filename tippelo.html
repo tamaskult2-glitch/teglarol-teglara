@@ -699,6 +699,8 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .team-blk.away-blk{flex-direction:row-reverse;text-align:right;}
 .team-blk .tf{font-size:26px;flex-shrink:0;}
 .team-blk .tn-wrap{min-width:0;overflow:hidden;}
+.team-blk .tn-wrap[data-clickable="team"]{cursor:pointer;-webkit-tap-highlight-color:rgba(0,255,135,0.2);}
+.team-blk .tn-wrap[data-clickable="team"]:active .tn{color:#00ff87;}
 .team-blk .tn{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;line-height:1.2;color:rgba(240,244,240,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
 .team-blk .tn-sub{font-size:9px;color:rgba(240,244,240,0.3);letter-spacing:0.5px;display:block;margin-top:1px;}
 .vs-block{font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;color:rgba(240,244,240,0.2);letter-spacing:3px;flex-shrink:0;}
@@ -826,7 +828,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .modal-box button:hover{background:var(--gold-dark);}
 
 /* TOAST */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--gold);color:#1c1d24;font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;padding:9px 22px;border-radius:28px;z-index:200;transition:transform 0.28s;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.35);}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:#00ff87;color:#0b0c0e;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;padding:9px 22px;border-radius:0;z-index:9999;transition:transform 0.28s;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.5), 0 0 20px rgba(0,255,135,0.3);clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
 /* SECTION HEADER */
@@ -1229,12 +1231,9 @@ footer a:hover{color:var(--gold);}
   box-shadow:0 24px 80px rgba(0,0,0,0.8), 0 0 40px rgba(0,255,135,0.06) !important;
 }
 
-/* Toast */
+/* Toast — Carbon override */
 #toast {
   border-radius:0 !important;
-  border-left:3px solid #00ff87 !important;
-  background:#1c1d24 !important;
-  backdrop-filter:blur(8px) !important;
 }
 
 /* Login warn */
@@ -3059,6 +3058,43 @@ async function adminDeleteTip() {
   }
 }
 
+
+// ===== CSAPAT NÉV TAPINTÁS — globális event delegation (iOS Safari-kompatibilis) =====
+(function() {
+  var _lastTeamTap = 0;
+  function handleTeamTap(e) {
+    var el = e.target;
+    // Felmegyünk max 3 szinttel a DOM-ban
+    for(var i = 0; i < 4; i++) {
+      if(!el) break;
+      if(el.getAttribute && el.getAttribute('data-clickable') === 'team') {
+        e.stopPropagation();
+        e.preventDefault();
+        var now = Date.now();
+        if(now - _lastTeamTap < 350) return; // double-tap guard
+        _lastTeamTap = now;
+        openTeamPanel(el.getAttribute('data-team'), el.getAttribute('data-group'));
+        return;
+      }
+      el = el.parentNode;
+    }
+  }
+  // touchend a legmegbízhatóbb iOS Safari-ban
+  document.addEventListener('touchend', handleTeamTap, {passive: false});
+  // click fallback asztali böngészőkre
+  document.addEventListener('click', function(e) {
+    var el = e.target;
+    for(var i = 0; i < 4; i++) {
+      if(!el) break;
+      if(el.getAttribute && el.getAttribute('data-clickable') === 'team') {
+        e.stopPropagation();
+        openTeamPanel(el.getAttribute('data-team'), el.getAttribute('data-group'));
+        return;
+      }
+      el = el.parentNode;
+    }
+  });
+})();
 
 // ===== FIREBASE ADMIN SECRET KEZELŐ =====
 function fbSecretRefreshStatus() {
@@ -6278,12 +6314,12 @@ function renderEmobMatches() {
       var _awayGroup = m.group || '';
       html += '<div class="match-body"><div class="match-teams-row">';
       html += '<div class="team-blk">'+getTeamBadge(m.homeFlag||'🏭',m.home);
-      html += '<div class="tn-wrap" onclick="event.stopPropagation();openTeamPanel(this.getAttribute(\'data-team\'),this.getAttribute(\'data-group\'))" data-team="'+escHtml(m.home)+'" data-group="'+escHtml(_homeGroup)+'" style="cursor:pointer;-webkit-tap-highlight-color:rgba(0,255,135,0.15);touch-action:manipulation;">'
-        +'<span class="tn">'+escHtml(m.home)+'</span>'+(m.homeLabel?'<span class="tn-sub">'+escHtml(m.homeLabel)+'</span>':'')+'</div></div>';
+      html += '<div class="tn-wrap" data-team="'+escHtml(m.home)+'" data-group="'+escHtml(_homeGroup)+'" data-clickable="team">'
+        +'<span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">'+escHtml(m.home)+'</span>'+(m.homeLabel?'<span class="tn-sub">'+escHtml(m.homeLabel)+'</span>':'')+'</div></div>';
       html += '<span class="vs-block">VS</span><span class="sc-block" style="visibility:hidden">–</span>';
       html += '<div class="team-blk away-blk">'+getTeamBadge(m.awayFlag||'🏭',m.away);
-      html += '<div class="tn-wrap" onclick="event.stopPropagation();openTeamPanel(this.getAttribute(\'data-team\'),this.getAttribute(\'data-group\'))" data-team="'+escHtml(m.away)+'" data-group="'+escHtml(_awayGroup)+'" style="cursor:pointer;-webkit-tap-highlight-color:rgba(0,255,135,0.15);touch-action:manipulation;">'
-        +'<span class="tn">'+escHtml(m.away)+'</span>'+(m.awayLabel?'<span class="tn-sub">'+escHtml(m.awayLabel)+'</span>':'')+'</div></div></div>';
+      html += '<div class="tn-wrap" data-team="'+escHtml(m.away)+'" data-group="'+escHtml(_awayGroup)+'" data-clickable="team">'
+        +'<span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">'+escHtml(m.away)+'</span>'+(m.awayLabel?'<span class="tn-sub">'+escHtml(m.awayLabel)+'</span>':'')+'</div></div></div>';
       // Kezdők ha van
       if((m.homeLineup&&m.homeLineup.length)||(m.awayLineup&&m.awayLineup.length)){
         html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0;font-size:11px;color:rgba(240,244,240,0.45);">';
