@@ -16,7 +16,7 @@
 :root {
   --pitch:#0b0c0e;
   --gold:#00ff87; --gold-dark:#00cc6a;
-  --white:#f0f4f0; --card:rgba(20,21,24,0.95); --card-border:rgba(0,255,135,0.14);
+  --white:#f0f4f0; --card:rgba(28,29,36,0.95); --card-border:rgba(0,255,135,0.14);
   --home:#3b82f6; --draw:#6b7280; --away:#ef4444;
   --correct:#00ff87; --radius:4px;
   --shadow-card:0 2px 8px rgba(0,0,0,0.6), 0 6px 24px rgba(0,0,0,0.45);
@@ -28,7 +28,7 @@
 
 body {
   font-family:'Source Sans 3',sans-serif;
-  background:#0b0c0e;
+  background:#0f1117;
   color:var(--white);
   min-height:100vh;
   overflow-x:hidden;
@@ -50,7 +50,7 @@ body::before {
 body::after {
   content:'';
   position:fixed;inset:0;
-  background:radial-gradient(ellipse 80% 40% at 50% -5%, rgba(0,255,135,0.06) 0%, transparent 60%);
+  background:radial-gradient(ellipse 80% 40% at 50% -5%, rgba(0,255,135,0.1) 0%, transparent 60%);
   pointer-events:none;z-index:0;
 }
 
@@ -59,7 +59,7 @@ header {
   position:relative;overflow:hidden;text-align:center;
   padding:28px 20px 22px;z-index:1;
   border-bottom:1px solid rgba(0,255,135,0.12);
-  background:#0e0f12;
+  background:#14151c;
 }
 header::after {
   content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
@@ -87,7 +87,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 /* STATUS BAR */
 .status-bar {
   display:flex;align-items:center;justify-content:center;gap:8px;padding:5px 16px;
-  font-size:11px;background:#0a0b0d;
+  font-size:11px;background:#0c0d12;
   border-bottom:1px solid rgba(255,255,255,0.04);
   position:relative;z-index:1;
 }
@@ -101,7 +101,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .nav-tabs {
   display:flex;justify-content:center;gap:4px;padding:10px 14px 8px;
   flex-wrap:wrap;position:sticky;top:0;z-index:100;
-  background:#0a0b0d;
+  background:#0c0d12;
   border-bottom:1px solid rgba(0,255,135,0.1);
 }
 .nav-tab {
@@ -149,7 +149,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 
 /* MATCH CARD — Carbon: dark, angular, left-accent */
 .match-card {
-  background:#141518;
+  background:#1c1d24;
   border:1px solid rgba(255,255,255,0.06);
   border-left:3px solid rgba(0,255,135,0.2);
   border-radius:0;
@@ -184,7 +184,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 
 /* LEADERBOARD */
 .lb-row {
-  background:#141518;
+  background:#1c1d24;
   border:1px solid rgba(255,255,255,0.05);
   border-left:3px solid rgba(0,255,135,0.1);
   border-radius:0;
@@ -196,7 +196,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
   cursor:pointer;
 }
 .lb-row:hover { border-left-color:rgba(0,255,135,0.4); box-shadow:var(--shadow-lift); }
-.lb-row.r1 { border-left-color:#00ff87; background:#141f18; box-shadow:-4px 0 20px rgba(0,255,135,0.08), var(--shadow-card); }
+.lb-row.r1 { border-left-color:#00ff87; background:#1a2420; box-shadow:-4px 0 20px rgba(0,255,135,0.08), var(--shadow-card); }
 .lb-row.r2 { border-left-color:rgba(173,181,189,0.4); }
 .lb-row.r3 { border-left-color:rgba(205,127,50,0.4); }
 
@@ -211,7 +211,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 /* CARDS (generic) */
 .match-meta,
 .opl-card {
-  background:linear-gradient(160deg, rgba(22,23,28,0.9), rgba(20,21,24,0.9)) !important;
+  background:linear-gradient(160deg, rgba(30,31,38,0.9), rgba(28,29,36,0.9)) !important;
   border-color:rgba(255,255,255,0.07) !important;
 }
 
@@ -226,7 +226,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 
 /* STAT CARDS */
 .stat-card {
-  background:linear-gradient(160deg, rgba(22,23,28,0.9), rgba(20,21,24,0.9));
+  background:linear-gradient(160deg, rgba(30,31,38,0.9), rgba(28,29,36,0.9));
   border:1px solid rgba(255,255,255,0.06);
   border-radius:16px;
   box-shadow:var(--shadow-card);
@@ -359,7 +359,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .opl-status-open{color:#00ff87;}
 .opl-status-done{color:#39ff9d;}
 .opl-status-rejected{color:rgba(240,244,240,0.3);text-decoration:line-through;}
-.vb-poll{background:linear-gradient(135deg,rgba(20,21,24,0.9),rgba(22,23,28,0.9));border:1px solid rgba(0,255,135,0.2);border-radius:14px;padding:14px 14px 10px;margin:0 0 14px;}
+.vb-poll{background:linear-gradient(135deg,rgba(28,29,36,0.9),rgba(30,31,38,0.9));border:1px solid rgba(0,255,135,0.2);border-radius:14px;padding:14px 14px 10px;margin:0 0 14px;}
 .vb-poll-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .vb-poll-icon{font-size:26px;line-height:1;}
 .vb-poll-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;}
@@ -398,7 +398,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
   text-transform:uppercase;color:var(--gold);line-height:1.15;}
 .md-sub{font-size:12px;color:rgba(240,244,240,0.7);margin-top:2px;line-height:1.2;}
 .md-btn{flex-shrink:0;position:relative;font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;
-  letter-spacing:0.8px;text-transform:uppercase;color:#141518;background:var(--gold);
+  letter-spacing:0.8px;text-transform:uppercase;color:#1c1d24;background:var(--gold);
   border:none;border-radius:11px;padding:9px 15px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
   box-shadow:0 3px 10px rgba(0,255,135,0.35);transition:transform 0.15s,box-shadow 0.15s;white-space:nowrap;}
 .md-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,255,135,0.5);}
@@ -474,7 +474,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
   display:none;
   position:fixed;bottom:20px;right:16px;z-index:150;
   width:52px;height:52px;border-radius:50%;
-  background:var(--gold);color:#141518;
+  background:var(--gold);color:#1c1d24;
   border:none;font-size:22px;cursor:pointer;
   box-shadow:0 4px 18px rgba(0,0,0,0.4);
   transition:transform 0.2s;align-items:center;justify-content:center;
@@ -793,7 +793,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .ai-row{display:flex;gap:8px;justify-content:center;margin-top:10px;}
 .ai-row input{padding:9px 14px;border-radius:8px;border:1.5px solid rgba(0,255,135,0.28);background:rgba(0,0,0,0.3);color:var(--white);font-size:14px;width:180px;}
 .ai-row input:focus{outline:none;border-color:var(--gold);}
-.btn-gold{padding:9px 20px;background:var(--gold);color:#141518;border:none;border-radius:8px;font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;cursor:pointer;}
+.btn-gold{padding:9px 20px;background:var(--gold);color:#1c1d24;border:none;border-radius:8px;font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;cursor:pointer;}
 .btn-gold:hover{background:var(--gold-dark);}
 .admin-content{display:none;}
 .admin-content.visible{display:block;}
@@ -822,11 +822,11 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .modal-box p{font-size:13px;color:rgba(240,244,240,0.55);line-height:1.6;margin-bottom:20px;}
 .modal-box input{width:100%;padding:12px 16px;border-radius:9px;border:2px solid rgba(0,255,135,0.28);background:rgba(0,0,0,0.28);color:var(--white);font-size:16px;font-family:'Oswald',sans-serif;letter-spacing:1px;text-align:center;margin-bottom:12px;transition:border-color 0.2s;}
 .modal-box input:focus{outline:none;border-color:var(--gold);}
-.modal-box button{width:100%;padding:13px;background:var(--gold);color:#141518;border:none;border-radius:9px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;}
+.modal-box button{width:100%;padding:13px;background:var(--gold);color:#1c1d24;border:none;border-radius:9px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;}
 .modal-box button:hover{background:var(--gold-dark);}
 
 /* TOAST */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--gold);color:#141518;font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;padding:9px 22px;border-radius:28px;z-index:200;transition:transform 0.28s;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.35);}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--gold);color:#1c1d24;font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;padding:9px 22px;border-radius:28px;z-index:200;transition:transform 0.28s;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,0.35);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
 /* SECTION HEADER */
@@ -980,7 +980,7 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .ob-footer-accept span{font-size:13px;color:rgba(240,244,240,0.6);}
 .ob-start-btn{
   padding:12px 32px;
-  background:var(--gold);color:#141518;
+  background:var(--gold);color:#1c1d24;
   border:none;border-radius:10px;
   font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;
   letter-spacing:2px;cursor:pointer;transition:all 0.2s;white-space:nowrap;
@@ -1094,13 +1094,13 @@ footer a:hover{color:var(--gold);}
 }
 .tipp-table td.match-cell{
   text-align:left;padding:8px 10px;
-  background:rgba(20,21,24,0.7);
+  background:rgba(28,29,36,0.7);
   position:sticky;left:0;z-index:1;
   border-right:1px solid rgba(0,255,135,0.1);
   min-width:120px;
 }
 .tipp-table tr:hover td{background:rgba(0,255,135,0.04);}
-.tipp-table tr:hover td.match-cell{background:rgba(20,21,24,0.85);}
+.tipp-table tr:hover td.match-cell{background:rgba(28,29,36,0.85);}
 .match-cell-home{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;white-space:nowrap;}
 .match-cell-time{font-size:9px;color:rgba(240,244,240,0.35);letter-spacing:0.5px;margin-top:1px;}
 .match-cell-score{font-family:'Oswald',sans-serif;font-size:11px;color:var(--gold);margin-top:2px;}
@@ -1128,7 +1128,7 @@ footer a:hover{color:var(--gold);}
 
 /* Match meta bar (top of each card) */
 .match-meta {
-  background:#0e0f12 !important;
+  background:#14151c !important;
   border-bottom:1px solid rgba(255,255,255,0.05) !important;
 }
 
@@ -1141,7 +1141,7 @@ footer a:hover{color:var(--gold);}
 
 /* OPL cards */
 .opl-card {
-  background:#141518 !important;
+  background:#1c1d24 !important;
   border:1px solid rgba(255,255,255,0.06) !important;
   border-left:2px solid rgba(0,255,135,0.2) !important;
   border-radius:0 !important;
@@ -1158,7 +1158,7 @@ footer a:hover{color:var(--gold);}
 
 /* VB Poll */
 .vb-poll {
-  background:#141518 !important;
+  background:#1c1d24 !important;
   border:1px solid rgba(0,255,135,0.12) !important;
   border-radius:0 !important;
   border-left:3px solid rgba(0,255,135,0.25) !important;
@@ -1188,7 +1188,7 @@ footer a:hover{color:var(--gold);}
 
 /* Stat cards */
 .stat-card {
-  background:#141518 !important;
+  background:#1c1d24 !important;
   border:1px solid rgba(255,255,255,0.05) !important;
   border-radius:0 !important;
   border-left:2px solid rgba(0,255,135,0.2) !important;
@@ -1196,20 +1196,20 @@ footer a:hover{color:var(--gold);}
 
 /* Sup meter */
 .sup-meter-wrap {
-  background:#141518 !important;
+  background:#1c1d24 !important;
   border:1px solid rgba(0,255,135,0.12) !important;
   border-radius:0 !important;
 }
 
 /* User bar */
 .user-bar {
-  background:#0a0b0d !important;
+  background:#0c0d12 !important;
   border-bottom:1px solid rgba(0,255,135,0.08) !important;
 }
 
 /* Popups */
 #pointsPopup > div {
-  background:#141518 !important;
+  background:#1c1d24 !important;
   border:1px solid rgba(0,255,135,0.2) !important;
   border-radius:0 !important;
   border-top:2px solid #00ff87 !important;
@@ -1220,7 +1220,7 @@ footer a:hover{color:var(--gold);}
 #toast {
   border-radius:0 !important;
   border-left:3px solid #00ff87 !important;
-  background:#141518 !important;
+  background:#1c1d24 !important;
   backdrop-filter:blur(8px) !important;
 }
 
@@ -1278,7 +1278,7 @@ input:focus, textarea:focus, select:focus {
 
 /* Onboarding */
 .onboard-box {
-  background:#141518 !important;
+  background:#1c1d24 !important;
   border:1px solid rgba(0,255,135,0.15) !important;
   border-radius:0 !important;
 }
@@ -1306,7 +1306,7 @@ input:focus, textarea:focus, select:focus {
 
 /* Push modal */
 #pushModal > div, #nyeremenyModal > div {
-  background:#141518 !important;
+  background:#1c1d24 !important;
   border:1px solid rgba(0,255,135,0.15) !important;
   border-top:2px solid #00ff87 !important;
   border-radius:0 !important;
@@ -2072,8 +2072,8 @@ input:focus, textarea:focus, select:focus {
   <button class="nav-tab" id="navOpl" style="display:none" onclick="showTab('opl')">📌 OPL <span id="oplBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navOtletek" onclick="showTab('otletek')">💡</button>
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
-  <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">📊 VB <span id="golNewBadge" style="background:#39ff9d;color:#141518;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
-  <button class="nav-tab" id="navNyeremenyek" onclick="showTab('nyeremenyek')">🎁 Nyeremények <span id="nyeremenyBadge" style="display:none;background:#39ff9d;color:#141518;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
+  <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">📊 VB <span id="golNewBadge" style="background:#39ff9d;color:#1c1d24;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
+  <button class="nav-tab" id="navNyeremenyek" onclick="showTab('nyeremenyek')">🎁 Nyeremények <span id="nyeremenyBadge" style="display:none;background:#39ff9d;color:#1c1d24;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
 </div>
 
 <!-- VB MOTIVÁCIÓS POPUP (jelszó migráció trigger) -->
@@ -2301,6 +2301,30 @@ input:focus, textarea:focus, select:focus {
           <button onclick="createTestMatches()" style="flex:1;padding:7px 10px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);color:#c084fc;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🧪 TESZT MECCSEK (2× + 3×)</button>
         </div>
         <div id="customMatchList"></div>
+      </div>
+    </div>
+
+    <!-- FIREBASE ADMIN SECRET -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:0;border-left:3px solid #ef4444;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);letter-spacing:1px;">🔑 FIREBASE ADMIN SECRET</span></div>
+      <div class="adm-collapse-body">
+        <div style="font-size:12px;color:rgba(240,244,240,0.5);margin-bottom:8px;line-height:1.6;">
+          A Firebase-szabályok be vannak állítva: az eredmény-mentéshez és admin írásokhoz secret kell.<br>
+          <b style="color:rgba(240,244,240,0.75);">Egyszeri beállítás — csak ebben a böngészőben tárolódik (localStorage).</b>
+        </div>
+        <div style="margin-bottom:8px;">
+          <div id="fbSecretStatus" style="font-size:11px;margin-bottom:6px;"></div>
+          <input id="fbSecretInput" type="password" placeholder="Firebase Database Secret..." style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(239,68,68,0.3);border-radius:0;background:rgba(0,0,0,0.4);color:white;font-family:monospace;font-size:12px;margin-bottom:6px;">
+          <div style="display:flex;gap:6px;">
+            <button onclick="fbSecretSave()" style="flex:1;padding:7px;border-radius:0;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.1);color:#f87171;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">💾 MENTÉS</button>
+            <button onclick="fbSecretTest()" style="flex:1;padding:7px;border-radius:0;border:1px solid rgba(0,255,135,0.3);background:rgba(0,255,135,0.06);color:#00ff87;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🧪 TESZT</button>
+            <button onclick="fbSecretClear()" style="padding:7px 12px;border-radius:0;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(240,244,240,0.3);font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;">✕</button>
+          </div>
+        </div>
+        <div style="font-size:10px;color:rgba(240,244,240,0.25);line-height:1.6;">
+          A secret a Firebase Console → Project Settings → Service Accounts → Database secrets alatt van.<br>
+          Más böngészőben/telefonon újra be kell állítani.
+        </div>
       </div>
     </div>
 
@@ -2566,7 +2590,7 @@ input:focus, textarea:focus, select:focus {
             <div>
               <div style="font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:4px;font-family:Oswald,sans-serif;letter-spacing:0.5px;">STÁTUSZ</div>
               <select id="oplInpStatus"
-                style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(20,21,24,0.95);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+                style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(28,29,36,0.95);color:white;font-family:Oswald,sans-serif;font-size:13px;">
                 <option value="open">🟡 Nyitott</option>
                 <option value="done">✅ Kész</option>
                 <option value="rejected">❌ Elvetve</option>
@@ -2631,7 +2655,7 @@ input:focus, textarea:focus, select:focus {
 
 <!-- NYEREMÉNY MODAL -->
 <div id="nyeremenyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:250;align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)nyeremenyCloseModal()">
-  <div style="background:#0e0f12;border:1px solid rgba(0,255,135,0.3);border-radius:18px;padding:24px 20px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;position:relative;animation:mIn 0.25s ease-out;">
+  <div style="background:#14151c;border:1px solid rgba(0,255,135,0.3);border-radius:18px;padding:24px 20px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;position:relative;animation:mIn 0.25s ease-out;">
     <button onclick="nyeremenyCloseModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(240,244,240,0.4);font-size:20px;cursor:pointer;">✕</button>
     <div style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:1px;margin-bottom:16px;" id="nyeremenyModalTitle">🎁 FELAJÁNLÁS</div>
 
@@ -2647,7 +2671,7 @@ input:focus, textarea:focus, select:focus {
     <input id="nyeremenyErtek" placeholder="pl. 3 500 Ft vagy becsléssel" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;">
 
     <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">KI KAPJA *</div>
-    <select id="nyeremenyNyertes" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:#0e0f12;color:white;font-family:Oswald,sans-serif;font-size:14px;margin-bottom:10px;cursor:pointer;">
+    <select id="nyeremenyNyertes" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:#14151c;color:white;font-family:Oswald,sans-serif;font-size:14px;margin-bottom:10px;cursor:pointer;">
       <option value="1">🥇 1. helyezett</option>
       <option value="2">🥈 2. helyezett</option>
       <option value="3">🥉 3. helyezett</option>
@@ -2813,10 +2837,23 @@ var activeInviteToken = new URLSearchParams(window.location.search).get('invite'
 
 // ===== FIREBASE REST =====
 // ===== Firebase REST API =====
-const fbGet = async p => { const r=await fetch(DB_URL+'/'+p+'.json'); if(!r.ok) throw new Error(r.status); return r.json(); };
-const fbSet = async (p,v) => { const r=await fetch(DB_URL+'/'+p+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); if(!r.ok) throw new Error(r.status); return r.json(); };
-const fbDel = async p => fetch(DB_URL+'/'+p+'.json',{method:'DELETE'});
-const fbPush = async (p,v) => { const r=await fetch(DB_URL+'/'+p+'.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return r.json(); };
+// Admin útvonalakhoz (results, scores, stb.) ?auth= token kell.
+// Egyszeri beállítás: a böngésző konzolon írd be:
+//   localStorage.setItem('fb_admin_secret', 'IDE_A_FIREBASE_DATABASE_SECRET')
+// A secret a Firebase Console → Project Settings → Service Accounts → Database secrets alatt van.
+const _fbAdminSecret = () => localStorage.getItem('fb_admin_secret') || '';
+const _fbAdminParam  = () => _fbAdminSecret() ? '?auth=' + _fbAdminSecret() : '';
+
+// Admin-only útvonalak — ezekhez ?auth= kell ha a szabályok be vannak állítva
+const ADMIN_PATHS = ['results','scores','etResults','penResults','topScorers','deletedUsers','adminPwHash','passwordReset','customMatches'];
+const _isAdminPath = p => ADMIN_PATHS.some(ap => p.startsWith(ap));
+const _authParam   = p => (_isAdminPath(p) || isAdminUnlocked) ? _fbAdminParam() : '';
+
+const fbGet  = async p => { const r=await fetch(DB_URL+'/'+p+'.json'+(_fbAdminParam()||'')); if(!r.ok) throw new Error(r.status); return r.json(); };
+const fbSet  = async (p,v) => { const auth=_authParam(p); const r=await fetch(DB_URL+'/'+p+'.json'+auth,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); if(!r.ok) throw new Error('FB írási hiba ('+r.status+') — nincs admin secret?'); return r.json(); };
+const fbDel  = async p => fetch(DB_URL+'/'+p+'.json'+_authParam(p),{method:'DELETE'});
+const fbPush = async (p,v) => { const auth=_authParam(p); const r=await fetch(DB_URL+'/'+p+'.json'+auth,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return r.json(); };
+
 
 // ===== localStorage (csak jelszavak + session) =====
 function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)||'null'); } catch(e){return null;} }
@@ -2930,7 +2967,7 @@ function buildTipDistBar(cnt, total, result) {
   var p1=Math.round(cnt['1']/total*100), pX=Math.round(cnt['X']/total*100), p2=Math.round(cnt['2']/total*100);
   var c1=result==='1'?'#39ff9d':'#3b82f6', cX=result==='X'?'#39ff9d':'#6b7280', c2=result==='2'?'#39ff9d':'#ef4444';
   return '<div style="display:flex;gap:4px;align-items:center;margin-top:6px;height:16px;border-radius:4px;overflow:hidden;font-family:Oswald,sans-serif;font-size:10px;">'
-    +(p1>0?'<div style="flex:'+p1+';background:'+c1+';color:#141518;text-align:center;line-height:16px;font-weight:700;min-width:28px;">1 '+p1+'%</div>':'')
+    +(p1>0?'<div style="flex:'+p1+';background:'+c1+';color:#1c1d24;text-align:center;line-height:16px;font-weight:700;min-width:28px;">1 '+p1+'%</div>':'')
     +(pX>0?'<div style="flex:'+pX+';background:'+cX+';color:#fff;text-align:center;line-height:16px;font-weight:700;min-width:28px;">X '+pX+'%</div>':'')
     +(p2>0?'<div style="flex:'+p2+';background:'+c2+';color:#fff;text-align:center;line-height:16px;font-weight:700;min-width:28px;">2 '+p2+'%</div>':'')
     +'</div>';
@@ -3010,7 +3047,43 @@ async function adminDeleteTip() {
 }
 
 
-// ===== ONBOARDING TAB NAVIGATION =====
+// ===== FIREBASE ADMIN SECRET KEZELŐ =====
+function fbSecretRefreshStatus() {
+  var el = document.getElementById('fbSecretStatus');
+  if(!el) return;
+  var s = _fbAdminSecret();
+  el.innerHTML = s
+    ? '<span style="color:#00ff87;">✅ Secret beállítva (' + s.substring(0,6) + '…' + s.slice(-3) + ')</span>'
+    : '<span style="color:rgba(239,68,68,0.7);">⚠️ Nincs beállítva — admin írások nem működnek ha a szabályok be vannak állítva</span>';
+}
+function fbSecretSave() {
+  var v = (document.getElementById('fbSecretInput') || {}).value.trim();
+  if(!v) { showToast('⚠️ Üres secret!'); return; }
+  localStorage.setItem('fb_admin_secret', v);
+  document.getElementById('fbSecretInput').value = '';
+  fbSecretRefreshStatus();
+  showToast('✅ Firebase secret mentve!');
+}
+function fbSecretClear() {
+  if(!confirm('Biztosan törlöd a Firebase admin secretet?')) return;
+  localStorage.removeItem('fb_admin_secret');
+  fbSecretRefreshStatus();
+  showToast('🗑️ Secret törölve');
+}
+async function fbSecretTest() {
+  var s = _fbAdminSecret();
+  if(!s) { showToast('⚠️ Nincs secret beállítva!'); return; }
+  try {
+    var r = await fetch(DB_URL + '/results.json?auth=' + s + '&shallow=true');
+    if(r.ok) {
+      showToast('✅ Secret működik — admin írások engedélyezve!');
+    } else {
+      showToast('❌ Hibás secret (HTTP ' + r.status + ')');
+    }
+  } catch(e) { showToast('❌ Teszt hiba: ' + e.message); }
+}
+
+
 var _obVisited = {};
 function obShowTab(idx, btn) {
   document.querySelectorAll('.ob-tab-panel').forEach(function(p){ p.classList.remove('active'); });
@@ -3583,7 +3656,7 @@ function showTab(t) {
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') renderLeaderboard();
   if(t==='tippek') { buildTippTable(); }
-  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); populateAdmDelTip(); }
+  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); populateAdmDelTip(); fbSecretRefreshStatus(); }
   if(t==='opl') oplLoad();
   if(t==='emob') renderEmobTab();
   if(t==='bl') renderBLTab();
@@ -4094,7 +4167,7 @@ function buildTippTable() {
 
           rows += '<tr style="border-bottom:1px solid rgba(255,255,255,0.06);">';
           // Meccs cella
-          rows += '<td style="padding:8px 10px;white-space:nowrap;position:sticky;left:0;z-index:1;background:rgba(20,21,24,0.97);min-width:160px;">'
+          rows += '<td style="padding:8px 10px;white-space:nowrap;position:sticky;left:0;z-index:1;background:rgba(28,29,36,0.97);min-width:160px;">'
             + '<div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.85);">'
             + m.homeFlag+' '+m.home+'</div>'
             + '<div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.85);">'
@@ -4862,7 +4935,7 @@ function isProUser(safeName){ return allProUsers.indexOf(safeName) >= 0; }
 function isVipUser(safeName){ return allVipUsers.indexOf(safeName) >= 0; }
 function proTag(){ return '<span class="pro-badge">PRO</span>'; }
 function vipTag(){ return '<span class="vip-badge">VIP</span>'; }
-function adminTag(){ return '<span class="pro-badge" style="background:#c9a227;color:#141518;">👑</span>'; }
+function adminTag(){ return '<span class="pro-badge" style="background:#c9a227;color:#1c1d24;">👑</span>'; }
 
 function userBadges(safeName) {
   var t = '';
@@ -5180,7 +5253,7 @@ function renderAdminMatches() {
             <input type="text" id="atip_user_${m.id}" placeholder="Felhasználónév"
               style="flex:1;min-width:80px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;">
             <select id="atip_o_${m.id}"
-              style="padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(20,21,24,0.95);color:white;font-family:Oswald,sans-serif;font-size:12px;">
+              style="padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(28,29,36,0.95);color:white;font-family:Oswald,sans-serif;font-size:12px;">
               <option value="1">1</option>
               <option value="X">X</option>
               <option value="2">2</option>
@@ -7445,7 +7518,7 @@ function renderLiveTicker() {
     }
 
     var borderTop = idx > 0 ? 'border-top:1px solid rgba(34,197,94,0.1);' : '';
-    html += '<div style="'+borderTop+'background:linear-gradient(90deg,rgba(34,197,94,0.07),rgba(34,197,94,0.03));padding:7px 12px;cursor:pointer;" onclick="var c=document.getElementById(\'mc_'+mid+'\');if(c)c.scrollIntoView({behavior:\'smooth\',block:\'center\'})">';
+    html += '<div style="'+borderTop+'background:linear-gradient(90deg,rgba(0,255,135,0.08),rgba(0,255,135,0.03));padding:7px 12px;cursor:pointer;" onclick="var c=document.getElementById(\'mc_'+mid+'\');if(c)c.scrollIntoView({behavior:\'smooth\',block:\'center\'})">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
     html += '<span style="font-family:Oswald,sans-serif;font-size:10px;color:#ef4444;letter-spacing:1px;animation:pulse 1.5s infinite;flex-shrink:0;">🔴 ÉLŐ</span>';
     html += '<span style="font-family:Oswald,sans-serif;font-size:13px;color:rgba(240,244,240,0.8);flex:1;min-width:0;">'+(m.homeFlag||'')+' '+(m.home||'?')+' <b style="color:#39ff9d;font-size:15px;margin:0 3px;">'+ls.home+' : '+ls.away+'</b> '+(m.away||'')+' '+(m.awayFlag||'')+'</span>';
@@ -10358,7 +10431,7 @@ setTimeout(function(){ showMotivPopup(); }, 3500);
       <span style="font-size:16px;">🙏</span>
     </div>
     <div style="display:flex;gap:10px;justify-content:center;">
-      <button onclick="closeMusicWelcome();toggleMusic()" style="padding:10px 18px;background:var(--gold);color:#141518;border:none;border-radius:10px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;">🎵 Lejátszás</button>
+      <button onclick="closeMusicWelcome();toggleMusic()" style="padding:10px 18px;background:var(--gold);color:#1c1d24;border:none;border-radius:10px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;">🎵 Lejátszás</button>
       <button onclick="closeMusicWelcome();window.open('karaoke.html','_blank')" style="padding:10px 18px;background:rgba(0,255,135,0.12);color:var(--gold);border:1px solid rgba(0,255,135,0.35);border-radius:10px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;">🎤 Karaoke</button>
     </div>
     <button onclick="closeMusicWelcome()" style="margin-top:14px;background:none;border:none;color:rgba(240,244,240,0.3);font-size:12px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:0.5px;">Bezárás</button>
