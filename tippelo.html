@@ -6276,10 +6276,10 @@ function renderEmobMatches() {
       if(m.title) html += '<div style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(0,255,135,0.5);letter-spacing:1.5px;padding:6px 0 0;">'+escHtml(m.title)+'</div>';
       html += '<div class="match-body"><div class="match-teams-row">';
       html += '<div class="team-blk">'+getTeamBadge(m.homeFlag||'🏭',m.home);
-      html += '<div class="tn-wrap"><span class="tn">'+escHtml(m.home)+'</span>'+(m.homeLabel?'<span class="tn-sub">'+escHtml(m.homeLabel)+'</span>':'')+'</div></div>';
+      html += '<div class="tn-wrap"><span class="tn" onclick="openTeamPanel(\''+m.home.replace(/'/g,"\\'")+(m.group?'\',\''+m.group:'\'')+'\')" style="cursor:pointer;" title="'+escHtml(m.home)+' eredményei">'+escHtml(m.home)+'</span>'+(m.homeLabel?'<span class="tn-sub">'+escHtml(m.homeLabel)+'</span>':'')+'</div></div>';
       html += '<span class="vs-block">VS</span><span class="sc-block" style="visibility:hidden">–</span>';
       html += '<div class="team-blk away-blk">'+getTeamBadge(m.awayFlag||'🏭',m.away);
-      html += '<div class="tn-wrap"><span class="tn">'+escHtml(m.away)+'</span>'+(m.awayLabel?'<span class="tn-sub">'+escHtml(m.awayLabel)+'</span>':'')+'</div></div></div>';
+      html += '<div class="tn-wrap"><span class="tn" onclick="openTeamPanel(\''+m.away.replace(/'/g,"\\'")+(m.group?'\',\''+m.group:'\'')+'\')" style="cursor:pointer;" title="'+escHtml(m.away)+' eredményei">'+escHtml(m.away)+'</span>'+(m.awayLabel?'<span class="tn-sub">'+escHtml(m.awayLabel)+'</span>':'')+'</div></div></div>';
       // Kezdők ha van
       if((m.homeLineup&&m.homeLineup.length)||(m.awayLineup&&m.awayLineup.length)){
         html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0;font-size:11px;color:rgba(240,244,240,0.45);">';
@@ -8288,7 +8288,161 @@ async function deleteCustomMatch(id) {
   showToast('🗑️ Meccs törölve');
 }
 
-// ===== 🎁 NYEREMÉNYEK =====
+// ===== CSAPAT PANEL (kattintásra csapatnévre) =====
+function openTeamPanel(teamName, group) {
+  // Összegyűjti a csapat összes meccsét és eredményét
+  var teamMatches = ALL_MATCHES.filter(function(m){
+    return isVbMatch(m) && (m.home === teamName || m.away === teamName);
+  }).sort(function(a,b){
+    return (a.huDate+a.huTime).localeCompare(b.huDate+b.huTime);
+  });
+
+  var teamFlag = '';
+  for(var i=0;i<teamMatches.length;i++){
+    if(teamMatches[i].home===teamName){ teamFlag=teamMatches[i].homeFlag||''; break; }
+    if(teamMatches[i].away===teamName){ teamFlag=teamMatches[i].awayFlag||''; break; }
+  }
+
+  // Statisztika kiszámítása
+  var stats = {p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+  var html = '';
+  teamMatches.forEach(function(m){
+    var isHome = m.home === teamName;
+    var opp = isHome ? m.away : m.home;
+    var oppFlag = isHome ? m.awayFlag : m.homeFlag;
+    var score = allScores[m.id];
+    var result = allResults[m.id];
+    var kickoffLocked = getBudapestDate() >= (m.huDate+'T'+m.huTime).replace('T','T').substring(0,16);
+    var dateStr = m.huDate ? m.huDate.slice(5).replace('-','. ') + '.' : '';
+
+    var scoreStr = '', outcome = '', outcomeColor = '', badge = '';
+    if(score){
+      var parts = score.split(':');
+      var hg=parseInt(parts[0]), ag=parseInt(parts[1]);
+      var tg = isHome ? hg : ag, og = isHome ? ag : hg;
+      scoreStr = tg + ' – ' + og;
+      stats.p++; stats.gf+=tg; stats.ga+=og;
+      if(tg>og){ stats.w++; stats.pts+=3; outcome='GY'; outcomeColor='#39ff9d'; badge='🟢'; }
+      else if(tg<og){ stats.l++; outcome='V'; outcomeColor='#f87171'; badge='🔴'; }
+      else{ stats.d++; stats.pts++; outcome='D'; outcomeColor='rgba(240,244,240,0.5)'; badge='🟡'; }
+    }
+
+    var rowBg = outcome==='GY' ? 'background:rgba(0,255,135,0.04);' : outcome==='V' ? 'background:rgba(239,68,68,0.04);' : '';
+    html += '<div style="'+rowBg+'padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:10px;">';
+
+    // Bal: dátum + csoport
+    html += '<div style="min-width:52px;flex-shrink:0;">';
+    html += '<div style="font-size:10px;color:rgba(240,244,240,0.3);font-family:Oswald,sans-serif;">' + dateStr + '</div>';
+    if(m.group && m.group.length<=2) html += '<div style="font-size:9px;color:rgba(0,255,135,0.5);letter-spacing:1px;">' + m.group + ' csoport</div>';
+    html += '</div>';
+
+    // Közép: ellenfél
+    html += '<div style="flex:1;min-width:0;">';
+    html += '<div style="font-size:13px;font-family:Oswald,sans-serif;color:rgba(240,244,240,0.85);">';
+    html += (isHome ? 'vs ' : '@\xa0') + (oppFlag||'') + ' ' + escHtml(opp);
+    html += '</div>';
+    if(!score && kickoffLocked) html += '<div style="font-size:10px;color:rgba(240,244,240,0.3);">Eredmény ismeretlen</div>';
+    if(!score && !kickoffLocked) html += '<div style="font-size:10px;color:rgba(240,244,240,0.25);">Még nem játszották le</div>';
+    html += '</div>';
+
+    // Jobb: eredmény + kimenetel
+    html += '<div style="flex-shrink:0;text-align:right;">';
+    if(score){
+      html += '<div style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:#fff;">' + scoreStr + '</div>';
+      html += '<div style="font-size:10px;font-weight:700;color:'+outcomeColor+';font-family:Oswald,sans-serif;">' + badge + ' ' + outcome + '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+  });
+
+  if(!html) html = '<div style="padding:20px;text-align:center;color:rgba(240,244,240,0.3);">Még nem játszottak</div>';
+
+  // Statisztika összesítő sor
+  var statHtml = '<div style="display:flex;gap:16px;padding:12px 14px;background:rgba(0,255,135,0.05);border-bottom:1px solid rgba(0,255,135,0.12);">';
+  [ ['Mérkőzés',stats.p], ['Győzelem',stats.w], ['Döntetlen',stats.d], ['Vereség',stats.l],
+    ['Gól',stats.gf+'-'+stats.ga], ['Pont',stats.pts] ].forEach(function(it){
+    statHtml += '<div style="text-align:center;flex:1;">'
+      + '<div style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:var(--gold);">' + it[1] + '</div>'
+      + '<div style="font-size:9px;color:rgba(240,244,240,0.35);letter-spacing:0.5px;">' + it[0].toUpperCase() + '</div>'
+      + '</div>';
+  });
+  statHtml += '</div>';
+
+  // Popup megjelenítése
+  var overlay = document.getElementById('teamPanelOverlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'teamPanelOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:250;display:flex;align-items:flex-end;justify-content:center;';
+    overlay.onclick = function(e){ if(e.target===this) closeTeamPanel(); };
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = '<div style="background:#14151c;border:1px solid rgba(0,255,135,0.2);border-top:2px solid #00ff87;border-radius:0;width:100%;max-width:520px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;">'
+    // Header
+    + '<div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.07);">'
+    + '<div style="display:flex;align-items:center;gap:8px;">'
+    + '<span style="font-size:24px;">' + teamFlag + '</span>'
+    + '<div>'
+    + '<div style="font-family:Oswald,sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:1px;">' + escHtml(teamName) + '</div>'
+    + (group ? '<div style="font-size:10px;color:rgba(0,255,135,0.6);letter-spacing:1.5px;">' + group + ' CSOPORT</div>' : '')
+    + '</div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;align-items:center;">'
+    + '<button onclick="openTeamInVB(\''+teamName.replace(/'/g,"\\'")+'\',\''+(group||'').replace(/'/g,"\\'")+'\');" style="font-size:11px;font-family:Oswald,sans-serif;padding:5px 10px;border:1px solid rgba(0,255,135,0.3);background:rgba(0,255,135,0.08);color:#00ff87;cursor:pointer;letter-spacing:0.5px;">📊 VB TÁBLA</button>'
+    + '<button onclick="closeTeamPanel()" style="background:none;border:none;color:rgba(240,244,240,0.4);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">✕</button>'
+    + '</div>'
+    + '</div>'
+    // Stat sor
+    + statHtml
+    // Meccsek lista
+    + '<div style="overflow-y:auto;flex:1;">' + html + '</div>'
+    + '</div>';
+  overlay.style.display = 'flex';
+}
+
+function closeTeamPanel() {
+  var o = document.getElementById('teamPanelOverlay');
+  if(o) o.style.display = 'none';
+}
+
+function openTeamInVB(teamName, group) {
+  closeTeamPanel();
+  showTab('gol');
+  // Rövid delay hogy a tab betöltődjön, majd scrollol a csoport tabellájára
+  setTimeout(function(){
+    renderGroupTables();
+    var container = document.getElementById('groupTablesContainer');
+    if(!container) return;
+    // Scroll a megfelelő csoportra
+    if(group){
+      var headers = container.querySelectorAll('[data-group]');
+      headers.forEach(function(el){ if(el.getAttribute('data-group')===group) el.scrollIntoView({behavior:'smooth',block:'start'}); });
+    } else {
+      container.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    // Csapat kiemelése a tabellában
+    highlightTeamInTable(teamName);
+  }, 180);
+}
+
+function highlightTeamInTable(teamName) {
+  var container = document.getElementById('groupTablesContainer');
+  if(!container) return;
+  var tds = container.querySelectorAll('td');
+  tds.forEach(function(td){
+    if(td.textContent.trim().replace(/^[^ ]+ /,'') === teamName || td.textContent.trim().endsWith(' '+teamName)){
+      var row = td.closest('tr');
+      if(row){
+        row.style.background='rgba(0,255,135,0.12)';
+        row.style.outline='1px solid rgba(0,255,135,0.3)';
+        row.scrollIntoView({behavior:'smooth',block:'center'});
+        setTimeout(function(){ row.style.background=''; row.style.outline=''; }, 2500);
+      }
+    }
+  });
+}
+
+
 var _nyeremenyKepBase64 = null;
 
 var NYERTESEK_MAP = {
@@ -9592,7 +9746,7 @@ function renderGroupTables() {
       return b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.name.localeCompare(b.name);
     });
     html += '<div style="background:var(--card);border:1px solid var(--card-border);border-radius:12px;overflow:hidden;">';
-    html += '<div style="padding:8px 12px;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:1px;background:rgba(0,255,135,0.06);">' + g + ' CSOPORT</div>';
+    html += '<div data-group="'+g+'" style="padding:8px 12px;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:1px;background:rgba(0,255,135,0.06);">' + g + ' CSOPORT</div>';
     html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
     html += '<tr style="color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:10px;letter-spacing:0.5px;">'
       + '<th style="text-align:left;padding:5px 8px;">Csapat</th>'
