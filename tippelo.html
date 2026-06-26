@@ -699,8 +699,8 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .team-blk.away-blk{flex-direction:row-reverse;text-align:right;}
 .team-blk .tf{font-size:26px;flex-shrink:0;}
 .team-blk .tn-wrap{min-width:0;overflow:hidden;}
-.team-blk .tn-wrap[data-clickable="team"]{cursor:pointer;-webkit-tap-highlight-color:rgba(0,255,135,0.2);}
-.team-blk .tn-wrap[data-clickable="team"]:active .tn{color:#00ff87;}
+.team-tap-btn{background:none;border:none;padding:0;margin:0;text-align:left;width:100%;min-width:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:rgba(0,255,135,0.15);}
+.team-tap-btn:active .tn{color:#00ff87 !important;}
 .team-blk .tn{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;line-height:1.2;color:rgba(240,244,240,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
 .team-blk .tn-sub{font-size:9px;color:rgba(240,244,240,0.3);letter-spacing:0.5px;display:block;margin-top:1px;}
 .vs-block{font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;color:rgba(240,244,240,0.2);letter-spacing:3px;flex-shrink:0;}
@@ -2480,7 +2480,6 @@ input:focus, textarea:focus, select:focus {
       <button onclick="showStatsSection('tabella')" id="statsTabella" class="nav-tab active" style="font-size:12px;padding:6px 14px;">📊 Tabellák</button>
       <button onclick="showStatsSection('gollovo')" id="statsGollovo" class="nav-tab" style="font-size:12px;padding:6px 14px;">👟 Góllövők</button>
       <button onclick="showStatsSection('verseny')" id="statsVerseny" class="nav-tab" style="font-size:12px;padding:6px 14px;">🏁 Verseny</button>
-      <button onclick="showStatsSection('elorejel')" id="statsElorejel" class="nav-tab" style="font-size:12px;padding:6px 14px;">🔮 Előrejelzések</button>
     </div>
 
     <!-- CSOPORT TABELLÁK -->
@@ -4640,19 +4639,19 @@ function renderMatches() {
           <div class="match-teams-row">
             <div class="team-blk">
               ${getTeamBadge(m.homeFlag, m.home)}
-              <div class="tn-wrap" data-clickable="team" data-team="${m.home.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}" style="cursor:pointer;">
+              <button class="tn-wrap team-tap-btn" onclick="openTeamPanel(this.dataset.team,this.dataset.group)" data-team="${m.home.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}">
                 <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.home}</span>
                 ${m.homeLabel?'<span class="tn-sub">'+m.homeLabel+'</span>':''}
-              </div>
+              </button>
             </div>
             <span class="vs-block">${liveScores[m.id] && !result ? '' : (result ? '' : 'VS')}</span>
             ${result ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:24px;font-weight:700;color:var(--gold);">'+(allScores[m.id]||result)+'</span><span style="font-size:10px;color:rgba(240,244,240,0.35);">VÉGE</span></div>' : (liveScores[m.id] ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:#39ff9d;">'+liveScores[m.id].home+' : '+liveScores[m.id].away+'</span><span style="font-size:10px;color:#39ff9d;animation:pulse 2s infinite;">⚽ '+liveScores[m.id].minute+'</span></div>' : '')}
             <div class="team-blk away-blk">
               ${getTeamBadge(m.awayFlag, m.away)}
-              <div class="tn-wrap" data-clickable="team" data-team="${m.away.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}" style="cursor:pointer;">
+              <button class="tn-wrap team-tap-btn" onclick="openTeamPanel(this.dataset.team,this.dataset.group)" data-team="${m.away.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}">
                 <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.away}</span>
                 ${m.awayLabel?'<span class="tn-sub">'+m.awayLabel+'</span>':''}
-              </div>
+              </button>
             </div>
           </div>
           <div class="tip-buttons">
@@ -9749,7 +9748,7 @@ function otletekFilter(f, btn) {
   otletekRender();
 }
 function showStatsSection(sec) {
-  ['tabella','gollovo','verseny','elorejel'].forEach(function(s){
+  ['tabella','gollovo','verseny'].forEach(function(s){
     var el = document.getElementById('statsSec' + s.charAt(0).toUpperCase() + s.slice(1));
     if(el) el.style.display = s===sec ? 'block' : 'none';
     var btn = document.getElementById('stats' + s.charAt(0).toUpperCase() + s.slice(1));
