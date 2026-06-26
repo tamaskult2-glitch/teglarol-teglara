@@ -2965,7 +2965,7 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw,adminPwRaw,deletedUsersRaw] = await Promise.all([
+    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw,adminPwRaw,deletedUsersRaw,scorerRes] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
@@ -2979,6 +2979,7 @@ async function pollData() {
       fbGet('users').catch(function(){return null;}),
       fbGet('adminPwHash').catch(function(){return null;}),
       fbGet('deletedUsers').catch(function(){return null;}),
+      fbGet('scorerResults').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -2990,6 +2991,10 @@ async function pollData() {
     });
     allResults=results||{}; allScores=scores||{};
     allEtResults=etRes||{}; allPenResults=penRes||{};
+    // Góllövő eredmények
+    if(scorerRes && typeof scorerRes==='object') {
+      Object.keys(scorerRes).forEach(function(mid){ allScorerResults[mid]=scorerRes[mid]||[]; });
+    }
     if(Array.isArray(proUsersRaw)) allProUsers=proUsersRaw.filter(Boolean);
     else if(proUsersRaw && typeof proUsersRaw==='object') allProUsers=Object.values(proUsersRaw).filter(Boolean);
     else allProUsers=[];
@@ -5482,6 +5487,19 @@ function renderAdminMatches() {
             <button onclick="adminSetTip('${m.id}')"
               style="padding:5px 10px;background:rgba(0,255,135,0.15);border:1px solid rgba(0,255,135,0.3);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">✓ Ment</button>
           </div>
+        </div>
+        <!-- GÓLLÖVŐK RÖGZÍTÉS (admin) -->
+        <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,255,135,0.12);">
+          <div style="font-size:10px;color:rgba(0,255,135,0.5);font-family:Oswald,sans-serif;letter-spacing:1px;margin-bottom:5px;">⚽ GÓLLÖVŐK RÖGZÍTÉSE</div>
+          ${(allScorerResults[m.id]||[]).length ? `<div style="font-size:11px;color:rgba(0,255,135,0.7);margin-bottom:5px;">${(allScorerResults[m.id]||[]).map(n=>'⚽ '+n).join(' · ')}</div>` : ''}
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="text" id="asc_${m.id}" placeholder="Góllövők vesszővel elválasztva (pl. Mbappé, Dembélé)"
+              value="${(allScorerResults[m.id]||[]).join(', ')}"
+              style="flex:1;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:monospace;font-size:11px;">
+            <button onclick="adminSaveScorers('${m.id}')"
+              style="padding:5px 10px;background:rgba(0,255,135,0.12);border:1px solid rgba(0,255,135,0.3);color:#00ff87;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">⚽ Ment</button>
+          </div>
+          <div style="font-size:9px;color:rgba(240,244,240,0.25);margin-top:3px;">Minden eltalált góllövő +1 pt (döntőn +2 pt) a tippelőknek</div>
         </div>
       </div>`;
     });
@@ -8501,34 +8519,47 @@ async function deleteCustomMatch(id) {
   showToast('🗑️ Meccs törölve');
 }
 
-// ===== GÓLLÖVŐ RENDSZER =====
+// ===== ADMIN GÓLLÖVŐK RÖGZÍTÉSE =====
+async function adminSaveScorers(mid) {
+  var input = document.getElementById('asc_' + mid);
+  if(!input) return;
+  var raw = input.value.trim();
+  var scorers = raw ? raw.split(',').map(function(s){ return s.trim(); }).filter(Boolean) : [];
+  allScorerResults[mid] = scorers;
+  try {
+    await fbSet('scorerResults/' + mid, scorers.length ? scorers : null);
+    showToast('⚽ ' + scorers.length + ' góllövő mentve!');
+    renderAdminMatches();
+    if(!_scoreSaving) try{ renderMatches(); }catch(e){}
+  } catch(e) {
+    showToast('❌ Hiba: ' + e.message);
+  }
+}
+
+
 var _scorerMatchId = null;
 var _scorerSelected = { home: [], away: [] };
 
 function getScorerCandidates(teamName, matchId) {
   var result = [];
 
-  // Teszt meccseken: a játékosok névsorából választhatók a góllövők
+  // Teszt meccseken: az összes tippelő neve (allTips-ből)
   if(matchId && matchId.startsWith('CM_TEST_')) {
-    // 1. Regisztrált userek (localStorage)
-    var users = getUsers();
-    Object.keys(users).forEach(function(name) {
-      if(name && result.indexOf(name) === -1) result.push(name);
-    });
-    // 2. Ha van allTips-ben más user akit nem tárol a localStorage
-    Object.values(allTips || {}).forEach(function(tipsByMatch) {
-      if(!tipsByMatch) return;
-      Object.keys(tipsByMatch).forEach(function(safeName) {
-        // safe name → valódi név: keresünk a users-ben
-        Object.keys(users).forEach(function(realName) {
-          if(fbSafeName(realName) === safeName && result.indexOf(realName) === -1) {
-            result.push(realName);
-          }
-        });
+    var seen = {};
+    // Minden meccs minden tippelőjét összegyűjtjük
+    Object.keys(allTips || {}).forEach(function(mid) {
+      Object.keys(allTips[mid] || {}).forEach(function(safeName) {
+        if(!seen[safeName]) {
+          seen[safeName] = true;
+          result.push(safeName);
+        }
       });
     });
-    // Ha currentUser nincs a listában, adjuk hozzá
-    if(currentUser && result.indexOf(currentUser) === -1) result.push(currentUser);
+    // currentUser-t is adjuk hozzá ha még nincs benne
+    if(currentUser) {
+      var cs = fbSafeName(currentUser);
+      if(!seen[cs]) result.push(cs);
+    }
     return result.sort();
   }
 
