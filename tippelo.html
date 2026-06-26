@@ -1449,6 +1449,17 @@ input:focus, textarea:focus, select:focus {
 
 <div class="toast" id="toast"></div>
 
+<!-- BRACKET POPUP -->
+<div id="bracketModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:260;overflow-y:auto;">
+  <div style="min-height:100%;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#13161e;border-bottom:1px solid rgba(0,255,135,0.2);position:sticky;top:0;z-index:2;">
+      <div style="font-family:Oswald,sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:2px;">🏆 KIESÉSES ÁGRAJZ</div>
+      <button onclick="document.getElementById('bracketModal').style.display='none'" style="background:none;border:none;color:rgba(240,244,240,0.4);font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <div id="bracketContent" style="flex:1;padding:12px 8px 40px;"></div>
+  </div>
+</div>
+
 <!-- GÓLLÖVŐ POPUP -->
 <div id="scorerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:260;align-items:flex-end;justify-content:center;">
   <div id="scorerModalBox" style="background:#13161e;border:1px solid rgba(0,255,135,0.2);border-top:2px solid #00ff87;width:100%;max-width:520px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
@@ -2135,6 +2146,7 @@ input:focus, textarea:focus, select:focus {
     <button id="adminBroadcastIcon" onclick="sendDaySummary()" title="📢 Napi összefoglaló küldése" style="display:none;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;align-items:center;justify-content:center;">📢</button>
     <button id="adminResultIcon" onclick="showTab('admin')" title="🏟️ Eredmény rögzítés" style="display:none;background:rgba(0,255,135,0.12);border:1px solid rgba(0,255,135,0.3);color:var(--gold);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;align-items:center;justify-content:center;">🏟️</button>
     <button id="pushBellBtn" onclick="openPushSettings()" title="Push értesítő beállítások" style="display:none;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(240,244,240,0.7);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;align-items:center;justify-content:center;position:relative;">🔔<span id="pushBellDot" style="display:none;position:absolute;top:2px;right:2px;width:7px;height:7px;background:#39ff9d;border-radius:50%;border:1.5px solid var(--bg);"></span></button>
+    <button onclick="openBracket()" title="Kieséses ábra" style="background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.25);color:#00ff87;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">🏆</button>
   </div>
   <div id="untippedText" onclick="jumpToNextUntipped()" style="display:none;text-align:center;margin-top:6px;cursor:pointer;animation:pulse 2s infinite;">
     <span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);letter-spacing:0.5px;">Mai meccsre még nem szagoltál! Tedd meg a tipped a labdán!</span>
@@ -8519,7 +8531,159 @@ async function deleteCustomMatch(id) {
   showToast('🗑️ Meccs törölve');
 }
 
-// ===== ADMIN GÓLLÖVŐK RÖGZÍTÉSE =====
+// ===== KIESÉSES ÁGRAJZ =====
+var BRACKET_ROUNDS = [
+  { key:'R32',   label:'⚡ R32',      short:'R32'        },
+  { key:'R16',   label:'⚡ R16',      short:'R16'        },
+  { key:'QF',    label:'🔥 Negyeddöntő', short:'NDD'    },
+  { key:'SF',    label:'⭐ Elődöntő', short:'EDÖ'        },
+  { key:'FINAL', label:'🏆 Döntő',    short:'DÖNTŐ'      },
+  { key:'BRONZE',label:'🥉 Bronz',    short:'BRONZ'      },
+];
+var ROUND_KEYWORDS = {
+  R32:    /nyolcaddöntő|r32|round.of.32|32-es/i,
+  R16:    /tizenhatod|r16|round.of.16|16-os/i,
+  QF:     /negyeddöntő|quarter|qf/i,
+  SF:     /elődöntő|semifinal|sf/i,
+  FINAL:  /^döntő$|^final$|^finale$/i,
+  BRONZE: /bronz|3rd|harmadik/i,
+};
+
+function detectRound(m) {
+  var g = (m.group||m.title||'').toLowerCase();
+  if(/bronz|3rd|harmadik/i.test(g)) return 'BRONZE';
+  if(/^döntő$|^final$/i.test(g.trim())) return 'FINAL';
+  if(/elődöntő|semifinal/i.test(g)) return 'SF';
+  if(/negyeddöntő|quarter/i.test(g)) return 'QF';
+  if(/tizenhatod|r16/i.test(g)) return 'R16';
+  if(/nyolcaddöntő|r32/i.test(g)) return 'R32';
+  return null;
+}
+
+function getMatchWinner(m) {
+  var res = allResults[m.id];
+  var etRes = allEtResults[m.id];
+  var penRes = allPenResults[m.id];
+  if(!res) return null;
+  var winner = null;
+  if(penRes) winner = penRes === '1' ? m.home : m.away;
+  else if(etRes && etRes !== 'X') winner = etRes === '1' ? m.home : m.away;
+  else if(res === '1') winner = m.home;
+  else if(res === '2') winner = m.away;
+  return winner ? { name: winner, flag: res==='1'||penRes==='1'||etRes==='1' ? m.homeFlag : m.awayFlag } : null;
+}
+
+function openBracket() {
+  var modal = document.getElementById('bracketModal');
+  modal.style.display = 'flex';
+  renderBracket();
+}
+
+function renderBracket() {
+  var container = document.getElementById('bracketContent');
+  if(!container) return;
+
+  // Knockout meccsek összegyűjtése és körökbe rendezése
+  var koMatches = ALL_MATCHES.filter(function(m){ return m.knockout; });
+  var byRound = {};
+  BRACKET_ROUNDS.forEach(function(r){ byRound[r.key] = []; });
+
+  koMatches.forEach(function(m) {
+    var r = detectRound(m);
+    if(r && byRound[r]) byRound[r].push(m);
+  });
+
+  // Rendezés dátum szerint
+  Object.keys(byRound).forEach(function(k){
+    byRound[k].sort(function(a,b){ return (a.huDate+a.huTime).localeCompare(b.huDate+b.huTime); });
+  });
+
+  var html = '';
+  var hasAny = Object.values(byRound).some(function(arr){ return arr.length > 0; });
+  if(!hasAny) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;letter-spacing:2px;">Még nem lettek kieséses meccsek rögzítve az Admin panelben.</div>';
+    return;
+  }
+
+  BRACKET_ROUNDS.forEach(function(roundDef) {
+    var matches = byRound[roundDef.key];
+    if(!matches.length) return;
+
+    var isFinal = roundDef.key === 'FINAL';
+    var isBronze = roundDef.key === 'BRONZE';
+
+    html += '<div style="margin-bottom:20px;">';
+    html += '<div style="font-family:Oswald,sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;color:rgba(0,255,135,0.6);margin-bottom:8px;padding:0 4px;border-left:2px solid #00ff87;padding-left:8px;">' + roundDef.label + '</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+
+    matches.forEach(function(m) {
+      var winner = getMatchWinner(m);
+      var res = allResults[m.id];
+      var score = allScores[m.id];
+      var etRes = allEtResults[m.id];
+      var penRes = allPenResults[m.id];
+      var isPlayed = !!res;
+      var isLive = liveScores[m.id] && !isPlayed;
+
+      var homeWon = winner && winner.name === m.home;
+      var awayWon = winner && winner.name === m.away;
+
+      var cardBg = isPlayed ? 'background:rgba(0,255,135,0.05);border-color:rgba(0,255,135,0.2);' :
+                   isLive   ? 'background:rgba(0,255,135,0.08);border-color:rgba(0,255,135,0.35);' :
+                               'background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);';
+
+      html += '<div style="border:1px solid;' + cardBg + 'padding:0;overflow:hidden;">';
+
+      // Hazai csapat sor
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.05);'
+        + (homeWon ? 'background:rgba(0,255,135,0.08);' : '') + '">';
+      html += '<span style="font-size:18px;flex-shrink:0;">' + (m.homeFlag||'🏳') + '</span>';
+      html += '<span style="flex:1;font-family:Oswald,sans-serif;font-size:13px;font-weight:' + (homeWon ? '700' : '400') + ';color:' + (homeWon ? '#fff' : 'rgba(240,244,240,0.65)') + ';">' + escHtml(m.home||'?') + '</span>';
+      if(isPlayed && score) {
+        var parts = score.split(':');
+        html += '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:' + (homeWon?'#00ff87':'rgba(240,244,240,0.4)') + ';min-width:24px;text-align:right;">' + (parts[0]||0) + '</span>';
+      } else if(isLive && liveScores[m.id]) {
+        html += '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:#39ff9d;min-width:24px;text-align:right;">' + liveScores[m.id].home + '</span>';
+      } else {
+        html += '<span style="font-size:10px;color:rgba(240,244,240,0.25);min-width:24px;text-align:right;">' + m.huDate.slice(5).replace('-','.') + '</span>';
+      }
+      if(homeWon) html += '<span style="font-size:11px;margin-left:4px;">🏆</span>';
+      html += '</div>';
+
+      // Vendég csapat sor
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;'
+        + (awayWon ? 'background:rgba(0,255,135,0.08);' : '') + '">';
+      html += '<span style="font-size:18px;flex-shrink:0;">' + (m.awayFlag||'🏳') + '</span>';
+      html += '<span style="flex:1;font-family:Oswald,sans-serif;font-size:13px;font-weight:' + (awayWon ? '700' : '400') + ';color:' + (awayWon ? '#fff' : 'rgba(240,244,240,0.65)') + ';">' + escHtml(m.away||'?') + '</span>';
+      if(isPlayed && score) {
+        var parts2 = score.split(':');
+        html += '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:' + (awayWon?'#00ff87':'rgba(240,244,240,0.4)') + ';min-width:24px;text-align:right;">' + (parts2[1]||0) + '</span>';
+      } else if(isLive && liveScores[m.id]) {
+        html += '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:#39ff9d;min-width:24px;text-align:right;">' + liveScores[m.id].away + '</span>';
+      }
+      if(awayWon) html += '<span style="font-size:11px;margin-left:4px;">🏆</span>';
+      html += '</div>';
+
+      // Extra info sor: ET/Pen/Live
+      var extraInfo = [];
+      if(isLive) extraInfo.push('<span style="color:#39ff9d;font-weight:700;">🔴 ÉLŐ ' + (liveScores[m.id].minute||'') + '\'</span>');
+      if(etRes) extraInfo.push('<span style="color:rgba(0,255,135,0.6);">⚡ H.idő: '+(etRes==='1'?m.home:etRes==='2'?m.away:'D')+'</span>');
+      if(penRes) extraInfo.push('<span style="color:rgba(0,255,135,0.6);">🥅 11-es: '+(penRes==='1'?m.home:m.away)+'</span>');
+      if(m.venue) extraInfo.push('<span style="color:rgba(240,244,240,0.25);">📍 '+escHtml(m.venue)+'</span>');
+      if(extraInfo.length) {
+        html += '<div style="padding:5px 12px;font-size:10px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.04);">' + extraInfo.join('') + '</div>';
+      }
+
+      html += '</div>'; // card
+    });
+
+    html += '</div></div>'; // round
+  });
+
+  container.innerHTML = html;
+}
+
+
 async function adminSaveScorers(mid) {
   var input = document.getElementById('asc_' + mid);
   if(!input) return;
