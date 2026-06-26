@@ -2480,12 +2480,25 @@ input:focus, textarea:focus, select:focus {
       <button onclick="showStatsSection('tabella')" id="statsTabella" class="nav-tab active" style="font-size:12px;padding:6px 14px;">📊 Tabellák</button>
       <button onclick="showStatsSection('gollovo')" id="statsGollovo" class="nav-tab" style="font-size:12px;padding:6px 14px;">👟 Góllövők</button>
       <button onclick="showStatsSection('verseny')" id="statsVerseny" class="nav-tab" style="font-size:12px;padding:6px 14px;">🏁 Verseny</button>
+      <button onclick="showStatsSection('elorejel')" id="statsElorejel" class="nav-tab" style="font-size:12px;padding:6px 14px;">🔮 Előrejelzések</button>
     </div>
 
     <!-- CSOPORT TABELLÁK -->
     <div id="statsSecTabella">
       <div class="section-header"><h2>📊 Csoportállások</h2></div>
       <div id="groupTablesContainer" style="display:flex;flex-direction:column;gap:12px;"></div>
+
+      <!-- 3. HELYEZETTI RANGSOR -->
+      <div style="margin-top:20px;">
+        <div style="font-family:Oswald,sans-serif;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:2px;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+          <span>🏅 3. HELYEZETTI RANGSOR</span>
+          <span style="font-size:10px;color:rgba(240,244,240,0.35);font-weight:400;letter-spacing:0.5px;">— top 8 továbbjut</span>
+        </div>
+        <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;">A 12 csoport 3. helyezettje közül a legjobb 8 jut tovább a kieséses szakaszba (pont → gólkülönbség → lőtt gól alapján).</div>
+        <div style="background:var(--card);border:1px solid var(--card-border);border-radius:12px;overflow:hidden;">
+          <div id="thirdPlaceContainer" style="padding:4px 0;"></div>
+        </div>
+      </div>
     </div>
 
     <!-- GÓLLÖVŐLISTA -->
@@ -4592,7 +4605,8 @@ function renderMatches() {
       const score=allScores[m.id]||null;
       const myTip=currentUser&&allTips[m.id]?(allTips[m.id][fbSafeName(currentUser)]||null):null;
       // Időzár: kickoff után nem lehet tippelni
-      const kickoffLocked = isKickoffPassed(m.huDate, m.huTime) || !!(liveScores[m.id] && (liveScores[m.id].status === 'live' || liveScores[m.id].status === 'ft'));
+      const kickoffLocked = m.id.startsWith('CM_TEST_') ? false :
+        (isKickoffPassed(m.huDate, m.huTime) || !!(liveScores[m.id] && (liveScores[m.id].status === 'live' || liveScores[m.id].status === 'ft')));
       const tips=allTips[m.id]||{};
       const cnt={'1':0,'X':0,'2':0};
       Object.values(tips).forEach(t=>{var o=getTipOutcome(t);if(cnt[o]!==undefined)cnt[o]++;});
@@ -4626,8 +4640,8 @@ function renderMatches() {
           <div class="match-teams-row">
             <div class="team-blk">
               ${getTeamBadge(m.homeFlag, m.home)}
-              <div class="tn-wrap">
-                <span class="tn">${m.home}</span>
+              <div class="tn-wrap" data-clickable="team" data-team="${m.home.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}" style="cursor:pointer;">
+                <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.home}</span>
                 ${m.homeLabel?'<span class="tn-sub">'+m.homeLabel+'</span>':''}
               </div>
             </div>
@@ -4635,8 +4649,8 @@ function renderMatches() {
             ${result ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:24px;font-weight:700;color:var(--gold);">'+(allScores[m.id]||result)+'</span><span style="font-size:10px;color:rgba(240,244,240,0.35);">VÉGE</span></div>' : (liveScores[m.id] ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:#39ff9d;">'+liveScores[m.id].home+' : '+liveScores[m.id].away+'</span><span style="font-size:10px;color:#39ff9d;animation:pulse 2s infinite;">⚽ '+liveScores[m.id].minute+'</span></div>' : '')}
             <div class="team-blk away-blk">
               ${getTeamBadge(m.awayFlag, m.away)}
-              <div class="tn-wrap">
-                <span class="tn">${m.away}</span>
+              <div class="tn-wrap" data-clickable="team" data-team="${m.away.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}" style="cursor:pointer;">
+                <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.away}</span>
                 ${m.awayLabel?'<span class="tn-sub">'+m.awayLabel+'</span>':''}
               </div>
             </div>
@@ -8262,9 +8276,9 @@ async function saveCustomMatch() {
 async function createTestMatches() {
   if(!confirm('Létrehozza a két teszt meccset?\n\n• 🧪 Teszt Negyeddöntő (2× szorzó)\n• 🧪 Teszt Döntő (3× szorzó)\n\nTörölhetők az Egyedi meccsek listájából.')) return;
   var today = getBudapestToday();
-  // Holnap (hogy ne legyen rögtön zárva)
+  // Mindig 7 napra a jövőbe, hogy biztosan ne legyen lezárva
   var d = new Date(today);
-  d.setDate(d.getDate() + 1);
+  d.setDate(d.getDate() + 7);
   var pad = function(n){ return String(n).padStart(2,'0'); };
   var nextDay = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 
@@ -8300,11 +8314,17 @@ async function createTestMatches() {
     _isTest: true
   };
 
-  // Ellenőrzés: ne duplikáljunk ha már van teszt meccs
-  var hasKO    = ALL_MATCHES.some(function(m){ return m.id && m.id.startsWith('CM_TEST_KO'); });
-  var hasFinal = ALL_MATCHES.some(function(m){ return m.id && m.id.startsWith('CM_TEST_FINAL'); });
-  if(hasKO || hasFinal) {
-    showToast('⚠️ Már van teszt meccs! Töröld előbb a régieket.');
+  // Ellenőrzés: ha már van teszt meccs, frissítjük a dátumát
+  var existingKO    = ALL_MATCHES.find(function(m){ return m.id && m.id.startsWith('CM_TEST_KO'); });
+  var existingFinal = ALL_MATCHES.find(function(m){ return m.id && m.id.startsWith('CM_TEST_FINAL'); });
+  if(existingKO || existingFinal) {
+    if(existingKO)    { existingKO.huDate    = nextDay; existingKO.huTime    = '18:00'; }
+    if(existingFinal) { existingFinal.huDate = nextDay; existingFinal.huTime = '21:00'; }
+    await saveCustomMatches();
+    renderCustomMatchAdmin();
+    await pollData();
+    renderAll();
+    showToast('📅 Teszt meccs dátumok frissítve → ' + nextDay);
     return;
   }
 
@@ -9729,7 +9749,7 @@ function otletekFilter(f, btn) {
   otletekRender();
 }
 function showStatsSection(sec) {
-  ['tabella','gollovo','verseny'].forEach(function(s){
+  ['tabella','gollovo','verseny','elorejel'].forEach(function(s){
     var el = document.getElementById('statsSec' + s.charAt(0).toUpperCase() + s.slice(1));
     if(el) el.style.display = s===sec ? 'block' : 'none';
     var btn = document.getElementById('stats' + s.charAt(0).toUpperCase() + s.slice(1));
@@ -9813,9 +9833,90 @@ function renderGroupTables() {
     html += '</table></div>';
   });
   container.innerHTML = html;
+
+  // ── 3. HELYEZETTI RANGSOR ──
+  render3rdPlaceRanking(groups);
 }
 
-// ===== GÓLLÖVŐLISTA (ESPN API) =====
+function render3rdPlaceRanking(groups) {
+  var container = document.getElementById('thirdPlaceContainer');
+  if(!container) return;
+
+  // Összegyűjtjük minden csoport 3. helyezettjét
+  var thirds = [];
+  Object.keys(groups).sort().forEach(function(g) {
+    var teams = Object.values(groups[g]).sort(function(a,b) {
+      return b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.name.localeCompare(b.name);
+    });
+    if(teams.length >= 3 && teams[2].p > 0) {
+      thirds.push({ group: g, team: teams[2] });
+    }
+  });
+
+  if(thirds.length === 0) {
+    container.innerHTML = '<div style="color:rgba(240,244,240,0.3);text-align:center;padding:12px;">Még nincs adat</div>';
+    return;
+  }
+
+  // Rangsort felállítjuk: pont → gólkülönbség → lőtt gól
+  thirds.sort(function(a,b) {
+    return b.team.pts - a.team.pts || b.team.gd - a.team.gd || b.team.gf - a.team.gf;
+  });
+
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+  html += '<tr style="color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;font-size:10px;letter-spacing:0.5px;">'
+    + '<th style="text-align:left;padding:5px 8px;width:24px;">#</th>'
+    + '<th style="text-align:left;padding:5px 8px;">Csapat</th>'
+    + '<th style="width:20px;text-align:center;">Cs.</th>'
+    + '<th style="width:24px;text-align:center;">M</th>'
+    + '<th style="width:24px;text-align:center;">Gy</th>'
+    + '<th style="width:24px;text-align:center;">D</th>'
+    + '<th style="width:24px;text-align:center;">V</th>'
+    + '<th style="width:36px;text-align:center;">G</th>'
+    + '<th style="width:28px;text-align:center;">GK</th>'
+    + '<th style="width:28px;text-align:center;color:var(--gold);">P</th></tr>';
+
+  thirds.forEach(function(entry, idx) {
+    var t = entry.team;
+    var advancing = idx < 8;
+    // Ha mind a 12 csoport játszott: 8 legjobb jut tovább
+    var allGroupsFinished = Object.keys(groups).length === 12 &&
+      Object.values(groups).every(function(g) {
+        return Object.values(g).some(function(tm) { return tm.p === 3; });
+      });
+    var rowBg = advancing && allGroupsFinished ? 'background:rgba(0,255,135,0.06);' :
+                idx < 8 ? 'background:rgba(0,255,135,0.03);' : '';
+    var border = idx < thirds.length - 1 ? 'border-bottom:1px solid rgba(255,255,255,0.04);' : '';
+    var advIcon = '';
+    if(allGroupsFinished) advIcon = advancing ? ' <span style="font-size:9px;color:#39ff9d;">✓</span>' : ' <span style="font-size:9px;color:#f87171;">✗</span>';
+    else advIcon = idx < 8 ? ' <span style="font-size:9px;color:rgba(0,255,135,0.5);">↑</span>' : '';
+
+    html += '<tr style="'+rowBg+border+'">'
+      + '<td style="padding:6px 8px;font-family:Oswald,sans-serif;font-weight:700;color:rgba(240,244,240,0.45);font-size:11px;">' + (idx+1) + '</td>'
+      + '<td style="padding:6px 8px;white-space:nowrap;font-weight:600;color:rgba(240,244,240,0.85);">' + t.flag + ' ' + t.name + advIcon + '</td>'
+      + '<td style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(0,255,135,0.6);">' + entry.group + '</td>'
+      + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.p + '</td>'
+      + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.w + '</td>'
+      + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.d + '</td>'
+      + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.l + '</td>'
+      + '<td style="text-align:center;color:rgba(240,244,240,0.5);">' + t.gf + '-' + t.ga + '</td>'
+      + '<td style="text-align:center;color:' + (t.gd>0?'#39ff9d':t.gd<0?'#f87171':'rgba(240,244,240,0.5)') + ';">' + (t.gd>0?'+':'') + t.gd + '</td>'
+      + '<td style="text-align:center;font-weight:700;color:var(--gold);font-family:Oswald,sans-serif;">' + t.pts + '</td></tr>';
+  });
+  html += '</table>';
+
+  // Vonal az 8. után (ha még nem játszottak le mindenkit)
+  var allGroupsFinished = Object.keys(groups).length === 12 &&
+    Object.values(groups).every(function(g) {
+      return Object.values(g).some(function(tm) { return tm.p === 3; });
+    });
+  if(!allGroupsFinished && thirds.length > 8) {
+    // Vizuális keret az aktuális 8-as határon
+    container.style.position = 'relative';
+  }
+
+  container.innerHTML = html;
+}
 var cachedScorers = null;
 var scorersFetchedAt = 0;
 
