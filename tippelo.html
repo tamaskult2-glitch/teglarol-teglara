@@ -1450,13 +1450,13 @@ input:focus, textarea:focus, select:focus {
 <div class="toast" id="toast"></div>
 
 <!-- BRACKET POPUP -->
-<div id="bracketModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:260;overflow-y:auto;">
-  <div style="min-height:100%;display:flex;flex-direction:column;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#13161e;border-bottom:1px solid rgba(0,255,135,0.2);position:sticky;top:0;z-index:2;">
-      <div style="font-family:Oswald,sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:2px;">🏆 KIESÉSES ÁGRAJZ</div>
-      <button onclick="document.getElementById('bracketModal').style.display='none'" style="background:none;border:none;color:rgba(240,244,240,0.4);font-size:22px;cursor:pointer;">✕</button>
+<div id="bracketModal" style="display:none;position:fixed;inset:0;background:#0d0f15;z-index:9000;overflow-y:auto;">
+  <div style="max-width:520px;margin:0 auto;min-height:100%;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#13161e;border-bottom:2px solid #00ff87;position:sticky;top:0;z-index:2;">
+      <div style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:2px;">🏆 KIESÉSES ÁGRAJZ</div>
+      <button onclick="document.getElementById('bracketModal').style.display='none'" style="background:none;border:none;color:rgba(240,244,240,0.5);font-size:24px;cursor:pointer;line-height:1;padding:0 4px;">✕</button>
     </div>
-    <div id="bracketContent" style="flex:1;padding:12px 8px 40px;"></div>
+    <div id="bracketContent" style="padding:14px 12px 60px;"></div>
   </div>
 </div>
 
@@ -8583,8 +8583,10 @@ function renderBracket() {
   var container = document.getElementById('bracketContent');
   if(!container) return;
 
-  // Knockout meccsek összegyűjtése és körökbe rendezése
-  var koMatches = ALL_MATCHES.filter(function(m){ return m.knockout; });
+  // Knockout meccsek összegyűjtése — teszt meccsek KIZÁRVA
+  var koMatches = ALL_MATCHES.filter(function(m){
+    return m.knockout && !m.id.startsWith('CM_TEST_');
+  });
   var byRound = {};
   BRACKET_ROUNDS.forEach(function(r){ byRound[r.key] = []; });
 
@@ -8601,7 +8603,11 @@ function renderBracket() {
   var html = '';
   var hasAny = Object.values(byRound).some(function(arr){ return arr.length > 0; });
   if(!hasAny) {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(240,244,240,0.4);font-family:Oswald,sans-serif;letter-spacing:2px;">Még nem lettek kieséses meccsek rögzítve az Admin panelben.</div>';
+    container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:rgba(240,244,240,0.35);font-family:Oswald,sans-serif;letter-spacing:1px;line-height:2;">'
+      + '<div style="font-size:48px;margin-bottom:16px;">🏆</div>'
+      + '<div style="font-size:14px;color:rgba(0,255,135,0.5);letter-spacing:3px;margin-bottom:8px;">HAMAROSAN</div>'
+      + '<div style="font-size:12px;">A kieséses meccseket az Admin panelben<br>kell felvenni (Egyedi meccsek).</div>'
+      + '</div>';
     return;
   }
 
