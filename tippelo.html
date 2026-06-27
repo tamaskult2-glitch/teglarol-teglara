@@ -3830,7 +3830,8 @@ function showTab(t) {
   activeTab=t;
   ['meccsek','tippek','ranglista','admin','opl','bet','kozos','gol','otletek','nyeremenyek'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
-  if(t==='ranglista') renderLeaderboard();
+  if(t==='ranglista') { renderLeaderboard(); setTimeout(function(){ var el=document.getElementById('tab-ranglista'); if(el) el.scrollIntoView({behavior:'instant',block:'start'}); },30); }
+  else if(t !== 'meccsek') { window.scrollTo({top:0,behavior:'instant'}); }
   if(t==='tippek') { buildTippTable(); }
   if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); populateAdmDelTip(); fbSecretRefreshStatus(); renderBracketAdminList(); }
   if(t==='opl') oplLoad();
@@ -3842,10 +3843,6 @@ function showTab(t) {
   if(t==='gol') renderGolTab();
   if(t==='otletek') otletekLoad();
   if(t==='nyeremenyek') nyeremenyekLoad();
-  // Scroll: tab tetejére görget
-  if(t !== 'meccsek') {
-    window.scrollTo({top: 0, behavior: 'instant'});
-  }
   try { renderMatchdayBanner(); } catch(e){}
 }
 
