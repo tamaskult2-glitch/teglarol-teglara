@@ -2477,6 +2477,27 @@ input:focus, textarea:focus, select:focus {
       </div>
     </div>
 
+    <!-- CSAPATKERET ADATBÁZIS -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(0,255,135,0.04);border:1px solid rgba(0,255,135,0.15);border-left:3px solid #00ff87;">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:#00ff87;letter-spacing:1px;">👕 CSAPATKERET ADATBÁZIS</span></div>
+      <div class="adm-collapse-body">
+        <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;line-height:1.5;">
+          Csapatnév pontosan (pl. <b style="color:#fff;">Franciaország</b>) + játékosok vesszővel vagy sortöréssel elválasztva.<br>
+          1 játékos csak egyszer szerepel. Göllövő popupban ebből szedi a neveket.
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+          <input id="rosterTeamName" type="text" placeholder="Csapat neve (pl. Franciaország)" style="flex:1;min-width:140px;padding:7px 10px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#fff;font-family:Oswald,sans-serif;font-size:13px;border-radius:0;">
+          <input id="rosterTeamFlag" type="text" placeholder="🇫🇷" style="width:44px;padding:7px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:16px;text-align:center;border-radius:0;">
+        </div>
+        <textarea id="rosterPlayers" placeholder="Mbappé, Dembélé, Giroud, Saliba, Hernandez, Konaté, Upamecano, Pavard, Tchouaméni, Camavinga, Griezmann&#10;&#10;Cserék: Maignan, Mike, Coman, Thuram, ..." rows="5" style="width:100%;box-sizing:border-box;padding:8px 10px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-family:monospace;font-size:12px;line-height:1.6;resize:vertical;border-radius:0;"></textarea>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button onclick="adminSaveRoster()" style="flex:1;padding:8px;background:rgba(0,255,135,0.12);border:1px solid rgba(0,255,135,0.35);color:#00ff87;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-radius:0;letter-spacing:1px;">✓ MENTÉS</button>
+          <button onclick="adminLoadRosterForEdit()" style="padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(240,244,240,0.5);font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;border-radius:0;">📂 Betölt</button>
+        </div>
+        <div id="rosterList" style="margin-top:10px;font-size:11px;max-height:200px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
     <!-- BRACKET TOVÁBBJUTÓK -->
     <div style="margin-bottom:12px;padding:10px 14px;background:rgba(0,255,135,0.04);border:1px solid rgba(0,255,135,0.15);border-radius:0;">
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(0,255,135,0.8);letter-spacing:1px;">🏆 BRACKET — TOVÁBBJUTÓK</span></div>
@@ -3021,7 +3042,7 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw,adminPwRaw,deletedUsersRaw,scorerRes,bracketTeamsRaw,etScoresRaw,penScoresRaw] = await Promise.all([
+    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw,adminPwRaw,deletedUsersRaw,scorerRes,bracketTeamsRaw,etScoresRaw,penScoresRaw,teamRostersRaw] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
@@ -3039,6 +3060,7 @@ async function pollData() {
       fbGet('bracketTeams').catch(function(){return null;}),
       fbGet('etScores').catch(function(){return null;}),
       fbGet('penScores').catch(function(){return null;}),
+      fbGet('teamRosters').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -3056,6 +3078,7 @@ async function pollData() {
     allBracketTeams = bracketTeamsRaw || {};
     if(etScoresRaw  && typeof etScoresRaw==='object')  allEtScores  = etScoresRaw;
     if(penScoresRaw && typeof penScoresRaw==='object') allPenScores = penScoresRaw;
+    if(teamRostersRaw && typeof teamRostersRaw==='object') allTeamRosters = teamRostersRaw;
     if(Array.isArray(proUsersRaw)) allProUsers=proUsersRaw.filter(Boolean);
     else if(proUsersRaw && typeof proUsersRaw==='object') allProUsers=Object.values(proUsersRaw).filter(Boolean);
     else allProUsers=[];
@@ -3868,7 +3891,7 @@ function showTab(t) {
     }, 30);
   }
   if(t==='tippek') { buildTippTable(); }
-  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); populateAdmDelTip(); fbSecretRefreshStatus(); renderBracketAdminList(); }
+  if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); populateAdmDelTip(); fbSecretRefreshStatus(); renderBracketAdminList(); renderRosterList(); }
   if(t==='opl') oplLoad();
   if(t==='emob') renderEmobTab();
   if(t==='bl') renderBLTab();
@@ -3992,6 +4015,7 @@ var allBracketTeams  = {}; // {slotId: {name:'Franciaország', flag:'🇫🇷'}}
 var allEtScores      = {}; // {matchId: 'H:A'} — hosszabbítás pontos eredmény
 var allPenScores     = {}; // {matchId: 'H:A'} — 11-es pontos eredmény
 var _virtualKOMatches = {}; // {matchId: matchObj} — R32/R16/stb. generált meccsek
+var allTeamRosters   = {}; // {teamName: ['Mbappé', 'Giroud', ...]} — Firebase teamRosters
 
 async function submitTip(mid,tip,phase) {
   phase = phase || 'o'; // 'o' = rendes játékidő, 'et' = hosszabbítás, 'pen' = 11-esek
@@ -8990,6 +9014,69 @@ async function handlePenScoreSave(btn) {
 }
 
 
+// ===== CSAPATKERET ADATBÁZIS =====
+async function adminSaveRoster() {
+  var name = (document.getElementById('rosterTeamName').value||'').trim();
+  var raw  = (document.getElementById('rosterPlayers').value||'').trim();
+  if(!name) { showToast('⚠️ Add meg a csapat nevét!'); return; }
+  var players = [];
+  var seen = {};
+  raw.replace(/\n/g, ',').split(',').forEach(function(p) {
+    var pn = p.trim();
+    if(pn && pn.length > 0 && !seen[pn.toLowerCase()]) { seen[pn.toLowerCase()]=true; players.push(pn); }
+  });
+  if(!players.length) { showToast('⚠️ Adj meg legalább egy játékost!'); return; }
+  allTeamRosters[name] = players;
+  try {
+    await fbSet('teamRosters/'+fbSafeName(name), players);
+    showToast('✅ '+name+': '+players.length+' játékos mentve');
+    document.getElementById('rosterTeamName').value='';
+    document.getElementById('rosterPlayers').value='';
+    renderRosterList();
+  } catch(e) { showToast('❌ '+e.message); }
+}
+
+async function adminDeleteRoster(safeName) {
+  try {
+    await fbDel('teamRosters/'+safeName);
+    delete allTeamRosters[safeName];
+    // Töröljük a valódi névből is
+    Object.keys(allTeamRosters).forEach(function(k){
+      if(fbSafeName(k)===safeName) delete allTeamRosters[k];
+    });
+    renderRosterList();
+    showToast('🗑️ Keret törölve');
+  } catch(e) { showToast('❌ '+e.message); }
+}
+
+function adminLoadRosterForEdit() {
+  var name = (document.getElementById('rosterTeamName').value||'').trim();
+  if(!name) { showToast('⚠️ Írd be a csapat nevét'); return; }
+  // Keresés valódi névvel és safe névvel is
+  var players = allTeamRosters[name] || allTeamRosters[fbSafeName(name)];
+  if(!players||!players.length) { showToast('⚠️ '+name+' — nincs mentett keret'); return; }
+  document.getElementById('rosterPlayers').value = players.join(', ');
+  showToast('📂 '+name+': '+players.length+' játékos betöltve');
+}
+
+function renderRosterList() {
+  var el = document.getElementById('rosterList');
+  if(!el) return;
+  var keys = Object.keys(allTeamRosters).filter(function(k){
+    return Array.isArray(allTeamRosters[k]);
+  }).sort();
+  if(!keys.length) { el.innerHTML='<div style="color:rgba(240,244,240,0.3);padding:4px 0;">Még nincs feltöltve keret.</div>'; return; }
+  el.innerHTML = keys.map(function(k) {
+    var players = allTeamRosters[k]||[];
+    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">'
+      +'<span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;color:#fff;">'+escHtml(k)+'</span>'
+      +'<span style="font-size:10px;color:rgba(0,255,135,0.5);">'+players.length+' fő</span>'
+      +'<button onclick="document.getElementById(\'rosterTeamName\').value='+JSON.stringify(k)+';adminLoadRosterForEdit();" style="background:none;border:none;color:rgba(0,255,135,0.5);cursor:pointer;font-size:12px;padding:0 4px;">✏️</button>'
+      +'<button onclick="adminDeleteRoster(\''+fbSafeName(k)+'\')" style="background:none;border:none;color:rgba(239,68,68,0.45);cursor:pointer;font-size:12px;padding:0 4px;">✕</button>'
+      +'</div>';
+  }).join('');
+}
+
 async function adminSaveBracketTeam() {
   var slotId = (document.getElementById('bracketSlotId').value||'').trim().toUpperCase();
   var flag   = (document.getElementById('bracketTeamFlag').value||'').trim();
@@ -9075,6 +9162,12 @@ function getScorerCandidates(teamName, matchId) {
   var seen2 = {};
   function addP(n) {
     if(n && typeof n==='string' && n.trim().length>1 && !seen2[n]) { seen2[n]=true; result.push(n); }
+  }
+
+  // 0. Firebase teamRosters — elsődleges forrás (admin tölti fel)
+  var roster = allTeamRosters[teamName] || allTeamRosters[fbSafeName(teamName)];
+  if(roster && roster.length) {
+    return roster.slice().sort();
   }
 
   // 1. m.homeLineup / m.awayLineup — meccs objektumon tárolt (string array)
