@@ -3991,6 +3991,7 @@ var allScorerResults = {}; // {matchId: ['Mbappé','Dembélé',...]}
 var allBracketTeams  = {}; // {slotId: {name:'Franciaország', flag:'🇫🇷'}}
 var allEtScores      = {}; // {matchId: 'H:A'} — hosszabbítás pontos eredmény
 var allPenScores     = {}; // {matchId: 'H:A'} — 11-es pontos eredmény
+var _virtualKOMatches = {}; // {matchId: matchObj} — R32/R16/stb. generált meccsek
 
 async function submitTip(mid,tip,phase) {
   phase = phase || 'o'; // 'o' = rendes játékidő, 'et' = hosszabbítás, 'pen' = 11-esek
@@ -4882,6 +4883,8 @@ function renderMatches() {
       _homeKnown: !!hTeam,
       _awayKnown: !!aTeam,
     });
+    // Globális cache hogy más függvények is megtalálják
+    _virtualKOMatches[id] = mainMatches[mainMatches.length-1];
   });
   const dates=[...new Set(mainMatches.map(m=>m.huDate))].sort();
   let html='';
@@ -4957,7 +4960,7 @@ function renderMatches() {
             ? `<span style="font-family:Oswald,sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;color:${koColor};background:rgba(0,0,0,0.3);border:1px solid ${koColor}40;padding:1px 7px;border-radius:3px;">${koLabel}</span>`
             : `<span class="grp-tag">${(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>`
           }
-          <span style="margin-left:auto;color:rgba(240,244,240,0.5);">${m.venue}</span>
+          <span style="margin-left:auto;color:rgba(240,244,240,0.5);">${m.venue||''}</span>
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
           ${kickoffLocked&&!result&&isAdminUnlocked?'<button onclick="event.stopPropagation();refreshLiveScore(\''+m.id+'\')" style="font-size:9px;color:#39ff9d;background:rgba(0,255,135,0.1);border:1px solid rgba(34,197,94,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">🔄</button>':''}
@@ -9095,8 +9098,8 @@ function getScorerCandidates(teamName, matchId) {
 }
 
 function openScorerModal(matchId) {
-  var m = ALL_MATCHES.find(function(x){ return x.id === matchId; });
-  if(!m) return;
+  var m = ALL_MATCHES.find(function(x){ return x.id === matchId; }) || _virtualKOMatches[matchId];
+  if(!m) { showToast('⚠️ Meccs nem található!'); return; }
   if(!currentUser) { document.getElementById('regModal').style.display='flex'; return; }
   if(isKickoffPassed(m.huDate, m.huTime) && !m.id.startsWith('CM_TEST_')) {
     showToast('⏰ Góllövő tipp csak a meccs előtt adható!'); return;
