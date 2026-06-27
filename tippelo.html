@@ -4885,6 +4885,35 @@ function renderMatches() {
   });
   const dates=[...new Set(mainMatches.map(m=>m.huDate))].sort();
   let html='';
+  var _lastPhase = 'group'; // track phase transitions
+
+  // Phase meghatározása a dátum meccseiből
+  function getDatePhase(dayMatches) {
+    var hasKO = dayMatches.some(function(m){ return m.knockout; });
+    var hasGroup = dayMatches.some(function(m){ return !m.knockout; });
+    if(hasGroup && !hasKO) return 'group';
+    if(hasKO && !hasGroup) {
+      // Mi a legmagasabb kör ezen a napon?
+      var rounds = dayMatches.filter(function(m){ return m.knockout; }).map(function(m){ return detectRound(m)||'R32'; });
+      if(rounds.some(function(r){ return r==='FINAL'; })) return 'FINAL';
+      if(rounds.some(function(r){ return r==='BRONZE'; })) return 'BRONZE';
+      if(rounds.some(function(r){ return r==='SF'; })) return 'SF';
+      if(rounds.some(function(r){ return r==='QF'; })) return 'QF';
+      if(rounds.some(function(r){ return r==='R16'; })) return 'R16';
+      return 'R32';
+    }
+    return hasKO ? 'R32' : 'group';
+  }
+
+  var PHASE_BANNERS = {
+    R32:    { label:'⚡ KIESÉSES SZAKASZ — ROUND OF 32', sub:'Kimenetel (1/X/2): 2× szorzó · Pontos: +2 extra pt · Hosszabbítás: +1 pt', color:'#00ff87', bg:'rgba(0,255,135,0.08)', border:'rgba(0,255,135,0.3)' },
+    R16:    { label:'⚡ R16 — 16-OS KÖR',                sub:'Kimenetel: 2× szorzó · Hosszabbítás tipp is számít', color:'#00ff87', bg:'rgba(0,255,135,0.08)', border:'rgba(0,255,135,0.3)' },
+    QF:     { label:'🔥 NEGYEDDÖNTŐ',                   sub:'Kimenetel: 2× szorzó · Góllövő tipp: +1 pt', color:'#f59e0b', bg:'rgba(245,158,11,0.08)', border:'rgba(245,158,11,0.3)' },
+    SF:     { label:'⭐ ELŐDÖNTŐ',                       sub:'Kimenetel: 2× szorzó · Góllövő tipp: +1 pt', color:'#f59e0b', bg:'rgba(245,158,11,0.08)', border:'rgba(245,158,11,0.3)' },
+    BRONZE: { label:'🥉 BRONZMECCS',                    sub:'Kimenetel: 3× szorzó · Góllövő tipp: +2 pt', color:'#cd7f32', bg:'rgba(205,127,50,0.08)', border:'rgba(205,127,50,0.3)' },
+    FINAL:  { label:'🏆 DÖNTŐ — GRAND FINAL',           sub:'Kimenetel: 3× szorzó · Góllövő tipp: +2 pt · Pontos: +3 extra pt', color:'#f5c518', bg:'rgba(245,197,24,0.1)', border:'rgba(245,197,24,0.4)' },
+  };
+
   dates.forEach(date=>{
     const dayMatches=mainMatches.filter(m=>m.huDate===date).sort((a,b)=>a.huTime.localeCompare(b.huTime));
     const d=new Date(date+'T12:00:00');
@@ -4894,6 +4923,18 @@ function renderMatches() {
     var colKey = 'dc_'+date;
     var collapsed = isTestDay && sessionStorage.getItem(colKey) !== 'open';
     var gId = 'dg_'+date.replace(/-/g,'');
+
+    // Szakasz határ banner
+    var thisPhase = getDatePhase(dayMatches);
+    if(thisPhase !== 'group' && thisPhase !== _lastPhase && PHASE_BANNERS[thisPhase]) {
+      var pb = PHASE_BANNERS[thisPhase];
+      html += '<div style="margin:20px 0 14px;padding:12px 16px;background:'+pb.bg+';border:1px solid '+pb.border+';border-left:4px solid '+pb.color+';">'
+        + '<div style="font-family:Oswald,sans-serif;font-size:14px;font-weight:700;color:'+pb.color+';letter-spacing:2px;">'+pb.label+'</div>'
+        + '<div style="font-size:11px;color:rgba(240,244,240,0.45);margin-top:4px;">'+pb.sub+'</div>'
+        + '</div>';
+    }
+    _lastPhase = thisPhase;
+
     html+=`<div class="date-header" style="cursor:pointer;" onclick="toggleDayGroup('${gId}','${colKey}')">
       <h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span>
       <span id="toggle_${gId}" style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">${collapsed?'+':'−'}</span>
@@ -4921,11 +4962,18 @@ function renderMatches() {
 
 
       const cardLocked = result || kickoffLocked;
+      var koRound = m.knockout ? (detectRound(m)||'R32') : null;
+      var koMult  = m.knockout ? getMatchMultiplier(m) : 1;
+      var koLabel = {R32:'R32 · 2×',R16:'R16 · 2×',QF:'Negyed · 2×',SF:'Előd · 2×',BRONZE:'Bronz · 3×',FINAL:'DÖNTŐ · 3×'}[koRound]||'';
+      var koColor = (koMult===3) ? '#f5c518' : '#00ff87';
       html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}${liveScores[m.id]&&liveScores[m.id].status==='live'?' is-live':''}" id="mc_${m.id}">
         <div class="match-meta">
           <span class="time-tag">${m.huTime}</span>
           ${liveScores[m.id]&&liveScores[m.id].status==='live'?'<span class="live-badge"><span class="live-dot"></span>ÉLŐ</span>':''}
-          <span class="grp-tag">${(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>
+          ${m.knockout
+            ? `<span style="font-family:Oswald,sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;color:${koColor};background:rgba(0,0,0,0.3);border:1px solid ${koColor}40;padding:1px 7px;border-radius:3px;">${koLabel}</span>`
+            : `<span class="grp-tag">${(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>`
+          }
           <span style="margin-left:auto;color:rgba(240,244,240,0.5);">${m.venue}</span>
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
