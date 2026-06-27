@@ -7854,10 +7854,10 @@ function renderLiveTicker() {
       if(allTippers.length > 0) {
         winnerHtml = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;">';
         allTippers.forEach(function(w) {
-          var icon  = w.exact ? '🎯' : w.gd ? '📐' : w.win ? '🟡' : '✗';
-          var color = w.exact ? '#39ff9d' : w.gd ? '#60a5fa' : w.win ? 'var(--gold)' : 'rgba(240,244,240,0.28)';
+          var icon  = w.exact ? '🎯' : w.gd ? '📐' : w.win ? '🟡' : '❌';
+          var color = w.exact ? '#39ff9d' : w.gd ? '#60a5fa' : w.win ? 'var(--gold)' : 'rgba(240,244,240,0.35)';
           var meStyle = currentUser && fbSafeName(currentUser)===w.name ? 'border-color:rgba(0,255,135,0.5);background:rgba(0,255,135,0.08);' : '';
-          var loseStyle = !w.win ? 'text-decoration:line-through;opacity:0.55;' : '';
+          var loseStyle = !w.win ? 'opacity:0.5;' : '';
           winnerHtml += '<span style="font-family:Oswald,sans-serif;font-size:11px;color:'+color+';background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:1px 6px;'+meStyle+loseStyle+'">'+icon+' '+escHtml(w.name)+'</span>';
         });
         winnerHtml += '</div>';
