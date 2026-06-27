@@ -3858,11 +3858,13 @@ function showTab(t) {
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
   if(t==='ranglista') { renderLeaderboard(); }
   if(t !== 'meccsek') {
-    // Minden fülnél a saját tartalom tetejére ugrik (kivéve meccsek — ott a navigátor logika működik)
     setTimeout(function(){
       var el = document.getElementById('tab-'+t);
-      if(el) el.scrollIntoView({behavior:'instant', block:'start'});
-      else window.scrollTo({top:0, behavior:'instant'});
+      var nav = document.getElementById('mainNavTabs');
+      if(!el) { window.scrollTo({top:0,behavior:'instant'}); return; }
+      var navH = nav ? nav.offsetHeight : 0;
+      var top = el.getBoundingClientRect().top + window.pageYOffset - navH - 4;
+      window.scrollTo({top: Math.max(0, top), behavior:'instant'});
     }, 30);
   }
   if(t==='tippek') { buildTippTable(); }
