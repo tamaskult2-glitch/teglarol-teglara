@@ -3830,8 +3830,15 @@ function showTab(t) {
   activeTab=t;
   ['meccsek','tippek','ranglista','admin','opl','bet','kozos','gol','otletek','nyeremenyek'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
   document.querySelectorAll('.nav-tab').forEach(function(b){ b.classList.toggle('active', b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+t+"'")); });
-  if(t==='ranglista') { renderLeaderboard(); setTimeout(function(){ var el=document.getElementById('tab-ranglista'); if(el) el.scrollIntoView({behavior:'instant',block:'start'}); },30); }
-  else if(t !== 'meccsek') { window.scrollTo({top:0,behavior:'instant'}); }
+  if(t==='ranglista') { renderLeaderboard(); }
+  if(t !== 'meccsek') {
+    // Minden fülnél a saját tartalom tetejére ugrik (kivéve meccsek — ott a navigátor logika működik)
+    setTimeout(function(){
+      var el = document.getElementById('tab-'+t);
+      if(el) el.scrollIntoView({behavior:'instant', block:'start'});
+      else window.scrollTo({top:0, behavior:'instant'});
+    }, 30);
+  }
   if(t==='tippek') { buildTippTable(); }
   if(t==='admin'&&isAdminUnlocked) { renderAdminMatches(); pmPopulateUsers(); inviteLoadList(); inviteLoadRequests(); populateAdmDelTip(); fbSecretRefreshStatus(); renderBracketAdminList(); }
   if(t==='opl') oplLoad();
@@ -8626,27 +8633,32 @@ async function deleteCustomMatch(id) {
 }
 
 // ===== KIESÉSES ÁGRAJZ =====
-var BRACKET_ROUNDS = [
-  { key:'R32',   label:'⚡ R32',      short:'R32'        },
-  { key:'R16',   label:'⚡ R16',      short:'R16'        },
-  { key:'QF',    label:'🔥 Negyeddöntő', short:'NDD'    },
-  { key:'SF',    label:'⭐ Elődöntő', short:'EDÖ'        },
-  { key:'FINAL', label:'🏆 Döntő',    short:'DÖNTŐ'      },
-  { key:'BRONZE',label:'🥉 Bronz',    short:'BRONZ'      },
+// ===== KIESÉSES ÁGRAJZ — FIFA 2026 szabályok alapján =====
+
+// R32 meccsek fix struktúrája
+var R32_STRUCTURE = [
+  { m:73, h:'2A', a:'2B',      date:'Jún 28', venue:'Los Angeles'  },
+  { m:76, h:'1C', a:'2F',      date:'Jún 29', venue:'Houston'      },
+  { m:74, h:'1E', a:'3ABCDF',  date:'Jún 29', venue:'Boston'       },
+  { m:75, h:'1F', a:'2C',      date:'Jún 29', venue:'Monterrey'    },
+  { m:78, h:'2E', a:'2I',      date:'Jún 30', venue:'Dallas'       },
+  { m:77, h:'1I', a:'3CDFGH',  date:'Jún 30', venue:'New York'     },
+  { m:79, h:'1A', a:'3CEFHI',  date:'Jún 30', venue:'Mexico City'  },
+  { m:81, h:'1D', a:'3BEFIJ',  date:'Júl 1',  venue:'San Francisco'},
+  { m:82, h:'1G', a:'3AEHIJ',  date:'Júl 1',  venue:'Seattle'      },
+  { m:80, h:'1L', a:'3EHIJK',  date:'Júl 1',  venue:'Atlanta'      },
+  { m:84, h:'1H', a:'2J',      date:'Júl 2',  venue:''             },
+  { m:86, h:'1J', a:'2H',      date:'Júl 2',  venue:''             },
+  { m:88, h:'2D', a:'2G',      date:'Júl 2',  venue:''             },
+  { m:85, h:'1B', a:'3EFGIJ',  date:'Júl 2',  venue:''             },
+  { m:87, h:'1K', a:'3DEIJL',  date:'Júl 2',  venue:''             },
+  { m:83, h:'2K', a:'2L',      date:'Júl 2',  venue:''             },
 ];
-var ROUND_KEYWORDS = {
-  R32:    /nyolcaddöntő|r32|round.of.32|32-es/i,
-  R16:    /tizenhatod|r16|round.of.16|16-os/i,
-  QF:     /negyeddöntő|quarter|qf/i,
-  SF:     /elődöntő|semifinal|sf/i,
-  FINAL:  /^döntő$|^final$|^finale$/i,
-  BRONZE: /bronz|3rd|harmadik/i,
-};
 
 function detectRound(m) {
-  var g = (m.group||m.title||'').toLowerCase();
+  var g = (m.group||m.title||'').toLowerCase().trim();
   if(/bronz|3rd|harmadik/i.test(g)) return 'BRONZE';
-  if(/^döntő$|^final$/i.test(g.trim())) return 'FINAL';
+  if(/^döntő$|^final$/i.test(g)) return 'FINAL';
   if(/elődöntő|semifinal/i.test(g)) return 'SF';
   if(/negyeddöntő|quarter/i.test(g)) return 'QF';
   if(/tizenhatod|r16/i.test(g)) return 'R16';
@@ -8655,194 +8667,157 @@ function detectRound(m) {
 }
 
 function getMatchWinner(m) {
-  var res = allResults[m.id];
-  var etRes = allEtResults[m.id];
-  var penRes = allPenResults[m.id];
+  var res = allResults[m.id], etRes = allEtResults[m.id], penRes = allPenResults[m.id];
   if(!res) return null;
-  var winner = null;
-  if(penRes) winner = penRes === '1' ? m.home : m.away;
-  else if(etRes && etRes !== 'X') winner = etRes === '1' ? m.home : m.away;
-  else if(res === '1') winner = m.home;
-  else if(res === '2') winner = m.away;
-  return winner ? { name: winner, flag: res==='1'||penRes==='1'||etRes==='1' ? m.homeFlag : m.awayFlag } : null;
+  var w = penRes ? (penRes==='1'?m.home:m.away) : (etRes&&etRes!=='X') ? (etRes==='1'?m.home:m.away) : res==='1' ? m.home : res==='2' ? m.away : null;
+  return w ? {name:w, flag: (w===m.home)?m.homeFlag:m.awayFlag} : null;
+}
+
+function getBestThirds(groups) {
+  var thirds = [];
+  Object.keys(groups||{}).forEach(function(g){
+    var ts = Object.values(groups[g]||{});
+    if(ts.length < 3) return;
+    ts.sort(function(a,b){ return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf; });
+    var t = ts[2];
+    if(t && t.p > 0) thirds.push({group:g,name:t.name,flag:t.flag||'',pts:t.pts,gd:t.gd,gf:t.gf,p:t.p});
+  });
+  thirds.sort(function(a,b){ return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf; });
+  return thirds.slice(0,8);
+}
+
+// Már felhasznált 3. helyezetteket nyomon követjük
+var _usedThirds = {};
+
+function resolveSlot(slot, groups, bestThirds, resetUsed) {
+  if(resetUsed) _usedThirds = {};
+  if(allBracketTeams[slot]) return allBracketTeams[slot];
+  var posMatch = slot.match(/^([12])([A-L])$/);
+  if(posMatch) {
+    var pos = parseInt(posMatch[1]), grp = posMatch[2];
+    var ts = Object.values(groups[grp]||{});
+    if(!ts.length) return null;
+    ts.sort(function(a,b){ return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf; });
+    var t = ts[pos-1];
+    return t && t.p > 0 ? {name:t.name,flag:t.flag||''} : null;
+  }
+  if(slot.startsWith('3') && bestThirds) {
+    var allowed = slot.slice(1).split('');
+    var cands = bestThirds.filter(function(t){ return allowed.indexOf(t.group)>=0 && !_usedThirds[t.name]; });
+    if(cands.length > 0) { _usedThirds[cands[0].name]=true; return {name:cands[0].name,flag:cands[0].flag||''}; }
+  }
+  return null;
 }
 
 function openBracket() {
-  var modal = document.getElementById('bracketModal');
-  modal.style.display = 'flex';
+  document.getElementById('bracketModal').style.display='flex';
   renderBracket();
 }
 
 function renderBracket() {
   var container = document.getElementById('bracketContent');
   if(!container) return;
+  var groups = null;
+  try { groups = buildGroupStandings(); } catch(e) {}
+  var bestThirds = groups ? getBestThirds(groups) : [];
+  _usedThirds = {};
 
-  // Knockout meccsek összegyűjtése — teszt meccsek KIZÁRVA
-  var koMatches = ALL_MATCHES.filter(function(m){
-    return m.knockout && !m.id.startsWith('CM_TEST_');
-  });
-  var byRound = {};
-  BRACKET_ROUNDS.forEach(function(r){ byRound[r.key] = []; });
+  var html = '<div style="font-size:10px;color:rgba(0,255,135,0.4);letter-spacing:1px;margin-bottom:12px;padding:0 4px;">⚡ Automatikusan frissül a csoportállásokból</div>';
 
-  koMatches.forEach(function(m) {
-    var r = detectRound(m);
-    if(r && byRound[r]) byRound[r].push(m);
-  });
+  // R32
+  html += '<div style="font-family:Oswald,sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(0,255,135,0.55);margin-bottom:8px;padding-left:8px;border-left:2px solid #00ff87;">⚡ ROUND OF 32</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:20px;">';
 
-  // Rendezés dátum szerint
-  Object.keys(byRound).forEach(function(k){
-    byRound[k].sort(function(a,b){ return (a.huDate+a.huTime).localeCompare(b.huDate+b.huTime); });
-  });
-
-  var html = '';
-  var hasAny = Object.values(byRound).some(function(arr){ return arr.length > 0; });
-  var hasBracketTeams = Object.keys(allBracketTeams).length > 0;
-
-  if(!hasAny && !hasBracketTeams) {
-    container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:rgba(240,244,240,0.35);font-family:Oswald,sans-serif;letter-spacing:1px;line-height:2;">'
-      + '<div style="font-size:48px;margin-bottom:16px;">🏆</div>'
-      + '<div style="font-size:14px;color:rgba(0,255,135,0.5);letter-spacing:3px;margin-bottom:8px;">HAMAROSAN</div>'
-      + '<div style="font-size:12px;">A kieséses meccseket az Admin panelben<br>kell felvenni (Egyedi meccsek).</div>'
-      + '</div>';
-    return;
-  }
-
-  // Továbbjutók megjelenítése (slot-alapú, admin tölti fel)
-  var slotKeys = Object.keys(allBracketTeams).sort();
-  if(slotKeys.length > 0) {
-    // Körök szerint csoportosít (slot formátum: R32_1, R32_2, R16_1, QF_1, SF_1, FINAL, BRONZE)
-    var slotsByRound = {};
-    slotKeys.forEach(function(k) {
-      var parts = k.split('_');
-      var roundKey = parts.slice(0, parts.length > 2 ? parts.length-1 : 1).join('_');
-      if(!slotsByRound[roundKey]) slotsByRound[roundKey] = [];
-      slotsByRound[roundKey].push(k);
+  R32_STRUCTURE.forEach(function(slot) {
+    var hTeam = resolveSlot(slot.h, groups, bestThirds);
+    var aTeam = resolveSlot(slot.a, groups, bestThirds);
+    var koMatch = ALL_MATCHES.find(function(m){
+      return m.knockout && !m.id.startsWith('CM_TEST_') &&
+        ((hTeam&&m.home===hTeam.name)||(aTeam&&m.away===aTeam.name));
     });
+    var result = koMatch?allResults[koMatch.id]:null;
+    var score  = koMatch?allScores[koMatch.id]:null;
+    var isLive = koMatch&&liveScores[koMatch.id]&&!result;
+    var winner = koMatch?getMatchWinner(koMatch):null;
+    var homeWon = winner&&koMatch&&winner.name===koMatch.home;
+    var awayWon = winner&&koMatch&&winner.name===koMatch.away;
+    var border = result?'rgba(0,255,135,0.2)':isLive?'#00ff87':'rgba(255,255,255,0.07)';
+    var bg     = result?'rgba(0,255,135,0.03)':isLive?'rgba(0,255,135,0.06)':'rgba(255,255,255,0.02)';
 
-    var roundOrder = ['R32','R16','QF','SF','FINAL','BRONZE'];
-    var roundLabels = {R32:'⚡ R32 — 32-es kör',R16:'⚡ R16 — 16-os kör',QF:'🔥 Negyeddöntő',SF:'⭐ Elődöntő',FINAL:'🏆 Döntő',BRONZE:'🥉 Bronzmeccs'};
+    html += '<div style="border:1px solid '+border+';background:'+bg+';overflow:hidden;">';
+    html += '<div style="display:flex;align-items:center;padding:3px 8px;background:rgba(0,0,0,0.2);gap:6px;">';
+    html += '<span style="font-family:Oswald,sans-serif;font-size:9px;color:rgba(0,255,135,0.45);">M'+slot.m+'</span>';
+    html += '<span style="font-size:9px;color:rgba(240,244,240,0.2);">'+slot.date+(slot.venue?' · '+slot.venue:'')+'</span>';
+    if(score) html += '<span style="margin-left:auto;font-family:Oswald,sans-serif;font-size:10px;color:rgba(0,255,135,0.65);">'+score+'</span>';
+    if(isLive) html += '<span style="margin-left:auto;font-size:9px;color:#00ff87;animation:pulse 1.5s infinite;">🔴 ÉLŐ</span>';
+    html += '</div>';
 
-    roundOrder.forEach(function(rk) {
-      var slots = slotsByRound[rk];
-      if(!slots || !slots.length) return;
-      // Párok összerakása (2 slot = 1 meccs)
-      var pairs = [];
-      for(var i=0; i<slots.length; i+=2) {
-        pairs.push([slots[i], slots[i+1]||null]);
-      }
+    function teamRow(team, slotLabel, won, border2) {
+      var known = !!team;
+      var name  = team ? team.name : slotLabel;
+      var flag  = team ? (team.flag||'🏳') : '';
+      var r = '<div style="display:flex;align-items:center;gap:7px;padding:6px 10px;'+border2+(won?'background:rgba(0,255,135,0.06);':'')+'">';
+      r += '<span style="font-size:16px;flex-shrink:0;opacity:'+(known?'1':'0.25')+';">'+(flag||'🏳')+'</span>';
+      r += '<span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;font-weight:'+(won?'700':'400')+';color:'+(known?(won?'#fff':'rgba(240,244,240,0.8)'):'rgba(240,244,240,0.2)')+';'+(known?'':'font-size:10px;')+'">'+escHtml(name)+'</span>';
+      if(won) r += '<span style="font-size:10px;">🏆</span>';
+      r += '</div>';
+      return r;
+    }
+    html += teamRow(hTeam, slot.h, homeWon, 'border-bottom:1px solid rgba(255,255,255,0.04);');
+    html += teamRow(aTeam, slot.a, awayWon, '');
+    html += '</div>';
+  });
 
-      html += '<div style="margin-bottom:18px;">';
-      html += '<div style="font-family:Oswald,sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(0,255,135,0.55);margin-bottom:8px;padding-left:8px;border-left:2px solid #00ff87;">' + (roundLabels[rk]||rk) + '</div>';
-      html += '<div style="display:flex;flex-direction:column;gap:5px;">';
+  html += '</div>';
 
-      pairs.forEach(function(pair) {
-        var t1 = allBracketTeams[pair[0]] || null;
-        var t2 = pair[1] ? allBracketTeams[pair[1]] : null;
+  // R16, QF, SF, Final, Bronze — rögzített admin adatokból
+  var laterRounds = [
+    {key:'R16',label:'⚡ R16 — 16-os kör',slots:['R16_1','R16_2','R16_3','R16_4','R16_5','R16_6','R16_7','R16_8']},
+    {key:'QF', label:'🔥 Negyeddöntő',     slots:['QF_1','QF_2','QF_3','QF_4']},
+    {key:'SF', label:'⭐ Elődöntő',         slots:['SF_1','SF_2']},
+    {key:'FINAL',label:'🏆 Döntő',          slots:['FINAL_1']},
+    {key:'BRONZE',label:'🥉 Bronzmeccs',    slots:['BRONZE_1']},
+  ];
 
-        html += '<div style="border:1px solid rgba(0,255,135,0.15);overflow:hidden;background:rgba(0,255,135,0.03);">';
+  laterRounds.forEach(function(round) {
+    var koRound = ALL_MATCHES.filter(function(m){ return m.knockout&&!m.id.startsWith('CM_TEST_')&&detectRound(m)===round.key; });
+    var slotData = round.slots.filter(function(s){ return !!allBracketTeams[s]; });
+    if(!koRound.length && !slotData.length) return;
 
-        // Csapat 1
-        html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">';
-        if(t1) {
-          html += '<span style="font-size:20px;">' + (t1.flag||'🏳') + '</span>';
-          html += '<span style="font-family:Oswald,sans-serif;font-size:14px;font-weight:600;color:#fff;">' + escHtml(t1.name) + '</span>';
-        } else {
-          html += '<span style="font-size:14px;color:rgba(240,244,240,0.2);">⏳ még nem ismert</span>';
-        }
-        html += '</div>';
+    html += '<div style="font-family:Oswald,sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(0,255,135,0.55);margin-bottom:8px;padding-left:8px;border-left:2px solid #00ff87;">'+round.label+'</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px;">';
 
-        // Csapat 2
-        html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;">';
-        if(t2) {
-          html += '<span style="font-size:20px;">' + (t2.flag||'🏳') + '</span>';
-          html += '<span style="font-family:Oswald,sans-serif;font-size:14px;font-weight:600;color:#fff;">' + escHtml(t2.name) + '</span>';
-        } else if(pair[1]) {
-          html += '<span style="font-size:14px;color:rgba(240,244,240,0.2);">⏳ még nem ismert</span>';
-        } else {
-          html += '<span style="font-size:14px;color:rgba(240,244,240,0.15);">—</span>';
-        }
-        html += '</div>';
-        html += '</div>';
-      });
-
+    koRound.forEach(function(m){
+      var res=allResults[m.id],score=allScores[m.id],win=getMatchWinner(m);
+      var hw=win&&win.name===m.home,aw=win&&win.name===m.away;
+      var border=res?'rgba(0,255,135,0.2)':'rgba(255,255,255,0.07)';
+      html += '<div style="border:1px solid '+border+';overflow:hidden;">';
+      html += '<div style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.04);'+(hw?'background:rgba(0,255,135,0.06);':'')+'">';
+      html += '<span style="font-size:16px;">'+(m.homeFlag||'🏳')+'</span><span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;font-weight:'+(hw?700:400)+';color:'+(hw?'#fff':'rgba(240,244,240,0.8)')+';">'+escHtml(m.home)+'</span>';
+      if(score) html += '<span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(0,255,135,0.65);">'+score.split(':')[0]+'</span>';
+      if(hw) html += '<span style="font-size:10px;margin-left:4px;">🏆</span>';
+      html += '</div><div style="display:flex;align-items:center;gap:7px;padding:6px 10px;'+(aw?'background:rgba(0,255,135,0.06);':'')+'">';
+      html += '<span style="font-size:16px;">'+(m.awayFlag||'🏳')+'</span><span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;font-weight:'+(aw?700:400)+';color:'+(aw?'#fff':'rgba(240,244,240,0.8)')+';">'+escHtml(m.away)+'</span>';
+      if(score) html += '<span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(0,255,135,0.65);">'+score.split(':')[1]+'</span>';
+      if(aw) html += '<span style="font-size:10px;margin-left:4px;">🏆</span>';
       html += '</div></div>';
     });
-  }
 
-  // Meccsek körönként (ha már rögzítve vannak az admin panelban)
-  BRACKET_ROUNDS.forEach(function(roundDef) {
-    var matches = byRound[roundDef.key];
-    if(!matches.length) return;
-
-    var isFinal = roundDef.key === 'FINAL';
-    var isBronze = roundDef.key === 'BRONZE';
-
-    html += '<div style="margin-bottom:20px;">';
-    html += '<div style="font-family:Oswald,sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;color:rgba(0,255,135,0.6);margin-bottom:8px;padding:0 4px;border-left:2px solid #00ff87;padding-left:8px;">' + roundDef.label + '</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
-
-    matches.forEach(function(m) {
-      var winner = getMatchWinner(m);
-      var res = allResults[m.id];
-      var score = allScores[m.id];
-      var etRes = allEtResults[m.id];
-      var penRes = allPenResults[m.id];
-      var isPlayed = !!res;
-      var isLive = liveScores[m.id] && !isPlayed;
-
-      var homeWon = winner && winner.name === m.home;
-      var awayWon = winner && winner.name === m.away;
-
-      var cardBg = isPlayed ? 'background:rgba(0,255,135,0.05);border-color:rgba(0,255,135,0.2);' :
-                   isLive   ? 'background:rgba(0,255,135,0.08);border-color:rgba(0,255,135,0.35);' :
-                               'background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);';
-
-      html += '<div style="border:1px solid;' + cardBg + 'padding:0;overflow:hidden;">';
-
-      // Hazai csapat sor
-      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.05);'
-        + (homeWon ? 'background:rgba(0,255,135,0.08);' : '') + '">';
-      html += '<span style="font-size:18px;flex-shrink:0;">' + (m.homeFlag||'🏳') + '</span>';
-      html += '<span style="flex:1;font-family:Oswald,sans-serif;font-size:13px;font-weight:' + (homeWon ? '700' : '400') + ';color:' + (homeWon ? '#fff' : 'rgba(240,244,240,0.65)') + ';">' + escHtml(m.home||'?') + '</span>';
-      if(isPlayed && score) {
-        var parts = score.split(':');
-        html += '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:' + (homeWon?'#00ff87':'rgba(240,244,240,0.4)') + ';min-width:24px;text-align:right;">' + (parts[0]||0) + '</span>';
-      } else if(isLive && liveScores[m.id]) {
-        html += '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:#39ff9d;min-width:24px;text-align:right;">' + liveScores[m.id].home + '</span>';
-      } else {
-        html += '<span style="font-size:10px;color:rgba(240,244,240,0.25);min-width:24px;text-align:right;">' + m.huDate.slice(5).replace('-','.') + '</span>';
-      }
-      if(homeWon) html += '<span style="font-size:11px;margin-left:4px;">🏆</span>';
+    for(var i=0;i<round.slots.length;i+=2) {
+      var t1=allBracketTeams[round.slots[i]], t2=allBracketTeams[round.slots[i+1]];
+      if(!t1&&!t2) continue;
+      html += '<div style="border:1px solid rgba(255,255,255,0.07);overflow:hidden;">';
+      [t1,t2].forEach(function(t,idx){
+        var border3=idx===0?'border-bottom:1px solid rgba(255,255,255,0.04);':'';
+        html += '<div style="display:flex;align-items:center;gap:7px;padding:6px 10px;'+border3+'">';
+        if(t) html += '<span style="font-size:16px;">'+(t.flag||'🏳')+'</span><span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;color:#fff;">'+escHtml(t.name)+'</span>';
+        else  html += '<span style="font-size:10px;color:rgba(240,244,240,0.2);flex:1;">⏳ TBD</span>';
+        html += '</div>';
+      });
       html += '</div>';
+    }
 
-      // Vendég csapat sor
-      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;'
-        + (awayWon ? 'background:rgba(0,255,135,0.08);' : '') + '">';
-      html += '<span style="font-size:18px;flex-shrink:0;">' + (m.awayFlag||'🏳') + '</span>';
-      html += '<span style="flex:1;font-family:Oswald,sans-serif;font-size:13px;font-weight:' + (awayWon ? '700' : '400') + ';color:' + (awayWon ? '#fff' : 'rgba(240,244,240,0.65)') + ';">' + escHtml(m.away||'?') + '</span>';
-      if(isPlayed && score) {
-        var parts2 = score.split(':');
-        html += '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:' + (awayWon?'#00ff87':'rgba(240,244,240,0.4)') + ';min-width:24px;text-align:right;">' + (parts2[1]||0) + '</span>';
-      } else if(isLive && liveScores[m.id]) {
-        html += '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:#39ff9d;min-width:24px;text-align:right;">' + liveScores[m.id].away + '</span>';
-      }
-      if(awayWon) html += '<span style="font-size:11px;margin-left:4px;">🏆</span>';
-      html += '</div>';
-
-      // Extra info sor: ET/Pen/Live
-      var extraInfo = [];
-      if(isLive) extraInfo.push('<span style="color:#39ff9d;font-weight:700;">🔴 ÉLŐ ' + (liveScores[m.id].minute||'') + "'</span>");
-      if(etRes) extraInfo.push('<span style="color:rgba(0,255,135,0.6);">⚡ H.idő: '+(etRes==='1'?m.home:etRes==='2'?m.away:'D')+'</span>');
-      if(penRes) extraInfo.push('<span style="color:rgba(0,255,135,0.6);">🥅 11-es: '+(penRes==='1'?m.home:m.away)+'</span>');
-      if(m.venue) extraInfo.push('<span style="color:rgba(240,244,240,0.25);">📍 '+escHtml(m.venue)+'</span>');
-      if(extraInfo.length) {
-        html += '<div style="padding:5px 12px;font-size:10px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.04);">' + extraInfo.join('') + '</div>';
-      }
-
-      html += '</div>'; // card
-    });
-
-    html += '</div></div>'; // round
+    html += '</div>';
   });
 
   container.innerHTML = html;
@@ -8982,36 +8957,47 @@ var _scorerSelected = { home: [], away: [] };
 function getScorerCandidates(teamName, matchId) {
   var result = [];
 
-  // Teszt meccseken: az összes tippelő neve (allTips-ből)
+  // Teszt meccseken: a tippelők névsorát kettéosztjuk
   if(matchId && matchId.startsWith('CM_TEST_')) {
     var seen = {};
-    // Minden meccs minden tippelőjét összegyűjtjük
+    var allNames = [];
     Object.keys(allTips || {}).forEach(function(mid) {
       Object.keys(allTips[mid] || {}).forEach(function(safeName) {
-        if(!seen[safeName]) {
-          seen[safeName] = true;
-          result.push(safeName);
-        }
+        if(!seen[safeName]) { seen[safeName]=true; allNames.push(safeName); }
       });
     });
-    // currentUser-t is adjuk hozzá ha még nincs benne
-    if(currentUser) {
-      var cs = fbSafeName(currentUser);
-      if(!seen[cs]) result.push(cs);
-    }
-    return result.sort();
+    if(currentUser) { var cs=fbSafeName(currentUser); if(!seen[cs]) allNames.push(cs); }
+    allNames.sort();
+    var m = ALL_MATCHES.find(function(x){ return x.id===matchId; });
+    var isAway = m && teamName === m.away;
+    var half = Math.floor(allNames.length / 2);
+    return isAway ? allNames.slice(half) : allNames.slice(0, half);
   }
 
-  // Rendes meccsen: ESPN topscorer lista csapat szerinti szűrés
-  if(window.cachedTopScorers) {
+  // Valódi meccseken: az eddigi meccsek lineup adataiból gyűjtjük a játékosokat
+  var seen2 = {};
+  ALL_MATCHES.forEach(function(m) {
+    if(!isVbMatch(m)) return;
+    var lineup = null;
+    if(m.home === teamName) lineup = m.homeLineup;
+    else if(m.away === teamName) lineup = m.awayLineup;
+    if(lineup) lineup.forEach(function(name) {
+      if(name && !seen2[name]) { seen2[name]=true; result.push(name); }
+    });
+  });
+
+  // Fallback: ESPN gólszerzők listája ha nincs lineup
+  if(!result.length && window.cachedTopScorers) {
     window.cachedTopScorers.forEach(function(p) {
-      if(p.team && (p.team.toLowerCase().indexOf(teamName.toLowerCase()) >= 0 ||
-                    teamName.toLowerCase().indexOf(p.team.toLowerCase()) >= 0)) {
-        if(p.name && result.indexOf(p.name) === -1) result.push(p.name);
+      if(p.team && (p.team.toLowerCase().indexOf(teamName.toLowerCase())>=0 ||
+                    teamName.toLowerCase().indexOf(p.team.toLowerCase())>=0)) {
+        if(p.name && result.indexOf(p.name)===-1) result.push(p.name);
       }
     });
+    return result.slice(0,20);
   }
-  return result.slice(0, 14);
+
+  return result.sort();
 }
 
 function openScorerModal(matchId) {
