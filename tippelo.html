@@ -2163,7 +2163,6 @@ input:focus, textarea:focus, select:focus {
 <div id="liveTicker" style="display:none;"></div>
 
 <div class="nav-tabs" id="mainNavTabs" style="display:none">
-  <button onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,255,135,0.25);background:rgba(0,255,135,0.08);color:var(--gold);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;" title="Fel">▲</button>
   <button class="nav-tab active" onclick="showTab('meccsek');setTimeout(jumpToNextUntipped,120)">⚽ Meccsek</button>
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
@@ -2173,6 +2172,7 @@ input:focus, textarea:focus, select:focus {
   <button class="nav-tab" id="navKozos" onclick="showTab('kozos')">📺 Közös <span id="kozosBadge" style="display:none;background:#CE2939;color:#fff;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
   <button class="nav-tab" id="navGol" onclick="showTab('gol');migrateHashSilent()">📊 VB <span id="golNewBadge" style="background:#39ff9d;color:#1c1d24;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;">ÚJ</span></button>
   <button class="nav-tab" id="navNyeremenyek" onclick="showTab('nyeremenyek')">🎁 Nyeremények <span id="nyeremenyBadge" style="display:none;background:#39ff9d;color:#1c1d24;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle;"></span></button>
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})" style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(0,255,135,0.4);background:rgba(0,255,135,0.12);color:var(--gold);font-size:18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;" title="Fel">▲</button>
 </div>
 
 <!-- VB MOTIVÁCIÓS POPUP (jelszó migráció trigger) -->
@@ -2974,7 +2974,7 @@ const _fbAdminSecret = () => localStorage.getItem('fb_admin_secret') || '';
 const _fbAdminParam  = () => _fbAdminSecret() ? '?auth=' + _fbAdminSecret() : '';
 
 // Admin-only útvonalak — ezekhez ?auth= kell ha a szabályok be vannak állítva
-const ADMIN_PATHS = ['results','scores','etResults','penResults','topScorers','deletedUsers','adminPwHash','passwordReset','customMatches'];
+const ADMIN_PATHS = ['results','scores','etResults','penResults','etScores','penScores','topScorers','deletedUsers','adminPwHash','passwordReset','customMatches','scorerResults','bracketTeams'];
 const _isAdminPath = p => ADMIN_PATHS.some(ap => p.startsWith(ap));
 const _authParam   = p => (_isAdminPath(p) || isAdminUnlocked) ? _fbAdminParam() : '';
 
@@ -2995,7 +2995,7 @@ function saveUsers(u){ lsSet(LS_USERS,u); }
 // ===== POLLING =====
 async function pollData() {
   try {
-    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw,adminPwRaw,deletedUsersRaw,scorerRes,bracketTeamsRaw] = await Promise.all([
+    const [tips,results,scores,etRes,penRes,proUsersRaw,vipUsersRaw,customRaw,musicPublicRaw,oplRaw,usersRaw,adminPwRaw,deletedUsersRaw,scorerRes,bracketTeamsRaw,etScoresRaw,penScoresRaw] = await Promise.all([
       fbGet('tips').catch(function(){return null;}),
       fbGet('results').catch(function(){return null;}),
       fbGet('scores').catch(function(){return null;}),
@@ -3011,6 +3011,8 @@ async function pollData() {
       fbGet('deletedUsers').catch(function(){return null;}),
       fbGet('scorerResults').catch(function(){return null;}),
       fbGet('bracketTeams').catch(function(){return null;}),
+      fbGet('etScores').catch(function(){return null;}),
+      fbGet('penScores').catch(function(){return null;}),
     ]);
     var rawTips=tips||{};
     allTips={};
@@ -3025,8 +3027,9 @@ async function pollData() {
     if(scorerRes && typeof scorerRes==='object') {
       Object.keys(scorerRes).forEach(function(mid){ allScorerResults[mid]=scorerRes[mid]||[]; });
     }
-    // Bracket továbbjutók
     allBracketTeams = bracketTeamsRaw || {};
+    if(etScoresRaw  && typeof etScoresRaw==='object')  allEtScores  = etScoresRaw;
+    if(penScoresRaw && typeof penScoresRaw==='object') allPenScores = penScoresRaw;
     if(Array.isArray(proUsersRaw)) allProUsers=proUsersRaw.filter(Boolean);
     else if(proUsersRaw && typeof proUsersRaw==='object') allProUsers=Object.values(proUsersRaw).filter(Boolean);
     else allProUsers=[];
@@ -3917,7 +3920,13 @@ function calcMatchPoints(m, tip) {
   // Góllövő bónusz pontok (kieséses meccseken)
   if(m.knockout) {
     var scorerBonus = calcScorerBonus(m, tip);
-    pts += scorerBonus; // mult-tal NEM szorozzuk, önállóan kerül
+    pts += scorerBonus;
+    // ET pontos eredmény bónusz (+1 pt, döntőn +2 pt)
+    var etSc = allEtScores[m.id];
+    if(etSc && tip.etScore && tip.etScore === etSc) pts += (mult===3?2:1);
+    // Pen pontos eredmény bónusz (+1 pt, döntőn +2 pt)
+    var penSc = allPenScores[m.id];
+    if(penSc && tip.penScore && tip.penScore === penSc) pts += (mult===3?2:1);
   }
   return pts * mult;
 }
@@ -3948,6 +3957,8 @@ function calcScorerBonus(m, tip) {
 // Valódi góllövők tárolója (admin rögzíti, vagy ESPN-ből auto-tölti)
 var allScorerResults = {}; // {matchId: ['Mbappé','Dembélé',...]}
 var allBracketTeams  = {}; // {slotId: {name:'Franciaország', flag:'🇫🇷'}}
+var allEtScores      = {}; // {matchId: 'H:A'} — hosszabbítás pontos eredmény
+var allPenScores     = {}; // {matchId: 'H:A'} — 11-es pontos eredmény
 
 async function submitTip(mid,tip,phase) {
   phase = phase || 'o'; // 'o' = rendes játékidő, 'et' = hosszabbítás, 'pen' = 11-esek
@@ -4180,8 +4191,18 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
   var disEt  = (!etResult && kickoffLocked) ? ' disabled' : '';
   var disPen = (!penResult && kickoffLocked) ? ' disabled' : '';
 
+  // Meglévő ET/Pen score tippek
+  var myEtH  = myTip && myTip.etScore  ? myTip.etScore.split(':')[0]  : '';
+  var myEtA  = myTip && myTip.etScore  ? myTip.etScore.split(':')[1]  : '';
+  var myPenH = myTip && myTip.penScore ? myTip.penScore.split(':')[0] : '';
+  var myPenA = myTip && myTip.penScore ? myTip.penScore.split(':')[1] : '';
+  // Valódi ET/Pen score eredmények
+  var realEtScore  = allEtScores[m.id]  || null;
+  var realPenScore = allPenScores[m.id] || null;
+
   var html = '';
   if(showEt) {
+    // ET kimenetel gombok
     html += '<div style="margin-top:8px;padding:6px 8px 4px;border-top:1px dashed rgba(0,255,135,0.18);">'
       + '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(0,255,135,0.6);letter-spacing:1.2px;margin-bottom:4px;text-align:center;">⚡ HOSSZABBÍTÁS</div>'
       + '<div class="tip-buttons">'
@@ -4194,10 +4215,26 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
       + '<button class="'+etCls('2')+'" onclick="submitTip(\''+m.id+'\',\'2\',\'et\')"'+disEt+'>'
       +   '<span class="tl">2</span><span class="tc">'+(etCnt['2']>0?(etCnt['2']+'×'):'')+'</span>'
       + '</button>'
+      + '</div>';
+
+    // ET pontos eredmény sor
+    var etScoreLocked = (!realEtScore && kickoffLocked && !m.id.startsWith('CM_TEST_'));
+    var etScoreClass  = realEtScore
+      ? (myEtH !== '' && myEtA !== '' && myEtH+':'+myEtA === realEtScore ? ' correct-score' : myEtH !== '' ? ' wrong-score' : '')
+      : '';
+    html += '<div class="score-row" style="margin-top:6px;">'
+      + '<span class="score-row-label" style="font-size:10px;color:rgba(0,255,135,0.5);">⚡ pontosan:</span>'
+      + '<input type="text" inputmode="numeric" id="ets_h_'+m.id+'" class="score-num-input'+etScoreClass+'" maxlength="2" value="'+escHtml(myEtH)+'" placeholder="-"'+(etScoreLocked?' disabled':'')+' style="width:38px;">'
+      + '<span class="score-sep">:</span>'
+      + '<input type="text" inputmode="numeric" id="ets_a_'+m.id+'" class="score-num-input'+etScoreClass+'" maxlength="2" value="'+escHtml(myEtA)+'" placeholder="-"'+(etScoreLocked?' disabled':'')+' style="width:38px;">'
+      + (realEtScore ? '<span style="font-size:11px;color:rgba(0,255,135,0.7);margin-left:6px;">'+realEtScore+'</span>' : '')
+      + '<button class="score-save-btn" data-mid="'+m.id+'" onclick="handleEtScoreSave(this)"'+(etScoreLocked?' disabled':'')+'>✓ Ment</button>'
       + '</div>'
       + '</div>';
   }
+
   if(showPen) {
+    // Pen kimenetel gombok
     html += '<div style="margin-top:6px;padding:6px 8px 4px;border-top:1px dashed rgba(0,255,135,0.18);">'
       + '<div style="font-family:Oswald,sans-serif;font-size:10px;color:rgba(0,255,135,0.6);letter-spacing:1.2px;margin-bottom:4px;text-align:center;">🥅 11-ESEK</div>'
       + '<div class="tip-buttons" style="grid-template-columns:1fr 1fr;">'
@@ -4207,6 +4244,20 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
       + '<button class="'+penCls('2')+'" onclick="submitTip(\''+m.id+'\',\'2\',\'pen\')"'+disPen+'>'
       +   '<span class="tl">2</span><span class="tc">'+(penCnt['2']>0?(penCnt['2']+'×'):'')+'</span>'
       + '</button>'
+      + '</div>';
+
+    // Pen pontos eredmény sor (pl. 4:3)
+    var penScoreLocked = (!realPenScore && kickoffLocked && !m.id.startsWith('CM_TEST_'));
+    var penScoreClass  = realPenScore
+      ? (myPenH !== '' && myPenA !== '' && myPenH+':'+myPenA === realPenScore ? ' correct-score' : myPenH !== '' ? ' wrong-score' : '')
+      : '';
+    html += '<div class="score-row" style="margin-top:6px;">'
+      + '<span class="score-row-label" style="font-size:10px;color:rgba(0,255,135,0.5);">🥅 pontosan:</span>'
+      + '<input type="text" inputmode="numeric" id="pens_h_'+m.id+'" class="score-num-input'+penScoreClass+'" maxlength="2" value="'+escHtml(myPenH)+'" placeholder="-"'+(penScoreLocked?' disabled':'')+' style="width:38px;">'
+      + '<span class="score-sep">:</span>'
+      + '<input type="text" inputmode="numeric" id="pens_a_'+m.id+'" class="score-num-input'+penScoreClass+'" maxlength="2" value="'+escHtml(myPenA)+'" placeholder="-"'+(penScoreLocked?' disabled':'')+' style="width:38px;">'
+      + (realPenScore ? '<span style="font-size:11px;color:rgba(0,255,135,0.7);margin-left:6px;">'+realPenScore+'</span>' : '')
+      + '<button class="score-save-btn" data-mid="'+m.id+'" onclick="handlePenScoreSave(this)"'+(penScoreLocked?' disabled':'')+'>✓ Ment</button>'
       + '</div>'
       + '</div>';
   }
@@ -5520,6 +5571,28 @@ function renderAdminMatches() {
             <button onclick="adminSetTip('${m.id}')"
               style="padding:5px 10px;background:rgba(0,255,135,0.15);border:1px solid rgba(0,255,135,0.3);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">✓ Ment</button>
           </div>
+        </div>
+        <!-- GÓLLÖVŐK RÖGZÍTÉS (admin) -->
+        <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,255,135,0.12);">
+          <div style="font-size:10px;color:rgba(0,255,135,0.5);font-family:Oswald,sans-serif;letter-spacing:1px;margin-bottom:5px;">⚡ HOSSZABBÍTÁS / 🥅 11-ES EREDMÉNY (admin)</div>
+          ${isKnockoutMatch(m) ? `
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:5px;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <span style="font-size:10px;color:rgba(0,255,135,0.5);">⚡</span>
+              <input type="text" inputmode="numeric" id="aets_h_${m.id}" placeholder="H" maxlength="2" value="${allEtScores[m.id]?allEtScores[m.id].split(':')[0]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;">
+              <span style="color:rgba(255,255,255,0.3);">:</span>
+              <input type="text" inputmode="numeric" id="aets_a_${m.id}" placeholder="V" maxlength="2" value="${allEtScores[m.id]?allEtScores[m.id].split(':')[1]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;">
+              <button onclick="adminSaveEtScore('${m.id}')" style="padding:4px 8px;background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:#00ff87;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;border-radius:0;">ET ✓</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <span style="font-size:10px;color:rgba(0,255,135,0.5);">🥅</span>
+              <input type="text" inputmode="numeric" id="apens_h_${m.id}" placeholder="H" maxlength="2" value="${allPenScores[m.id]?allPenScores[m.id].split(':')[0]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;">
+              <span style="color:rgba(255,255,255,0.3);">:</span>
+              <input type="text" inputmode="numeric" id="apens_a_${m.id}" placeholder="V" maxlength="2" value="${allPenScores[m.id]?allPenScores[m.id].split(':')[1]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;">
+              <button onclick="adminSavePenScore('${m.id}')" style="padding:4px 8px;background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:#00ff87;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;border-radius:0;">11-es ✓</button>
+            </div>
+          </div>
+          ` : ''}
         </div>
         <!-- GÓLLÖVŐK RÖGZÍTÉS (admin) -->
         <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,255,135,0.12);">
@@ -7758,7 +7831,7 @@ function renderLiveTicker() {
     if(!isNaN(hg) && !isNaN(ag) && allTips[mid]) {
       var liveOutcome = hg > ag ? '1' : hg === ag ? 'X' : '2';
       var liveScore = hg + ':' + ag;
-      var winners = [];
+      var allTippers = [];
       Object.entries(allTips[mid]).forEach(function(te) {
         var user = te[0], tip = te[1];
         var tipOutcome = getTipOutcome(tip);
@@ -7767,24 +7840,27 @@ function renderLiveTicker() {
           var implied = tipSc.h > tipSc.a ? '1' : tipSc.h === tipSc.a ? 'X' : '2';
           if(implied !== tipOutcome) tipOutcome = implied;
         }
-        if(tipOutcome === liveOutcome) {
-          var isExact = tipSc && (tipSc.h+':'+tipSc.a === liveScore);
-          var isGD = !isExact && tipSc && ((tipSc.h-tipSc.a)===(hg-ag));
-          winners.push({name:user, exact:isExact, gd:isGD});
-        }
+        var isWin    = tipOutcome === liveOutcome;
+        var isExact  = isWin && tipSc && (tipSc.h+':'+tipSc.a === liveScore);
+        var isGD     = isWin && !isExact && tipSc && ((tipSc.h-tipSc.a)===(hg-ag));
+        allTippers.push({name:user, win:isWin, exact:isExact, gd:isGD, outcome:tipOutcome});
       });
-      winners.sort(function(a,b){ return (b.exact?2:b.gd?1:0)-(a.exact?2:a.gd?1:0); });
-      if(winners.length > 0) {
+      // Rendezés: pontos > gólkülönbség > helyes kimenetel > téves
+      allTippers.sort(function(a,b){
+        var sa = a.exact?3:a.gd?2:a.win?1:0;
+        var sb = b.exact?3:b.gd?2:b.win?1:0;
+        return sb - sa;
+      });
+      if(allTippers.length > 0) {
         winnerHtml = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;">';
-        winners.forEach(function(w) {
-          var icon = w.exact ? '🎯' : w.gd ? '📐' : '🟡';
-          var color = w.exact ? '#39ff9d' : w.gd ? '#60a5fa' : 'var(--gold)';
+        allTippers.forEach(function(w) {
+          var icon  = w.exact ? '🎯' : w.gd ? '📐' : w.win ? '🟡' : '✗';
+          var color = w.exact ? '#39ff9d' : w.gd ? '#60a5fa' : w.win ? 'var(--gold)' : 'rgba(240,244,240,0.28)';
           var meStyle = currentUser && fbSafeName(currentUser)===w.name ? 'border-color:rgba(0,255,135,0.5);background:rgba(0,255,135,0.08);' : '';
-          winnerHtml += '<span style="font-family:Oswald,sans-serif;font-size:11px;color:'+color+';background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:1px 6px;'+meStyle+'">'+icon+' '+escHtml(w.name)+'</span>';
+          var loseStyle = !w.win ? 'text-decoration:line-through;opacity:0.55;' : '';
+          winnerHtml += '<span style="font-family:Oswald,sans-serif;font-size:11px;color:'+color+';background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:1px 6px;'+meStyle+loseStyle+'">'+icon+' '+escHtml(w.name)+'</span>';
         });
         winnerHtml += '</div>';
-      } else {
-        winnerHtml = '<div style="font-size:11px;color:rgba(240,244,240,0.25);margin-top:3px;">Senki sem áll nyerésre</div>';
       }
     }
 
@@ -8775,7 +8851,76 @@ function renderBracket() {
   container.innerHTML = html;
 }
 
-// ===== BRACKET ADMIN =====
+async function adminSaveEtScore(mid) {
+  var h = parseInt((document.getElementById('aets_h_'+mid)||{}).value);
+  var a = parseInt((document.getElementById('aets_a_'+mid)||{}).value);
+  if(isNaN(h)||isNaN(a)) { showToast('⚠️ Adj meg érvényes ET eredményt!'); return; }
+  allEtScores[mid] = h+':'+a;
+  try {
+    await fbSet('etScores/'+mid, h+':'+a);
+    showToast('⚡ ET score mentve: '+h+':'+a);
+    renderAdminMatches();
+    if(!_scoreSaving) try{ renderMatches(); }catch(e){}
+  } catch(e) { showToast('❌ '+e.message); }
+}
+
+async function adminSavePenScore(mid) {
+  var h = parseInt((document.getElementById('apens_h_'+mid)||{}).value);
+  var a = parseInt((document.getElementById('apens_a_'+mid)||{}).value);
+  if(isNaN(h)||isNaN(a)) { showToast('⚠️ Adj meg érvényes 11-es eredményt!'); return; }
+  allPenScores[mid] = h+':'+a;
+  try {
+    await fbSet('penScores/'+mid, h+':'+a);
+    showToast('🥅 11-es score mentve: '+h+':'+a);
+    renderAdminMatches();
+    if(!_scoreSaving) try{ renderMatches(); }catch(e){}
+  } catch(e) { showToast('❌ '+e.message); }
+}
+
+// ET score mentés
+async function handleEtScoreSave(btn) {
+  var mid = btn.getAttribute('data-mid');
+  var a = (document.getElementById('ets_a_'+mid)||{}).value;
+  h = parseInt(h); a = parseInt(a);
+  if(isNaN(h)||isNaN(a)||h<0||a<0||h>20||a>20) { showToast('⚠️ Érvénytelen eredmény!'); return; }
+  if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
+  var existing = allTips[mid] && allTips[mid][fbSafeName(currentUser)];
+  if(!existing) { showToast('⚠️ Előbb adj le ET kimenetelt!'); return; }
+  var newTip = Object.assign({}, existing);
+  newTip.etScore = h+':'+a;
+  newTip.ts = Date.now();
+  if(!allTips[mid]) allTips[mid]={};
+  allTips[mid][fbSafeName(currentUser)] = newTip;
+  try {
+    await fbSet('tips/'+mid+'/'+fbSafeName(currentUser), newTip);
+    showToast('⚡ ET eredmény mentve: '+h+':'+a);
+    if(!_scoreSaving) try{ renderMatches(); }catch(e){}
+  } catch(e) { showToast('❌ Hiba: '+e.message); }
+}
+
+// Pen score mentés
+async function handlePenScoreSave(btn) {
+  var mid = btn.getAttribute('data-mid');
+  var h = (document.getElementById('pens_h_'+mid)||{}).value;
+  var a = (document.getElementById('pens_a_'+mid)||{}).value;
+  h = parseInt(h); a = parseInt(a);
+  if(isNaN(h)||isNaN(a)||h<0||a<0||h>20||a>20) { showToast('⚠️ Érvénytelen eredmény!'); return; }
+  if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
+  var existing = allTips[mid] && allTips[mid][fbSafeName(currentUser)];
+  if(!existing) { showToast('⚠️ Előbb adj le 11-es kimenetelt!'); return; }
+  var newTip = Object.assign({}, existing);
+  newTip.penScore = h+':'+a;
+  newTip.ts = Date.now();
+  if(!allTips[mid]) allTips[mid]={};
+  allTips[mid][fbSafeName(currentUser)] = newTip;
+  try {
+    await fbSet('tips/'+mid+'/'+fbSafeName(currentUser), newTip);
+    showToast('🥅 11-es eredmény mentve: '+h+':'+a);
+    if(!_scoreSaving) try{ renderMatches(); }catch(e){}
+  } catch(e) { showToast('❌ Hiba: '+e.message); }
+}
+
+
 async function adminSaveBracketTeam() {
   var slotId = (document.getElementById('bracketSlotId').value||'').trim().toUpperCase();
   var flag   = (document.getElementById('bracketTeamFlag').value||'').trim();
