@@ -9071,27 +9071,59 @@ function getScorerCandidates(teamName, matchId) {
     return isAway ? allNames.slice(half) : allNames.slice(0, half);
   }
 
-  // Valódi meccseken: az eddigi meccsek lineup adataiból gyűjtjük a játékosokat
+  // Valódi meccseken: minden forrásból gyűjtjük a játékosokat
   var seen2 = {};
+  function addP(n) {
+    if(n && typeof n==='string' && n.trim().length>1 && !seen2[n]) { seen2[n]=true; result.push(n); }
+  }
+
+  // 1. m.homeLineup / m.awayLineup — meccs objektumon tárolt (string array)
   ALL_MATCHES.forEach(function(m) {
     if(!isVbMatch(m)) return;
-    var lineup = null;
-    if(m.home === teamName) lineup = m.homeLineup;
-    else if(m.away === teamName) lineup = m.awayLineup;
-    if(lineup) lineup.forEach(function(name) {
-      if(name && !seen2[name]) { seen2[name]=true; result.push(name); }
+    var lu = (m.home===teamName) ? m.homeLineup : (m.away===teamName) ? m.awayLineup : null;
+    if(lu) lu.forEach(addP);
+  });
+
+  // 2. liveLineups[matchId] — ESPN summary API struktúra: {home:{players:[],subs:[]}, away:{...}}
+  Object.keys(liveLineups||{}).forEach(function(mid) {
+    var mm = ALL_MATCHES.find(function(x){ return x.id===mid; });
+    if(!mm||!isVbMatch(mm)) return;
+    var isHome = mm.home===teamName, isAway = mm.away===teamName;
+    if(!isHome&&!isAway) return;
+    var lu = liveLineups[mid];
+    var side = isHome ? 'home' : 'away';
+    if(lu && lu[side]) {
+      var sd = lu[side];
+      // Struktúra: {players:[...], subs:[...]}
+      if(sd.players) sd.players.forEach(addP);
+      if(sd.subs) sd.subs.forEach(addP);
+      // Vagy array of player objects
+      if(Array.isArray(sd)) sd.forEach(function(p){
+        addP(p.athlete ? (p.athlete.displayName||'') : (p.displayName||p.name||''));
+      });
+    }
+  });
+
+  // 3. liveEventsAll — gólesemények, cserék
+  Object.keys(liveEventsAll||{}).forEach(function(mid) {
+    var mm = ALL_MATCHES.find(function(x){ return x.id===mid; });
+    if(!mm||!isVbMatch(mm)) return;
+    if(mm.home!==teamName && mm.away!==teamName) return;
+    (liveEventsAll[mid]||[]).forEach(function(ev){
+      if(ev.participants) ev.participants.forEach(function(p){
+        addP(p.athlete ? p.athlete.displayName : (p.displayName||''));
+      });
     });
   });
 
-  // Fallback: ESPN gólszerzők listája ha nincs lineup
+  // 4. Fallback: topScorers
   if(!result.length && window.cachedTopScorers) {
     window.cachedTopScorers.forEach(function(p) {
       if(p.team && (p.team.toLowerCase().indexOf(teamName.toLowerCase())>=0 ||
                     teamName.toLowerCase().indexOf(p.team.toLowerCase())>=0)) {
-        if(p.name && result.indexOf(p.name)===-1) result.push(p.name);
+        addP(p.name);
       }
     });
-    return result.slice(0,20);
   }
 
   return result.sort();
@@ -9126,6 +9158,13 @@ function openScorerModal(matchId) {
   document.getElementById('scorerModal').style.display = 'flex';
   document.getElementById('scorerHomeInput').value = '';
   document.getElementById('scorerAwayInput').value = '';
+
+  // Ha nincs lineup adat, próbáljuk betölteni ESPN-ből az összes korábbi meccsről
+  var homeCands = getScorerCandidates(m.home, matchId);
+  var awayCands = getScorerCandidates(m.away, matchId);
+  if(!homeCands.length && !awayCands.length) {
+    fetchLineupForScorer(m, matchId);
+  }
 }
 
 function renderScorerPlayers(side, teamName, matchId) {
@@ -9203,6 +9242,62 @@ async function saveScorerTip() {
     if(!_scoreSaving) try{ renderMatches(); }catch(e){}
   } catch(e){ showToast('❌ Mentési hiba: '+e.message); }
 }
+
+// Async lineup betöltés a scorer popuphoz — ESPN scoreboard API alapján
+async function fetchLineupForScorer(m, matchId) {
+  try {
+    // Az adott csapat összes VB meccsét megkeressük
+    var teamMatches = ALL_MATCHES.filter(function(x){
+      return isVbMatch(x) && (x.home===m.home || x.away===m.away || x.home===m.away || x.away===m.home);
+    });
+    // Dátumok amiken ezek a meccsek voltak
+    var dates = [...new Set(teamMatches.map(function(x){ return x.huDate.replace(/-/g,''); }))];
+    for(var di=0; di<Math.min(dates.length, 6); di++) {
+      var d = dates[di];
+      try {
+        var r = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+d+'&limit=50');
+        if(!r.ok) continue;
+        var sb = await r.json();
+        var events = sb.events || [];
+        for(var ei=0; ei<events.length; ei++) {
+          var ev = events[ei];
+          var comp = ev.competitions&&ev.competitions[0]; if(!comp) continue;
+          var teams = comp.competitors||[];
+          var homeT = teams.find(function(t){return t.homeAway==='home';});
+          var awayT = teams.find(function(t){return t.homeAway==='away';});
+          if(!homeT||!awayT) continue;
+          var huH = teamNameToHu((homeT.team.displayName||'').toLowerCase());
+          var huA = teamNameToHu((awayT.team.displayName||'').toLowerCase());
+          // Keressük a megfelelő meccset
+          var localM = teamMatches.find(function(x){
+            return (x.home===huH && x.away===huA) || ((huH&&x.home.toLowerCase()===huH)||x.home.toLowerCase().includes(huH.substring(0,4)));
+          });
+          if(!localM) continue;
+          // Ha van lineup az ESPN válaszban
+          if(homeT.lineups && homeT.lineups.length) {
+            localM.homeLineup = homeT.lineups.map(function(p){return p.athlete?p.athlete.displayName:p.displayName||'';}).filter(Boolean);
+          } else if(homeT.roster) {
+            localM.homeLineup = homeT.roster.map(function(p){return p.athlete?p.athlete.displayName:p.displayName||'';}).filter(Boolean);
+          }
+          if(awayT.lineups && awayT.lineups.length) {
+            localM.awayLineup = awayT.lineups.map(function(p){return p.athlete?p.athlete.displayName:p.displayName||'';}).filter(Boolean);
+          } else if(awayT.roster) {
+            localM.awayLineup = awayT.roster.map(function(p){return p.athlete?p.athlete.displayName:p.displayName||'';}).filter(Boolean);
+          }
+        }
+      } catch(e) {}
+    }
+    // Lista frissítése
+    if(document.getElementById('scorerModal').style.display !== 'none') {
+      var mm = ALL_MATCHES.find(function(x){ return x.id===matchId; }) || _virtualKOMatches[matchId];
+      if(mm) {
+        renderScorerPlayers('home', mm.home, matchId);
+        renderScorerPlayers('away', mm.away, matchId);
+      }
+    }
+  } catch(e) {}
+}
+
 
 function closeScorerModal() {
   var m = document.getElementById('scorerModal');
