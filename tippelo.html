@@ -4024,8 +4024,8 @@ var allTeamRosters   = {}; // {teamName: ['Mbappé', 'Giroud', ...]} — Firebas
 async function submitTip(mid,tip,phase) {
   phase = phase || 'o'; // 'o' = rendes játékidő, 'et' = hosszabbítás, 'pen' = 11-esek
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
-  const m=ALL_MATCHES.find(x=>x.id===mid);
-  if(m&&isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
+  const m=ALL_MATCHES.find(x=>x.id===mid) || _virtualKOMatches[mid];
+  if(m&&isKickoffPassed(m.huDate,m.huTime)&&!mid.startsWith('CM_TEST_')){showToast('⏰ A meccs már elkezdett!');return;}
   if(allResults[mid] && phase==='o'){showToast('⛔ Már ismert az eredmény!');return;}
   if(allEtResults[mid] && phase==='et'){showToast('⛔ Hosszabbítás eredménye már ismert!');return;}
   if(allPenResults[mid] && phase==='pen'){showToast('⛔ 11-es eredmény már ismert!');return;}
@@ -4092,8 +4092,8 @@ function handleScoreSave(btn) {
   var aVal = aEl ? aEl.value : '';
 
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
-  var m = ALL_MATCHES.find(function(x){return x.id===mid;});
-  if(m && isKickoffPassed(m.huDate,m.huTime)){showToast('⏰ A meccs már elkezdett!');return;}
+  var m = ALL_MATCHES.find(function(x){return x.id===mid;}) || _virtualKOMatches[mid];
+  if(m && isKickoffPassed(m.huDate,m.huTime) && !mid.startsWith('CM_TEST_')){showToast('⏰ A meccs már elkezdett!');return;}
   if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
   if(hVal===''||aVal===''){showToast('⚠️ Írd be mindkét számot!');return;}
   
@@ -4925,10 +4925,11 @@ function renderMatches() {
   var r32Ids = new Set(mainMatches.filter(function(m){ return m.id&&m.id.startsWith('R32_'); }).map(function(m){ return m.id; }));
   R32_STRUCTURE.forEach(function(slot) {
     var id = 'R32_M'+slot.m;
-    if(r32Ids.has(id)) return; // már benne van
-    var hTeam = resolveSlot(slot.h, groups, bestThirds3);
-    var aTeam = resolveSlot(slot.a, groups, bestThirds3);
-    if(!hTeam && !aTeam) return; // egyik sem ismert még
+    if(r32Ids.has(id)) return;
+    // Ismert csapatok: struktúrában lévő home/away elsőbbséget élvez a slot-kalkuláció felett
+    var hTeam = slot.home ? {name:slot.home, flag:slot.homeFlag||''} : resolveSlot(slot.h, groups, bestThirds3);
+    var aTeam = slot.away ? {name:slot.away, flag:slot.awayFlag||''} : resolveSlot(slot.a, groups, bestThirds3);
+    if(!hTeam && !aTeam) return;
     mainMatches.push({
       id: id,
       huDate: slot.huDate,
@@ -5660,10 +5661,19 @@ function renderAdminMatches() {
   try { renderVipAdmin(); } catch(e){}
   try { renderCustomMatchAdmin(); } catch(e){}
   const c=document.getElementById('adminMatchList');
-  const dates=[...new Set(ALL_MATCHES.map(m=>m.huDate))];
+  // Admin eredmény rögzítés: csak kieséses szakasz meccsek + teszt meccsek
+  var adminMatchList = ALL_MATCHES.filter(function(m){
+    return m.knockout || m.id.startsWith('CM_TEST_');
+  });
+  // Virtuális R32 meccsek is belekerülnek
+  Object.values(_virtualKOMatches||{}).forEach(function(vm){
+    if(!adminMatchList.some(function(x){ return x.id===vm.id; })) adminMatchList.push(vm);
+  });
+  adminMatchList.sort(function(a,b){ return (a.huDate+a.huTime).localeCompare(b.huDate+b.huTime); });
+  const dates=[...new Set(adminMatchList.map(m=>m.huDate))];
   let html='';
   dates.forEach(date=>{
-    const dms=ALL_MATCHES.filter(m=>m.huDate===date);
+    const dms=adminMatchList.filter(m=>m.huDate===date);
     const d=new Date(date+'T12:00:00');
     html+=`<div class="section-header" style="margin-top:16px;"><h2>${d.toLocaleDateString('hu-HU',{month:'long',day:'numeric'})}</h2></div>`;
     dms.forEach(m=>{
@@ -8827,25 +8837,24 @@ async function deleteCustomMatch(id) {
 
 // R32 meccsek fix struktúrája
 var R32_STRUCTURE = [
-  // Magyar idő (CEST) — forrás: M4Sport, KuponKirály, HungarySport
-  { m:73, h:'2A', a:'2B',      date:'Jún 28', huDate:'2026-06-28', huTime:'21:00', venue:'Los Angeles'  },
-  { m:76, h:'1C', a:'2F',      date:'Jún 29', huDate:'2026-06-29', huTime:'19:00', venue:'Houston'      },
-  { m:74, h:'1E', a:'3ABCDF',  date:'Jún 29', huDate:'2026-06-29', huTime:'22:30', venue:'Boston'       },
-  { m:75, h:'1F', a:'2C',      date:'Jún 30', huDate:'2026-06-30', huTime:'03:00', venue:'Monterrey'    },
-  { m:78, h:'2E', a:'2I',      date:'Jún 30', huDate:'2026-06-30', huTime:'19:00', venue:'Dallas'       },
-  { m:77, h:'1I', a:'3CDFGH',  date:'Jún 30', huDate:'2026-06-30', huTime:'23:00', venue:'New York'     },
-  { m:79, h:'1A', a:'3CEFHI',  date:'Júl 1',  huDate:'2026-07-01', huTime:'03:00', venue:'Mexico City'  },
-  { m:80, h:'1L', a:'3EHIJK',  date:'Júl 1',  huDate:'2026-07-01', huTime:'18:00', venue:'Atlanta'      },
-  { m:82, h:'1G', a:'3AEHIJ',  date:'Júl 1',  huDate:'2026-07-01', huTime:'22:00', venue:'Seattle'      },
-  { m:81, h:'1D', a:'3BEFIJ',  date:'Júl 2',  huDate:'2026-07-02', huTime:'02:00', venue:'Santa Clara'  },
-  { m:84, h:'1H', a:'2J',      date:'Júl 2',  huDate:'2026-07-02', huTime:'21:00', venue:'Los Angeles'  },
-  { m:86, h:'1J', a:'2H',      date:'Júl 3',  huDate:'2026-07-03', huTime:'01:00', venue:''             },
-  { m:88, h:'2D', a:'2G',      date:'Júl 3',  huDate:'2026-07-03', huTime:'19:00', venue:''             },
-  { m:85, h:'1B', a:'3EFGIJ',  date:'Júl 3',  huDate:'2026-07-03', huTime:'22:30', venue:''             },
-  { m:87, h:'1K', a:'3DEIJL',  date:'Júl 4',  huDate:'2026-07-04', huTime:'03:00', venue:''             },
-  { m:83, h:'2K', a:'2L',      date:'Júl 5',  huDate:'2026-07-05', huTime:'03:00', venue:''             },
+  // Hivatalos FIFA R32 párosítások — forrás: ESPN, Yahoo Sports, Sky Sports
+  { m:73, home:'Dél-Afrika',          homeFlag:'🇿🇦', away:'Kanada',                awayFlag:'🇨🇦', h:'2A', a:'2B',     date:'Jún 28', huDate:'2026-06-28', huTime:'21:00', venue:'Los Angeles'  },
+  { m:76, home:'Brazília',             homeFlag:'🇧🇷', away:'Japán',                 awayFlag:'🇯🇵', h:'1C', a:'2F',     date:'Jún 29', huDate:'2026-06-29', huTime:'19:00', venue:'Houston'      },
+  { m:74, home:'Németország',          homeFlag:'🇩🇪', away:'Paraguay',              awayFlag:'🇵🇾', h:'1E', a:'3ABCDF', date:'Jún 29', huDate:'2026-06-29', huTime:'22:30', venue:'Boston'       },
+  { m:75, home:'Hollandia',            homeFlag:'🇳🇱', away:'Marokkó',               awayFlag:'🇲🇦', h:'1F', a:'2C',     date:'Jún 30', huDate:'2026-06-30', huTime:'03:00', venue:'Monterrey'    },
+  { m:78, home:'Elefántcsontpart',     homeFlag:'🇨🇮', away:'Norvégia',              awayFlag:'🇳🇴', h:'2E', a:'2I',     date:'Jún 30', huDate:'2026-06-30', huTime:'19:00', venue:'Dallas'       },
+  { m:77, home:'Franciaország',        homeFlag:'🇫🇷', away:'Svédország',            awayFlag:'🇸🇪', h:'1I', a:'3CDFGH', date:'Jún 30', huDate:'2026-06-30', huTime:'23:00', venue:'New York'     },
+  { m:79, home:'Mexikó',               homeFlag:'🇲🇽', away:'Ecuador',               awayFlag:'🇪🇨', h:'1A', a:'3CEFHI', date:'Júl 1',  huDate:'2026-07-01', huTime:'03:00', venue:'Mexico City'  },
+  { m:80, home:'Anglia',               homeFlag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', away:'Kongói DK',             awayFlag:'🇨🇩', h:'1L', a:'3EHIJK', date:'Júl 1',  huDate:'2026-07-01', huTime:'18:00', venue:'Atlanta'      },
+  { m:82, home:'Belgium',              homeFlag:'🇧🇪', away:'Szenegál',              awayFlag:'🇸🇳', h:'1G', a:'3AEHIJ', date:'Júl 1',  huDate:'2026-07-01', huTime:'22:00', venue:'Seattle'      },
+  { m:81, home:'USA',                  homeFlag:'🇺🇸', away:'Bosznia-Hercegovina',   awayFlag:'🇧🇦', h:'1D', a:'3BEFIJ', date:'Júl 2',  huDate:'2026-07-02', huTime:'02:00', venue:'Santa Clara'  },
+  { m:84, home:'Spanyolország',        homeFlag:'🇪🇸', away:'Ausztria',              awayFlag:'🇦🇹', h:'1H', a:'2J',     date:'Júl 2',  huDate:'2026-07-02', huTime:'21:00', venue:'Los Angeles'  },
+  { m:86, home:'Argentína',            homeFlag:'🇦🇷', away:'Zöld-foki-szigetek',    awayFlag:'🇨🇻', h:'1J', a:'2H',     date:'Júl 3',  huDate:'2026-07-03', huTime:'01:00', venue:'Miami'        },
+  { m:88, home:'Ausztrália',           homeFlag:'🇦🇺', away:'Egyiptom',              awayFlag:'🇪🇬', h:'2D', a:'2G',     date:'Júl 3',  huDate:'2026-07-03', huTime:'19:00', venue:'Dallas'       },
+  { m:85, home:'Svájc',                homeFlag:'🇨🇭', away:'Algéria',               awayFlag:'🇩🇿', h:'1B', a:'3EFGIJ', date:'Júl 3',  huDate:'2026-07-03', huTime:'22:30', venue:'Vancouver'    },
+  { m:87, home:'Kolumbia',             homeFlag:'🇨🇴', away:'Ghána',                 awayFlag:'🇬🇭', h:'1K', a:'3DEIJL', date:'Júl 4',  huDate:'2026-07-04', huTime:'02:30', venue:'Kansas City'  },
+  { m:83, home:'Portugália',           homeFlag:'🇵🇹', away:'Horvátország',           awayFlag:'🇭🇷', h:'2K', a:'2L',     date:'Júl 5',  huDate:'2026-07-05', huTime:'03:00', venue:''            },
 ];
-
 function detectRound(m) {
   var g = (m.group||m.title||'').toLowerCase().trim();
   if(/bronz|3rd|harmadik/i.test(g)) return 'BRONZE';
@@ -8920,8 +8929,8 @@ function renderBracket() {
   html += '<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:20px;">';
 
   R32_STRUCTURE.forEach(function(slot) {
-    var hTeam = resolveSlot(slot.h, groups, bestThirds);
-    var aTeam = resolveSlot(slot.a, groups, bestThirds);
+    var hTeam = slot.home ? {name:slot.home, flag:slot.homeFlag||''} : resolveSlot(slot.h, groups, bestThirds);
+    var aTeam = slot.away ? {name:slot.away, flag:slot.awayFlag||''} : resolveSlot(slot.a, groups, bestThirds);
     var koMatch = ALL_MATCHES.find(function(m){
       return m.knockout && !m.id.startsWith('CM_TEST_') &&
         ((hTeam&&m.home===hTeam.name)||(aTeam&&m.away===aTeam.name));
