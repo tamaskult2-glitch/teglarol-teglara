@@ -1475,8 +1475,9 @@ input:focus, textarea:focus, select:focus {
 
     <!-- Tartalom (görgethető) -->
     <div style="overflow-y:auto;flex:1;padding:12px 14px;">
-      <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:10px;line-height:1.5;">
-        Válaszd ki, szerinted ki fog gólt lőni. Minden helyes tipp: <span style="color:#00ff87;font-weight:700;">+1 pont</span> (döntőben/bronzon: <span style="color:#00ff87;font-weight:700;">+2 pt</span>).
+      <div style="font-size:11px;color:rgba(240,244,244,0.4);margin-bottom:10px;line-height:1.5;">
+        Válaszd ki ki lő gólt <b style="color:rgba(240,244,240,0.7);">90 percben vagy hosszabbításban</b>. Minden helyes tipp: <span style="color:#00ff87;font-weight:700;">+1 pont</span> (döntőben/bronzon: <span style="color:#00ff87;font-weight:700;">+2 pt</span>).<br>
+        <span style="color:rgba(240,244,240,0.3);">⚠️ 11-esek góllövői NEM számítanak.</span>
       </div>
 
       <!-- Hazai csapat -->
@@ -4356,7 +4357,7 @@ function buildScorerBtn(m, myTip, kickoffLocked) {
     +'" style="width:100%;padding:8px 12px;background:'+(hasSc?'rgba(0,255,135,0.12)':'rgba(255,255,255,0.04)')+';'
     +'border:1px solid '+(hasSc?'rgba(0,255,135,0.3)':'rgba(255,255,255,0.1)')+';'
     +'color:'+(hasSc?'#00ff87':'rgba(240,244,240,0.5)')+';font-family:Oswald,sans-serif;font-size:11px;letter-spacing:1px;'+btnStyle+'">'
-    + '⚽ GÓLLÖVŐK ' + (hasSc ? '('+([].concat(scorers.home||[],scorers.away||[]).length)+'db) · '+ptLabel : '· '+ptLabel)
+    + '⚽ GÓLLÖVŐK (90\'+H.idő) ' + (hasSc ? '('+([].concat(scorers.home||[],scorers.away||[]).length)+'db) · '+ptLabel : '· '+ptLabel)
     + '</button>'
     + scDisplay
     + '</div>';
@@ -4941,7 +4942,6 @@ function renderMatches() {
     var colKey = 'dcv2_'+date;
     // Zárva ha: csoport meccs nap ÉS nem nyitotta meg a user ebben a munkamenetben
     var collapsed = !hasKnockout && !_openDayGroups[gId];
-    var gId = 'dg_'+date.replace(/-/g,'');
 
     html+=`<div class="date-header" style="cursor:pointer;" onclick="toggleDayGroup('${gId}')">
       <h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span>
@@ -7480,7 +7480,8 @@ async function fetchFromESPN() {
         homeScore: parseInt(home.score)||0,
         awayScore: parseInt(away.score)||0,
         status: isFT?'ft':'live',
-        minute: minute
+        minute: minute,
+        espnId: ev.id || ''
       });
     });
     return results.length > 0 ? results : null;
@@ -7715,6 +7716,19 @@ async function checkAutoResults() {
         allScores[localMatch.id] = score;
         autoSaved++;
         showToast('🤖 Auto: '+localMatch.home+' '+score+' '+localMatch.away);
+        // Kieséses meccsnél ET/Pen/Góllövők auto-fetch (ha döntetlen 90min)
+        if(localMatch.knockout && result === 'X') {
+          autoFetchKnockoutDetails(localMatch, ar);
+        } else if(localMatch.knockout) {
+          autoFetchKnockoutScorers(localMatch, ar);
+        }
+      } else if(ar.status === 'ft' && allResults[localMatch.id] && localMatch.knockout) {
+        // Kész kieséses meccs — ET/Pen/Góllövők auto-frissítés ha még nincs
+        if(!allEtResults[localMatch.id] && !allPenResults[localMatch.id] && !allScorerResults[localMatch.id]) {
+          autoFetchKnockoutDetails(localMatch, ar);
+        } else if(!allScorerResults[localMatch.id]) {
+          autoFetchKnockoutScorers(localMatch, ar);
+        }
       }
       // Events/stats/lineups mentése FT meccsekre is (utólagos megtekintés)
       if(ar.events && ar.events.length && !liveEventsAll[localMatch.id]) {
@@ -9058,7 +9072,97 @@ async function handlePenScoreSave(btn) {
 }
 
 
-// ===== CSAPATKERET ADATBÁZIS =====
+// ===== KIESÉSES MECCS AUTO-FETCH: ET, Pen, Góllövők =====
+async function autoFetchKnockoutDetails(localMatch, ar) {
+  try {
+    // ESPN summary endpoint — részletes period/shootout adatok
+    var espnId = ar.espnId || ar.id;
+    if(!espnId) return;
+    var url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=' + espnId;
+    var resp = await fetch(url);
+    if(!resp.ok) return;
+    var sum = await resp.json();
+    var comp = sum.header && sum.header.competitions && sum.header.competitions[0];
+    if(!comp) return;
+
+    var teams = comp.competitors || [];
+    var homeT = teams.find(function(t){ return t.homeAway==='home'; });
+    var awayT = teams.find(function(t){ return t.homeAway==='away'; });
+    if(!homeT || !awayT) return;
+
+    // Period scores: periods[0]=1st half, [1]=2nd half, [2]=ET1, [3]=ET2, [4]=Penalties
+    var linescores = comp.linescores || homeT.linescores || [];
+    var homePeriods = [], awayPeriods = [];
+    if(homeT.linescores) homeT.linescores.forEach(function(p){ homePeriods.push(parseInt(p.displayValue)||0); });
+    if(awayT.linescores) awayT.linescores.forEach(function(p){ awayPeriods.push(parseInt(p.displayValue)||0); });
+
+    var hasPeriods = homePeriods.length > 0;
+
+    // ET eredmény: periódus 2 (index 2-3 = ET1+ET2)
+    if(hasPeriods && homePeriods.length >= 3 && !allEtResults[localMatch.id]) {
+      var etH = (homePeriods[2]||0) + (homePeriods[3]||0);
+      var etA = (awayPeriods[2]||0) + (awayPeriods[3]||0);
+      var etResult = etH>etA?'1':etH===etA?'X':'2';
+      var etScore = etH+':'+etA;
+      allEtResults[localMatch.id] = etResult;
+      allEtScores[localMatch.id] = etScore;
+      fbSet('etResults/'+localMatch.id, etResult).catch(function(){});
+      fbSet('etScores/'+localMatch.id, etScore).catch(function(){});
+      console.log('🤖 Auto ET: '+localMatch.home+' '+etScore+' '+localMatch.away);
+    }
+
+    // 11-es: periódus 4 (index 4 = Penalties)
+    if(hasPeriods && homePeriods.length >= 5 && !allPenResults[localMatch.id]) {
+      var penH = homePeriods[4]||0, penA = awayPeriods[4]||0;
+      var penResult = penH>penA?'1':'2';
+      var penScore = penH+':'+penA;
+      allPenResults[localMatch.id] = penResult;
+      allPenScores[localMatch.id] = penScore;
+      fbSet('penResults/'+localMatch.id, penResult).catch(function(){});
+      fbSet('penScores/'+localMatch.id, penScore).catch(function(){});
+      showToast('🤖 Auto Pen: '+localMatch.home+' '+penScore+' '+localMatch.away);
+    }
+
+    // Góllövők auto-rögzítés
+    await autoFetchKnockoutScorers(localMatch, ar, sum);
+    renderMatches();
+  } catch(e) { console.log('autoFetchKnockoutDetails hiba:', e.message); }
+}
+
+async function autoFetchKnockoutScorers(localMatch, ar, sum) {
+  try {
+    if(allScorerResults[localMatch.id] && allScorerResults[localMatch.id].length) return;
+    // Ha nincs sum, lekérjük
+    if(!sum) {
+      var espnId = ar.espnId || ar.id;
+      if(!espnId) return;
+      var resp = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event='+espnId);
+      if(!resp.ok) return;
+      sum = await resp.json();
+    }
+    var keyEvents = (sum.keyEvents || sum.scoring || []);
+    var scorers = [];
+    keyEvents.forEach(function(ev) {
+      var typeText = (ev.type&&ev.type.text)||ev.typeText||'';
+      var isPen = typeText.toLowerCase().includes('penalty')||!!ev.penaltyKick;
+      var isOg  = typeText.toLowerCase().includes('own')||!!ev.ownGoal;
+      var isShootout = isPen && (parseInt((ev.clock&&ev.clock.displayValue)||'0') > 120);
+      // Csak 90'+ET gólok, NEM 11-es szétlövés
+      var isGoal = typeText.startsWith('Goal')||ev.scoreValue>0||typeText.includes('Goal');
+      if(!isGoal || isOg || isShootout) return;
+      var name = ev.participants&&ev.participants[0]&&ev.participants[0].athlete
+        ? ev.participants[0].athlete.displayName : (ev.text||'');
+      if(name && scorers.indexOf(name)===-1) scorers.push(name);
+    });
+    if(scorers.length > 0) {
+      allScorerResults[localMatch.id] = scorers;
+      fbSet('scorerResults/'+localMatch.id, scorers).catch(function(){});
+      console.log('🤖 Auto Góllövők ['+localMatch.id+']: '+scorers.join(', '));
+    }
+  } catch(e) { console.log('autoFetchKnockoutScorers hiba:', e.message); }
+}
+
+
 async function adminSaveRoster() {
   var name = (document.getElementById('rosterTeamName').value||'').trim();
   var raw  = (document.getElementById('rosterPlayers').value||'').trim();
@@ -9332,7 +9436,7 @@ function openScorerModal(matchId) {
   var mult = getMatchMultiplier(m);
   document.getElementById('scorerSubtitle').textContent =
     (m.homeFlag||'') + ' ' + m.home + ' vs ' + m.away + ' ' + (m.awayFlag||'') +
-    (mult === 3 ? '  ·  +2 PT/GÓLLÖVŐ' : '  ·  +1 PT/GÓLLÖVŐ');
+    (mult === 3 ? '  ·  +2 PT/GÓLLÖVŐ (90\'+H.idő)' : '  ·  +1 PT/GÓLLÖVŐ (90\'+H.idő)');
   document.getElementById('scorerHomeTitle').textContent = (m.homeFlag||'⚽') + '  ' + m.home;
   document.getElementById('scorerAwayTitle').textContent = (m.awayFlag||'⚽') + '  ' + m.away;
   renderScorerPlayers('home', m.home, matchId);
@@ -9350,19 +9454,46 @@ function openScorerModal(matchId) {
   }
 }
 
+// Max kiválasztható góllövők: FT gólok + ET gólok csapatonként
+function getMaxScorers(matchId, side) {
+  var tip = allTips[matchId] && allTips[matchId][fbSafeName(currentUser)];
+  if(!tip) return 99;
+  var ftH = 0, ftA = 0, etH = 0, etA = 0;
+  // FT score a tippből
+  var ftSc = getTipScore(tip);
+  if(ftSc) { ftH = ftSc.h; ftA = ftSc.a; }
+  // ET score a tippből
+  if(tip.etScore) {
+    var ep = tip.etScore.split(':');
+    etH = parseInt(ep[0])||0;
+    etA = parseInt(ep[1])||0;
+  }
+  return side === 'home' ? (ftH + etH) : (ftA + etA);
+}
+
 function renderScorerPlayers(side, teamName, matchId) {
   var container = document.getElementById('scorer'+(side==='home'?'Home':'Away')+'Players');
   var candidates = getScorerCandidates(teamName, matchId || _scorerMatchId);
   var allSel = _scorerSelected[side];
+  var maxSc = getMaxScorers(matchId || _scorerMatchId, side);
+  var atMax = allSel.length >= maxSc && maxSc > 0;
+  // Fejléc: max korlát kiírása
+  var titleEl = document.getElementById('scorer'+(side==='home'?'Home':'Away')+'Title');
+  if(titleEl && maxSc < 99) {
+    titleEl.innerHTML = (side==='home'?'': '') + teamName
+      + ' <span style="font-size:10px;color:rgba(0,255,135,0.5);font-weight:400;">max '+maxSc+' góllövő</span>';
+  }
   // Egyéni hozzáadottak is megjelennek
   var allNames = candidates.slice();
   allSel.forEach(function(n){ if(allNames.indexOf(n)===-1) allNames.push(n); });
   var html = allNames.map(function(name){
     var sel = allSel.indexOf(name) >= 0;
-    return '<button onclick="scorerToggle(\''+side+'\',this)" data-name="'+escHtml(name)+'" style="'
-      +'padding:6px 11px;font-size:12px;font-family:Oswald,sans-serif;letter-spacing:0.5px;cursor:pointer;transition:all 0.15s;'
+    var disabled = !sel && atMax; // Max elérve → tiltás
+    return '<button '+(disabled?'disabled ':'')+' onclick="scorerToggle(\''+side+'\',this)" data-name="'+escHtml(name)+'" style="'
+      +'padding:6px 11px;font-size:12px;font-family:Oswald,sans-serif;letter-spacing:0.5px;cursor:'+(disabled?'not-allowed':'pointer')+';transition:all 0.15s;'
       +(sel?'background:#00ff87;color:#0b0c0e;border:1px solid #00ff87;'
-           :'background:rgba(255,255,255,0.05);color:rgba(240,244,240,0.7);border:1px solid rgba(255,255,255,0.1);')
+           :disabled?'background:rgba(255,255,255,0.02);color:rgba(240,244,240,0.25);border:1px solid rgba(255,255,255,0.05);'
+                    :'background:rgba(255,255,255,0.05);color:rgba(240,244,240,0.7);border:1px solid rgba(255,255,255,0.1);')
       +'">'+escHtml(name)+(sel?' ✓':'')+'</button>';
   }).join('');
   container.innerHTML = html;
@@ -9372,18 +9503,20 @@ function scorerToggle(side, btn) {
   var name = btn.getAttribute('data-name');
   var idx = _scorerSelected[side].indexOf(name);
   if(idx >= 0) {
+    // Kijelölés törlése — mindig szabad
     _scorerSelected[side].splice(idx, 1);
-    btn.style.background='rgba(255,255,255,0.05)';
-    btn.style.color='rgba(240,244,240,0.7)';
-    btn.style.borderColor='rgba(255,255,255,0.1)';
-    btn.textContent = name;
   } else {
+    // Max ellenőrzés
+    var maxSc = getMaxScorers(_scorerMatchId, side);
+    if(maxSc > 0 && _scorerSelected[side].length >= maxSc) {
+      showToast('⚠️ Max '+maxSc+' góllövőt jelölhetsz ki ennél a csapatnál!');
+      return;
+    }
     _scorerSelected[side].push(name);
-    btn.style.background='#00ff87';
-    btn.style.color='#0b0c0e';
-    btn.style.borderColor='#00ff87';
-    btn.textContent = name + ' ✓';
   }
+  // Gombsor újrarenderelése
+  var m = ALL_MATCHES.find(function(x){ return x.id===_scorerMatchId; }) || _virtualKOMatches[_scorerMatchId];
+  if(m) renderScorerPlayers(side, side==='home'?m.home:m.away, _scorerMatchId);
   scorerUpdateSelected();
 }
 
