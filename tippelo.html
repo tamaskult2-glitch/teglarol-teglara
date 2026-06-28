@@ -4400,7 +4400,7 @@ function buildOtherTips(mid, locked) {
   var allEntries = Object.entries(allTips[mid]);
   if(allEntries.length === 0) return '';
   var result = allResults[mid];
-  var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+  var m = ALL_MATCHES.find(function(x){return x.id===mid;}) || _virtualKOMatches[mid];
   var ls = liveScores[mid];
   var isLive = ls && ls.status === 'live';
 
@@ -4453,7 +4453,8 @@ function buildOtherTips(mid, locked) {
       else if(isGDR) { bg='rgba(59,130,246,0.12)'; icon='📐'; ptsColor='#60a5fa'; }
       else if(isCorrectR) { bg='rgba(0,255,135,0.12)'; icon='🟡'; ptsColor='var(--gold)'; }
       else { bg='rgba(239,68,68,0.08)'; nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.6)'; icon='❌'; ptsColor='rgba(239,68,68,0.75)'; }
-      ptsStr = ' <span style="color:'+ptsColor+';font-size:11px;font-weight:700;">'+icon+' +'+pts+'</span>';
+      var mult = m ? getMatchMultiplier(m) : 1;
+      ptsStr = ' <span style="color:'+ptsColor+';font-size:11px;font-weight:700;">'+icon+' +'+pts+(mult>1?' (×'+mult+')':'')+'</span>';
     } else if(isLive && !result) {
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
       if(!isNaN(hg) && !isNaN(ag)) {
