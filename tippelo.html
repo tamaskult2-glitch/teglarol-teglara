@@ -2424,6 +2424,7 @@ input:focus, textarea:focus, select:focus {
         <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
           <button onclick="openCustomMatchModal(null)" style="flex:1;padding:7px 10px;background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">+ ÚJ MECCS</button>
           <button onclick="createTestMatches()" style="flex:1;padding:7px 10px;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);color:#c084fc;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🧪 TESZT MECCSEK (2× + 3×)</button>
+          <button onclick="adminSetTestResults()" style="flex:1;padding:7px 10px;background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:#00ff87;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">✅ TESZT EREDMÉNY</button>
         </div>
         <div id="customMatchList"></div>
       </div>
@@ -3330,7 +3331,8 @@ function toggleAdmSec(hdr) {
 
 // ===== VB MECCS SZŰRŐ =====
 function isVbMatch(m) {
-  return m.id !== 'TEST1' && m.id !== 'BL2026' && !m.isEmob && m.group !== '🏭' && m.group !== '⭐BL';
+  return m.id !== 'TEST1' && m.id !== 'BL2026' && !m.isEmob && m.group !== '🏭' && m.group !== '⭐BL'
+    && !m.id.startsWith('CM_TEST_'); // Teszt meccsek nem számítanak
 }
 
 // ===== #4: STREAK SZÁMLÁLÓ =====
@@ -3402,7 +3404,7 @@ function getWeeklyMvpBukta() {
       var dayNum = Math.floor((today - vbStart) / 86400000) + 1;
       var totalDays = Math.floor((vbEnd - vbStart) / 86400000) + 1;
       if(dayNum > totalDays) dayNum = totalDays;
-      var totalMatches = ALL_MATCHES.filter(isVbMatch).length;
+      var totalMatches = 104; // 72 csoportköri + 32 kieséses (R32+R16+QF+SF+bronz+döntő)
       var playedMatches = ALL_MATCHES.filter(function(m){ return isVbMatch(m) && allResults[m.id]; }).length;
       el.innerHTML = '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);letter-spacing:1px;">⚽ ' + dayNum + '/' + totalDays + '. NAP · ' + playedMatches + '/' + totalMatches + ' MECCS</span>';
       toggleKickoffBalls(true);
@@ -4983,7 +4985,7 @@ function renderMatches() {
           ${liveScores[m.id]&&liveScores[m.id].status==='live'?'<span class="live-badge"><span class="live-dot"></span>ÉLŐ</span>':''}
           ${m.knockout
             ? `<span style="font-family:Oswald,sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;color:${koColor};background:rgba(0,0,0,0.3);border:1px solid ${koColor}40;padding:1px 7px;border-radius:3px;">${koLabel}</span>`
-            : `<span class="grp-tag">${(/\p{Emoji}/u.test(m.group)?m.group:m.group+' csoport')}</span>`
+            : `<span class="grp-tag">${(/\p{Emoji}/u.test(m.group)?m.group:'⚽ '+m.group+' csop.')}</span>`
           }
           <span style="margin-left:auto;color:rgba(240,244,240,0.5);">${m.venue||''}</span>
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
@@ -5096,7 +5098,7 @@ function renderStats() {
     }
   });
   document.getElementById('stTipped').textContent=tipped;
-  document.getElementById('stTotal').textContent=vbMatches.length;
+  document.getElementById('stTotal').textContent=104; // 72 csoportköri + 32 kieséses
   document.getElementById('stCorrect').textContent=pts;
   document.getElementById('stAcc').textContent=resolved>0?Math.round(correct/resolved*100)+'%':'–';
 }
@@ -8667,6 +8669,31 @@ async function saveCustomMatch() {
   renderCustomMatchAdmin();
   renderAdminMatches();
   showToast('✅ Meccs elmentve: '+home+' – '+away);
+}
+
+// Teszt meccs eredmények rögzítése (képek alapján)
+async function adminSetTestResults() {
+  var koMatch    = ALL_MATCHES.find(function(m){ return m.id && m.id.startsWith('CM_TEST_KO'); });
+  var finalMatch = ALL_MATCHES.find(function(m){ return m.id && m.id.startsWith('CM_TEST_FINAL'); });
+  var saved = 0;
+  if(koMatch) {
+    await fbSet('results/'+koMatch.id,'X');   await fbSet('scores/'+koMatch.id,'1:1');
+    await fbSet('etResults/'+koMatch.id,'X'); await fbSet('etScores/'+koMatch.id,'2:2');
+    await fbSet('penResults/'+koMatch.id,'1');await fbSet('penScores/'+koMatch.id,'5:4');
+    allResults[koMatch.id]='X'; allScores[koMatch.id]='1:1';
+    allEtResults[koMatch.id]='X'; allEtScores[koMatch.id]='2:2';
+    allPenResults[koMatch.id]='1'; allPenScores[koMatch.id]='5:4'; saved++;
+  }
+  if(finalMatch) {
+    await fbSet('results/'+finalMatch.id,'X');   await fbSet('scores/'+finalMatch.id,'1:1');
+    await fbSet('etResults/'+finalMatch.id,'X'); await fbSet('etScores/'+finalMatch.id,'0:0');
+    await fbSet('penResults/'+finalMatch.id,'1');await fbSet('penScores/'+finalMatch.id,'5:4');
+    allResults[finalMatch.id]='X'; allScores[finalMatch.id]='1:1';
+    allEtResults[finalMatch.id]='X'; allEtScores[finalMatch.id]='0:0';
+    allPenResults[finalMatch.id]='1'; allPenScores[finalMatch.id]='5:4'; saved++;
+  }
+  showToast('✅ '+saved+' teszt meccs eredmény mentve!');
+  renderMatches(); if(!_scoreSaving) try{ renderLeaderboard(); }catch(e){}
 }
 
 async function createTestMatches() {
