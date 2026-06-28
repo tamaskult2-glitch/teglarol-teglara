@@ -4664,6 +4664,7 @@ function renderMatchdayBanner() {
 
 // Ugrás: ÉLŐ meccs → következő tippeletlen → következő jövőbeli
 // Ciklikus navigátor állapot
+var _openDayGroups = {}; // {gId: true} — nyitott csoportköri napok (reset oldalfrissítéskor)
 var _navLastId = null;
 var _navPhase = 0; // 0=mai tippeletlen, 1=mai élő, 2=jövőbeli tippeletlen
 
@@ -4746,6 +4747,7 @@ function scrollToMatch(m) {
     var btn = document.getElementById('toggle_'+gId);
     if(btn) btn.textContent='−';
     sessionStorage.setItem('dcv2_'+m.huDate,'open');
+    _openDayGroups[gId] = true;
   }
   // Kis delay hogy a DOM frissüljön a csoport megnyitása után
   setTimeout(function(){
@@ -4933,13 +4935,15 @@ function renderMatches() {
     const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
     const dayCount=dayMatches.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
     var isTestDay = (date === '2026-05-27' || date === '2026-05-30');
-    // Csoportköri napok alapból zárva; kieséses napok nyitva
+    // Csoportköri napok alapból ZÁRVA — csak ha a felhasználó kinyitotta, mutatjuk
     var hasKnockout = dayMatches.some(function(m){ return m.knockout; });
+    var gId = 'dg_'+date.replace(/-/g,'');
     var colKey = 'dcv2_'+date;
-    var collapsed = !hasKnockout && sessionStorage.getItem(colKey) !== 'open';
+    // Zárva ha: csoport meccs nap ÉS nem nyitotta meg a user ebben a munkamenetben
+    var collapsed = !hasKnockout && !_openDayGroups[gId];
     var gId = 'dg_'+date.replace(/-/g,'');
 
-    html+=`<div class="date-header" style="cursor:pointer;" onclick="toggleDayGroup('${gId}','${colKey}')">
+    html+=`<div class="date-header" style="cursor:pointer;" onclick="toggleDayGroup('${gId}')">
       <h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span>
       <span id="toggle_${gId}" style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">${collapsed?'+':'−'}</span>
     </div>`;
@@ -9861,16 +9865,15 @@ function initBLPoll() {
 
 
 // Nap-csoport collapse/expand
-function toggleDayGroup(groupId, storageKey) {
+function toggleDayGroup(groupId) {
   var el = document.getElementById(groupId);
   if(!el) return;
   var isNowHidden = el.style.display === 'none';
-  el.style.display = isNowHidden ? 'block' : 'none';
+  el.style.display = isNowHidden ? '' : 'none';
   var btn = document.getElementById('toggle_'+groupId);
   if(btn) btn.textContent = isNowHidden ? '−' : '+';
-  sessionStorage.setItem(storageKey, isNowHidden ? 'open' : 'closed');
-
-  // Ha kinyitottuk → ugrás az első tippeletlen meccshez ebben a napban
+  _openDayGroups[groupId] = isNowHidden;
+  // Ha kinyitottuk → ugrás az első tippeletlen meccshez
   if(isNowHidden) {
     setTimeout(function() {
       var cards = el.querySelectorAll('.match-card');
@@ -9884,88 +9887,14 @@ function toggleDayGroup(groupId, storageKey) {
         var hasTip = safe && allTips[mid] && allTips[mid][safe];
         if(!isLocked && !hasTip) { target = card; break; }
       }
-      // Ha minden tippelt/zárolt, ugrás az első kártyához
-      if(!target && cards.length) target = cards[0];
-      if(target) target.scrollIntoView({ behavior:'smooth', block:'center' });
+      if(target) {
+        var navH = document.querySelector('.nav-tabs') ? document.querySelector('.nav-tabs').offsetHeight+8 : 0;
+        window.scrollTo({top: target.getBoundingClientRect().top+window.scrollY-navH, behavior:'smooth'});
+      }
     }, 80);
   }
 }
-async function debugScorers() {
-  var res = document.getElementById('scorerDebugResult');
-  if(!res) return;
-  res.textContent = '⏳ Lekérés...';
-  var log = [];
-  try {
-    var today = getBudapestToday().replace(/-/g,'');
-    var d = new Date(); d.setDate(d.getDate()-1);
-    var yesterday = d.toLocaleDateString('sv-SE',{timeZone:'Europe/Budapest'}).replace(/-/g,'');
-    var url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+yesterday+'-'+today+'&limit=50';
-    var resp = await fetch(url);
-    var data = await resp.json();
-    var events = (data.events||[]).filter(function(ev){
-      var st=ev.competitions&&ev.competitions[0]&&ev.competitions[0].status&&ev.competitions[0].status.type?ev.competitions[0].status.type.name:'';
-      return st.includes('FULL_TIME')||st.includes('FINAL')||st.includes('PROGRESS')||st.includes('HALFTIME');
-    });
-    log.push('📡 '+events.length+' meccs találva\n');
-    for(var i=0;i<events.length;i++) {
-      var ev = events[i];
-      var comp = ev.competitions&&ev.competitions[0];
-      var teams = comp&&comp.competitors||[];
-      var homeTeam = teams.find(function(t){return t.homeAway==='home';});
-      var awayTeam = teams.find(function(t){return t.homeAway==='away';});
-      log.push('─── '+(homeTeam&&homeTeam.team.displayName||'?')+' vs '+(awayTeam&&awayTeam.team.displayName||'?')+' ───');
-      try {
-        var sumResp = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event='+ev.id);
-        var sum = await sumResp.json();
-        var evList = sum.keyEvents||sum.scoringPlays||[];
-        log.push('  keyEvents: '+(sum.keyEvents||[]).length+' | scoringPlays: '+(sum.scoringPlays||[]).length);
-        evList.slice(0,20).forEach(function(kev){
-          var tt=(kev.type&&kev.type.text)||'-';
-          var tid=(kev.type&&kev.type.id)||'-';
-          var athlete=kev.participants&&kev.participants[0]&&kev.participants[0].athlete;
-          var name=athlete?(athlete.displayName||athlete.shortName||'-'):(kev.text||kev.athleteName||'-');
-          var min=(kev.clock&&kev.clock.displayValue)||'';
-          var sv=kev.scoreValue||0;
-          log.push('  ['+tt+'|'+tid+'] '+name+' '+min+(sv?' score:'+sv:''));
-        });
-      } catch(e){ log.push('  ❌ '+e.message); }
-      log.push('');
-    }
-  } catch(e) { log.push('❌ '+e.message); }
-  res.textContent = log.join('\n');
-}
 
-// ===== API DEBUG =====
-async function debugApiSources() {
-  var res = document.getElementById('apiDebugResult');
-  if(!res) return;
-  res.textContent = '⏳ API-k tesztelése...';
-  var log = [];
-  var apis = [
-    {name:'api-football', fn: fetchFromApiFootball},
-    {name:'ESPN', fn: fetchFromESPN},
-    {name:'WC26.ir', fn: fetchFromWC26},
-    {name:'TheSportsDB', fn: fetchFromSportsDB},
-    {name:'OpenFootball', fn: fetchFromOpenFootball},
-  ];
-  for(var i=0; i<apis.length; i++) {
-    var api = apis[i];
-    try {
-      var r = await api.fn();
-      if(r && r.length > 0) {
-        log.push('✅ '+api.name+': '+r.length+' meccs');
-        r.forEach(function(m){ log.push('   '+m.homeName+' '+m.homeScore+':'+m.awayScore+' '+m.awayName+' ['+m.status+']'); });
-      } else {
-        log.push('❌ '+api.name+': nincs adat');
-      }
-    } catch(e) {
-      log.push('❌ '+api.name+': '+e.message);
-    }
-  }
-  res.textContent = log.join('\n');
-}
-
-// ===== GÓLSZERZŐK A MECCSKÁRTYÁN =====
 function buildScorerRow(mid, m) {
   var scorers = matchScorers[mid];
   if(!scorers) return '';
