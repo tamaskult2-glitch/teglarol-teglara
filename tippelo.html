@@ -5851,7 +5851,7 @@ async function adminSetTip(mid) {
 }
 
 async function setResult(mid,tip){
-  try{await fbSet('results/'+mid,tip);showToast('✅ '+tip+' rögzítve');await pollData();renderAdminMatches();}
+  try{await fbSet('results/'+mid,tip);showToast('✅ '+tip+' rögzítve');await pollData();}
   catch(e){showToast('❌ Hiba!');}
 }
 async function clearRes(mid){
@@ -5870,7 +5870,7 @@ async function setEtResult(mid,tip){
   try{await fbSet('etResults/'+mid,tip);showToast('⚡ Hosszabbítás: '+tip);
     // Ha az ET eredmény nem X, akkor a pen eredmény értelmetlen → töröljük
     if(tip !== 'X') { await fbDel('penResults/'+mid).catch(function(){}); }
-    await pollData();renderAdminMatches();}
+    await pollData();}
   catch(e){showToast('❌ Hiba!');}
 }
 async function clearEtRes(mid){
@@ -5882,11 +5882,11 @@ async function clearEtRes(mid){
   } catch(e){}
 }
 async function setPenResult(mid,tip){
-  try{await fbSet('penResults/'+mid,tip);showToast('🥅 11-es győztes: '+tip);await pollData();renderAdminMatches();}
+  try{await fbSet('penResults/'+mid,tip);showToast('🥅 11-es győztes: '+tip);await pollData();}
   catch(e){showToast('❌ Hiba!');}
 }
 async function clearPenRes(mid){
-  try{await fbDel('penResults/'+mid);showToast('🗑️ 11-es törölve');await pollData();renderAdminMatches();}
+  try{await fbDel('penResults/'+mid);showToast('🗑️ 11-es törölve');await pollData();}
   catch(e){}
 }
 async function deleteUser(){
@@ -5929,7 +5929,7 @@ async function saveScore(mid){
   var h=document.getElementById('sh_'+mid)?.value;
   var a=document.getElementById('sa_'+mid)?.value;
   if(h!==''&&h!==undefined&&a!==''&&a!==undefined){
-    try{await fbSet('scores/'+mid,h+':'+a);showToast('⚽ '+h+':'+a);await pollData();renderAdminMatches();}
+    try{await fbSet('scores/'+mid,h+':'+a);showToast('⚽ '+h+':'+a);await pollData();}
     catch(e){showToast('❌ Hiba!');}
   }
 }
@@ -7722,7 +7722,13 @@ function matchApiToLocal(apiResult) {
   var apiAS = (apiResult.awayShort||'').toUpperCase();
   var apiHN = (apiResult.homeName||'').toLowerCase();
   var apiAN = (apiResult.awayName||'').toLowerCase();
-  ALL_MATCHES.filter(isVbMatch).forEach(function(m) {
+  // Keresés: ALL_MATCHES + virtuális R32 meccsek
+  var searchPool = ALL_MATCHES.filter(isVbMatch).concat(
+    Object.values(_virtualKOMatches||{}).filter(function(vm){
+      return !ALL_MATCHES.some(function(x){ return x.id===vm.id; });
+    })
+  );
+  searchPool.forEach(function(m) {
     if(allResults[m.id] && apiResult.status !== 'live') return;
     // 1. Rövidítés alapú (ESPN)
     var homeHu = TEAM_MAP[apiHS] || '';
@@ -9072,7 +9078,6 @@ async function adminSaveEtScore(mid) {
   try {
     await fbSet('etScores/'+mid, h+':'+a);
     showToast('⚡ ET score mentve: '+h+':'+a);
-    renderAdminMatches();
     if(!_scoreSaving) try{ renderMatches(); }catch(e){}
   } catch(e) { showToast('❌ '+e.message); }
 }
@@ -9085,7 +9090,6 @@ async function adminSavePenScore(mid) {
   try {
     await fbSet('penScores/'+mid, h+':'+a);
     showToast('🥅 11-es score mentve: '+h+':'+a);
-    renderAdminMatches();
     if(!_scoreSaving) try{ renderMatches(); }catch(e){}
   } catch(e) { showToast('❌ '+e.message); }
 }
@@ -9347,7 +9351,6 @@ async function adminSaveScorers(mid) {
   try {
     await fbSet('scorerResults/' + mid, scorers.length ? scorers : null);
     showToast('⚽ ' + scorers.length + ' góllövő mentve!');
-    renderAdminMatches();
     if(!_scoreSaving) try{ renderMatches(); }catch(e){}
   } catch(e) {
     showToast('❌ Hiba: ' + e.message);
