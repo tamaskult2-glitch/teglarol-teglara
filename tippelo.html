@@ -4672,7 +4672,14 @@ function jumpToNextUntipped() {
   var safe = fbSafeName(currentUser);
   var today = getBudapestToday();
   var now = getBudapestNow();
-  var vbMatches = ALL_MATCHES.filter(isVbMatch).sort(function(a,b){
+
+  // VB meccsek = ALL_MATCHES (non-test) + virtuális R32 meccsek
+  var vbBase = ALL_MATCHES.filter(isVbMatch);
+  var virtualList = Object.values(_virtualKOMatches || {});
+  var vbMatches = vbBase.concat(virtualList.filter(function(m){
+    return !vbBase.some(function(x){ return x.id === m.id; });
+  }));
+  vbMatches.sort(function(a,b){
     return (a.huDate+a.huTime).localeCompare(b.huDate+b.huTime);
   });
 
@@ -4740,15 +4747,18 @@ function scrollToMatch(m) {
     if(btn) btn.textContent='−';
     sessionStorage.setItem('dc_'+m.huDate,'open');
   }
-  var card = document.getElementById('mc_'+m.id);
-  if(card) {
-    var navH = document.querySelector('.nav-tabs') ? document.querySelector('.nav-tabs').offsetHeight+8 : 0;
-    window.scrollTo({top: card.getBoundingClientRect().top+window.scrollY-navH, behavior:'smooth'});
-    card.classList.remove('md-highlight');
-    void card.offsetWidth;
-    card.classList.add('md-highlight');
-    setTimeout(function(){ card.classList.remove('md-highlight'); }, 1700);
-  }
+  // Kis delay hogy a DOM frissüljön a csoport megnyitása után
+  setTimeout(function(){
+    var card = document.getElementById('mc_'+m.id);
+    if(card) {
+      var navH = document.querySelector('.nav-tabs') ? document.querySelector('.nav-tabs').offsetHeight+8 : 0;
+      window.scrollTo({top: card.getBoundingClientRect().top+window.scrollY-navH, behavior:'smooth'});
+      card.classList.remove('md-highlight');
+      void card.offsetWidth;
+      card.classList.add('md-highlight');
+      setTimeout(function(){ card.classList.remove('md-highlight'); }, 1700);
+    }
+  }, grp && grp.style.display==='' ? 50 : 0);
 }
 
 function dismissMatchday() {
@@ -4923,8 +4933,10 @@ function renderMatches() {
     const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
     const dayCount=dayMatches.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
     var isTestDay = (date === '2026-05-27' || date === '2026-05-30');
+    // Csoportköri napok alapból zárva; kieséses napok nyitva
+    var hasKnockout = dayMatches.some(function(m){ return m.knockout; });
     var colKey = 'dc_'+date;
-    var collapsed = isTestDay && sessionStorage.getItem(colKey) !== 'open';
+    var collapsed = !hasKnockout && sessionStorage.getItem(colKey) !== 'open';
     var gId = 'dg_'+date.replace(/-/g,'');
 
     html+=`<div class="date-header" style="cursor:pointer;" onclick="toggleDayGroup('${gId}','${colKey}')">
