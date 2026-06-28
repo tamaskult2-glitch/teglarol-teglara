@@ -5156,6 +5156,11 @@ function renderMatches() {
 function renderStats() {
   if(!currentUser) return;
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
+
+  // Virtuális R32 meccsek hozzáadása
+  Object.values(_virtualKOMatches||{}).forEach(function(vm){
+    if(!vbMatches.some(function(x){ return x.id===vm.id; })) vbMatches.push(vm);
+  });
   let tipped=0,pts=0,resolved=0,correct=0;
   vbMatches.forEach(m=>{
     const tip=allTips[m.id]?.[fbSafeName(currentUser)];
@@ -5234,6 +5239,11 @@ function renderLeaderboard() {
   const users=new Set();
   // Csak VB meccsek tippjeiből gyűjtünk usereket
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
+
+  // Virtuális R32 meccsek hozzáadása
+  Object.values(_virtualKOMatches||{}).forEach(function(vm){
+    if(!vbMatches.some(function(x){ return x.id===vm.id; })) vbMatches.push(vm);
+  });
   vbMatches.forEach(function(m){ if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){users.add(u);}); });
   if(!users.size){c.innerHTML='<div class="ldg" style="padding:40px;">Még nincs VB tipp ⏳</div>';return;}
   const sc=[];
@@ -6475,6 +6485,11 @@ async function sendDaySummary() {
   var users = {};
   Object.keys(allTips).forEach(function(mid){ if(!allTips[mid])return; Object.keys(allTips[mid]).forEach(function(u){ if(!users[u]) users[u]={pts:0,exact:0}; }); });
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
+
+  // Virtuális R32 meccsek hozzáadása
+  Object.values(_virtualKOMatches||{}).forEach(function(vm){
+    if(!vbMatches.some(function(x){ return x.id===vm.id; })) vbMatches.push(vm);
+  });
   Object.keys(users).forEach(function(u){
     vbMatches.forEach(function(m){
       var tip = allTips[m.id]&&allTips[m.id][u];
@@ -6588,8 +6603,16 @@ function showPointsBreakdown(safeName) {
   if(!popup || !content) return;
   if(nameEl) nameEl.innerHTML = escHtml(safeName) + ' ' + userBadges(safeName);
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
-  // Legújabb meccs felül
-  vbMatches.sort(function(a,b){ return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime); });
+  // Virtuális R32 meccsek hozzáadása
+  Object.values(_virtualKOMatches||{}).forEach(function(vm){
+    if(!vbMatches.some(function(x){ return x.id===vm.id; })) vbMatches.push(vm);
+  });
+  // Kieséses meccsek felülre, utána csoportköri — mindkettő legújabb felül
+  vbMatches.sort(function(a,b){
+    var ka = a.knockout?0:1, kb = b.knockout?0:1;
+    if(ka !== kb) return ka - kb;
+    return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime);
+  });
   var totalPts = 0, html = '', playedCount = 0, tippedCount = 0;
   vbMatches.forEach(function(m) {
     var res = allResults[m.id];
@@ -11632,6 +11655,11 @@ function calcDayFilteredScores(includeLive) {
   var allUsers = new Set();
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
 
+  // Virtuális R32 meccsek hozzáadása
+  Object.values(_virtualKOMatches||{}).forEach(function(vm){
+    if(!vbMatches.some(function(x){ return x.id===vm.id; })) vbMatches.push(vm);
+  });
+
   vbMatches.forEach(function(m) {
     if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){ allUsers.add(u); });
   });
@@ -11759,6 +11787,11 @@ var raceColors = [
 function buildRaceData() {
   // Collect VB matches with results, sorted by date
   var vbMatches = ALL_MATCHES.filter(isVbMatch);
+
+  // Virtuális R32 meccsek hozzáadása
+  Object.values(_virtualKOMatches||{}).forEach(function(vm){
+    if(!vbMatches.some(function(x){ return x.id===vm.id; })) vbMatches.push(vm);
+  });
   var matchesByDate = {};
   vbMatches.forEach(function(m) {
     if(!allResults[m.id]) return; // only resolved matches
