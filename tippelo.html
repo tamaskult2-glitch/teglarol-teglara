@@ -4505,18 +4505,39 @@ function buildTippTable() {
           return;
         }
 
-        // Meccsek ahol van tipp - kronológiai sorrend
-        var sortedMatches = ALL_MATCHES.slice().sort(function(a,b) {
-          var da = a.huDate + ' ' + a.huTime;
-          var db = b.huDate + ' ' + b.huTime;
-          return da.localeCompare(db);
+        // Meccsek ahol van tipp - kieséses meccsek felül, csoport meccsek alul, kronológiai
+        var koMatches = [];
+        var grpMatches = [];
+
+        // Virtuális R32 meccsek is belekerülnek
+        var allForTipp = ALL_MATCHES.slice();
+        Object.values(_virtualKOMatches||{}).forEach(function(vm){
+          if(!allForTipp.some(function(x){ return x.id===vm.id; })) allForTipp.push(vm);
         });
+
+        allForTipp.sort(function(a,b){
+          return (a.huDate+' '+a.huTime).localeCompare(b.huDate+' '+b.huTime);
+        });
+
+        allForTipp.forEach(function(m) {
+          if(m.id === 'BL2026' || m.id === 'TEST1' || m.isEmob || m.group === '⭐BL' || m.group === '🏭') return;
+          if(m.id.startsWith('CM_TEST_')) return; // teszt meccsek kihagyva
+          if(m.knockout) koMatches.push(m);
+          else grpMatches.push(m);
+        });
+
+        var sortedMatches = koMatches.concat(grpMatches);
         var rows = '';
         sortedMatches.forEach(function(m) {
+          // Szekció elválasztók
+          if(m === koMatches[0] && koMatches.length > 0) {
+            rows += '<tr><td colspan="'+(users.length+1)+'" style="background:rgba(0,255,135,0.07);border-bottom:2px solid rgba(0,255,135,0.25);padding:5px 10px;font-family:Oswald,sans-serif;font-size:10px;color:#00ff87;letter-spacing:2px;">⚡ KIESÉSES SZAKASZ</td></tr>';
+          }
+          if(m === grpMatches[0] && grpMatches.length > 0) {
+            rows += '<tr><td colspan="'+(users.length+1)+'" style="background:rgba(255,255,255,0.03);border-top:2px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.07);padding:5px 10px;font-family:Oswald,sans-serif;font-size:10px;color:rgba(240,244,240,0.4);letter-spacing:2px;">⚽ CSOPORTKÖRI MECCSEK</td></tr>';
+          }
+
           var mt = t[m.id];
-          if(!mt) return;
-          // BL és Foca meccsek kihagyása
-          if(m.id === 'BL2026' || m.id === 'TEST1' || m.isEmob || m.group === '⭐BL' || m.group === '🏭') return;
           var hasTip = mt && Object.keys(mt).some(function(u){ var tip=mt[u]; return tip && (typeof tip==='object' ? tip.o : tip); });
           if(!hasTip) return;
 
@@ -8806,22 +8827,23 @@ async function deleteCustomMatch(id) {
 
 // R32 meccsek fix struktúrája
 var R32_STRUCTURE = [
-  { m:73, h:'2A', a:'2B',      date:'Jún 28', huDate:'2026-06-28', huTime:'22:00', venue:'Los Angeles'  },
-  { m:76, h:'1C', a:'2F',      date:'Jún 29', huDate:'2026-06-29', huTime:'03:00', venue:'Houston'      },
-  { m:74, h:'1E', a:'3ABCDF',  date:'Jún 29', huDate:'2026-06-29', huTime:'22:00', venue:'Boston'       },
-  { m:75, h:'1F', a:'2C',      date:'Jún 29', huDate:'2026-06-29', huTime:'22:00', venue:'Monterrey'    },
-  { m:78, h:'2E', a:'2I',      date:'Jún 30', huDate:'2026-06-30', huTime:'03:00', venue:'Dallas'       },
-  { m:77, h:'1I', a:'3CDFGH',  date:'Jún 30', huDate:'2026-06-30', huTime:'22:00', venue:'New York'     },
-  { m:79, h:'1A', a:'3CEFHI',  date:'Jún 30', huDate:'2026-06-30', huTime:'22:00', venue:'Mexico City'  },
-  { m:81, h:'1D', a:'3BEFIJ',  date:'Júl 1',  huDate:'2026-07-01', huTime:'03:00', venue:'San Francisco'},
+  // Magyar idő (CEST) — forrás: M4Sport, KuponKirály, HungarySport
+  { m:73, h:'2A', a:'2B',      date:'Jún 28', huDate:'2026-06-28', huTime:'21:00', venue:'Los Angeles'  },
+  { m:76, h:'1C', a:'2F',      date:'Jún 29', huDate:'2026-06-29', huTime:'19:00', venue:'Houston'      },
+  { m:74, h:'1E', a:'3ABCDF',  date:'Jún 29', huDate:'2026-06-29', huTime:'22:30', venue:'Boston'       },
+  { m:75, h:'1F', a:'2C',      date:'Jún 30', huDate:'2026-06-30', huTime:'03:00', venue:'Monterrey'    },
+  { m:78, h:'2E', a:'2I',      date:'Jún 30', huDate:'2026-06-30', huTime:'19:00', venue:'Dallas'       },
+  { m:77, h:'1I', a:'3CDFGH',  date:'Jún 30', huDate:'2026-06-30', huTime:'23:00', venue:'New York'     },
+  { m:79, h:'1A', a:'3CEFHI',  date:'Júl 1',  huDate:'2026-07-01', huTime:'03:00', venue:'Mexico City'  },
+  { m:80, h:'1L', a:'3EHIJK',  date:'Júl 1',  huDate:'2026-07-01', huTime:'18:00', venue:'Atlanta'      },
   { m:82, h:'1G', a:'3AEHIJ',  date:'Júl 1',  huDate:'2026-07-01', huTime:'22:00', venue:'Seattle'      },
-  { m:80, h:'1L', a:'3EHIJK',  date:'Júl 1',  huDate:'2026-07-01', huTime:'22:00', venue:'Atlanta'      },
-  { m:84, h:'1H', a:'2J',      date:'Júl 2',  huDate:'2026-07-02', huTime:'03:00', venue:''             },
-  { m:86, h:'1J', a:'2H',      date:'Júl 2',  huDate:'2026-07-02', huTime:'22:00', venue:''             },
-  { m:88, h:'2D', a:'2G',      date:'Júl 2',  huDate:'2026-07-02', huTime:'03:00', venue:''             },
-  { m:85, h:'1B', a:'3EFGIJ',  date:'Júl 2',  huDate:'2026-07-02', huTime:'22:00', venue:''             },
-  { m:87, h:'1K', a:'3DEIJL',  date:'Júl 2',  huDate:'2026-07-02', huTime:'03:00', venue:''             },
-  { m:83, h:'2K', a:'2L',      date:'Júl 2',  huDate:'2026-07-02', huTime:'22:00', venue:''             },
+  { m:81, h:'1D', a:'3BEFIJ',  date:'Júl 2',  huDate:'2026-07-02', huTime:'02:00', venue:'Santa Clara'  },
+  { m:84, h:'1H', a:'2J',      date:'Júl 2',  huDate:'2026-07-02', huTime:'21:00', venue:'Los Angeles'  },
+  { m:86, h:'1J', a:'2H',      date:'Júl 3',  huDate:'2026-07-03', huTime:'01:00', venue:''             },
+  { m:88, h:'2D', a:'2G',      date:'Júl 3',  huDate:'2026-07-03', huTime:'19:00', venue:''             },
+  { m:85, h:'1B', a:'3EFGIJ',  date:'Júl 3',  huDate:'2026-07-03', huTime:'22:30', venue:''             },
+  { m:87, h:'1K', a:'3DEIJL',  date:'Júl 4',  huDate:'2026-07-04', huTime:'03:00', venue:''             },
+  { m:83, h:'2K', a:'2L',      date:'Júl 5',  huDate:'2026-07-05', huTime:'03:00', venue:''             },
 ];
 
 function detectRound(m) {
