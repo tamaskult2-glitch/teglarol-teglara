@@ -4210,12 +4210,41 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
   var etResult  = allEtResults[m.id]  || null;
   var penResult = allPenResults[m.id] || null;
 
+  // ET score-ból levezetett kimenetel
+  var myEtFromScore = null;
+  if(myTip && myTip.etScore) {
+    var _ets = myTip.etScore.split(':');
+    var _eth = parseInt(_ets[0]), _eta = parseInt(_ets[1]);
+    if(!isNaN(_eth) && !isNaN(_eta)) {
+      myEtFromScore = _eth > _eta ? '1' : _eth === _eta ? 'X' : '2';
+      if(!myEt) myEt = myEtFromScore;
+    }
+  }
   var showEt  = (myOut === 'X') || (regResult === 'X') || !!etResult;
-  var showPen = (myEt  === 'X') || (etResult === 'X') || !!penResult;
+  var showPen = (myEt  === 'X') || (etResult === 'X') || !!penResult || (myEtFromScore === 'X');
+
+  // Tipp összefoglaló sor: mutatja az ET és Pen tippet ha X-et rögzített
+  var tipSummary = '';
+  if(myTip && myOut === 'X') {
+    var summaryParts = [];
+    if(myTip.etScore) {
+      var etOK = realEtScore && myTip.etScore === realEtScore;
+      var etColor = realEtScore ? (etOK ? '#00ff87' : 'rgba(239,68,68,0.7)') : 'rgba(0,255,135,0.6)';
+      summaryParts.push('<span style="color:'+etColor+';">⚡ ET: '+myTip.etScore+'</span>');
+    }
+    if(myTip.penScore) {
+      var penOK = realPenScore && myTip.penScore === realPenScore;
+      var penColor = realPenScore ? (penOK ? '#00ff87' : 'rgba(239,68,68,0.7)') : 'rgba(0,255,135,0.5)';
+      summaryParts.push('<span style="color:'+penColor+';">🥅 Pen: '+myTip.penScore+'</span>');
+    }
+    if(summaryParts.length) {
+      tipSummary = '<div style="padding:4px 10px 2px;display:flex;gap:10px;font-size:11px;font-family:Oswald,sans-serif;letter-spacing:.5px;border-top:1px dashed rgba(255,255,255,0.06);">'
+        + summaryParts.join('') + '</div>';
+    }
+  }
 
   if(!showEt && !showPen) {
-    // Nincs ET/Pen de knockout → mutassuk a góllövő gombot ha van már tipp
-    if(myOut) return buildScorerBtn(m, myTip, kickoffLocked);
+    if(myOut) return tipSummary + buildScorerBtn(m, myTip, kickoffLocked);
     return '';
   }
 
@@ -4319,6 +4348,7 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
       + '</div>';
   }
   // Góllövő gomb az ET/Pen sorok alatt is
+  html += tipSummary;
   html += buildScorerBtn(m, myTip, kickoffLocked);
   return html;
 }
@@ -4399,6 +4429,17 @@ function buildOtherTips(mid, locked) {
     if(sc) { var implied = sc.h>sc.a?'1':sc.h===sc.a?'X':'2'; if(implied!==o) o=implied; }
     var pts = (result && m) ? calcMatchPoints(m, tip) : null;
     var tipStr = sc ? sc.h+':'+sc.a : (o||'?');
+    // Hosszabbítás és 11-es tipp megjelenítése ha X volt a kimenetel
+    if(o === 'X' || (sc && sc.h === sc.a)) {
+      var etTip = getTipEt(tip);
+      var penTip = getTipPen(tip);
+      var etSc = tip && tip.etScore;
+      var penSc = tip && tip.penScore;
+      if(etSc) tipStr += ' ⚡'+etSc;
+      else if(etTip) tipStr += ' ⚡'+etTip;
+      if(penSc) tipStr += ' 🥅'+penSc;
+      else if(penTip) tipStr += ' 🥅'+(penTip==='1'?'H':'V');
+    }
     var bg = 'rgba(255,255,255,0.04)';
     var nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.85)';
     var livePtsStr = '', rankStr = '', ptsStr = '';
