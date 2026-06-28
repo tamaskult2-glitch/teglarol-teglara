@@ -4745,7 +4745,7 @@ function scrollToMatch(m) {
     grp.style.display='';
     var btn = document.getElementById('toggle_'+gId);
     if(btn) btn.textContent='−';
-    sessionStorage.setItem('dc_'+m.huDate,'open');
+    sessionStorage.setItem('dcv2_'+m.huDate,'open');
   }
   // Kis delay hogy a DOM frissüljön a csoport megnyitása után
   setTimeout(function(){
@@ -4935,7 +4935,7 @@ function renderMatches() {
     var isTestDay = (date === '2026-05-27' || date === '2026-05-30');
     // Csoportköri napok alapból zárva; kieséses napok nyitva
     var hasKnockout = dayMatches.some(function(m){ return m.knockout; });
-    var colKey = 'dc_'+date;
+    var colKey = 'dcv2_'+date;
     var collapsed = !hasKnockout && sessionStorage.getItem(colKey) !== 'open';
     var gId = 'dg_'+date.replace(/-/g,'');
 
