@@ -9290,32 +9290,138 @@ var _scorerSelected = { home: [], away: [] };
 // ===== BEÉGETETT VB 2026 KERETEK (R32 csapatok) =====
 // Admin felülírhatja Firebase-ből, de ha nincs adat ez az alap
 var HARDCODED_ROSTERS = {
-  'Dél-Afrika': ['Ronwen Williams','Veli Mothwa','Ricardo Goss','Siyanda Xulu','Rushine De Reuck','Thibang Phete','Njabulo Ngcobo','Aubrey Modiba','Terrence Mashego','Reeve Frosler','Teboho Mokoena','Themba Zwane','Bongani Zungu','Ethan Noti','Yusuf Maart','Lyle Foster','Percy Tau','Evidence Makgopa','Ethan Brooks','Makhehleni Mkhulise','Goodman Mosele','Bradley Cross'],
-  'Kanada': ['Maxime Crépeau','Milan Borjan','James Pantemis','Doneil Henry','Steven Vitória','Liam Fraser','Alistair Johnston','Kamal Miller','Sam Adekugbe','Joel Waterman','Richie Laryea','Ismael Koné','Liam Millar','Jonathan David','Alphonso Davies','David Wotherspoon','Mark-Anthony Kaye','Scott Kennedy','Tajon Buchanan','Cyle Larin','Lucas Cavallini','Charles-Andreas Brym'],
-  'Brazília': ['Alisson','Ederson','Weverton','Danilo','Éder Militão','Marquinhos','Gabriel Magalhães','Wendell','Alex Sandro','Guilherme Arana','Casemiro','Bruno Guimarães','Lucas Paquetá','Rodrygo','Vinicius Junior','Raphinha','Richarlison','Gabriel Martinelli','Endrick','Pedro','Gabriel Barbosa','Antony'],
-  'Japán': ['Zion Suzuki','Kosei Tani','Ryoya Morishita','Miki Yamane','Ko Itakura','Takehiro Tomiyasu','Yuto Nagatomo','Daichi Hayashi','Maya Yoshida','Hidemasa Morita','Shuichi Gonda','Junya Ito','Ritsu Doan','Kaoru Mitoma','Yuya Osako','Daizen Maeda','Takuma Asano','Ayase Ueda','Ao Tanaka','Wataru Endo','Shogo Taniguchi','Keito Nakamura'],
-  'Németország': ['Manuel Neuer','Marc-André ter Stegen','Oliver Baumann','Joshua Kimmich','Antonio Rüdiger','David Raum','Nico Schlotterbeck','Thilo Kehrer','Benjamin Henrichs','Kai Havertz','Leon Goretzka','Florian Wirtz','Jamal Musiala','Leroy Sané','Thomas Müller','Serge Gnabry','Timo Werner','Niclas Füllkrug','İlkay Gündoğan','Pascal Groß','Robin Gosens','Chris Führich'],
-  'Paraguay': ['Antony Silva','Jorge Morel','Julio Enciso','Gustavo Gómez','Santiago Arzamendia','Robert Rojas','Fabian Balbuena','Blas Riveros','Oscar Romero','Miguel Almirón','Ángel Cardozo Lucena','Braian Samudio','Antonio Sanabria','Gabriel Ávalos','Richard Sánchez','Mathías Villasanti','Alejandro Romero','Néstor Camacho','Héctor Villalba','Ramón Sosa','Carlos González','Diego Gómez'],
-  'Hollandia': ['Bart Verbruggen','Justin Bijlow','Mark Flekken','Virgil van Dijk','Stefan de Vrij','Nathan Aké','Matthijs de Ligt','Denzel Dumfries','Daley Blind','Tyrell Malacia','Frenkie de Jong','Georginio Wijnaldum','Tijjani Reijnders','Teun Koopmeiners','Steven Bergwijn','Cody Gakpo','Donyell Malen','Wout Weghorst','Xavi Simons','Memphis Depay','Quinten Timber','Brian Brobbey'],
-  'Marokkó': ['Yassine Bounou','Ahmed Reda Tagnaouti','Munir Mohamedi','Romain Saïss','Nayef Aguerd','Noussair Mazraoui','Achraf Hakimi','Jawad El Yamiq','Yahia Attiat-Allah','Sofyan Amrabat','Azzedine Ounahi','Ilias Chair','Hakim Ziyech','Sofiane Boufal','Youssef En-Nesyri','Walid Cheddira','Selim Amallah','Abde Ezzalzouli','Abdessamad Ezzalzouli','Ibrahim Salah','Zakaria Aboukhlal','Anass Zaroury'],
-  'Franciaország': ['Mike Maignan','Alphonse Aréola','Brice Samba','Jules Koundé','Raphaël Varane','Ibrahima Konaté','William Saliba','Lucas Hernandez','Theo Hernandez','Benjamin Pavard','Aurélien Tchouaméni','Adrien Rabiot','Eduardo Camavinga','Youssouf Fofana','Antoine Griezmann','Kingsley Coman','Ousmane Dembélé','Marcus Thuram','Kylian Mbappé','Randal Kolo Muani','Matteo Guendouzi','Bradley Barcola'],
-  'Svédország': ['Robin Olsen','Karl-Johan Johnsson','Andreas Linde','Ludwig Augustinsson','Victor Nilsson Lindelöf','Carl Starfelt','Isak Hien','Emil Krafth','Filip Helander','Jens Cajuste','Viktor Claesson','Alexander Isak','Dejan Kulusevski','Anthony Elanga','Jesper Karlsson','Robin Quaison','Zlatan Ibrahimovic','Kristoffer Olsson','Sebastian Larsson','Marcus Danielson','Joel Andersson','Mattias Svanberg'],
-  'Elefántcsontpart': ['Yahia Fofana','Badra Ali Sangaré','Sylvain Gbohouo','Serge Aurier','Wilfried Singo','Ghislain Konan','Simon Deli','Eric Bailly','Odilon Kossounou','Ibrahim Sangaré','Franck Kessie','Seko Fofana','Yacine Adli','Wilfried Zaha','Nicolas Pépé','Sébastien Haller','Jean-Philippe Krasso','Oumar Diakité','Abdallah Sima','Karim Konaté','Maxwel Cornet','Christian Kouamé'],
-  'Norvégia': ['Ørjan Nyland','Rune Jarstein','Jørgen Strand Larsen','Sander Berge','Martin Ødegaard','Erling Haaland','Alexander Sørloth','Joshua King','Kristian Thorvaldsen','Andreas Hoelgebaum Pereira','Mathias Normann','Marcus Holmgren Pedersen','Julian Ryerson','Leo Østigård','Stian Gregersen','Birger Meling','Morten Thorsby','Fredrik Aursnes','Mohamed Elyounoussi','Patrick Berg','Emil Bohinen','Anders Trondsen'],
-  'Mexikó': ['Guillermo Ochoa','Luis Malagón','Rodolfo Cota','César Montes','Jorge Sánchez','Johan Vásquez','Jesús Gallardo','Kevin Álvarez','Gerardo Arteaga','Edson Álvarez','Carlos Rodríguez','Roberto Alvarado','Hirving Lozano','Uriel Antuna','Alexis Vega','Santiago Giménez','Henry Martín','Raúl Jiménez','Chucky Lozano','Orbelin Pineda','Erick Gutierrez','Luis Romo'],
-  'USA': ['Matt Turner','Sean Johnson','Ethan Horvath','Sergiño Dest','Joe Scally','Walker Zimmerman','Mark McKenzie','Chris Richards','Antonee Robinson','Tyler Adams','Weston McKennie','Luca de la Torre','Yunus Musah','Gio Reyna','Christian Pulisic','Tim Weah','Ricardo Pepi','Josh Sargent','Jesús Ferreira','Brenden Aaronson','Jordan Morris','Cameron Carter-Vickers'],
-  'Bosznia-Hercegovina': ['Kenan Pirić','Ibrahim Šehić','Nikola Vasilj','Dario Kvesić','Amer Gojak','Miralem Pjanić','Edin Džeko','Ermedin Demirović','Sead Kolašinac','Lamine Diarra','Benjamin Tahirović','Ognjen Todorović','Saša Kovačević','Haris Duljevic','Rade Krunic','Amar Dedić','Armin Gigović','Eldar Civic','Anel Ahmedhodžic','Dženan Radončić','Denis Huseinbašic','Adnan Kovačević'],
-  'Spanyolország': ['Unai Simón','David Raya','Robert Sánchez','Dani Carvajal','César Azpilicueta','Robin Le Normand','Aymeric Laporte','Pau Cubarsí','Alejandro Grimaldo','Marc Cucurella','Rodri','Fabián Ruiz','Pedri','Gavi','Marcos Llorente','Lamine Yamal','Nico Williams','Ferrán Torres','Mikel Oyarzabal','Álvaro Morata','Joselu','Dani Olmo'],
-  'Argentína': ['Emiliano Martínez','Gerónimo Rulli','Juan Musso','Nahuel Molina','Gonzalo Montiel','Cristian Romero','Germán Pezzella','Lisandro Martínez','Nicolás Otamendi','Marcos Acuña','Nicolás Tagliafico','Rodrigo De Paul','Leandro Paredes','Enzo Fernández','Alexis Mac Allister','Giovani Lo Celso','Ángel Di María','Paulo Dybala','Lautaro Martínez','Julián Álvarez','Alejandro Garnacho','Nicolás González'],
-  'Kongói DK': ['Lionel Mpasi','Joël Kiassumbua','Ley Matampi','Chancel Mbemba','Yoane Wissa','Arthur Masuaku','Ngianga-Wa Nanga','Christian Luyindama','Cédric Bakambu','Joris Kayembe','Silas Wissa','Dieumerci Mbokani','Junior Kabananga','Théo Bongonda','Arnold Bouka Moutou','Bryan Limbombe','Ngonda Muzinga','Meschak Elia','Jonathan Bolingi','Paul-José Mpoku','Meschak Luzolo','Dodi Lukebakio'],
-  'Üzbegisztán': ['Ulugbek Nishonov','Otabek Shukurov','Jasur Jaloliddinov','Islom Tukhtahujaev','Jaloliddin Masharipov','Eldor Shomurodov','Abbosbek Fayzullaev','Bobur Abdixoliqov','Shamsiddin Karimov','Otabek Shamsiev','Jamshid Iskanderov','Dilshod Nematov','Muzaffar Nizomov','Khamdamjon Utkinov','Dostonbek Khamdamov','Temur Musaev','Bunyod Hamrobekov','Lochinbek Ochilov','Akbar Madaminov','Bekzod Hamrobekov','Oston Urunov','Sardor Rashidov'],
-  'Jordánia': ['Yazeed Abdelhamid','Ahmad Rami','Mohammad Rashid','Mohammad Al-Rosan','Baha Abdelrahman','Abdallah Nasib','Ehsan Haddad','Ahmad Al-Sarha','Musa Al-Tamari','Mohammad Abu Zema','Yazan Al-Naimat','Mohammad Shbair','Fehid Musa','Oday Dabbagh','Ahmad Saleh','Ahmad Al-Ali','Ahmad Yazan','Anas Bani Yaseen','Mohammad Al-Harethi','Basel Al-Rawabdeh','Mohammad Bushnaq','Mohammad Qasem'],
-  'Kolumbia': ['Camilo Vargas','David Ospina','Álvaro Montero','Davinson Sánchez','Yerry Mina','Carlos Cuesta','Daniel Muñoz','William Tesillo','Johan Mojica','Jhon Lucumí','Mateus Uribe','Juan Cuadrado','Wilmar Barrios','Jefferson Lerma','James Rodríguez','Luis Díaz','Juan Fernando Quintero','Duván Zapata','Rafael Santos Borré','Radamel Falcao','Óscar Murillo','Jhon Arias'],
-  'Portugália': ['Rui Patrício','Diogo Costa','José Sá','João Cancelo','Rúben Dias','Pepe','Gonçalo Inácio','Nuno Mendes','Raphaël Guerreiro','João Palhinha','Vitinha','Rúben Neves','Bernardo Silva','Otávio','Bruno Fernandes','Rafael Leão','Cristiano Ronaldo','Gonçalo Ramos','Diogo Jota','João Félix','Pedro Neto','Ricardo Horta'],
-  'Anglia': ['Jordan Pickford','Nick Pope','Aaron Ramsdale','Kyle Walker','John Stones','Harry Maguire','Luke Shaw','Trent Alexander-Arnold','Kieran Trippier','Declan Rice','Jordan Henderson','Jude Bellingham','Phil Foden','Bukayo Saka','Raheem Sterling','Harry Kane','Marcus Rashford','Callum Wilson','Jack Grealish','Cole Palmer','Jarrod Bowen','Conor Gallagher'],
-  'Horvátország': ['Dominik Livaković','Ivica Ivušić','Ivo Grbić','Joško Gvardiol','Dejan Lovren','Duje Ćaleta-Car','Borna Sosa','Josip Juranović','Martin Erlić','Luka Modrić','Mateo Kovačić','Marcelo Brozović','Ivan Perišić','Andrej Kramarić','Bruno Petković','Mario Pašalić','Nikola Vlašić','Josip Sutalo','Ante Budimir','Marko Livaja','Luka Ivanušec','Lovro Majer'],
-  'Ghána': ['Lawrence Ati-Zigi','Jojo Wollacott','Ibrahim Danlad','Daniel Amartey','Alexander Djiku','Jonathan Mensah','Tariq Lamptey','Abdul Rahman Baba','Andy Yiadom','Thomas Partey','Emmanuel Gyasi','Jordan Ayew','André Ayew','Mohammed Salisu','Kudus Mohammed','Antoine Semenyo','Iñaki Williams','Callum Hudson-Odoi','Kamaldeen Sulemana','Osman Bukari','Salis Abdul Samed','Daniel Kofi Kyereh'],
-  'Svájc': ['Yann Sommer','Gregor Kobel','Jonas Omlin','Manuel Akanji','Nico Elvedi','Fabian Schär','Ricardo Rodriguez','Silvan Widmer','Kevin Mbabu','Granit Xhaka','Remo Freuler','Xherdan Shaqiri','Denis Zakaria','Breel Embolo','Haris Seferović','Christian Fassnacht','Noah Okafor','Michel Aebischer','Renato Steffen','Fabian Frei','Dan Ndoye','Kwadwo Duah'],
+  // ===== R32 CSAPATOK — Hivatalos 2026 VB keretek =====
+  'Argentína': ['Emiliano Martínez -GK','Gerónimo Rulli -GK','Juan Musso -GK',
+    'Nicolás Otamendi','Nicolás Tagliafico','Nahuel Molina','Cristian Romero','Gonzalo Montiel','Lisandro Martínez','Leonardo Balerdi','Facundo Medina',
+    'Rodrigo De Paul','Leandro Paredes','Giovani Lo Celso','Alexis Mac Allister','Enzo Fernández','Exequiel Palacios','Valentín Barco',
+    'Lionel Messi','Lautaro Martínez','Julián Álvarez','Nicolás González','Thiago Almada','Giuliano Simeone','Nico Paz','José Manuel López'],
+
+  'Brazília': ['Alisson -GK','Ederson -GK','Weverton -GK',
+    'Danilo','Marquinhos','Gabriel Magalhães','Wendell','Alex Sandro','Guilherme Arana','Bremer',
+    'Casemiro','Bruno Guimarães','Lucas Paquetá','Gerson','Andreas Pereira',
+    'Rodrygo','Vinicius Junior','Raphinha','Richarlison','Gabriel Martinelli','Endrick','Pedro','Gabriel Barbosa','Antony','Savinho','Lucas Moura'],
+
+  'Hollandia': ['Bart Verbruggen -GK','Justin Bijlow -GK','Mark Flekken -GK',
+    'Virgil van Dijk','Stefan de Vrij','Nathan Aké','Matthijs de Ligt','Denzel Dumfries','Daley Blind','Tyrell Malacia',
+    'Frenkie de Jong','Georginio Wijnaldum','Tijjani Reijnders','Teun Koopmeiners','Ryan Gravenberch',
+    'Steven Bergwijn','Cody Gakpo','Donyell Malen','Wout Weghorst','Memphis Depay','Brian Brobbey','Quinten Timber','Noa Lang'],
+
+  'Franciaország': ['Mike Maignan -GK','Brice Samba -GK','Robin Risser -GK',
+    'Lucas Digne','Jules Koundé','William Saliba','Ibrahima Konaté','Benjamin Pavard','Theo Hernandez','Axel Disasi','Wesley Fofana',
+    'N\'Golo Kanté','Adrien Rabiot','Warren Zaïre-Emery','Youssouf Fofana','Matteo Guendouzi','Aurélien Tchouaméni',
+    'Kylian Mbappé','Ousmane Dembélé','Marcus Thuram','Antoine Griezmann','Randal Kolo Muani','Bradley Barcola','Kingsley Coman'],
+
+  'Németország': ['Manuel Neuer -GK','Marc-André ter Stegen -GK','Oliver Baumann -GK',
+    'Joshua Kimmich','Antonio Rüdiger','David Raum','Nico Schlotterbeck','Thilo Kehrer','Benjamin Henrichs','Waldemar Anton','Jonathan Tah',
+    'Kai Havertz','Leon Goretzka','Florian Wirtz','Jamal Musiala','İlkay Gündoğan','Pascal Groß','Robert Andrich',
+    'Leroy Sané','Thomas Müller','Timo Werner','Niclas Füllkrug','Deniz Undav','Chris Führich','Maximilian Beier','Álvaro'],
+
+  'Spanyolország': ['Unai Simón -GK','David Raya -GK','Alex Remiro -GK',
+    'Dani Carvajal','Robin Le Normand','Aymeric Laporte','Pau Cubarsí','Alejandro Grimaldo','Marc Cucurella','Jesús Navas','Martín Zubimendi',
+    'Rodri','Fabián Ruiz','Pedri','Gavi','Marcos Llorente','Dani Olmo','Mikel Merino',
+    'Lamine Yamal','Nico Williams','Ferrán Torres','Mikel Oyarzabal','Álvaro Morata','Joselu','Bryan Zaragoza'],
+
+  'Anglia': ['Jordan Pickford -GK','Nick Pope -GK','Aaron Ramsdale -GK',
+    'Kyle Walker','John Stones','Harry Maguire','Luke Shaw','Trent Alexander-Arnold','Kieran Trippier','Marc Guéhi','Levi Colwill',
+    'Declan Rice','Jude Bellingham','Conor Gallagher','Adam Wharton','Phil Foden',
+    'Bukayo Saka','Raheem Sterling','Harry Kane','Marcus Rashford','Cole Palmer','Jarrod Bowen','Anthony Gordon','Eberechi Eze','Ollie Watkins'],
+
+  'Japán': ['Zion Suzuki -GK','Kosei Tani -GK','Ryoya Morishita -GK',
+    'Miki Yamane','Ko Itakura','Takehiro Tomiyasu','Yuto Nagatomo','Daichi Hayashi','Maya Yoshida','Shogo Taniguchi','Hiroki Ito',
+    'Hidemasa Morita','Wataru Endo','Ao Tanaka','Junya Ito','Ritsu Doan',
+    'Keito Nakamura','Daizen Maeda','Takuma Asano','Ayuse Ueda','Yuya Osako'],
+
+  'Kanada': ['Maxime Crépeau -GK','Milan Borjan -GK','James Pantemis -GK',
+    'Doneil Henry','Steven Vitória','Alistair Johnston','Kamal Miller','Sam Adekugbe','Richie Laryea','Joel Waterman','Derek Cornelius',
+    'Ismael Koné','Liam Millar','Mark-Anthony Kaye','Stephen Eustáquio','Jonathan Osorio','Jacob Shaffelburg',
+    'Jonathan David','Alphonso Davies','Tajon Buchanan','Cyle Larin','Lucas Cavallini','Charles-Andreas Brym'],
+
+  'USA': ['Matt Turner -GK','Sean Johnson -GK','Ethan Horvath -GK',
+    'Sergiño Dest','Joe Scally','Walker Zimmerman','Mark McKenzie','Chris Richards','Antonee Robinson','Cameron Carter-Vickers','John Brooks',
+    'Tyler Adams','Weston McKennie','Luca de la Torre','Yunus Musah','Brendan Aaronson','Paxten Aaronson',
+    'Gio Reyna','Christian Pulisic','Tim Weah','Ricardo Pepi','Josh Sargent','Jesús Ferreira','Jordan Morris','Daryl Dike'],
+
+  'Mexikó': ['Guillermo Ochoa -GK','Rodolfo Cota -GK','Hugo González -GK',
+    'César Montes','Jorge Sánchez','Johan Vásquez','Jesús Gallardo','Kevin Álvarez','Gerardo Arteaga','Édson Álvarez','Fernando Beltrán',
+    'Carlos Rodríguez','Roberto Alvarado','Orbelín Pineda','Erick Gutierrez','Uriel Antuna','Luis Romo',
+    'Hirving Lozano','Santiago Giménez','Henry Martín','Alexis Vega','Raúl Jiménez'],
+
+  'Marokkó': ['Yassine Bounou -GK','Ahmed Reda Tagnaouti -GK','Munir Mohamedi -GK',
+    'Romain Saïss','Nayef Aguerd','Noussair Mazraoui','Achraf Hakimi','Jawad El Yamiq','Yahia Attiat-Allah','Badr Benoun','Achraf Dari',
+    'Sofyan Amrabat','Azzedine Ounahi','Ilias Chair','Hakim Ziyech','Selim Amallah','Abdessamad Ezzalzouli',
+    'Youssef En-Nesyri','Walid Cheddira','Soufiane Rahimi','Zakaria Aboukhlal','Anass Zaroury'],
+
+  'Portugália': ['Rui Patrício -GK','Diogo Costa -GK','José Sá -GK',
+    'João Cancelo','Rúben Dias','Pepe','Gonçalo Inácio','Nuno Mendes','Raphaël Guerreiro','Diogo Dalot','Tiago Djaló',
+    'João Palhinha','Vitinha','Rúben Neves','Bernardo Silva','Otávio','Bruno Fernandes',
+    'Rafael Leão','Cristiano Ronaldo','Gonçalo Ramos','Diogo Jota','João Félix','Pedro Neto','Francisco Conceição'],
+
+  'Svájc': ['Yann Sommer -GK','Gregor Kobel -GK','Jonas Omlin -GK',
+    'Manuel Akanji','Nico Elvedi','Fabian Schär','Ricardo Rodriguez','Silvan Widmer','Kevin Mbabu','Edimilson Fernandes',
+    'Granit Xhaka','Remo Freuler','Xherdan Shaqiri','Denis Zakaria','Michel Aebischer','Fabian Frei',
+    'Breel Embolo','Haris Seferović','Christian Fassnacht','Noah Okafor','Dan Ndoye','Kwadwo Duah','Ruben Vargas'],
+
+
+
+  'Kolumbia': ['Camilo Vargas -GK','Álvaro Montero -GK','David Ospina -GK',
+    'Davinson Sánchez','Yerry Mina','Carlos Cuesta','Daniel Muñoz','William Tesillo','Johan Mojica','Jhon Lucumí','Jordi Mina',
+    'Mateus Uribe','Juan Cuadrado','Wilmar Barrios','Jefferson Lerma','James Rodríguez','Jhon Arias',
+    'Luis Díaz','Duván Zapata','Rafael Santos Borré','Radamel Falcao','Óscar Murillo'],
+
+  'Horvátország': ['Dominik Livaković -GK','Ivica Ivušić -GK','Ivo Grbić -GK',
+    'Joško Gvardiol','Dejan Lovren','Duje Ćaleta-Car','Borna Sosa','Josip Juranović','Martin Erlić','Josip Sutalo','Marin Pongračić',
+    'Luka Modrić','Mateo Kovačić','Marcelo Brozović','Ivan Perišić','Mario Pašalić','Nikola Vlašić','Lovro Majer',
+    'Andrej Kramarić','Bruno Petković','Ante Budimir','Marko Livaja','Luka Ivanušec'],
+
+  'Ghána': ['Lawrence Ati-Zigi -GK','Jojo Wollacott -GK','Ibrahim Danlad -GK',
+    'Daniel Amartey','Alexander Djiku','Jonathan Mensah','Tariq Lamptey','Abdul Rahman Baba','Andy Yiadom','Denis Odoi',
+    'Thomas Partey','Emmanuel Gyasi','Jordan Ayew','André Ayew','Kudus Mohammed','Salis Abdul Samed',
+    'Antoine Semenyo','Iñaki Williams','Callum Hudson-Odoi','Kamaldeen Sulemana','Osman Bukari','Ernest Nuamah'],
+
+  'Elefántcsontpart': ['Yahia Fofana -GK','Badra Ali Sangaré -GK','Sylvain Gbohouo -GK',
+    'Serge Aurier','Wilfried Singo','Ghislain Konan','Simon Deli','Eric Bailly','Odilon Kossounou','Jean-Louis Touré',
+    'Ibrahim Sangaré','Franck Kessie','Seko Fofana','Yacine Adli','Stéphane Sébastien Lié','Christian Kouamé',
+    'Wilfried Zaha','Nicolas Pépé','Sébastien Haller','Jean-Philippe Krasso','Karim Konaté','Maxwel Cornet','Abde Ezzalzouli'],
+
+  'Norvégia': ['Ørjan Nyland -GK','Rune Jarstein -GK','Oscar Aga -GK',
+    'Sander Berge','Martin Ødegaard','Leo Østigård','Julian Ryerson','Birger Meling','Marcus Holmgren Pedersen','Stian Gregersen','Morten Thorsby',
+    'Patrick Berg','Fredrik Aursnes','Mohamed Elyounoussi','Mathias Normann',
+    'Erling Haaland','Alexander Sørloth','Joshua King','Jørgen Strand Larsen','Kristian Thorvaldsen'],
+
+  'Svédország': ['Robin Olsen -GK','Karl-Johan Johnsson -GK','Andreas Linde -GK',
+    'Ludwig Augustinsson','Victor Nilsson Lindelöf','Carl Starfelt','Isak Hien','Emil Krafth','Filip Helander','Marcus Danielson',
+    'Jens Cajuste','Viktor Claesson','Sebastian Larsson','Mattias Svanberg','Kristoffer Olsson','Robin Quaison',
+    'Alexander Isak','Dejan Kulusevski','Anthony Elanga','Jesper Karlsson','Joel Andersson'],
+
+  'Dél-Afrika': ['Ronwen Williams -GK','Veli Mothwa -GK','Ricardo Goss -GK',
+    'Siyanda Xulu','Rushine De Reuck','Thibang Phete','Njabulo Ngcobo','Aubrey Modiba','Terrence Mashego','Reeve Frosler',
+    'Teboho Mokoena','Themba Zwane','Bongani Zungu','Ethan Noti','Yusuf Maart','Lyle Foster',
+    'Percy Tau','Evidence Makgopa','Ethan Brooks','Makhehleni Mkhulise','Goodman Mosele','Bradley Cross'],
+
+  'Bosznia-Hercegovina': ['Kenan Pirić -GK','Ibrahim Šehić -GK','Nikola Vasilj -GK',
+    'Dario Kvesić','Amer Gojak','Miralem Pjanić','Sead Kolašinac','Lamine Diarra','Benjamin Tahirović','Anel Ahmedhodžić','Amar Dedić',
+    'Rade Krunic','Adnan Kovačević','Haris Duljevic','Ognjen Todorović',
+    'Edin Džeko','Ermedin Demirović','Anel Kljajić','Elvis Sarić','Denijan Radončić'],
+
+  'Kongói DK': ['Lionel Mpasi -GK','Joël Kiassumbua -GK','Ley Matampi -GK',
+    'Chancel Mbemba','Yoane Wissa','Arthur Masuaku','Christian Luyindama','Cédric Bakambu','Silas Wissa','Dodi Lukebakio',
+    'Ngonda Muzinga','Meschak Elia','Bryan Limbombe','Junior Kabananga','Théo Bongonda',
+    'Arnold Bouka Moutou','Joris Kayembe','Jonathan Bolingi','Paul-José Mpoku'],
+
+  'Üzbegisztán': ['Ulugbek Nishonov -GK','Otabek Shukurov -GK','Jasur Jaloliddinov -GK',
+    'Islom Tukhtahujaev','Jaloliddin Masharipov','Eldor Shomurodov','Abbosbek Fayzullaev','Bobur Abdixoliqov','Shamsiddin Karimov',
+    'Otabek Shamsiev','Jamshid Iskanderov','Dilshod Nematov','Muzaffar Nizomov','Khamdamjon Utkinov',
+    'Dostonbek Khamdamov','Temur Musaev','Lochinbek Ochilov','Akbar Madaminov','Oston Urunov','Sardor Rashidov'],
+
+  'Paraguái': ['Antony Silva -GK','Jorge Morel -GK','Julio Enciso -GK',
+    'Gustavo Gómez','Santiago Arzamendia','Robert Rojas','Fabian Balbuena','Blas Riveros','Óscar Romero',
+    'Miguel Almirón','Ángel Cardozo Lucena','Richard Sánchez','Mathías Villasanti','Alejandro Romero','Néstor Camacho',
+    'Héctor Villalba','Ramón Sosa','Carlos González','Diego Gómez','Antonio Sanabria','Gabriel Ávalos','Braian Samudio'],
+
+  'Jordánia': ['Yazeed Abdelhamid -GK','Ahmad Rami -GK','Mohammad Rashid -GK',
+    'Mohammad Al-Rosan','Baha Abdelrahman','Abdallah Nasib','Ehsan Haddad','Ahmad Al-Sarha','Musa Al-Tamari',
+    'Mohammad Abu Zema','Yazan Al-Naimat','Mohammad Shbair','Fehid Musa','Oday Dabbagh',
+    'Ahmad Saleh','Ahmad Al-Ali','Anas Bani Yaseen','Basel Al-Rawabdeh'],
 };
 
 // Inicializálás: ha nincs Firebase adat, a hardcoded értékek lesznek az alap
