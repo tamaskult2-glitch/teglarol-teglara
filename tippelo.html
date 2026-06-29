@@ -4963,6 +4963,7 @@ function renderMatches() {
     return m.id !== 'TEST1' && m.id !== 'BL2026'
       && !(m.group === '⭐BL')
       && !(m.isEmob)
+      && !m.id.startsWith('CM_TEST_')  // Teszt meccsek nem a fő listában
       && !(m.id.startsWith('CM_') && (m.group==='🏭' || (m.title&&(m.title.indexOf('Foca')>=0||m.title.indexOf('E-mob')>=0))));
   });
 
@@ -5227,9 +5228,9 @@ function renderMatches() {
             ${myTip && !cardLocked ? `<button onclick="clearTip('${m.id}')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;">⌫</button>` : ''}
           </div>
           ${kickoffLocked&&total>0?buildTipDistBar(cnt,total,result):''}
-          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildScorerRow(m.id,m):''}
-          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildEventTimeline(m.id):''}
-          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildTimelineStrip(m.id):''}
+          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live')||matchScorers[m.id])?buildScorerRow(m.id,m):''}
+          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live')||liveEventsAll[m.id])?buildEventTimeline(m.id):''}
+          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live')||liveEventsAll[m.id])?buildTimelineStrip(m.id):''}
           ${(liveScores[m.id]&&liveScores[m.id].status==='live')?buildMomentumBar(m.id):''}
           </div>
           ${buildScoreRow(m.id,myTip,result,allScores[m.id],cardLocked)}${buildOtherTips(m.id,cardLocked)}
