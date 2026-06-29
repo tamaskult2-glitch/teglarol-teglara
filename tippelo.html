@@ -5212,15 +5212,24 @@ function renderMatches() {
                 </button>
               </div>
             </div>
-            ${kickoffLocked&&total>0?buildTipDistBar(cnt,total,result):''}
-            ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildScorerRow(m.id,m):''}
-            ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildEventTimeline(m.id):''}
-            ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildTimelineStrip(m.id):''}
-            ${(liveLineups[m.id])?buildLineupSection(m.id,m):''}
+          </div>
+          <div class="tip-buttons">
+            <button class="${bc('1','hb')}" onclick="submitTip('${m.id}','1')"><span class="tl">1</span><span class="tc">${cnt['1']>0?(cnt['1']+'×'):''}</span></button>
+            <button class="${bc('X','db')}" onclick="submitTip('${m.id}','X')"><span class="tl">X</span><span class="tc">${cnt['X']>0?(cnt['X']+'×'):''}</span></button>
+            <button class="${bc('2','ab')}" onclick="submitTip('${m.id}','2')"><span class="tl">2</span><span class="tc">${cnt['2']>0?(cnt['2']+'×'):''}</span></button>
+            ${myTip && !cardLocked ? `<button onclick="clearTip('${m.id}')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;">⌫</button>` : ''}
+          </div>
+          ${kickoffLocked&&total>0?buildTipDistBar(cnt,total,result):''}
+          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildScorerRow(m.id,m):''}
+          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildEventTimeline(m.id):''}
+          ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildTimelineStrip(m.id):''}
+          ${(liveScores[m.id]&&liveScores[m.id].status==='live')?buildMomentumBar(m.id):''}
           </div>
           ${buildScoreRow(m.id,myTip,result,allScores[m.id],cardLocked)}${buildOtherTips(m.id,cardLocked)}
           ${isKnockoutMatch(m)?buildKnockoutRows(m,myTip,result,kickoffLocked):''}
+          ${(liveScores[m.id]&&liveScores[m.id].status==='live')?buildCommentaryTicker(m.id):''}
           ${liveStats[m.id]?buildLiveStatsBar(m.id):''}
+          ${(liveLineups[m.id])?buildLineupSection(m.id,m):''}
         </div>`;
       });
       html += '</div>'; // nap wrapper vége (KO)
