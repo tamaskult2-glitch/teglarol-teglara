@@ -1275,7 +1275,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* Live ticker bands */
-#liveTicker > div { border-radius:0 !important; }
+.day-group-closed { display: none !important; }
 
 /* Pts badge */
 .pts-badge { border-radius:0 !important; }
@@ -3412,8 +3412,10 @@ function getWeeklyMvpBukta() {
       var dayNum = Math.floor((today - vbStart) / 86400000) + 1;
       var totalDays = Math.floor((vbEnd - vbStart) / 86400000) + 1;
       if(dayNum > totalDays) dayNum = totalDays;
-      var totalMatches = 104; // 72 csoportköri + 32 kieséses (R32+R16+QF+SF+bronz+döntő)
-      var playedMatches = ALL_MATCHES.filter(function(m){ return isVbMatch(m) && allResults[m.id]; }).length;
+      var totalMatches = 104; // 72 csoportköri + 32 kieséses
+      var playedVb = ALL_MATCHES.filter(function(m){ return isVbMatch(m) && allResults[m.id]; }).length;
+      var playedKo = Object.keys(_virtualKOMatches||{}).filter(function(id){ return !!allResults[id]; }).length;
+      var playedMatches = playedVb + playedKo;
       el.innerHTML = '<span style="font-family:Oswald,sans-serif;font-size:13px;color:var(--gold);letter-spacing:1px;">⚽ ' + dayNum + '/' + totalDays + '. NAP · ' + playedMatches + '/' + totalMatches + ' MECCS</span>';
       toggleKickoffBalls(true);
       return;
@@ -4812,11 +4814,11 @@ function scrollToMatch(m) {
   if(!m) return;
   var gId = 'dg_' + m.huDate.replace(/-/g,'');
   var grp = document.getElementById(gId);
-  if(grp && grp.style.display==='none') {
-    grp.style.display='';
+  if(grp && grp.classList.contains('day-group-closed')) {
+    grp.classList.remove('day-group-closed');
+    grp.style.display = '';
     var btn = document.getElementById('toggle_'+gId);
     if(btn) btn.textContent='−';
-    sessionStorage.setItem('dcv2_'+m.huDate,'open');
     _openDayGroups[gId] = true;
   }
   // Kis delay hogy a DOM frissüljön a csoport megnyitása után
@@ -5017,7 +5019,7 @@ function renderMatches() {
       <h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span>
       <span id="toggle_${gId}" style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">${collapsed?'+':'−'}</span>
     </div>`;
-    html+=`<div id="${gId}" style="${collapsed?'display:none':''}">`;
+    html+=`<div id="${gId}" class="day-group${collapsed?' day-group-closed':''}">`;
     dayMatches.forEach(m=>{
       const result=allResults[m.id]||null;
       const score=allScores[m.id]||null;
@@ -5146,10 +5148,11 @@ function renderMatches() {
   if(_savedMatchId) {
     try {
       var restoredCard = document.getElementById(_savedMatchId);
-      if(restoredCard) {
+      // Csak ha a kártya látható (nem display:none szülőben)
+      if(restoredCard && restoredCard.offsetParent !== null) {
         var newRect = restoredCard.getBoundingClientRect();
         var drift = newRect.top - _savedOffsetFromTop;
-        if(Math.abs(drift) > 5) { // Csak ha >5px eltérés van
+        if(Math.abs(drift) > 5 && Math.abs(drift) < 2000) {
           window.scrollBy({top: drift, behavior: 'instant'});
         }
       }
@@ -10287,31 +10290,17 @@ function initBLPoll() {
 function toggleDayGroup(groupId) {
   var el = document.getElementById(groupId);
   if(!el) return;
-  var isNowHidden = el.style.display === 'none';
-  el.style.display = isNowHidden ? '' : 'none';
-  var btn = document.getElementById('toggle_'+groupId);
-  if(btn) btn.textContent = isNowHidden ? '−' : '+';
-  _openDayGroups[groupId] = isNowHidden;
-  // Ha kinyitottuk → ugrás az első tippeletlen meccshez
-  if(isNowHidden) {
-    setTimeout(function() {
-      var cards = el.querySelectorAll('.match-card');
-      var target = null;
-      var safe = currentUser ? fbSafeName(currentUser) : null;
-      for(var i = 0; i < cards.length; i++) {
-        var card = cards[i];
-        var mid = card.id.replace('mc_','');
-        if(!mid) continue;
-        var isLocked = card.classList.contains('locked');
-        var hasTip = safe && allTips[mid] && allTips[mid][safe];
-        if(!isLocked && !hasTip) { target = card; break; }
-      }
-      if(target) {
-        var navH = document.querySelector('.nav-tabs') ? document.querySelector('.nav-tabs').offsetHeight+8 : 0;
-        window.scrollTo({top: target.getBoundingClientRect().top+window.scrollY-navH, behavior:'smooth'});
-      }
-    }, 80);
+  var isNowClosed = el.classList.contains('day-group-closed');
+  if(isNowClosed) {
+    el.classList.remove('day-group-closed');
+    el.style.display = '';
+  } else {
+    el.classList.add('day-group-closed');
+    el.style.display = 'none';
   }
+  var btn = document.getElementById('toggle_'+groupId);
+  if(btn) btn.textContent = isNowClosed ? '−' : '+';
+  _openDayGroups[groupId] = isNowClosed; // true = nyitva
 }
 
 function buildScorerRow(mid, m) {
