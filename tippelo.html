@@ -5013,25 +5013,19 @@ function renderMatches() {
   var _groupSectionClosed = false;
 
   dates.forEach(date=>{
-    const dayMatches=mainMatches.filter(m=>m.huDate===date).sort((a,b)=>a.huTime.localeCompare(b.huTime));
-    if(!dayMatches.length) return;
+    const allDayM=mainMatches.filter(m=>m.huDate===date).sort((a,b)=>a.huTime.localeCompare(b.huTime));
+    if(!allDayM.length) return;
     const d=new Date(date+'T12:00:00');
     const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
-    var hasKnockout = dayMatches.some(function(m){ return m.knockout; });
+    const grpDayM = allDayM.filter(function(m){ return !m.knockout; });
+    const koDayM  = allDayM.filter(function(m){ return  m.knockout; });
 
-    // Ha az első kieséses nap — lezárjuk a group_section-t
-    if(hasKnockout && !_groupSectionClosed) {
-      html += '</div>'; // group_section vége
-      _groupSectionClosed = true;
-    }
-
-    // Napi fejléc (csak ha VAN meccs ezen a napon)
-    html+=`<div class="date-header">
-      <h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span>
-    </div>`;
-    var gId = 'dg_'+date.replace(/-/g,'');
-    html+=`<div id="${gId}">`;
-    dayMatches.forEach(m=>{
+    // CSOPORT rész: csoportmeccsek group_section-ön BELÜL
+    if(grpDayM.length > 0 && !_groupSectionClosed) {
+      html+=`<div class="date-header"><h2>${dayStr}</h2><span class="date-badge">${grpDayM.length} meccs</span></div>`;
+      html+=`<div id="dg_grp_${date.replace(/-/g,'')}">`;
+      var dayMatches = grpDayM; // match card loop body erre fut
+      dayMatches.forEach(m=>{
       const result=allResults[m.id]||null;
       const score=allScores[m.id]||null;
       const myTip=currentUser&&allTips[m.id]?(allTips[m.id][fbSafeName(currentUser)]||null):null;
@@ -5151,7 +5145,85 @@ function renderMatches() {
         </div>
       </div>`;
     });
-    html += '</div>'; // nap wrapper vége
+    html += '</div>'; // nap wrapper vége (grp rész)
+    } // end if grpDayM
+
+    // KO rész: kieséses meccsek group_section-ön KÍVÜL
+    if(koDayM.length > 0) {
+      if(!_groupSectionClosed) {
+        html += '</div>'; // group_section lezárás
+        _groupSectionClosed = true;
+      }
+      const d_ko=new Date(date+'T12:00:00');
+      const dayStr_ko=d_ko.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
+      html+=`<div class="date-header"><h2>${dayStr_ko}</h2><span class="date-badge">${koDayM.length} meccs</span></div>`;
+      html+=`<div id="dg_ko_${date.replace(/-/g,'')}">`;
+      koDayM.forEach(m=>{
+        const result=allResults[m.id]||null;
+        const score=allScores[m.id]||null;
+        const myTip=currentUser&&allTips[m.id]?(allTips[m.id][fbSafeName(currentUser)]||null):null;
+        const kickoffLocked = m.id.startsWith('CM_TEST_') ? false :
+          (isKickoffPassed(m.huDate, m.huTime) || !!(liveScores[m.id] && (liveScores[m.id].status === 'live' || liveScores[m.id].status === 'ft')));
+        const tips=allTips[m.id]||{};
+        const cnt={'1':0,'X':0,'2':0};
+        Object.values(tips).forEach(t=>{var o=getTipOutcome(t);if(cnt[o]!==undefined)cnt[o]++;});
+        const total=cnt['1']+cnt['X']+cnt['2'];
+        const cardLocked=kickoffLocked;
+        var koRound = detectRound(m)||'R32';
+        var koMult  = getMatchMultiplier(m);
+        var koLabel = {R32:'R32 · 2×',R16:'R16 · 2×',QF:'Negyed · 2×',SF:'Előd · 2×',BRONZE:'Bronz · 3×',FINAL:'DÖNTŐ · 3×'}[koRound]||'R32 · 2×';
+        var koColor = koMult===3 ? '#f5c518' : '#00ff87';
+        if(koRound !== _lastMatchPhase && PHASE_BANNERS[koRound]) {
+          var pb2=PHASE_BANNERS[koRound];
+          html += '<div style="margin:16px 0 10px;padding:11px 14px;background:'+pb2.bg+';border:1px solid '+pb2.border+';border-left:4px solid '+pb2.color+';">'
+            + '<div style="font-family:Oswald,sans-serif;font-size:13px;font-weight:700;color:'+pb2.color+';letter-spacing:2px;">'+pb2.label+'</div>'
+            + '<div style="font-size:10px;color:rgba(240,244,240,0.4);margin-top:3px;">'+pb2.sub+'</div>'
+            + '</div>';
+          _lastMatchPhase = koRound;
+        }
+        html+=`<div class="match-card${result?' has-result':''}${cardLocked?' locked':''}${liveScores[m.id]&&liveScores[m.id].status==='live'?' is-live':''}" id="mc_${m.id}">
+          <div class="match-meta">
+            <span class="time-tag">${m.huTime}</span>
+            ${liveScores[m.id]&&liveScores[m.id].status==='live'?'<span class="live-badge"><span class="live-dot"></span>ÉLŐ</span>':''}
+            <span style="font-family:Oswald,sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;color:${koColor};background:rgba(0,0,0,0.3);border:1px solid ${koColor}40;padding:1px 7px;border-radius:3px;">${koLabel}</span>
+            <span style="margin-left:auto;color:rgba(240,244,240,0.5);">${m.venue||''}</span>
+            ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
+            ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
+            ${result?'<span style="font-size:9px;color:rgba(0,255,135,0.6);background:rgba(0,255,135,0.08);border:1px solid rgba(0,255,135,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>':''}
+            ${kickoffLocked&&isAdminUnlocked?`<button data-mid="${m.id}" onclick="event.stopPropagation();testDetailFetch(this.dataset.mid)" style="font-size:9px;color:#60a5fa;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">📊</button>`:''}
+            ${isAdminUnlocked&&(liveScores[m.id]||result)?'<span style="font-size:8px;color:rgba(240,244,240,0.2);">'+(liveEventsAll[m.id]?'📋':'')+(liveStats[m.id]?'📊':'')+(liveLineups[m.id]?'👕':'')+((!liveEventsAll[m.id]&&!liveStats[m.id]&&!liveLineups[m.id])?'⏳ADat':'')+'</span>':''}
+          </div>
+          ${m.title?'<div style="text-align:center;font-family:Oswald,sans-serif;font-size:10px;color:rgba(0,255,135,0.5);letter-spacing:1.5px;padding:6px 0 0;">'+m.title+'</div>':''}
+          <div class="match-body">
+            <div class="match-teams-row">
+              <div class="team-blk">
+                ${getTeamBadge(m.homeFlag, m.home)}
+                <button class="tn-wrap team-tap-btn" data-clickable="team" data-team="${m.home.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}">
+                  <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.home}</span>
+                </button>
+              </div>
+              <span class="vs-block">${liveScores[m.id]&&!result?'':result?'':'VS'}</span>
+              ${result?'<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:24px;font-weight:700;color:var(--gold);">'+(allScores[m.id]||result)+'</span><span style="font-size:10px;color:rgba(240,244,240,0.35);">VÉGE</span></div>':(liveScores[m.id]?'<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:#39ff9d;">'+liveScores[m.id].home+' : '+liveScores[m.id].away+'</span><span style="font-size:10px;color:#39ff9d;animation:pulse 2s infinite;">⚽ '+liveScores[m.id].minute+'</span></div>':'')}
+              <div class="team-blk away-blk">
+                ${getTeamBadge(m.awayFlag, m.away)}
+                <button class="tn-wrap team-tap-btn" data-clickable="team" data-team="${m.away.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}" style="text-align:right;">
+                  <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.away}</span>
+                </button>
+              </div>
+            </div>
+            ${kickoffLocked&&total>0?buildTipDistBar(cnt,total,result):''}
+            ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildScorerRow(m.id,m):''}
+            ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildEventTimeline(m.id):''}
+            ${(result||(liveScores[m.id]&&liveScores[m.id].status==='live'))?buildTimelineStrip(m.id):''}
+            ${(liveLineups[m.id])?buildLineupSection(m.id,m):''}
+          </div>
+          ${buildScoreRow(m.id,myTip,result,allScores[m.id],cardLocked)}${buildOtherTips(m.id,cardLocked)}
+          ${isKnockoutMatch(m)?buildKnockoutRows(m,myTip,result,kickoffLocked):''}
+          ${liveStats[m.id]?buildLiveStatsBar(m.id):''}
+        </div>`;
+      });
+      html += '</div>'; // nap wrapper vége (KO)
+    }
   })
 
   if(!_groupSectionClosed) html += '</div>'; // group_section vége
