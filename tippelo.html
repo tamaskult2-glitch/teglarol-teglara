@@ -5163,13 +5163,20 @@ function renderMatches() {
         const result=allResults[m.id]||null;
         const score=allScores[m.id]||null;
         const myTip=currentUser&&allTips[m.id]?(allTips[m.id][fbSafeName(currentUser)]||null):null;
+        const myOut=getTipOutcome(myTip);
         const kickoffLocked = m.id.startsWith('CM_TEST_') ? false :
           (isKickoffPassed(m.huDate, m.huTime) || !!(liveScores[m.id] && (liveScores[m.id].status === 'live' || liveScores[m.id].status === 'ft')));
         const tips=allTips[m.id]||{};
         const cnt={'1':0,'X':0,'2':0};
         Object.values(tips).forEach(t=>{var o=getTipOutcome(t);if(cnt[o]!==undefined)cnt[o]++;});
         const total=cnt['1']+cnt['X']+cnt['2'];
-        const cardLocked=kickoffLocked;
+        const cardLocked=result||kickoffLocked;
+        function bc(val,base){
+          var c='tip-btn '+base;
+          if(myOut===val){if(result&&result===val)c+=' correct';else if(result&&result!==val)c+=' sel wrong-sel';else c+=' sel';}
+          else if(result===val) c+=' cr-result';
+          return c;
+        }
         var koRound = detectRound(m)||'R32';
         var koMult  = getMatchMultiplier(m);
         var koLabel = {R32:'R32 · 2×',R16:'R16 · 2×',QF:'Negyed · 2×',SF:'Előd · 2×',BRONZE:'Bronz · 3×',FINAL:'DÖNTŐ · 3×'}[koRound]||'R32 · 2×';
