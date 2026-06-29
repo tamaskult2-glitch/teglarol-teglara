@@ -5004,6 +5004,15 @@ function renderMatches() {
   // Csoportköri összefoglaló szekció (egy nagy, alapból ZÁRVA)
   var grpClosed = !_openDayGroups['group_section'];
   var grpCount = mainMatches.filter(function(m){ return !m.knockout; }).length;
+
+  var PHASE_BANNERS = {
+    R32:    { label:'⚡ KIESÉSES SZAKASZ — ROUND OF 32', sub:'Kimenetel (1/X/2): 2× szorzó · Pontos: +2 extra pt · Hosszabbítás +1 pt', color:'#00ff87', bg:'rgba(0,255,135,0.07)', border:'rgba(0,255,135,0.3)' },
+    R16:    { label:'⚡ R16 — 16-OS KÖR',                sub:'Kimenetel: 2× szorzó · Hosszabbítás, 11-es tipp is él', color:'#00ff87', bg:'rgba(0,255,135,0.07)', border:'rgba(0,255,135,0.3)' },
+    QF:     { label:'🔥 NEGYEDDÖNTŐ',                   sub:'Kimenetel: 2× szorzó', color:'#f59e0b', bg:'rgba(245,158,11,0.07)', border:'rgba(245,158,11,0.3)' },
+    SF:     { label:'⭐ ELŐDÖNTŐ',                       sub:'Kimenetel: 2× szorzó', color:'#f59e0b', bg:'rgba(245,158,11,0.07)', border:'rgba(245,158,11,0.3)' },
+    BRONZE: { label:'🥉 BRONZMECCS',                    sub:'Kimenetel: 3× szorzó · ET/11-es pontos: +2 pt', color:'#cd7f32', bg:'rgba(205,127,50,0.07)', border:'rgba(205,127,50,0.3)' },
+    FINAL:  { label:'🏆 DÖNTŐ — GRAND FINAL',           sub:'Kimenetel: 3× szorzó · Pontos: +3 extra pt', color:'#f5c518', bg:'rgba(245,197,24,0.09)', border:'rgba(245,197,24,0.4)' },
+  };
   html += '<div class="date-header" style="cursor:pointer;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.07);" data-toggle-group="group_section">'
     + '<h2 style="color:rgba(240,244,240,0.75);">⚽ Csoportköri meccsek</h2>'
     + '<span class="date-badge">'+grpCount+' meccs</span>'
@@ -5055,14 +5064,6 @@ function renderMatches() {
       // Fázis-határ banner közvetlenül a meccs előtt
       var matchPhase = m.knockout ? (koRound||'R32') : 'group';
       if(matchPhase !== 'group' && matchPhase !== _lastMatchPhase) {
-        var PHASE_BANNERS = {
-          R32:    { label:'⚡ KIESÉSES SZAKASZ — ROUND OF 32', sub:'Kimenetel (1/X/2): 2× szorzó · Pontos: +2 extra pt · Hosszabbítás +1 pt', color:'#00ff87', bg:'rgba(0,255,135,0.07)', border:'rgba(0,255,135,0.3)' },
-          R16:    { label:'⚡ R16 — 16-OS KÖR',                sub:'Kimenetel: 2× szorzó · Hosszabbítás, 11-es és góllövő tipp is él', color:'#00ff87', bg:'rgba(0,255,135,0.07)', border:'rgba(0,255,135,0.3)' },
-          QF:     { label:'🔥 NEGYEDDÖNTŐ',                   sub:'Kimenetel: 2× szorzó', color:'#f59e0b', bg:'rgba(245,158,11,0.07)', border:'rgba(245,158,11,0.3)' },
-          SF:     { label:'⭐ ELŐDÖNTŐ',                       sub:'Kimenetel: 2× szorzó', color:'#f59e0b', bg:'rgba(245,158,11,0.07)', border:'rgba(245,158,11,0.3)' },
-          BRONZE: { label:'🥉 BRONZMECCS',                    sub:'Kimenetel: 3× szorzó · Pontos ET/11-es: +2 pt', color:'#cd7f32', bg:'rgba(205,127,50,0.07)', border:'rgba(205,127,50,0.3)' },
-          FINAL:  { label:'🏆 DÖNTŐ — GRAND FINAL',           sub:'Kimenetel: 3× szorzó · Pontos: +3 extra pt', color:'#f5c518', bg:'rgba(245,197,24,0.09)', border:'rgba(245,197,24,0.4)' },
-        };
         var pb = PHASE_BANNERS[matchPhase];
         if(pb) {
           html += '<div style="margin:16px 0 10px;padding:11px 14px;background:'+pb.bg+';border:1px solid '+pb.border+';border-left:4px solid '+pb.color+';">'
