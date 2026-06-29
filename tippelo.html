@@ -2480,6 +2480,13 @@ input:focus, textarea:focus, select:focus {
     </div>
 
     <!-- CSAPATKERET ADATBÁZIS -->
+    <div style="margin-bottom:12px;padding:10px 14px;background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.15);border-left:3px solid rgba(239,68,68,0.5);">
+      <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);letter-spacing:1px;">🗑️ GÓLLÖVŐ TIPPEK TÖRLÉSE</span></div>
+      <div class="adm-collapse-body">
+        <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;">Törli az összes felhasználó összes góllövő tippjét Firebase-ből. Ez visszavonhatatlan!</div>
+        <button onclick="adminClearAllScorers()" style="width:100%;padding:9px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#ef4444;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;">🗑️ ÖSSZES GÓLLÖVŐ TIPP TÖRLÉSE</button>
+      </div>
+    </div>
     <div style="margin-bottom:12px;padding:10px 14px;background:rgba(0,255,135,0.04);border:1px solid rgba(0,255,135,0.15);border-left:3px solid #00ff87;">
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:#00ff87;letter-spacing:1px;">👕 CSAPATKERET ADATBÁZIS</span></div>
       <div class="adm-collapse-body">
@@ -4244,7 +4251,7 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
   }
 
   if(!showEt && !showPen) {
-    if(myOut) return tipSummary + buildScorerBtn(m, myTip, kickoffLocked);
+    if(myOut) return tipSummary;
     return '';
   }
 
@@ -4349,7 +4356,6 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
   }
   // Góllövő gomb az ET/Pen sorok alatt is
   html += tipSummary;
-  html += buildScorerBtn(m, myTip, kickoffLocked);
   return html;
 }
 
@@ -7789,9 +7795,7 @@ async function checkAutoResults() {
         liveUpdated = true;
         // Események, statisztikák, felállás mentése (ha van)
         if(ar.events) {
-          console.log('📋 Events betöltve: '+localMatch.id+' ('+ar.events.length+' event)');
           liveEventsAll[localMatch.id] = ar.events;
-          // matchScorers frissítése events-ből (felülírja ESPN adatot)
           var evGoals = ar.events.filter(function(e){ return e.type==='goal'; });
           var evCards = ar.events.filter(function(e){ return e.type==='card'; });
           var parsed = [];
@@ -7805,8 +7809,12 @@ async function checkAutoResults() {
           });
           if(parsed.length>0) matchScorers[localMatch.id] = parsed;
         }
-        if(ar.stats) { liveStats[localMatch.id] = ar.stats; console.log('📊 Stats betöltve: '+localMatch.id); }
-        if(ar.lineups) { liveLineups[localMatch.id] = ar.lineups; console.log('👕 Lineups betöltve: '+localMatch.id); }
+        if(ar.stats) liveStats[localMatch.id] = ar.stats;
+        if(ar.lineups) liveLineups[localMatch.id] = ar.lineups;
+        // Kieséses meccsnél ESPN summary fetch eseményekért (minden poll-ban frissít)
+        if(localMatch.knockout && ar.espnId) {
+          autoFetchMatchEvents(localMatch, ar.espnId);
+        }
       } else if(ar.status === 'ft' && !allResults[localMatch.id] && isAdminUnlocked) {
         // Végleges eredmény mentése (csak admin)
         var h = ar.homeScore, a = ar.awayScore;
@@ -7830,6 +7838,13 @@ async function checkAutoResults() {
           autoFetchKnockoutDetails(localMatch, ar);
         } else if(!allScorerResults[localMatch.id]) {
           autoFetchKnockoutScorers(localMatch, ar);
+        }
+      } else if(ar.status === 'ft' && !liveEventsAll[localMatch.id]) {
+        // Befejezett meccs, nincs még esemény-adat — auto fetch ESPN summary-ból
+        if(ar.espnId) {
+          (function(lm, espnId) {
+            setTimeout(function() { autoFetchMatchEvents(lm, espnId); }, 300 + Math.random()*1200);
+          })(localMatch, ar.espnId);
         }
       }
       // Events/stats/lineups mentése FT meccsekre is (utólagos megtekintés)
@@ -9173,6 +9188,46 @@ async function handlePenScoreSave(btn) {
 
 
 // ===== KIESÉSES MECCS AUTO-FETCH: ET, Pen, Góllövők =====
+// Kieséses meccs eseményeinek auto-fetch ESPN summary-ból (gólok, lapok, cserék)
+async function autoFetchMatchEvents(localMatch, espnId) {
+  try {
+    var resp = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event='+espnId);
+    if(!resp.ok) return;
+    var sum = await resp.json();
+    var keyEv = sum.keyEvents || sum.scoring || [];
+
+    if(keyEv.length > 0 || sum.rosters) {
+      if(keyEv.length > 0) liveEventsAll[localMatch.id] = keyEv;
+      if(sum.rosters) liveLineups[localMatch.id] = sum.rosters;
+      // Gólszerzők és lapok parse-olása
+      var parsed = [];
+      keyEv.forEach(function(ev) {
+        var typeText = (ev.type && ev.type.text) || ev.typeText || '';
+        var isGoal = typeText.startsWith('Goal') || (ev.scoreValue && ev.scoreValue > 0);
+        var isYellow = typeText.indexOf('Yellow') >= 0 || typeText.indexOf('Caution') >= 0;
+        var isRed = typeText.indexOf('Red') >= 0 || typeText.indexOf('Ejection') >= 0;
+        var isSub = typeText.indexOf('Sub') >= 0 || typeText.indexOf('Substitution') >= 0;
+        var isPen = typeText.indexOf('Penalty') >= 0 || !!ev.penaltyKick;
+        var isOg  = typeText.indexOf('Own') >= 0 || !!ev.ownGoal;
+        var minute = ev.clock && ev.clock.displayValue ? ev.clock.displayValue+"'" : '';
+        var teamSide = ev.team && ev.team.homeAway ? ev.team.homeAway : (ev.homeAway || '');
+        var player = '';
+        if(ev.participants && ev.participants[0] && ev.participants[0].athlete) {
+          player = ev.participants[0].athlete.displayName || '';
+        }
+        if(!player) player = ev.text || '';
+
+        if(isGoal && !isOg)  parsed.push({name:player, teamId:teamSide, minute:minute, type:'goal', isPen:isPen});
+        else if(isGoal && isOg) parsed.push({name:player, teamId:teamSide, minute:minute, type:'goal', isOg:true});
+        else if(isRed)    parsed.push({name:player, teamId:teamSide, minute:minute, type:'red'});
+        else if(isYellow) parsed.push({name:player, teamId:teamSide, minute:minute, type:'yellow'});
+      });
+      if(parsed.length > 0) matchScorers[localMatch.id] = parsed;
+      renderMatches();
+    }
+  } catch(e) {}
+}
+
 async function autoFetchKnockoutDetails(localMatch, ar) {
   try {
     // ESPN summary endpoint — részletes period/shootout adatok
@@ -9262,6 +9317,32 @@ async function autoFetchKnockoutScorers(localMatch, ar, sum) {
   } catch(e) { console.log('autoFetchKnockoutScorers hiba:', e.message); }
 }
 
+
+// Góllövő tippek törlése Firebase-ből
+async function adminClearAllScorers() {
+  if(!confirm('Törlöd az összes góllövő tippet? Ez visszavonhatatlan.')) return;
+  var count = 0;
+  var deletes = [];
+  Object.keys(allTips).forEach(function(mid) {
+    Object.keys(allTips[mid]||{}).forEach(function(safeName) {
+      var tip = allTips[mid][safeName];
+      if(tip && tip.scorers && tip.scorers.length > 0) {
+        var newTip = Object.assign({}, tip);
+        delete newTip.scorers;
+        allTips[mid][safeName] = newTip;
+        deletes.push(fbSet('tips/'+mid+'/'+safeName, newTip));
+        count++;
+      }
+    });
+  });
+  Object.keys(allScorerResults||{}).forEach(function(mid) {
+    deletes.push(fbDel('scorerResults/'+mid));
+    delete allScorerResults[mid];
+  });
+  await Promise.all(deletes);
+  showToast('🗑️ '+count+' góllövő tipp törölve');
+  renderMatches();
+}
 
 async function adminSaveRoster() {
   var name = (document.getElementById('rosterTeamName').value||'').trim();
