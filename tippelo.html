@@ -5001,24 +5001,36 @@ function renderMatches() {
   let html='';
   var _lastMatchPhase = 'group';
 
+  // Csoportköri összefoglaló szekció (egy nagy, alapból ZÁRVA)
+  var grpClosed = !_openDayGroups['group_section'];
+  var grpCount = mainMatches.filter(function(m){ return !m.knockout; }).length;
+  html += '<div class="date-header" style="cursor:pointer;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.07);" data-toggle-group="group_section">'
+    + '<h2 style="color:rgba(240,244,240,0.75);">⚽ Csoportköri meccsek</h2>'
+    + '<span class="date-badge">'+grpCount+' meccs</span>'
+    + '<span id="toggle_group_section" style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">'+(grpClosed?'+':'−')+'</span>'
+    + '</div>';
+  html += '<div id="group_section" class="day-group'+(grpClosed?' day-group-closed':'')+'">';
+  var _groupSectionClosed = false;
+
   dates.forEach(date=>{
     const dayMatches=mainMatches.filter(m=>m.huDate===date).sort((a,b)=>a.huTime.localeCompare(b.huTime));
+    if(!dayMatches.length) return;
     const d=new Date(date+'T12:00:00');
     const dayStr=d.toLocaleDateString('hu-HU',{weekday:'long',month:'long',day:'numeric'});
-    const dayCount=dayMatches.filter(m=>allTips[m.id]?.[fbSafeName(currentUser)]).length;
-    var isTestDay = (date === '2026-05-27' || date === '2026-05-30');
-    // Csoportköri napok alapból ZÁRVA — csak ha a felhasználó kinyitotta, mutatjuk
     var hasKnockout = dayMatches.some(function(m){ return m.knockout; });
-    var gId = 'dg_'+date.replace(/-/g,'');
-    var colKey = 'dcv2_'+date;
-    // Zárva ha: csoport meccs nap ÉS nem nyitotta meg a user ebben a munkamenetben
-    var collapsed = !hasKnockout && !_openDayGroups[gId];
 
-    html+=`<div class="date-header" style="cursor:pointer;" onclick="toggleDayGroup('${gId}')">
+    // Ha az első kieséses nap — lezárjuk a group_section-t
+    if(hasKnockout && !_groupSectionClosed) {
+      html += '</div>'; // group_section vége
+      _groupSectionClosed = true;
+    }
+
+    // Napi fejléc (csak ha VAN meccs ezen a napon)
+    html+=`<div class="date-header">
       <h2>${dayStr}</h2><span class="date-badge">${dayMatches.length} meccs</span>
-      <span id="toggle_${gId}" style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">${collapsed?'+':'−'}</span>
     </div>`;
-    html+=`<div id="${gId}" class="day-group${collapsed?' day-group-closed':''}">`;
+    var gId = 'dg_'+date.replace(/-/g,'');
+    html+=`<div id="${gId}">`;
     dayMatches.forEach(m=>{
       const result=allResults[m.id]||null;
       const score=allScores[m.id]||null;
@@ -5140,7 +5152,9 @@ function renderMatches() {
       </div>`;
     });
     html += '</div>'; // nap wrapper vége
-  });
+  })
+
+  if(!_groupSectionClosed) html += '</div>'; // group_section vége
   container.innerHTML=html;
 
   // ═══ SCROLL POZÍCIÓ VISSZAÁLLÍTÁS ═══
@@ -7932,12 +7946,12 @@ setTimeout(checkAutoResults, 15000); // első: 15mp
 async function testDetailFetch(mid) {
   showToast('📊 ESPN adat lekérés...');
   try {
-    var m = ALL_MATCHES.find(function(x){return x.id===mid;});
-    if(!m) { alert('❌ Match: '+mid); return; }
-    var today = getBudapestToday().replace(/-/g,'');
-    var d = new Date(); d.setDate(d.getDate()-1);
-    var yesterday = d.toLocaleDateString('sv-SE',{timeZone:'Europe/Budapest'}).replace(/-/g,'');
-    var r1 = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+yesterday+'-'+today+'&limit=50');
+    var m = ALL_MATCHES.find(function(x){return x.id===mid;}) || _virtualKOMatches[mid];
+    if(!m) { showToast('❌ Match nem found: '+mid); return; }
+    // Virtuális meccsekhez dátum alapú keresés
+    var matchDate = (m.huDate||'').replace(/-/g,'');
+    var prevDate = m.huDate ? (function(){var d=new Date(m.huDate+'T12:00:00'); d.setDate(d.getDate()-1); return d.toLocaleDateString('sv-SE',{timeZone:'Europe/Budapest'}).replace(/-/g,''); })() : matchDate;
+    var r1 = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+prevDate+'-'+matchDate+'&limit=50');
     if(!r1.ok) { alert('❌ ESPN HTTP '+r1.status); return; }
     var d1 = await r1.json();
     var events = d1.events || [];
@@ -9906,6 +9920,17 @@ async function fetchLineupForScorer(m, matchId) {
   } catch(e) {}
 }
 
+
+// Event delegation for group section header
+document.addEventListener('click', function(e) {
+  var el = e.target;
+  for(var i=0; i<4; i++) {
+    if(!el) break;
+    var grp = el.getAttribute && el.getAttribute('data-toggle-group');
+    if(grp) { toggleDayGroup(grp); return; }
+    el = el.parentNode;
+  }
+});
 
 function closeScorerModal() {
   var m = document.getElementById('scorerModal');
