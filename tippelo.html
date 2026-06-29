@@ -4366,7 +4366,6 @@ function buildScorerBtn(m, myTip, kickoffLocked) {
   var scorers = myTip.scorers;
   var hasSc = scorers && (scorers.home&&scorers.home.length || scorers.away&&scorers.away.length);
   var mult = getMatchMultiplier(m);
-  var ptLabel = mult===3 ? '+2pt/gól' : '+1pt/gól';
 
   // Kiválasztott góllövők megjelenítése
   var scDisplay = '';
@@ -5051,12 +5050,12 @@ function renderMatches() {
       var matchPhase = m.knockout ? (koRound||'R32') : 'group';
       if(matchPhase !== 'group' && matchPhase !== _lastMatchPhase) {
         var PHASE_BANNERS = {
-          R32:    { label:'⚡ KIESÉSES SZAKASZ — ROUND OF 32', sub:'Kimenetel (1/X/2): 2× szorzó · Pontos: +2 extra pt · Hosszabbítás +1 pt · Góllövő: +1 pt', color:'#00ff87', bg:'rgba(0,255,135,0.07)', border:'rgba(0,255,135,0.3)' },
+          R32:    { label:'⚡ KIESÉSES SZAKASZ — ROUND OF 32', sub:'Kimenetel (1/X/2): 2× szorzó · Pontos: +2 extra pt · Hosszabbítás +1 pt', color:'#00ff87', bg:'rgba(0,255,135,0.07)', border:'rgba(0,255,135,0.3)' },
           R16:    { label:'⚡ R16 — 16-OS KÖR',                sub:'Kimenetel: 2× szorzó · Hosszabbítás, 11-es és góllövő tipp is él', color:'#00ff87', bg:'rgba(0,255,135,0.07)', border:'rgba(0,255,135,0.3)' },
-          QF:     { label:'🔥 NEGYEDDÖNTŐ',                   sub:'Kimenetel: 2× szorzó · Góllövő tipp: +1 pt', color:'#f59e0b', bg:'rgba(245,158,11,0.07)', border:'rgba(245,158,11,0.3)' },
-          SF:     { label:'⭐ ELŐDÖNTŐ',                       sub:'Kimenetel: 2× szorzó · Góllövő tipp: +1 pt', color:'#f59e0b', bg:'rgba(245,158,11,0.07)', border:'rgba(245,158,11,0.3)' },
-          BRONZE: { label:'🥉 BRONZMECCS',                    sub:'Kimenetel: 3× szorzó · Góllövő: +2 pt · Pontos ET/11-es: +2 pt', color:'#cd7f32', bg:'rgba(205,127,50,0.07)', border:'rgba(205,127,50,0.3)' },
-          FINAL:  { label:'🏆 DÖNTŐ — GRAND FINAL',           sub:'Kimenetel: 3× szorzó · Góllövő: +2 pt · Pontos: +3 extra pt', color:'#f5c518', bg:'rgba(245,197,24,0.09)', border:'rgba(245,197,24,0.4)' },
+          QF:     { label:'🔥 NEGYEDDÖNTŐ',                   sub:'Kimenetel: 2× szorzó', color:'#f59e0b', bg:'rgba(245,158,11,0.07)', border:'rgba(245,158,11,0.3)' },
+          SF:     { label:'⭐ ELŐDÖNTŐ',                       sub:'Kimenetel: 2× szorzó', color:'#f59e0b', bg:'rgba(245,158,11,0.07)', border:'rgba(245,158,11,0.3)' },
+          BRONZE: { label:'🥉 BRONZMECCS',                    sub:'Kimenetel: 3× szorzó · Pontos ET/11-es: +2 pt', color:'#cd7f32', bg:'rgba(205,127,50,0.07)', border:'rgba(205,127,50,0.3)' },
+          FINAL:  { label:'🏆 DÖNTŐ — GRAND FINAL',           sub:'Kimenetel: 3× szorzó · Pontos: +3 extra pt', color:'#f5c518', bg:'rgba(245,197,24,0.09)', border:'rgba(245,197,24,0.4)' },
         };
         var pb = PHASE_BANNERS[matchPhase];
         if(pb) {
@@ -7834,6 +7833,10 @@ async function checkAutoResults() {
           autoFetchKnockoutDetails(localMatch, ar);
         } else if(localMatch.knockout) {
           autoFetchKnockoutScorers(localMatch, ar);
+        }
+        // Kieséses meccsnél esemény adatok (gólok, lapok, cserék, felállás)
+        if(localMatch.knockout && ar.espnId) {
+          (function(lm,eid){ setTimeout(function(){ autoFetchMatchEvents(lm,eid); },600); })(localMatch,ar.espnId);
         }
       } else if(ar.status === 'ft' && allResults[localMatch.id] && localMatch.knockout) {
         // Kész kieséses meccs — ET/Pen/Góllövők auto-frissítés ha még nincs
