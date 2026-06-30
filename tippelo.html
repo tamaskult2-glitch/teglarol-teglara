@@ -4151,18 +4151,32 @@ function calcMatchPoints(m, tip) {
 
   // Knockout bónuszok
   if(m.knockout) {
-    // ET kimenetel bónusz
-    if(rule.et_outcome) {
-      var etRes = allEtResults[m.id];
-      if(etRes) { var etTip = getTipEt(tip); if(etTip && etTip === etRes) totalPts += rule.et_mult ? rule.pts_et_outcome*mult : rule.pts_et_outcome; }
+    // ET kimenetel — explicit tip.et VAGY a megadott etScore-ból levezetett kimenetel
+    var etRes = allEtResults[m.id];
+    var etTip = getTipEt(tip);
+    if(!etTip && tip.etScore) {
+      var _etp = tip.etScore.split(':');
+      var _eh = parseInt(_etp[0]), _ea = parseInt(_etp[1]);
+      if(!isNaN(_eh) && !isNaN(_ea)) etTip = _eh > _ea ? '1' : _eh === _ea ? 'X' : '2';
     }
-    // Pen kimenetel bónusz
-    if(rule.pen_outcome) {
-      var penRes = allPenResults[m.id];
-      if(penRes) { var penTip = getTipPen(tip); if(penTip && penTip === penRes) totalPts += rule.pen_mult ? rule.pts_pen_outcome*mult : rule.pts_pen_outcome; }
+    var etOutcomeCorrect = !!(etRes && etTip && etTip === etRes);
+    if(rule.et_outcome && etOutcomeCorrect) {
+      totalPts += rule.et_mult ? rule.pts_et_outcome*mult : rule.pts_et_outcome;
     }
-    // ET pontos score bónusz VAGY gólkülönbség bónusz (döntőn duplázódik, kivéve ha et_mult is aktív)
-    if(rule.et_exact || rule.et_gd) {
+    // Pen kimenetel — explicit tip.pen VAGY a megadott penScore-ból levezetett kimenetel
+    var penRes = allPenResults[m.id];
+    var penTip = getTipPen(tip);
+    if(!penTip && tip.penScore) {
+      var _pep = tip.penScore.split(':');
+      var _ph = parseInt(_pep[0]), _pa = parseInt(_pep[1]);
+      if(!isNaN(_ph) && !isNaN(_pa) && _ph !== _pa) penTip = _ph > _pa ? '1' : '2';
+    }
+    var penOutcomeCorrect = !!(penRes && penTip && penTip === penRes);
+    if(rule.pen_outcome && penOutcomeCorrect) {
+      totalPts += rule.pen_mult ? rule.pts_pen_outcome*mult : rule.pts_pen_outcome;
+    }
+    // ET pontos score bónusz VAGY gólkülönbség bónusz — CSAK ha a kimenetel is helyes
+    if(etOutcomeCorrect && (rule.et_exact || rule.et_gd)) {
       var etSc = allEtScores[m.id];
       if(etSc && tip.etScore) {
         if(rule.et_exact && tip.etScore === etSc) {
@@ -4178,8 +4192,8 @@ function calcMatchPoints(m, tip) {
         }
       }
     }
-    // Pen pontos score bónusz VAGY gólkülönbség bónusz (döntőn duplázódik, kivéve ha pen_mult is aktív)
-    if(rule.pen_exact || rule.pen_gd) {
+    // Pen pontos score bónusz VAGY gólkülönbség bónusz — CSAK ha a kimenetel is helyes
+    if(penOutcomeCorrect && (rule.pen_exact || rule.pen_gd)) {
       var penSc = allPenScores[m.id];
       if(penSc && tip.penScore) {
         if(rule.pen_exact && tip.penScore === penSc) {
@@ -6134,10 +6148,13 @@ function renderAdminMatches() {
         </div>`:''}
         <!-- ADMIN TIPP RÖGZÍTÉS -->
         <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.08);">
-          <div style="font-size:10px;color:rgba(240,244,240,0.35);font-family:Oswald,sans-serif;letter-spacing:1px;margin-bottom:5px;">👤 TIPP RÖGZÍTÉS (bármely user)</div>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <div style="font-size:10px;color:rgba(240,244,240,0.35);font-family:Oswald,sans-serif;letter-spacing:1px;margin-bottom:5px;">👤 TIPP RÖGZÍTÉS (bármely user — FT, ET, 11-es)</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
             <input type="text" id="atip_user_${m.id}" placeholder="Felhasználónév"
               style="flex:1;min-width:80px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;">
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
+            <span style="font-size:10px;color:rgba(240,244,240,0.4);width:32px;">⚽FT</span>
             <select id="atip_o_${m.id}"
               style="padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(30,32,42,0.95);color:white;font-family:Oswald,sans-serif;font-size:12px;">
               <option value="1">1</option>
@@ -6149,9 +6166,34 @@ function renderAdminMatches() {
             <span style="color:rgba(240,244,240,0.3);font-size:12px;">:</span>
             <input type="text" inputmode="numeric" id="atip_a_${m.id}" placeholder="V"
               style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
-            <button onclick="adminSetTip('${m.id}')"
-              style="padding:5px 10px;background:rgba(0,255,135,0.15);border:1px solid rgba(0,255,135,0.3);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">✓ Ment</button>
           </div>
+          ${isKnockoutMatch(m) ? `
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
+            <span style="font-size:10px;color:rgba(0,255,135,0.6);width:32px;">⚡ET</span>
+            <select id="atip_eto_${m.id}"
+              style="padding:5px 8px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(30,32,42,0.95);color:white;font-family:Oswald,sans-serif;font-size:12px;">
+              <option value="">–</option>
+              <option value="1">1</option>
+              <option value="X">X</option>
+              <option value="2">2</option>
+            </select>
+            <input type="text" inputmode="numeric" id="atip_eth_${m.id}" placeholder="H"
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+            <span style="color:rgba(240,244,240,0.3);font-size:12px;">:</span>
+            <input type="text" inputmode="numeric" id="atip_eta_${m.id}" placeholder="V"
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
+            <span style="font-size:10px;color:rgba(205,127,50,0.7);width:32px;">🥅11</span>
+            <input type="text" inputmode="numeric" id="atip_penh_${m.id}" placeholder="H"
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(205,127,50,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+            <span style="color:rgba(240,244,240,0.3);font-size:12px;">:</span>
+            <input type="text" inputmode="numeric" id="atip_pena_${m.id}" placeholder="V"
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(205,127,50,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+          </div>
+          ` : ''}
+          <button onclick="adminSetTip('${m.id}')"
+            style="width:100%;padding:6px 10px;background:rgba(0,255,135,0.15);border:1px solid rgba(0,255,135,0.3);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;">✓ Tipp mentése (FT+ET+11-es)</button>
         </div>
         <!-- GÓLLÖVŐK RÖGZÍTÉS (admin) -->
         <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,255,135,0.12);">
@@ -6210,18 +6252,49 @@ async function adminSetTip(mid) {
     tip.h = parseInt(h);
     tip.a = parseInt(a);
   }
+
+  // ET mezők (csak kieséses meccsnél jelennek meg)
+  var etoInp = document.getElementById('atip_eto_'+mid);
+  var ethInp = document.getElementById('atip_eth_'+mid);
+  var etaInp = document.getElementById('atip_eta_'+mid);
+  var eto = etoInp ? etoInp.value : '';
+  var eth = ethInp ? ethInp.value.trim() : '';
+  var eta = etaInp ? etaInp.value.trim() : '';
+  if(eto) tip.et = eto;
+  if(eth !== '' && eta !== '' && !isNaN(parseInt(eth)) && !isNaN(parseInt(eta))) {
+    tip.etScore = parseInt(eth)+':'+parseInt(eta);
+  }
+
+  // 11-es mezők (csak gólok, a kimenetel a gólokból derül ki)
+  var penhInp = document.getElementById('atip_penh_'+mid);
+  var penaInp = document.getElementById('atip_pena_'+mid);
+  var penh = penhInp ? penhInp.value.trim() : '';
+  var pena = penaInp ? penaInp.value.trim() : '';
+  if(penh !== '' && pena !== '' && !isNaN(parseInt(penh)) && !isNaN(parseInt(pena))) {
+    tip.penScore = parseInt(penh)+':'+parseInt(pena);
+    tip.pen = parseInt(penh) > parseInt(pena) ? '1' : '2';
+  }
+
   tip.ts = Date.now();
   try {
     // Közvetlen Firebase írás — NEM hívunk pollData/renderAll hogy ne renderelje újra a kártyát
     await fbSet('tips/'+mid+'/'+safe, tip);
     if(!allTips[mid]) allTips[mid]={};
     allTips[mid][safe] = tip;
-    showToast('✅ '+rawName+' → '+o+(tip.h!==undefined?' ('+tip.h+':'+tip.a+')':''));
+    var summary = o + (tip.h!==undefined?' ('+tip.h+':'+tip.a+')':'');
+    if(tip.et || tip.etScore) summary += ' · ET ' + (tip.et||'') + (tip.etScore?' ('+tip.etScore+')':'');
+    if(tip.penScore) summary += ' · 11-es ' + tip.penScore;
+    showToast('✅ '+rawName+' → '+summary);
     // Csak a mezőket ürítjük, nem renderelünk újra
     if(userInp) userInp.value='';
     if(hInp) hInp.value='';
     if(aInp) aInp.value='';
     if(oInp) oInp.value='1';
+    if(etoInp) etoInp.value='';
+    if(ethInp) ethInp.value='';
+    if(etaInp) etaInp.value='';
+    if(penhInp) penhInp.value='';
+    if(penaInp) penaInp.value='';
   } catch(e){ showToast('❌ Firebase hiba!'); }
 }
 
