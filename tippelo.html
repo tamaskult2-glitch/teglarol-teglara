@@ -7712,7 +7712,10 @@ async function fetchFromESPN() {
       var clock = comp.status && comp.status.displayClock ? comp.status.displayClock : '';
       var period = comp.status && comp.status.period ? comp.status.period : 0;
       var isLive = statusType==='STATUS_IN_PROGRESS'||statusType==='STATUS_HALFTIME'||statusType==='STATUS_FIRST_HALF'||statusType==='STATUS_SECOND_HALF';
-      var isFT = statusType==='STATUS_FULL_TIME'||statusType==='STATUS_FINAL';
+      var isFT = statusType==='STATUS_FULL_TIME'||statusType==='STATUS_FINAL'
+        ||statusType==='STATUS_FINAL_AET'||statusType==='STATUS_FINAL_PEN'
+        ||statusType==='STATUS_FULL_PEN'||statusType==='STATUS_FULL_AET'
+        ||statusType.indexOf('FINAL')>=0||statusType.indexOf('FULL_TIME')>=0;
       if(!isLive && !isFT) return;
       var teams = comp.competitors || [];
       if(teams.length < 2) return;
@@ -8142,10 +8145,50 @@ async function testDetailFetch(mid) {
     
     alert(info);
     
-    // Ha van adat, mentsük
-    if(sum.boxscore && sum.boxscore.teams && sum.boxscore.teams.length >= 2) {
+    // Eredmény mentése ha még nincs és a meccs véget ért
+    var comp = espnEvent.competitions[0];
+    var statusType = comp.status && comp.status.type ? comp.status.type.name : '';
+    var isFT2 = statusType.indexOf('FINAL')>=0||statusType.indexOf('FULL_TIME')>=0;
+    if(isFT2 && !allResults[mid]) {
+      var ht2 = comp.competitors.find(function(t){return t.homeAway==='home';});
+      var at2 = comp.competitors.find(function(t){return t.homeAway==='away';});
+      if(ht2 && at2) {
+        // Period scores: [1H, 2H, ET1, ET2, Pen]
+        var hPer = (ht2.linescores||[]).map(function(p){return parseInt(p.displayValue)||0;});
+        var aPer = (at2.linescores||[]).map(function(p){return parseInt(p.displayValue)||0;});
+        // 90min score = period 1+2
+        var h90 = (hPer[0]||0)+(hPer[1]||0), a90 = (aPer[0]||0)+(aPer[1]||0);
+        // Ha nincs periódus adat, az overall score
+        if(hPer.length === 0) { h90 = parseInt(ht2.score)||0; a90 = parseInt(at2.score)||0; }
+        var result90 = h90>a90?'1':h90===a90?'X':'2';
+        var score90 = h90+':'+a90;
+        await fbSet('results/'+mid, result90);
+        await fbSet('scores/'+mid, score90);
+        allResults[mid] = result90; allScores[mid] = score90;
+        showToast('✅ 90\': '+m.home+' '+score90+' '+m.away+' ('+result90+')');
+        // ET
+        if(hPer.length >= 4) {
+          var hET = (hPer[2]||0)+(hPer[3]||0), aET = (aPer[2]||0)+(aPer[3]||0);
+          var etR = hET>aET?'1':hET===aET?'X':'2';
+          await fbSet('etResults/'+mid, etR); await fbSet('etScores/'+mid, hET+':'+aET);
+          allEtResults[mid]=etR; allEtScores[mid]=hET+':'+aET;
+          showToast('⚡ ET: '+hET+':'+aET);
+        }
+        // Pen
+        if(hPer.length >= 5) {
+          var hPen = hPer[4]||0, aPen = aPer[4]||0;
+          var penR = hPen>aPen?'1':'2';
+          await fbSet('penResults/'+mid, penR); await fbSet('penScores/'+mid, hPen+':'+aPen);
+          allPenResults[mid]=penR; allPenScores[mid]=hPen+':'+aPen;
+          showToast('🥅 Pen: '+hPen+':'+aPen);
+        }
+        await autoFetchMatchEvents({id:mid, home:m.home, away:m.away, knockout:true}, espnEvent.id);
+        renderAll();
+      }
+    }
       var comp = espnEvent.competitions[0];
       var homeTeam = comp.competitors.find(function(t){return t.homeAway==='home';});
+      if(sum.boxscore && sum.boxscore.teams && sum.boxscore.teams.length >= 2) {
       var getStat = function(team, names) {
         if(typeof names === 'string') names = [names];
         for(var ni=0;ni<names.length;ni++) {
