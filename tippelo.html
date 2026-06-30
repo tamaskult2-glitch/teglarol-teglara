@@ -4236,9 +4236,10 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
   var userTippedDraw = (myOut === 'X');
   var hasSavedEt  = !!(myTip && (myTip.etScore || myTip.etOut));
   var hasSavedPen = !!(myTip && (myTip.penScore || myTip.penOut));
-  var showEt  = userTippedDraw || hasSavedEt  || (kickoffLocked && !!etResult);
-  var showPen = (myEtFromScore === 'X' || myEt === 'X') || hasSavedPen
-              || (kickoffLocked && !!penResult);
+  // HARDCORE SZABÁLY: ET/Pen szekció CSAK ha a user X-et tippelt 90'-re
+  // VAGY ha már van mentett ET/Pen tipp - kickoff után nem lehet módosítani!
+  var showEt  = userTippedDraw || hasSavedEt;
+  var showPen = (myEtFromScore === 'X' || myEt === 'X') || hasSavedPen;
 
   // Tipp összefoglaló sor: mutatja az ET és Pen tippet ha X-et rögzített
   var tipSummary = '';
@@ -4295,8 +4296,9 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
     var p = getTipPen(t); if(p && penCnt[p]!==undefined) penCnt[p]++;
   });
 
-  var disEt  = (!etResult && kickoffLocked) ? ' disabled' : '';
-  var disPen = (!penResult && kickoffLocked) ? ' disabled' : '';
+  // HARDCORE: kickoff után minden ET/Pen gomb és input le van tiltva
+  var disEt  = (kickoffLocked && !m.id.startsWith('CM_TEST_')) ? ' disabled' : '';
+  var disPen = (kickoffLocked && !m.id.startsWith('CM_TEST_')) ? ' disabled' : '';
 
   // Meglévő ET/Pen score tippek
   var myEtH  = myTip && myTip.etScore  ? myTip.etScore.split(':')[0]  : '';
@@ -4325,7 +4327,7 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
       + '</div>';
 
     // ET pontos eredmény sor
-    var etScoreLocked = (!realEtScore && kickoffLocked && !m.id.startsWith('CM_TEST_'));
+    var etScoreLocked = (kickoffLocked && !m.id.startsWith('CM_TEST_'));
     var etOK = realEtScore && myEtH !== '' && myEtA !== '' && myEtH+':'+myEtA === realEtScore;
     html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px 10px;flex-wrap:nowrap;">'
       + '<span style="font-size:10px;color:rgba(0,255,135,0.5);white-space:nowrap;flex-shrink:0;">⚡ pontosan:</span>'
@@ -4352,7 +4354,7 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
       + '</div>';
 
     // Pen pontos eredmény sor (pl. 4:3)
-    var penScoreLocked = (!realPenScore && kickoffLocked && !m.id.startsWith('CM_TEST_'));
+    var penScoreLocked = (kickoffLocked && !m.id.startsWith('CM_TEST_'));
     var penOK = realPenScore && myPenH !== '' && myPenA !== '' && myPenH+':'+myPenA === realPenScore;
     html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px 10px;flex-wrap:nowrap;">'
       + '<span style="font-size:10px;color:rgba(0,255,135,0.5);white-space:nowrap;flex-shrink:0;">🥅 pontosan:</span>'
