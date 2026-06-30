@@ -3978,25 +3978,25 @@ function calcMatchPoints(m, tip) {
       }
     }
   }
-  // Knockout bónuszok
+  // Alappont × szorzó (csak kimenetel/GD/pontos szorzódik)
+  var totalPts = pts * mult;
+
+  // Knockout bónuszok — NEM szorzódnak
   if(m.knockout) {
+    // ET kimenetel bónusz
     var etRes = allEtResults[m.id];
-    if(etRes) { var etTip = getTipEt(tip); if(etTip && etTip === etRes) pts += 1; }
+    if(etRes) { var etTip = getTipEt(tip); if(etTip && etTip === etRes) totalPts += 1; }
+    // Pen kimenetel bónusz
     var penRes = allPenResults[m.id];
-    if(penRes) { var penTip = getTipPen(tip); if(penTip && penTip === penRes) pts += 1; }
-  }
-  // Góllövő bónusz pontok (kieséses meccseken)
-  if(m.knockout) {
-    var scorerBonus = calcScorerBonus(m, tip);
-    pts += scorerBonus;
-    // ET pontos eredmény bónusz (+1 pt, döntőn +2 pt)
+    if(penRes) { var penTip = getTipPen(tip); if(penTip && penTip === penRes) totalPts += 1; }
+    // ET pontos score bónusz (+1 pt, döntőn +2 pt — de nem szorzódik!)
     var etSc = allEtScores[m.id];
-    if(etSc && tip.etScore && tip.etScore === etSc) pts += (mult===3?2:1);
-    // Pen pontos eredmény bónusz (+1 pt, döntőn +2 pt)
+    if(etSc && tip.etScore && tip.etScore === etSc) totalPts += (mult===3?2:1);
+    // Pen pontos score bónusz
     var penSc = allPenScores[m.id];
-    if(penSc && tip.penScore && tip.penScore === penSc) pts += (mult===3?2:1);
+    if(penSc && tip.penScore && tip.penScore === penSc) totalPts += (mult===3?2:1);
   }
-  return pts * mult;
+  return totalPts;
 }
 
 // Góllövő bónusz számítás: minden eltalált góllövő 1 pt (döntő/bronz: 2 pt)
