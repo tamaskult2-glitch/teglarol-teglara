@@ -4115,13 +4115,14 @@ function getScoringRule(mid) {
 
 
 // Pont számítás egy meccsre
-function calcMatchPoints(m, tip) {
-  if(!m || !tip) return 0;
+function calcMatchPointsBreakdown(m, tip) {
+  var zero = {ft:0, et:0, pen:0, total:0, mult:1};
+  if(!m || !tip) return zero;
   var res = allResults[m.id];
-  if(!res) return 0;
+  if(!res) return zero;
   var rule = getScoringRule(m.id);
   var outcome = getTipOutcome(tip);
-  if(!outcome) return 0;
+  if(!outcome) return zero;
 
   // Védelmi ellenőrzés: ha a pontos eredmény ellentmond a kimenetelnek,
   // a pontos eredmény a mérvadó (specifikusabb tipp)
@@ -4146,8 +4147,9 @@ function calcMatchPoints(m, tip) {
       }
     }
   }
-  // Alappont × szorzó (csak ha ft_mult aktív)
-  var totalPts = rule.ft_mult ? (pts * mult) : pts;
+  // FT pont × szorzó (csak ha ft_mult aktív)
+  var ftPts = rule.ft_mult ? (pts * mult) : pts;
+  var etPts = 0, penPts = 0;
 
   // Knockout bónuszok
   if(m.knockout) {
@@ -4161,7 +4163,7 @@ function calcMatchPoints(m, tip) {
     }
     var etOutcomeCorrect = !!(etRes && etTip && etTip === etRes);
     if(rule.et_outcome && etOutcomeCorrect) {
-      totalPts += rule.et_mult ? rule.pts_et_outcome*mult : rule.pts_et_outcome;
+      etPts += rule.et_mult ? rule.pts_et_outcome*mult : rule.pts_et_outcome;
     }
     // Pen kimenetel — explicit tip.pen VAGY a megadott penScore-ból levezetett kimenetel
     var penRes = allPenResults[m.id];
@@ -4173,7 +4175,7 @@ function calcMatchPoints(m, tip) {
     }
     var penOutcomeCorrect = !!(penRes && penTip && penTip === penRes);
     if(rule.pen_outcome && penOutcomeCorrect) {
-      totalPts += rule.pen_mult ? rule.pts_pen_outcome*mult : rule.pts_pen_outcome;
+      penPts += rule.pen_mult ? rule.pts_pen_outcome*mult : rule.pts_pen_outcome;
     }
     // ET pontos score bónusz VAGY gólkülönbség bónusz — CSAK ha a kimenetel is helyes
     if(etOutcomeCorrect && (rule.et_exact || rule.et_gd)) {
@@ -4181,13 +4183,13 @@ function calcMatchPoints(m, tip) {
       if(etSc && tip.etScore) {
         if(rule.et_exact && tip.etScore === etSc) {
           var etExactPts = rule.pts_et_exact * (mult===3 && !rule.et_mult ? 2 : 1);
-          totalPts += rule.et_mult ? etExactPts*mult : etExactPts;
+          etPts += rule.et_mult ? etExactPts*mult : etExactPts;
         } else if(rule.et_gd) {
           var etParts = tip.etScore.split(':');
           var etTipObj = { h: etParts[0], a: etParts[1] };
           if(isGoalDiffCorrect(etTipObj, etSc)) {
             var etGdPts = rule.pts_et_gd * (mult===3 && !rule.et_mult ? 2 : 1);
-            totalPts += rule.et_mult ? etGdPts*mult : etGdPts;
+            etPts += rule.et_mult ? etGdPts*mult : etGdPts;
           }
         }
       }
@@ -4198,19 +4200,23 @@ function calcMatchPoints(m, tip) {
       if(penSc && tip.penScore) {
         if(rule.pen_exact && tip.penScore === penSc) {
           var penExactPts = rule.pts_pen_exact * (mult===3 && !rule.pen_mult ? 2 : 1);
-          totalPts += rule.pen_mult ? penExactPts*mult : penExactPts;
+          penPts += rule.pen_mult ? penExactPts*mult : penExactPts;
         } else if(rule.pen_gd) {
           var penParts = tip.penScore.split(':');
           var penTipObj = { h: penParts[0], a: penParts[1] };
           if(isGoalDiffCorrect(penTipObj, penSc)) {
             var penGdPts = rule.pts_pen_gd * (mult===3 && !rule.pen_mult ? 2 : 1);
-            totalPts += rule.pen_mult ? penGdPts*mult : penGdPts;
+            penPts += rule.pen_mult ? penGdPts*mult : penGdPts;
           }
         }
       }
     }
   }
-  return totalPts;
+  return { ft: ftPts, et: etPts, pen: penPts, total: ftPts+etPts+penPts, mult: mult };
+}
+
+function calcMatchPoints(m, tip) {
+  return calcMatchPointsBreakdown(m, tip).total;
 }
 
 // Góllövő bónusz számítás: minden eltalált góllövő 1 pt (döntő/bronz: 2 pt)
@@ -4684,8 +4690,10 @@ function buildOtherTips(mid, locked) {
       else if(isGDR) { bg='rgba(59,130,246,0.12)'; icon='📐'; ptsColor='#60a5fa'; }
       else if(isCorrectR) { bg='rgba(0,255,135,0.12)'; icon='🟡'; ptsColor='var(--gold)'; }
       else { bg='rgba(239,68,68,0.08)'; nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.6)'; icon='❌'; ptsColor='rgba(239,68,68,0.75)'; }
-      var mult = m ? getMatchMultiplier(m) : 1;
-      ptsStr = ' <span style="color:'+ptsColor+';font-size:11px;font-weight:700;">'+icon+' +'+pts+(mult>1?' (×'+mult+')':'')+'</span>';
+      var bd = (m && tip) ? calcMatchPointsBreakdown(m, tip) : {ft:0,et:0,pen:0,total:pts,mult:1};
+      var breakdownStr = 'FT+'+bd.ft + (bd.et?' ET+'+bd.et:'') + (bd.pen?' 11+'+bd.pen:'');
+      ptsStr = ' <span style="color:'+ptsColor+';font-size:11px;font-weight:700;" title="'+breakdownStr+'">'+icon+' +'+pts+'</span>'
+             + (m && m.knockout ? ' <span style="color:rgba(240,244,240,0.3);font-size:9px;">('+breakdownStr+')</span>' : '');
     } else if(isLive && !result) {
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
       if(!isNaN(hg) && !isNaN(ag)) {
