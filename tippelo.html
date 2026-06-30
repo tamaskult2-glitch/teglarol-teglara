@@ -4135,20 +4135,31 @@ function calcMatchPointsBreakdown(m, tip) {
   }
 
   var mult = getMatchMultiplier(m);
-  var pts = 0;
-  if(rule.ft_outcome && outcome === res) {
-    var realSc = allScores[m.id];
-    if(rule.ft_exact && tipSc && realSc && tipSc.h+':'+tipSc.a === realSc) {
-      pts = rule.pts_ft_exact; // pontos eredmény
+
+  // Egységes pont-hierarchia: kimenetel jó -> alappont; +gólkülönbség jó -> azzal számol;
+  // +pontos eredmény jó -> azzal számol (nem adódik a kimenetel/gd ponthoz, hanem helyettesíti).
+  // Ugyanez a logika FT-re, ET-re és 11-esre is.
+  function calcSection(outcomeOk, outcomePts, exactOk, exactPts, gdOk, gdPts, useMult, doubleOnFinal) {
+    if(!outcomeOk) return 0;
+    var base;
+    if(exactOk) {
+      base = exactPts;
+    } else if(gdOk) {
+      base = outcomePts + gdPts;
     } else {
-      pts = rule.pts_ft_outcome; // helyes kimenetel
-      if(rule.ft_gd && tipSc && realSc && isGoalDiffCorrect(tipSc, realSc)) {
-        pts += rule.pts_ft_gd; // gólkülönbség bónusz
-      }
+      base = outcomePts;
     }
+    if(doubleOnFinal && mult===3 && !useMult) base = base * 2;
+    return useMult ? base*mult : base;
   }
-  // FT pont × szorzó (csak ha ft_mult aktív)
-  var ftPts = rule.ft_mult ? (pts * mult) : pts;
+
+  // ===== FT =====
+  var ftOutcomeOk = rule.ft_outcome && outcome === res;
+  var realSc = allScores[m.id];
+  var ftExactOk = ftOutcomeOk && rule.ft_exact && tipSc && realSc && tipSc.h+':'+tipSc.a === realSc;
+  var ftGdOk    = ftOutcomeOk && !ftExactOk && rule.ft_gd && tipSc && realSc && isGoalDiffCorrect(tipSc, realSc);
+  var ftPts = calcSection(ftOutcomeOk, rule.pts_ft_outcome, ftExactOk, rule.pts_ft_exact, ftGdOk, rule.pts_ft_gd, rule.ft_mult, false);
+
   var etPts = 0, penPts = 0;
 
   // Knockout bónuszok
@@ -4161,10 +4172,16 @@ function calcMatchPointsBreakdown(m, tip) {
       var _eh = parseInt(_etp[0]), _ea = parseInt(_etp[1]);
       if(!isNaN(_eh) && !isNaN(_ea)) etTip = _eh > _ea ? '1' : _eh === _ea ? 'X' : '2';
     }
-    var etOutcomeCorrect = !!(etRes && etTip && etTip === etRes);
-    if(rule.et_outcome && etOutcomeCorrect) {
-      etPts += rule.et_mult ? rule.pts_et_outcome*mult : rule.pts_et_outcome;
+    var etOutcomeOk = rule.et_outcome && !!(etRes && etTip && etTip === etRes);
+    var etSc = allEtScores[m.id];
+    var etExactOk = etOutcomeOk && rule.et_exact && etSc && tip.etScore && tip.etScore === etSc;
+    var etGdOk = false;
+    if(etOutcomeOk && !etExactOk && rule.et_gd && etSc && tip.etScore) {
+      var etParts = tip.etScore.split(':');
+      etGdOk = isGoalDiffCorrect({h:etParts[0],a:etParts[1]}, etSc);
     }
+    etPts = calcSection(etOutcomeOk, rule.pts_et_outcome, etExactOk, rule.pts_et_exact, etGdOk, rule.pts_et_gd, rule.et_mult, true);
+
     // Pen kimenetel — explicit tip.pen VAGY a megadott penScore-ból levezetett kimenetel
     var penRes = allPenResults[m.id];
     var penTip = getTipPen(tip);
@@ -4173,44 +4190,15 @@ function calcMatchPointsBreakdown(m, tip) {
       var _ph = parseInt(_pep[0]), _pa = parseInt(_pep[1]);
       if(!isNaN(_ph) && !isNaN(_pa) && _ph !== _pa) penTip = _ph > _pa ? '1' : '2';
     }
-    var penOutcomeCorrect = !!(penRes && penTip && penTip === penRes);
-    if(rule.pen_outcome && penOutcomeCorrect) {
-      penPts += rule.pen_mult ? rule.pts_pen_outcome*mult : rule.pts_pen_outcome;
+    var penOutcomeOk = rule.pen_outcome && !!(penRes && penTip && penTip === penRes);
+    var penSc = allPenScores[m.id];
+    var penExactOk = penOutcomeOk && rule.pen_exact && penSc && tip.penScore && tip.penScore === penSc;
+    var penGdOk = false;
+    if(penOutcomeOk && !penExactOk && rule.pen_gd && penSc && tip.penScore) {
+      var penParts = tip.penScore.split(':');
+      penGdOk = isGoalDiffCorrect({h:penParts[0],a:penParts[1]}, penSc);
     }
-    // ET pontos score bónusz VAGY gólkülönbség bónusz — CSAK ha a kimenetel is helyes
-    if(etOutcomeCorrect && (rule.et_exact || rule.et_gd)) {
-      var etSc = allEtScores[m.id];
-      if(etSc && tip.etScore) {
-        if(rule.et_exact && tip.etScore === etSc) {
-          var etExactPts = rule.pts_et_exact * (mult===3 && !rule.et_mult ? 2 : 1);
-          etPts += rule.et_mult ? etExactPts*mult : etExactPts;
-        } else if(rule.et_gd) {
-          var etParts = tip.etScore.split(':');
-          var etTipObj = { h: etParts[0], a: etParts[1] };
-          if(isGoalDiffCorrect(etTipObj, etSc)) {
-            var etGdPts = rule.pts_et_gd * (mult===3 && !rule.et_mult ? 2 : 1);
-            etPts += rule.et_mult ? etGdPts*mult : etGdPts;
-          }
-        }
-      }
-    }
-    // Pen pontos score bónusz VAGY gólkülönbség bónusz — CSAK ha a kimenetel is helyes
-    if(penOutcomeCorrect && (rule.pen_exact || rule.pen_gd)) {
-      var penSc = allPenScores[m.id];
-      if(penSc && tip.penScore) {
-        if(rule.pen_exact && tip.penScore === penSc) {
-          var penExactPts = rule.pts_pen_exact * (mult===3 && !rule.pen_mult ? 2 : 1);
-          penPts += rule.pen_mult ? penExactPts*mult : penExactPts;
-        } else if(rule.pen_gd) {
-          var penParts = tip.penScore.split(':');
-          var penTipObj = { h: penParts[0], a: penParts[1] };
-          if(isGoalDiffCorrect(penTipObj, penSc)) {
-            var penGdPts = rule.pts_pen_gd * (mult===3 && !rule.pen_mult ? 2 : 1);
-            penPts += rule.pen_mult ? penGdPts*mult : penGdPts;
-          }
-        }
-      }
-    }
+    penPts = calcSection(penOutcomeOk, rule.pts_pen_outcome, penExactOk, rule.pts_pen_exact, penGdOk, rule.pts_pen_gd, rule.pen_mult, true);
   }
   return { ft: ftPts, et: etPts, pen: penPts, total: ftPts+etPts+penPts, mult: mult };
 }
