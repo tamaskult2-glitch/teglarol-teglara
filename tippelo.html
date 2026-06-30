@@ -4229,8 +4229,16 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
       if(!myEt) myEt = myEtFromScore;
     }
   }
-  var showEt  = (myOut === 'X') || (regResult === 'X') || !!etResult;
-  var showPen = (myEt  === 'X') || (etResult === 'X') || !!penResult || (myEtFromScore === 'X');
+  // ET/Pen szekció csak akkor látszik ha:
+  // - A felhasználó X-et tippelt 90'-re (döntetlen), VAGY
+  // - Van már mentett ET/Pen tipp, VAGY
+  // - Lezárt meccs + ismert ET/Pen eredmény (csak megmutatjuk mi történt)
+  var userTippedDraw = (myOut === 'X');
+  var hasSavedEt  = !!(myTip && (myTip.etScore || myTip.etOut));
+  var hasSavedPen = !!(myTip && (myTip.penScore || myTip.penOut));
+  var showEt  = userTippedDraw || hasSavedEt  || (kickoffLocked && !!etResult);
+  var showPen = (myEtFromScore === 'X' || myEt === 'X') || hasSavedPen
+              || (kickoffLocked && !!penResult);
 
   // Tipp összefoglaló sor: mutatja az ET és Pen tippet ha X-et rögzített
   var tipSummary = '';
