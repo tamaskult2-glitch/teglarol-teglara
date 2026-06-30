@@ -5022,7 +5022,7 @@ function renderMatches() {
       groupHtml += `<div class="date-header"><h2>${dayStr}</h2><span class="date-badge">${grpDayM.length} meccs</span></div>`;
       groupHtml += `<div id="dg_grp_${date.replace(/-/g,'')}">`;
       grpDayM.forEach(m=>{
-        var html = groupHtml;
+        var html = '';
 
       const result=allResults[m.id]||null;
       const score=allScores[m.id]||null;
@@ -5134,7 +5134,7 @@ function renderMatches() {
           <div id="lrr_${m.id}" style="font-size:11px;color:rgba(240,244,240,0.45);text-align:center;min-height:14px;padding:0 4px 6px;"></div>`:''}
         </div>
       </div>`;
-        groupHtml = html;
+        groupHtml += html;
       }); // end grpDayM.forEach
       groupHtml += '</div>';
     }
@@ -5144,7 +5144,7 @@ function renderMatches() {
       koHtml += `<div class="date-header"><h2>${dayStr}</h2><span class="date-badge">${koDayM.length} meccs</span></div>`;
       koHtml += `<div id="dg_ko_${date.replace(/-/g,'')}">`;
       koDayM.forEach(m=>{
-        var html = koHtml;
+        var html = '';
 
       const result=allResults[m.id]||null;
       const score=allScores[m.id]||null;
@@ -5256,7 +5256,7 @@ function renderMatches() {
           <div id="lrr_${m.id}" style="font-size:11px;color:rgba(240,244,240,0.45);text-align:center;min-height:14px;padding:0 4px 6px;"></div>`:''}
         </div>
       </div>`;
-        koHtml = html;
+        koHtml += html;
       }); // end koDayM.forEach
       koHtml += '</div>';
     }
