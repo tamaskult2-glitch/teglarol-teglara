@@ -2506,7 +2506,7 @@ input:focus, textarea:focus, select:focus {
 
           <input type="checkbox" id="rule_ft_gd" checked>
           <span style="color:#fff;">FT gólkülönbség bónusz</span>
-          <input type="number" id="pts_ft_gd" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#f5c518;text-align:center;">
+          <input type="number" id="pts_ft_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#f5c518;text-align:center;">
 
           <input type="checkbox" id="rule_ft_mult" checked>
           <span style="color:#fff;">FT szorzó (kör-szorzó)</span>
@@ -2524,7 +2524,7 @@ input:focus, textarea:focus, select:focus {
 
           <input type="checkbox" id="rule_et_gd" checked>
           <span style="color:#fff;">ET gólkülönbség bónusz</span>
-          <input type="number" id="pts_et_gd" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;">
+          <input type="number" id="pts_et_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;">
 
           <input type="checkbox" id="rule_et_mult">
           <span style="color:#fff;">ET szorzó (kör-szorzó)</span>
@@ -2542,14 +2542,14 @@ input:focus, textarea:focus, select:focus {
 
           <input type="checkbox" id="rule_pen_gd" checked>
           <span style="color:#fff;">11-es gólkülönbség bónusz</span>
-          <input type="number" id="pts_pen_gd" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;">
+          <input type="number" id="pts_pen_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;">
 
           <input type="checkbox" id="rule_pen_mult">
           <span style="color:#fff;">11-es szorzó (kör-szorzó)</span>
           <span style="font-size:10px;color:rgba(240,244,240,0.3);text-align:center;">×1/2/3</span>
 
           <div style="grid-column:1/-1;font-size:10px;color:rgba(240,244,240,0.35);margin-top:4px;">
-            ℹ️ Az ET pontos eredmény és gólkülönbség a hosszabbítás <b>végeredménye</b> alapján számol (90+ET együtt). Döntő/bronz meccsnél (×3 szorzó) az ET/11-es pontos eredmény automatikusan duplázódik (kivéve ha az adott szorzó is be van pipálva).
+            ℹ️ A "gólkülönbség" és "pontos eredmény" pontérték a kimenetel pontját <b>felülírja</b> (nem adódik hozzá). Pl. ha kimenetel=1, gólkülönbség=2: kimenetel+GD találatnál a végpont 2, nem 1+2=3. Az ET pontos eredmény és gólkülönbség a hosszabbítás <b>végeredménye</b> alapján számol (90+ET együtt). Döntő/bronz meccsnél (×3 szorzó) az ET/11-es pontos eredmény automatikusan duplázódik (kivéve ha az adott szorzó is be van pipálva).
           </div>
         </div>
 
@@ -3135,7 +3135,7 @@ const ADMIN_PATHS = ['results','scores','etResults','penResults','etScores','pen
 const _isAdminPath = p => ADMIN_PATHS.some(ap => p.startsWith(ap));
 const _authParam   = p => (_isAdminPath(p) || isAdminUnlocked) ? _fbAdminParam() : '';
 
-const fbGet  = async p => { const r=await fetch(DB_URL+'/'+p+'.json'+(_fbAdminParam()||'')); if(!r.ok) throw new Error(r.status); return r.json(); };
+const fbGet  = async p => { const r=await fetch(DB_URL+'/'+p+'.json'+(_fbAdminParam()||''), {cache:'no-store'}); if(!r.ok) throw new Error(r.status); return r.json(); };
 const fbSet  = async (p,v) => { const auth=_authParam(p); const r=await fetch(DB_URL+'/'+p+'.json'+auth,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); if(!r.ok) throw new Error('FB írási hiba ('+r.status+') — nincs admin secret?'); return r.json(); };
 const fbDel  = async p => fetch(DB_URL+'/'+p+'.json'+_authParam(p),{method:'DELETE'});
 const fbPush = async (p,v) => { const auth=_authParam(p); const r=await fetch(DB_URL+'/'+p+'.json'+auth,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return r.json(); };
@@ -3937,6 +3937,7 @@ updateAdminTabLabel();
 updateInviteStatus();
 setTimeout(function(){ pmCheckForUser(); }, 2000); // PM check after initial data load
 setTimeout(function(){ checkBroadcast(); }, 3000); // Közlemény check
+setInterval(function(){ checkBroadcast(); }, 60000); // Periodikus újraellenőrzés — ne csak betöltéskor
 
 // Hardcode admin felhasználók automatikus feloldása
 function isHardcodeAdmin(name) {
@@ -4094,13 +4095,13 @@ function getScoringRule(mid) {
     // Pontértékek (admin szerkesztheti)
     pts_ft_outcome: 1,
     pts_ft_exact:   3,
-    pts_ft_gd:      1,
+    pts_ft_gd:      2,  // történelmi alapérték: kimenetel(1)+bónusz(1)=2 össz., most "felülíró" értékként
     pts_et_outcome: 1,
     pts_et_exact:   1,
-    pts_et_gd:      1,
+    pts_et_gd:      2,
     pts_pen_outcome:1,
     pts_pen_exact:  1,
-    pts_pen_gd:     1,
+    pts_pen_gd:     2,
   };
   var override = allScoringRules[mid];
   if(!override) override = globalScoringRule; // ha nincs egyedi, a fix globális szabály jön
@@ -4136,16 +4137,16 @@ function calcMatchPointsBreakdown(m, tip) {
 
   var mult = getMatchMultiplier(m);
 
-  // Egységes pont-hierarchia: kimenetel jó -> alappont; +gólkülönbség jó -> azzal számol;
-  // +pontos eredmény jó -> azzal számol (nem adódik a kimenetel/gd ponthoz, hanem helyettesíti).
-  // Ugyanez a logika FT-re, ET-re és 11-esre is.
+  // Egységes pont-hierarchia: kimenetel jó -> alappont; kimenetel+gólkülönbség jó -> CSAK a gólkülönbség
+  // pontjaival számol (felülírja a kimenetel pontot); kimenetel+pontos jó -> CSAK a pontos pontjaival
+  // számol. Ugyanez a logika FT-re, ET-re és 11-esre is.
   function calcSection(outcomeOk, outcomePts, exactOk, exactPts, gdOk, gdPts, useMult, doubleOnFinal) {
     if(!outcomeOk) return 0;
     var base;
     if(exactOk) {
       base = exactPts;
     } else if(gdOk) {
-      base = outcomePts + gdPts;
+      base = gdPts;
     } else {
       base = outcomePts;
     }
@@ -9856,7 +9857,7 @@ async function adminClearAllScorers() {
 // ===== PONTOZÁSI SZABÁLYOK ADMIN =====
 var SCORING_RULE_KEYS = ['ft_outcome','ft_exact','ft_gd','ft_mult','et_outcome','et_exact','et_gd','et_mult','pen_outcome','pen_exact','pen_gd','pen_mult'];
 var SCORING_PTS_KEYS  = ['pts_ft_outcome','pts_ft_exact','pts_ft_gd','pts_et_outcome','pts_et_exact','pts_et_gd','pts_pen_outcome','pts_pen_exact','pts_pen_gd'];
-var SCORING_PTS_DEFAULTS = {pts_ft_outcome:1, pts_ft_exact:3, pts_ft_gd:1, pts_et_outcome:1, pts_et_exact:1, pts_et_gd:1, pts_pen_outcome:1, pts_pen_exact:1, pts_pen_gd:1};
+var SCORING_PTS_DEFAULTS = {pts_ft_outcome:1, pts_ft_exact:3, pts_ft_gd:2, pts_et_outcome:1, pts_et_exact:1, pts_et_gd:2, pts_pen_outcome:1, pts_pen_exact:1, pts_pen_gd:2};
 
 function populateScoringRuleMatchSelect() {
   var sel = document.getElementById('scoringRuleMatchSelect');
