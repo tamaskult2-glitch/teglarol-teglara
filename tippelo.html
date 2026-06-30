@@ -2519,8 +2519,12 @@ input:focus, textarea:focus, select:focus {
           <input type="number" id="pts_et_outcome" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;">
 
           <input type="checkbox" id="rule_et_exact" checked>
-          <span style="color:#fff;">ET pontos eredmény</span>
+          <span style="color:#fff;">ET pontos eredmény (végeredmény)</span>
           <input type="number" id="pts_et_exact" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;">
+
+          <input type="checkbox" id="rule_et_gd" checked>
+          <span style="color:#fff;">ET gólkülönbség bónusz</span>
+          <input type="number" id="pts_et_gd" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;">
 
           <input type="checkbox" id="rule_et_mult">
           <span style="color:#fff;">ET szorzó (kör-szorzó)</span>
@@ -2536,12 +2540,16 @@ input:focus, textarea:focus, select:focus {
           <span style="color:#fff;">11-es pontos eredmény</span>
           <input type="number" id="pts_pen_exact" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;">
 
+          <input type="checkbox" id="rule_pen_gd" checked>
+          <span style="color:#fff;">11-es gólkülönbség bónusz</span>
+          <input type="number" id="pts_pen_gd" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;">
+
           <input type="checkbox" id="rule_pen_mult">
           <span style="color:#fff;">11-es szorzó (kör-szorzó)</span>
           <span style="font-size:10px;color:rgba(240,244,240,0.3);text-align:center;">×1/2/3</span>
 
           <div style="grid-column:1/-1;font-size:10px;color:rgba(240,244,240,0.35);margin-top:4px;">
-            ℹ️ Döntő/bronz meccsnél (×3 szorzó) az ET/11-es pontos eredmény automatikusan duplázódik (kivéve ha az adott szorzó is be van pipálva).
+            ℹ️ Az ET pontos eredmény és gólkülönbség a hosszabbítás <b>végeredménye</b> alapján számol (90+ET együtt). Döntő/bronz meccsnél (×3 szorzó) az ET/11-es pontos eredmény automatikusan duplázódik (kivéve ha az adott szorzó is be van pipálva).
           </div>
         </div>
 
@@ -4045,6 +4053,29 @@ function isGoalDiffCorrect(tipScore, realScore) {
   return (th - ta) === (rh - ra);
 }
 
+// FT/ET/Pen végeredmény breakdown — meccs kártyán jelenik meg lezárt kieséses meccseknél
+function buildFtEtPenBreakdown(m) {
+  if(!m || !m.knockout) return '';
+  var ftRes = allResults[m.id];
+  if(!ftRes) return '';
+  var ftSc  = allScores[m.id];
+  var etSc  = allEtScores[m.id];
+  var etRes = allEtResults[m.id];
+  var penSc = allPenScores[m.id];
+  var penRes= allPenResults[m.id];
+
+  var parts = [];
+  parts.push('<span style="color:rgba(240,244,240,0.55);">FT <b style="color:var(--gold);">'+(ftSc||ftRes)+'</b></span>');
+  if(etSc || etRes) {
+    parts.push('<span style="color:rgba(240,244,240,0.55);">ET <b style="color:#00ff87;">'+(etSc||etRes)+'</b></span>');
+  }
+  if(penSc || penRes) {
+    parts.push('<span style="color:rgba(240,244,240,0.55);">Pen <b style="color:#cd7f32;">'+(penSc||penRes)+'</b></span>');
+  }
+  if(parts.length <= 1) return ''; // ha csak FT van, nincs mit külön mutatni (a fő score már mutatja)
+  return '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;font-size:11px;font-family:Oswald,sans-serif;letter-spacing:0.3px;margin-top:2px;">'+parts.join('')+'</div>';
+}
+
 // Pontozási szabály lekérése egy meccshez — admin testreszabható, alapértelmezett: minden aktív
 function getScoringRule(mid) {
   var def = {
@@ -4053,10 +4084,12 @@ function getScoringRule(mid) {
     ft_gd:      true,  // FT gólkülönbség bónusz
     ft_mult:    true,  // FT pontok szorzódnak a kör-szorzóval
     et_outcome: true,  // ET (hosszabbítás) kimenetel — +1 pt
-    et_exact:   true,  // ET pontos eredmény — +1/+2 pt
+    et_exact:   true,  // ET pontos eredmény (végeredmény) — +1/+2 pt
+    et_gd:      true,  // ET gólkülönbség bónusz (végeredmény alapján)
     et_mult:    false, // ET pontok szorzódnak-e (alapból NEM, hardcore szabály szerint)
     pen_outcome:true,  // 11-es kimenetel — +1 pt
     pen_exact:  true,  // 11-es pontos eredmény — +1/+2 pt
+    pen_gd:     true,  // 11-es gólkülönbség bónusz
     pen_mult:   false, // Pen pontok szorzódnak-e
     // Pontértékek (admin szerkesztheti)
     pts_ft_outcome: 1,
@@ -4064,8 +4097,10 @@ function getScoringRule(mid) {
     pts_ft_gd:      1,
     pts_et_outcome: 1,
     pts_et_exact:   1,
+    pts_et_gd:      1,
     pts_pen_outcome:1,
     pts_pen_exact:  1,
+    pts_pen_gd:     1,
   };
   var override = allScoringRules[mid];
   if(!override) override = globalScoringRule; // ha nincs egyedi, a fix globális szabály jön
@@ -4126,20 +4161,38 @@ function calcMatchPoints(m, tip) {
       var penRes = allPenResults[m.id];
       if(penRes) { var penTip = getTipPen(tip); if(penTip && penTip === penRes) totalPts += rule.pen_mult ? rule.pts_pen_outcome*mult : rule.pts_pen_outcome; }
     }
-    // ET pontos score bónusz (döntőn duplázódik, kivéve ha et_mult is aktív)
-    if(rule.et_exact) {
+    // ET pontos score bónusz VAGY gólkülönbség bónusz (döntőn duplázódik, kivéve ha et_mult is aktív)
+    if(rule.et_exact || rule.et_gd) {
       var etSc = allEtScores[m.id];
-      if(etSc && tip.etScore && tip.etScore === etSc) {
-        var etExactPts = rule.pts_et_exact * (mult===3 && !rule.et_mult ? 2 : 1);
-        totalPts += rule.et_mult ? etExactPts*mult : etExactPts;
+      if(etSc && tip.etScore) {
+        if(rule.et_exact && tip.etScore === etSc) {
+          var etExactPts = rule.pts_et_exact * (mult===3 && !rule.et_mult ? 2 : 1);
+          totalPts += rule.et_mult ? etExactPts*mult : etExactPts;
+        } else if(rule.et_gd) {
+          var etParts = tip.etScore.split(':');
+          var etTipObj = { h: etParts[0], a: etParts[1] };
+          if(isGoalDiffCorrect(etTipObj, etSc)) {
+            var etGdPts = rule.pts_et_gd * (mult===3 && !rule.et_mult ? 2 : 1);
+            totalPts += rule.et_mult ? etGdPts*mult : etGdPts;
+          }
+        }
       }
     }
-    // Pen pontos score bónusz (döntőn duplázódik, kivéve ha pen_mult is aktív)
-    if(rule.pen_exact) {
+    // Pen pontos score bónusz VAGY gólkülönbség bónusz (döntőn duplázódik, kivéve ha pen_mult is aktív)
+    if(rule.pen_exact || rule.pen_gd) {
       var penSc = allPenScores[m.id];
-      if(penSc && tip.penScore && tip.penScore === penSc) {
-        var penExactPts = rule.pts_pen_exact * (mult===3 && !rule.pen_mult ? 2 : 1);
-        totalPts += rule.pen_mult ? penExactPts*mult : penExactPts;
+      if(penSc && tip.penScore) {
+        if(rule.pen_exact && tip.penScore === penSc) {
+          var penExactPts = rule.pts_pen_exact * (mult===3 && !rule.pen_mult ? 2 : 1);
+          totalPts += rule.pen_mult ? penExactPts*mult : penExactPts;
+        } else if(rule.pen_gd) {
+          var penParts = tip.penScore.split(':');
+          var penTipObj = { h: penParts[0], a: penParts[1] };
+          if(isGoalDiffCorrect(penTipObj, penSc)) {
+            var penGdPts = rule.pts_pen_gd * (mult===3 && !rule.pen_mult ? 2 : 1);
+            totalPts += rule.pen_mult ? penGdPts*mult : penGdPts;
+          }
+        }
       }
     }
   }
@@ -5264,6 +5317,7 @@ function renderMatches() {
               </button>
             </div>
           </div>
+          ${m.knockout ? buildFtEtPenBreakdown(m) : ''}
           <div class="tip-buttons">
             <button class="${bc('1','hb')}" onclick="submitTip('${m.id}','1')">
               <span class="tl">1</span>
@@ -5386,6 +5440,7 @@ function renderMatches() {
               </button>
             </div>
           </div>
+          ${m.knockout ? buildFtEtPenBreakdown(m) : ''}
           <div class="tip-buttons">
             <button class="${bc('1','hb')}" onclick="submitTip('${m.id}','1')">
               <span class="tl">1</span>
@@ -9730,9 +9785,9 @@ async function adminClearAllScorers() {
 }
 
 // ===== PONTOZÁSI SZABÁLYOK ADMIN =====
-var SCORING_RULE_KEYS = ['ft_outcome','ft_exact','ft_gd','ft_mult','et_outcome','et_exact','et_mult','pen_outcome','pen_exact','pen_mult'];
-var SCORING_PTS_KEYS  = ['pts_ft_outcome','pts_ft_exact','pts_ft_gd','pts_et_outcome','pts_et_exact','pts_pen_outcome','pts_pen_exact'];
-var SCORING_PTS_DEFAULTS = {pts_ft_outcome:1, pts_ft_exact:3, pts_ft_gd:1, pts_et_outcome:1, pts_et_exact:1, pts_pen_outcome:1, pts_pen_exact:1};
+var SCORING_RULE_KEYS = ['ft_outcome','ft_exact','ft_gd','ft_mult','et_outcome','et_exact','et_gd','et_mult','pen_outcome','pen_exact','pen_gd','pen_mult'];
+var SCORING_PTS_KEYS  = ['pts_ft_outcome','pts_ft_exact','pts_ft_gd','pts_et_outcome','pts_et_exact','pts_et_gd','pts_pen_outcome','pts_pen_exact','pts_pen_gd'];
+var SCORING_PTS_DEFAULTS = {pts_ft_outcome:1, pts_ft_exact:3, pts_ft_gd:1, pts_et_outcome:1, pts_et_exact:1, pts_et_gd:1, pts_pen_outcome:1, pts_pen_exact:1, pts_pen_gd:1};
 
 function populateScoringRuleMatchSelect() {
   var sel = document.getElementById('scoringRuleMatchSelect');
@@ -9825,7 +9880,7 @@ async function deleteScoringRule() {
   await fbDel('scoringRules/'+mid);
   SCORING_RULE_KEYS.forEach(function(k){
     var el = document.getElementById('rule_'+k);
-    if(el) el.checked = (k !== 'et_mult' && k !== 'pen_mult'); // alapérték
+    if(el) el.checked = (k !== 'et_mult' && k !== 'pen_mult'); // alapérték (et_gd alapból true)
   });
   SCORING_PTS_KEYS.forEach(function(k){
     var el = document.getElementById(k);
