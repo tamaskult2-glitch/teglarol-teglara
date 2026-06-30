@@ -4201,7 +4201,9 @@ function calcMatchPointsBreakdown(m, tip) {
     }
     penPts = calcSection(penOutcomeOk, rule.pts_pen_outcome, penExactOk, rule.pts_pen_exact, penGdOk, rule.pts_pen_gd, rule.pen_mult, true);
   }
-  return { ft: ftPts, et: etPts, pen: penPts, total: ftPts+etPts+penPts, mult: mult };
+  var bonusPts = (tip.adminBonus && !isNaN(tip.adminBonus)) ? Number(tip.adminBonus) : 0;
+  return { ft: ftPts, et: etPts, pen: penPts, bonus: bonusPts, total: ftPts+etPts+penPts+bonusPts, mult: mult,
+           bonusNote: tip.adminBonusNote || '' };
 }
 
 function calcMatchPoints(m, tip) {
@@ -4679,9 +4681,15 @@ function buildOtherTips(mid, locked) {
       else if(isGDR) { bg='rgba(59,130,246,0.12)'; icon='📐'; ptsColor='#60a5fa'; }
       else if(isCorrectR) { bg='rgba(0,255,135,0.12)'; icon='🟡'; ptsColor='var(--gold)'; }
       else { bg='rgba(239,68,68,0.08)'; nameClr = isMe ? 'var(--gold)' : 'rgba(240,244,240,0.6)'; icon='❌'; ptsColor='rgba(239,68,68,0.75)'; }
-      var bd = (m && tip) ? calcMatchPointsBreakdown(m, tip) : {ft:0,et:0,pen:0,total:pts,mult:1};
-      var breakdownStr = 'FT+'+bd.ft + (bd.et?' ET+'+bd.et:'') + (bd.pen?' 11+'+bd.pen:'');
-      ptsStr = ' <span style="color:'+ptsColor+';font-size:11px;font-weight:700;" title="'+breakdownStr+'">'+icon+' +'+pts+'</span>'
+      var bd = (m && tip) ? calcMatchPointsBreakdown(m, tip) : {ft:0,et:0,pen:0,bonus:0,total:pts,mult:1,bonusNote:''};
+      var breakdownParts = ['FT+'+bd.ft];
+      if(bd.et) breakdownParts.push('ET+'+bd.et);
+      if(bd.pen) breakdownParts.push('11+'+bd.pen);
+      if(bd.bonus) breakdownParts.push('⭐+'+bd.bonus);
+      var breakdownStr = breakdownParts.join(' ');
+      var bonusMarker = bd.bonus ? ' <span style="color:#ef4444;font-size:10px;cursor:help;" title="Admin bónusz: '+(bd.bonusNote||'')+'">⭐*</span>' : '';
+      ptsStr = ' <span style="color:'+ptsColor+';font-size:11px;font-weight:700;" title="'+breakdownStr+(bd.bonusNote?' — '+bd.bonusNote:'')+'">'+icon+' +'+pts+'</span>'
+             + bonusMarker
              + (m && m.knockout ? ' <span style="color:rgba(240,244,240,0.3);font-size:9px;">('+breakdownStr+')</span>' : '');
     } else if(isLive && !result) {
       var hg = parseInt(ls.home), ag = parseInt(ls.away);
@@ -4880,12 +4888,14 @@ function buildTippTable() {
             if(pen) { var penMul = getMatchMultiplier(m); rows += '<span style="font-size:9px;font-family:Oswald,sans-serif;color:'+penCol+';line-height:1;letter-spacing:0.5px;">🥅'+pen+(penRes&&pen===penRes?' +'+(1*penMul):'')+'</span>'; }
             if(result) {
               var tipObj = tip && typeof tip==='object' ? tip : {o:tip};
-              var cellPts = calcMatchPoints(m, tipObj);
+              var cellBd = calcMatchPointsBreakdown(m, tipObj);
+              var cellPts = cellBd.total;
               if(isExact) rows += '<span style="font-size:9px;color:#39ff9d;line-height:1;">🎯+'+(3*getMatchMultiplier(m))+'</span>';
               else if(isHit && cellPts > 0) {
                 var hasGD = h!==null && a!==null && score && isGoalDiffCorrect({h:parseInt(h),a:parseInt(a)}, score);
                 rows += '<span style="font-size:9px;color:'+(hasGD?'#60a5fa':'#86efac')+';line-height:1;">'+(hasGD?'📐':'')+'+'+cellPts+'</span>';
               }
+              if(cellBd.bonus) rows += '<span style="font-size:9px;color:#ef4444;line-height:1;" title="'+( cellBd.bonusNote||'Admin bónusz')+'">⭐*+'+cellBd.bonus+'</span>';
             }
             rows += '</div></td>';
           });
@@ -5761,6 +5771,20 @@ function renderLeaderboard() {
   }
   html+=`<div class="lb-row r${Math.min(i+1,3)}" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;${me?'border-color:rgba(0,255,135,0.45);background:rgba(0,255,135,0.07)':''}"><span class="lb-rank" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;">${i<3?med[i]:(i+1)+'.'}</span><span class="lb-name${me?' lb-me':''}" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;">${s.u}${userBadges(s.u)}${isMvp?' <span title="Heti MVP" style="font-size:12px;">⭐</span>':''}${isBukta?' <span title="Heti bukta" style="font-size:12px;">💀</span>':''}${me?' 👈':''}${liveArrow}</span><div class="lb-score-col" onclick="event.stopPropagation();showPointsBreakdown('${s.u.replace(/'/g,"\\'")}')" style="cursor:pointer;"><div class="lb-pts">${s.pts} <span style="font-size:13px;opacity:0.75">pt</span></div>${prizeHtml}<div class="lb-sub">${s.tot} tipp · ${s.acc}% · ${s.exact>0?`<span style="color:#00ff87">🎯 ${s.exact} pontos</span> · `:''}${streak>=3?`<span style="color:#f97316">🔥 ${streak}</span> · `:''}${s.pend} várja</div></div></div>`;});
   html+='</div>';
+  // Admin bónusz jelzés ha van bármely tippben
+  var hasBonusAnywhere = false;
+  try {
+    Object.values(allTips).forEach(function(matchTips){
+      Object.values(matchTips||{}).forEach(function(tip){
+        if(tip && tip.adminBonus) hasBonusAnywhere = true;
+      });
+    });
+  } catch(e){}
+  if(hasBonusAnywhere) html += '<div style="margin-top:10px;padding:8px 12px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);font-size:11px;color:rgba(240,244,240,0.55);line-height:1.6;">'
+    + '<span style="color:#ef4444;font-weight:700;">⭐* Admin bónusz</span> — '
+    + 'A kieséses szakasz kezdetekor fennálló ET tippelési szabály anomália miatt egyes felhasználók admin bónusz pontban részesültek. '
+    + 'Ezek a pontok az adott meccs kártyáján és a Tippek fülön ⭐* jelöléssel láthatók.'
+    + '</div>';
   if(!vbMatches.some(function(m){return allResults[m.id];})) html+='<div style="text-align:center;padding:16px;font-size:12px;color:rgba(240,244,240,0.3);">⏳ A VB indulása után látható a pontszám (jún. 11.)</div>';
   c.innerHTML=html;
 }
@@ -6191,6 +6215,14 @@ function renderAdminMatches() {
           ` : ''}
           <button onclick="adminSetTip('${m.id}')"
             style="width:100%;padding:6px 10px;background:rgba(0,255,135,0.15);border:1px solid rgba(0,255,135,0.3);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;">✓ Tipp mentése (FT+ET+11-es)</button>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(239,68,68,0.2);">
+            <span style="font-size:10px;color:rgba(239,68,68,0.8);flex-shrink:0;">⭐ Admin bónusz pont:</span>
+            <input type="number" id="atip_bonus_${m.id}" placeholder="0" step="0.5"
+              style="width:56px;padding:5px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(239,68,68,0.35);color:#ef4444;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;text-align:center;border-radius:4px;">
+            <input type="text" id="atip_bonus_note_${m.id}" placeholder="Indoklás (pl. ET anomália)"
+              style="flex:1;padding:5px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(239,68,68,0.2);color:rgba(240,244,240,0.7);font-family:Oswald,sans-serif;font-size:11px;border-radius:4px;">
+          </div>
+
         </div>
         <!-- GÓLLÖVŐK RÖGZÍTÉS (admin) -->
         <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,255,135,0.12);">
@@ -6272,6 +6304,15 @@ async function adminSetTip(mid) {
     tip.pen = parseInt(penh) > parseInt(pena) ? '1' : '2';
   }
 
+  // Bónusz pontok (admin)
+  var bonusInp = document.getElementById('atip_bonus_'+mid);
+  var bonusNoteInp = document.getElementById('atip_bonus_note_'+mid);
+  var bonusVal = bonusInp ? parseFloat(bonusInp.value) : NaN;
+  if(!isNaN(bonusVal) && bonusVal !== 0) {
+    tip.adminBonus = bonusVal;
+    tip.adminBonusNote = bonusNoteInp ? (bonusNoteInp.value.trim() || 'Admin bónusz') : 'Admin bónusz';
+  }
+
   tip.ts = Date.now();
   try {
     // Közvetlen Firebase írás — NEM hívunk pollData/renderAll hogy ne renderelje újra a kártyát
@@ -6290,6 +6331,8 @@ async function adminSetTip(mid) {
     if(etoInp) etoInp.value='';
     if(ethInp) ethInp.value='';
     if(etaInp) etaInp.value='';
+    if(bonusInp) bonusInp.value='';
+    if(bonusNoteInp) bonusNoteInp.value='';
     if(penhInp) penhInp.value='';
     if(penaInp) penaInp.value='';
   } catch(e){ showToast('❌ Firebase hiba!'); }
