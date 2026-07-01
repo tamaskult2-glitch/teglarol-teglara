@@ -4966,7 +4966,14 @@ function renderMatchdayBanner() {
 
 // Ugrás: ÉLŐ meccs → következő tippeletlen → következő jövőbeli
 // Ciklikus navigátor állapot
-var _openDayGroups = {}; // {gId: true} — nyitott csoportköri napok (reset oldalfrissítéskor)
+var _openDayGroups = (function(){
+  try {
+    var saved = JSON.parse(localStorage.getItem('_openDayGroups')||'{}');
+    // group_section alapból ZÁRT (false), kivéve ha a felhasználó explicit nyitotta
+    if(saved['group_section'] === undefined) saved['group_section'] = false;
+    return saved;
+  } catch(e){ return {group_section:false}; }
+})();
 var _navLastId = null;
 var _navPhase = 0; // 0=mai tippeletlen, 1=mai élő, 2=jövőbeli tippeletlen
 
@@ -11035,6 +11042,7 @@ function toggleDayGroup(groupId) {
   var btn = document.getElementById('toggle_'+groupId);
   if(btn) btn.textContent = isNowClosed ? '−' : '+';
   _openDayGroups[groupId] = isNowClosed; // true = nyitva
+  try { localStorage.setItem('_openDayGroups', JSON.stringify(_openDayGroups)); } catch(e){}
 }
 
 function buildScorerRow(mid, m) {
