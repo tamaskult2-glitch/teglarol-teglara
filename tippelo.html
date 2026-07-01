@@ -5229,6 +5229,52 @@ function renderMatches() {
     // Globális cache hogy más függvények is megtalálják
     _virtualKOMatches[id] = mainMatches[mainMatches.length-1];
   });
+
+  // R16 kieséses meccsek hozzáadása — ha az R32 győztes már ismert
+  var R16_STRUCTURE = [
+    // { m: R16 mérkőzésszám, hSrc: R32_M szám amiből hazai jön, aSrc: R32_M szám amiből vendég jön, huDate, huTime, venue }
+    { m:89, hSrc:73, aSrc:76, huDate:'2026-07-05', huTime:'22:00', venue:'Los Angeles'  },
+    { m:90, hSrc:74, aSrc:75, huDate:'2026-07-06', huTime:'02:00', venue:'Kansas City'  },
+    { m:91, hSrc:78, aSrc:77, huDate:'2026-07-06', huTime:'19:00', venue:'Houston'      },
+    { m:92, hSrc:79, aSrc:80, huDate:'2026-07-06', huTime:'23:00', venue:'Atlanta'      },
+    { m:93, hSrc:81, aSrc:82, huDate:'2026-07-07', huTime:'21:00', venue:'Seattle'      },
+    { m:94, hSrc:83, aSrc:84, huDate:'2026-07-08', huTime:'02:00', venue:'Dallas'       },
+    { m:95, hSrc:85, aSrc:86, huDate:'2026-07-08', huTime:'19:00', venue:'Miami'        },
+    { m:96, hSrc:87, aSrc:88, huDate:'2026-07-09', huTime:'02:00', venue:'Boston'       },
+  ];
+  var r16Ids = new Set(mainMatches.filter(function(m){ return m.id&&m.id.startsWith('R16_'); }).map(function(m){ return m.id; }));
+  R16_STRUCTURE.forEach(function(slot) {
+    var id = 'R16_M'+slot.m;
+    if(r16Ids.has(id)) return;
+    var hSrcId = 'R32_M'+slot.hSrc;
+    var aSrcId = 'R32_M'+slot.aSrc;
+    var hSrcM = _virtualKOMatches[hSrcId] || mainMatches.find(function(x){ return x.id===hSrcId; });
+    var aSrcM = _virtualKOMatches[aSrcId] || mainMatches.find(function(x){ return x.id===aSrcId; });
+    var hWinner = hSrcM ? getMatchWinner(hSrcM) : null;
+    var aWinner = aSrcM ? getMatchWinner(aSrcM) : null;
+    // Csak akkor jelenjen meg ha legalább az egyik R32 meccs le van játszva
+    if(!hWinner && !aWinner) return;
+    var hName = hWinner ? hWinner.name : ('M'+slot.hSrc+' győztese');
+    var hFlag = hWinner ? hWinner.flag : '❓';
+    var aName = aWinner ? aWinner.name : ('M'+slot.aSrc+' győztese');
+    var aFlag = aWinner ? aWinner.flag : '❓';
+    mainMatches.push({
+      id: id,
+      huDate: slot.huDate,
+      huTime: slot.huTime,
+      home: hName,
+      away: aName,
+      homeFlag: hFlag,
+      awayFlag: aFlag,
+      group: 'R16',
+      title: 'M'+slot.m + (slot.venue?' · '+slot.venue:''),
+      knockout: true,
+      _virtual: true,
+      _homeKnown: !!hWinner,
+      _awayKnown: !!aWinner,
+    });
+    _virtualKOMatches[id] = mainMatches[mainMatches.length-1];
+  });
   const dates=[...new Set(mainMatches.map(m=>m.huDate))].sort();
   let html='';
   var _lastMatchPhase = 'group';
