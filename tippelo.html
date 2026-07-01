@@ -8387,8 +8387,8 @@ async function checkAutoResults() {
         }
         if(ar.stats) liveStats[localMatch.id] = ar.stats;
         if(ar.lineups) liveLineups[localMatch.id] = ar.lineups;
-        // Kieséses meccsnél ESPN summary fetch eseményekért (minden poll-ban frissít)
-        if(localMatch.knockout && ar.espnId) {
+        // ESPN summary fetch — góllövők, statisztikák, felállás MINDEN live meccshez
+        if(ar.espnId && !matchScorers[localMatch.id]) {
           autoFetchMatchEvents(localMatch, ar.espnId);
         }
       } else if(ar.status === 'ft' && !allResults[localMatch.id] && isAdminUnlocked) {
@@ -9842,20 +9842,26 @@ async function autoFetchMatchEvents(localMatch, espnId) {
       var parsed = [];
       keyEv.forEach(function(ev) {
         var typeText = (ev.type && ev.type.text) || ev.typeText || '';
-        var isGoal = typeText.startsWith('Goal') || (ev.scoreValue && ev.scoreValue > 0);
+        var typeId   = (ev.type && (ev.type.id||ev.type.abbreviation||'')) || '';
+        var isGoal = typeText.startsWith('Goal')
+          || typeText==='Penalty Goal'||typeText==='Own Goal'
+          || typeText.startsWith('Penalty – Scored')||typeText.startsWith('Penalty - Scored')
+          || typeId==='goal'||typeId==='98'
+          || typeText.includes('Goal –')||typeText.includes('Goal -')
+          || (ev.scoreValue && ev.scoreValue > 0);
         var isYellow = typeText.indexOf('Yellow') >= 0 || typeText.indexOf('Caution') >= 0;
-        var isRed = typeText.indexOf('Red') >= 0 || typeText.indexOf('Ejection') >= 0;
-        var isSub = typeText.indexOf('Sub') >= 0 || typeText.indexOf('Substitution') >= 0;
-        var isPen = typeText.indexOf('Penalty') >= 0 || !!ev.penaltyKick;
-        var isOg  = typeText.indexOf('Own') >= 0 || !!ev.ownGoal;
-        var minute = ev.clock && ev.clock.displayValue ? ev.clock.displayValue+"'" : '';
-        var teamSide = ev.team && ev.team.homeAway ? ev.team.homeAway : (ev.homeAway || '');
+        var isRed    = typeText.indexOf('Red') >= 0 || typeText.indexOf('Ejection') >= 0;
+        var isPen    = typeText.indexOf('Penalty') >= 0 || !!ev.penaltyKick;
+        var isOg     = typeText.indexOf('Own') >= 0 || !!ev.ownGoal;
+        var minute   = ev.clock && ev.clock.displayValue ? ev.clock.displayValue+"'" : '';
+        var teamSide = (ev.team && ev.team.homeAway) || (ev.homeAway) || '';
         var player = '';
-        if(ev.participants && ev.participants[0] && ev.participants[0].athlete) {
-          player = ev.participants[0].athlete.displayName || '';
+        // Játékos neve: participants keresés (kizárva a kapus jelöltséget), majd text
+        if(ev.participants && ev.participants.length > 0) {
+          var part = ev.participants.find(function(p){ return !p.type || (p.type.text||'') !== 'Goalkeeper'; }) || ev.participants[0];
+          if(part && part.athlete) player = part.athlete.displayName || part.athlete.shortName || '';
         }
-        if(!player) player = ev.text || '';
-
+        if(!player) player = (ev.shortText||ev.text||'').replace(/\s*\(.*\)/,'').trim();
         if(isGoal && !isOg)  parsed.push({name:player, teamId:teamSide, minute:minute, type:'goal', isPen:isPen});
         else if(isGoal && isOg) parsed.push({name:player, teamId:teamSide, minute:minute, type:'goal', isOg:true});
         else if(isRed)    parsed.push({name:player, teamId:teamSide, minute:minute, type:'red'});
@@ -11130,7 +11136,7 @@ function buildScorerRow(mid, m) {
 
   var fmtGoals = function(list) {
     return list.map(function(s) {
-      var name = s.name.split(' ').pop();
+      var name = s.name || '?';
       var extra = s.isOg ? ' (ög)' : s.isPen ? ' (b)' : '';
       return '<span style="color:rgba(240,244,240,0.95);">⚽ '+name+extra+'</span><span style="color:rgba(240,244,240,0.5);font-size:11px;"> '+s.minute+'</span>';
     }).join('  ');
