@@ -4966,14 +4966,13 @@ function renderMatchdayBanner() {
 
 // Ugrás: ÉLŐ meccs → következő tippeletlen → következő jövőbeli
 // Ciklikus navigátor állapot
-var _openDayGroups = (function(){
-  try {
-    var saved = JSON.parse(localStorage.getItem('_openDayGroups')||'{}');
-    // group_section alapból ZÁRT (false), kivéve ha a felhasználó explicit nyitotta
-    if(saved['group_section'] === undefined) saved['group_section'] = false;
-    return saved;
-  } catch(e){ return {group_section:false}; }
-})();
+var _openDayGroups = {}; // session-szintű állapot
+// group_section localStorage állapot visszaállítás (CSAK ha a user explicit nyitotta)
+try {
+  var _lsGrp = localStorage.getItem('grpSectionOpen');
+  if(_lsGrp === 'true') _openDayGroups['group_section'] = true;
+  // ha null vagy 'false' → marad false (zárt)
+} catch(e){}
 var _navLastId = null;
 var _navPhase = 0; // 0=mai tippeletlen, 1=mai élő, 2=jövőbeli tippeletlen
 
@@ -5282,6 +5281,56 @@ function renderMatches() {
     });
     _virtualKOMatches[id] = mainMatches[mainMatches.length-1];
   });
+
+  // === QF / SF / DÖNTŐ / BRONZ BRACKET ===
+  var QF_STRUCTURE = [
+    { m:97,  hSrc:'R16_M89', aSrc:'R16_M90', huDate:'2026-07-10', huTime:'01:00', venue:'Boston'      },
+    { m:98,  hSrc:'R16_M93', aSrc:'R16_M94', huDate:'2026-07-10', huTime:'21:00', venue:'Los Angeles'  },
+    { m:99,  hSrc:'R16_M91', aSrc:'R16_M92', huDate:'2026-07-11', huTime:'03:00', venue:'Miami'        },
+    { m:100, hSrc:'R16_M95', aSrc:'R16_M96', huDate:'2026-07-12', huTime:'03:00', venue:'Kansas City'  },
+  ];
+  var SF_STRUCTURE = [
+    { m:101, hSrc:'QF_M97',  aSrc:'QF_M98',  huDate:'2026-07-15', huTime:'01:00', venue:'Dallas'   },
+    { m:102, hSrc:'QF_M99',  aSrc:'QF_M100', huDate:'2026-07-16', huTime:'01:00', venue:'Atlanta'  },
+  ];
+  var FINAL_STRUCTURE = [
+    { m:103, hSrc:'SF_M101', aSrc:'SF_M102', huDate:'2026-07-19', huTime:'03:00', venue:'Miami',       group:'BRONZE', isLoser:true  },
+    { m:104, hSrc:'SF_M101', aSrc:'SF_M102', huDate:'2026-07-19', huTime:'21:00', venue:'New Jersey',  group:'FINAL',  isLoser:false },
+  ];
+
+  function addVirtualRound(structure, prefix) {
+    var existingIds = new Set(mainMatches.filter(function(x){ return x.id&&x.id.startsWith(prefix+'_'); }).map(function(x){ return x.id; }));
+    structure.forEach(function(slot) {
+      var id = prefix+'_M'+slot.m;
+      if(existingIds.has(id)) return;
+      var hSrcM = _virtualKOMatches[slot.hSrc] || mainMatches.find(function(x){ return x.id===slot.hSrc; });
+      var aSrcM = _virtualKOMatches[slot.aSrc] || mainMatches.find(function(x){ return x.id===slot.aSrc; });
+      var hTeam = hSrcM ? (slot.isLoser ? getMatchLoser(hSrcM) : getMatchWinner(hSrcM)) : null;
+      var aTeam = aSrcM ? (slot.isLoser ? getMatchLoser(aSrcM) : getMatchWinner(aSrcM)) : null;
+      if(!hTeam && !aTeam) return;
+      mainMatches.push({
+        id: id,
+        huDate: slot.huDate,
+        huTime: slot.huTime,
+        home: hTeam ? hTeam.name : (slot.hSrc+' '+(slot.isLoser?'vesztese':'győztese')),
+        away: aTeam ? aTeam.name : (slot.aSrc+' '+(slot.isLoser?'vesztese':'győztese')),
+        homeFlag: hTeam ? hTeam.flag : '❓',
+        awayFlag: aTeam ? aTeam.flag : '❓',
+        group: slot.group || prefix,
+        title: 'M'+slot.m + (slot.venue?' · '+slot.venue:''),
+        knockout: true,
+        _virtual: true,
+        _homeKnown: !!hTeam,
+        _awayKnown: !!aTeam,
+      });
+      _virtualKOMatches[id] = mainMatches[mainMatches.length-1];
+    });
+  }
+
+  addVirtualRound(QF_STRUCTURE,    'QF');
+  addVirtualRound(SF_STRUCTURE,    'SF');
+  addVirtualRound(FINAL_STRUCTURE, 'FIN');
+
   const dates=[...new Set(mainMatches.map(m=>m.huDate))].sort();
   let html='';
   var _lastMatchPhase = 'group';
@@ -9530,6 +9579,14 @@ function getMatchWinner(m) {
   return w ? {name:w, flag: (w===m.home)?m.homeFlag:m.awayFlag} : null;
 }
 
+function getMatchLoser(m) {
+  var winner = getMatchWinner(m);
+  if(!winner) return null;
+  var loserName = winner.name === m.home ? m.away : m.home;
+  var loserFlag = winner.name === m.home ? m.awayFlag : m.homeFlag;
+  return loserName ? {name:loserName, flag:loserFlag} : null;
+}
+
 function getBestThirds(groups) {
   var thirds = [];
   Object.keys(groups||{}).forEach(function(g){
@@ -11042,7 +11099,10 @@ function toggleDayGroup(groupId) {
   var btn = document.getElementById('toggle_'+groupId);
   if(btn) btn.textContent = isNowClosed ? '−' : '+';
   _openDayGroups[groupId] = isNowClosed; // true = nyitva
-  try { localStorage.setItem('_openDayGroups', JSON.stringify(_openDayGroups)); } catch(e){}
+  // group_section állapot mentése localStorage-ba
+  if(groupId === 'group_section') {
+    try { localStorage.setItem('grpSectionOpen', isNowClosed ? 'true' : 'false'); } catch(e) {}
+  }
 }
 
 function buildScorerRow(mid, m) {
