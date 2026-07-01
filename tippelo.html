@@ -5415,7 +5415,7 @@ function renderMatches() {
           <span style="margin-left:auto;color:rgba(240,244,240,0.5);">${m.venue||''}</span>
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
-          ${kickoffLocked&&!result&&isAdminUnlocked?'<button onclick="event.stopPropagation();refreshLiveScore(\''+m.id+'\')" style="font-size:9px;color:#39ff9d;background:rgba(0,255,135,0.1);border:1px solid rgba(34,197,94,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">🔄</button>':''}
+          ${kickoffLocked&&isAdminUnlocked?'<button onclick="event.stopPropagation();refreshLiveScore(\''+m.id+'\')" title="ESPN adatok frissítése" style="font-size:9px;color:'+(result?'rgba(0,255,135,0.5)':'#39ff9d')+';background:rgba(0,255,135,0.1);border:1px solid rgba(34,197,94,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">🔄</button>':''}
           ${kickoffLocked&&isAdminUnlocked?'<button onclick="event.stopPropagation();testDetailFetch(\''+m.id+'\')" style="font-size:9px;color:#60a5fa;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">📊</button>':''}
           ${isAdminUnlocked&&(liveScores[m.id]||result)?'<span style="font-size:8px;color:rgba(240,244,240,0.2);">'+(liveEventsAll[m.id]?'📋':'')+(liveStats[m.id]?'📊':'')+(liveLineups[m.id]?'👕':'')+((!liveEventsAll[m.id]&&!liveStats[m.id]&&!liveLineups[m.id])?'⏳ADat':'')+'</span>':''}
           ${result?'<span style="font-size:9px;color:rgba(0,255,135,0.6);background:rgba(0,255,135,0.08);border:1px solid rgba(0,255,135,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>':''}
@@ -5457,7 +5457,7 @@ function renderMatches() {
             ${myTip && !cardLocked ? `<button onclick="clearTip('${m.id}')" title="Tipp törlése" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;line-height:1;margin-left:2px;transition:all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='rgba(239,68,68,0.6)'">⌫</button>` : ''}
           </div>
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
-          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildScorerRow(m.id, m) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live') || matchScorers[m.id]) ? buildScorerRow(m.id, m) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildTimelineStrip(m.id) : ''}
           ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildMomentumBar(m.id) : ''}
@@ -5538,7 +5538,7 @@ function renderMatches() {
           <span style="margin-left:auto;color:rgba(240,244,240,0.5);">${m.venue||''}</span>
           ${total>0?('<span style="color:rgba(240,244,240,0.22)">'+total+'✎</span>'):''}
           ${kickoffLocked&&!result?'<span style="font-size:9px;color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:8px;">⏰ ZÁRVA</span>':''}
-          ${kickoffLocked&&!result&&isAdminUnlocked?'<button onclick="event.stopPropagation();refreshLiveScore(\''+m.id+'\')" style="font-size:9px;color:#39ff9d;background:rgba(0,255,135,0.1);border:1px solid rgba(34,197,94,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">🔄</button>':''}
+          ${kickoffLocked&&isAdminUnlocked?'<button onclick="event.stopPropagation();refreshLiveScore(\''+m.id+'\')" title="ESPN adatok frissítése" style="font-size:9px;color:'+(result?'rgba(0,255,135,0.5)':'#39ff9d')+';background:rgba(0,255,135,0.1);border:1px solid rgba(34,197,94,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">🔄</button>':''}
           ${kickoffLocked&&isAdminUnlocked?'<button onclick="event.stopPropagation();testDetailFetch(\''+m.id+'\')" style="font-size:9px;color:#60a5fa;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);padding:1px 8px;border-radius:8px;cursor:pointer;font-family:Oswald,sans-serif;">📊</button>':''}
           ${isAdminUnlocked&&(liveScores[m.id]||result)?'<span style="font-size:8px;color:rgba(240,244,240,0.2);">'+(liveEventsAll[m.id]?'📋':'')+(liveStats[m.id]?'📊':'')+(liveLineups[m.id]?'👕':'')+((!liveEventsAll[m.id]&&!liveStats[m.id]&&!liveLineups[m.id])?'⏳ADat':'')+'</span>':''}
           ${result?'<span style="font-size:9px;color:rgba(0,255,135,0.6);background:rgba(0,255,135,0.08);border:1px solid rgba(0,255,135,0.2);padding:1px 6px;border-radius:8px;">🔒 VÉGE</span>':''}
@@ -5580,7 +5580,7 @@ function renderMatches() {
             ${myTip && !cardLocked ? `<button onclick="clearTip('${m.id}')" title="Tipp törlése" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.6);border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;line-height:1;margin-left:2px;transition:all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='rgba(239,68,68,0.6)'">⌫</button>` : ''}
           </div>
           ${kickoffLocked && total>0 ? buildTipDistBar(cnt, total, result) : ''}
-          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildScorerRow(m.id, m) : ''}
+          ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live') || matchScorers[m.id]) ? buildScorerRow(m.id, m) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildEventTimeline(m.id) : ''}
           ${(result || (liveScores[m.id]&&liveScores[m.id].status==='live')) ? buildTimelineStrip(m.id) : ''}
           ${(liveScores[m.id]&&liveScores[m.id].status==='live') ? buildMomentumBar(m.id) : ''}
@@ -8770,33 +8770,44 @@ var prevLiveScores = {};
 
 // Admin kézi frissítés egy meccshez
 async function refreshLiveScore(mid) {
-  var m = ALL_MATCHES.find(function(x){return x.id===mid;});
+  var m = ALL_MATCHES.find(function(x){return x.id===mid;}) || _virtualKOMatches[mid];
   if(!m) return;
   showToast('🔄 Frissítés…');
   try {
     var apiResults = await fetchLiveScores();
-    console.log('🔄 Frissítés eredmény:', apiResults);
     if(!apiResults || apiResults.length === 0) { showToast('⚠️ Egyik API sem elérhető'); return; }
     var found = false;
-    apiResults.forEach(function(ar) {
+    for(var i=0; i<apiResults.length; i++) {
+      var ar = apiResults[i];
       var lm = matchApiToLocal(ar);
       if(lm && lm.id === mid) {
         found = true;
         if(ar.status === 'live') {
           liveScores[mid] = {home:ar.homeScore, away:ar.awayScore, minute:ar.minute, status:'live'};
           showToast('⚽ ÉLŐ: '+ar.homeScore+':'+ar.awayScore+' ('+ar.minute+')');
+          if(ar.events) liveEventsAll[mid] = ar.events;
+          if(ar.stats) liveStats[mid] = ar.stats;
+          if(ar.lineups) liveLineups[mid] = ar.lineups;
+          renderAll(); renderLiveTicker(); detectGoals();
         } else if(ar.status === 'ft') {
           liveScores[mid] = {home:ar.homeScore, away:ar.awayScore, minute:'Vége', status:'ft'};
-          showToast('🏁 Vége: '+ar.homeScore+':'+ar.awayScore+' — rögzítés az auto rendszerre vár');
+          showToast('🏁 Vége: '+ar.homeScore+':'+ar.awayScore);
+          // Kész meccsnél: ESPN summary API-ból göllövők, statisztikák, felállás
+          if(ar.espnId) {
+            showToast('📊 ESPN adatok betöltése…');
+            await autoFetchMatchEvents(m, ar.espnId);
+            await autoFetchMatchEvents(m, ar.espnId); // scorers
+          }
+          renderAll(); renderLiveTicker(); detectGoals();
         }
-        // Events/stats/lineups mentése
-        if(ar.events) liveEventsAll[mid] = ar.events;
-        if(ar.stats) liveStats[mid] = ar.stats;
-        if(ar.lineups) liveLineups[mid] = ar.lineups;
-        renderAll(); renderLiveTicker(); detectGoals();
+        break;
       }
-    });
-    if(!found) showToast('⚠️ Meccs nem található az API-ban');
+    }
+    if(!found) {
+      // Ha nincs az API-ban (régi meccs), próbáljuk a testDetailFetch-szel
+      showToast('⚠️ Élő adatban nem található — ESPN detail lekérés…');
+      await testDetailFetch(mid);
+    }
   } catch(e) { showToast('❌ Hiba: '+e.message); }
 }
 function detectGoals() {
