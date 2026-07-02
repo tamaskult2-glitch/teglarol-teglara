@@ -8281,7 +8281,7 @@ async function fetchFromOpenFootball() {
 var TEAM_MAP = {
   'MEX':'Mexikó','RSA':'Dél-Afrika','KOR':'Dél-Korea','CZE':'Csehország',
   'CAN':'Kanada','BIH':'Bosznia-Hercegovina','QAT':'Katar','SUI':'Svájc',
-  'BRA':'Brazília','MAR':'Marokkó','USA':'Egyesült Államok','PAR':'Paraguay',
+  'BRA':'Brazília','MAR':'Marokkó','USA':'USA','PAR':'Paraguay',
   'AUS':'Ausztrália','TUR':'Törökország','GER':'Németország','CUW':'Curaçao',
   'NED':'Hollandia','JPN':'Japán','CIV':'Elefántcsontpart','ECU':'Ecuador',
   'FRA':'Franciaország','PAN':'Panama','ARG':'Argentína','PER':'Peru',
@@ -8302,8 +8302,8 @@ var TEAM_MAP = {
 // Angol teljes név → magyar (api-football kompatibilitás)
 var TEAM_NAME_MAP = {
   'mexico':'Mexikó','south africa':'Dél-Afrika','south korea':'Dél-Korea','korea republic':'Dél-Korea','czechia':'Csehország','czech republic':'Csehország',
-  'canada':'Kanada','bosnia and herzegovina':'Bosznia-Hercegovina','bosnia & herzegovina':'Bosznia-Hercegovina','qatar':'Katar','switzerland':'Svájc',
-  'brazil':'Brazília','morocco':'Marokkó','united states':'Egyesült Államok','usa':'Egyesült Államok','paraguay':'Paraguay',
+  'canada':'Kanada','bosnia and herzegovina':'Bosznia-Hercegovina','bosnia & herzegovina':'Bosznia-Hercegovina','bosnia-herzegovina':'Bosznia-Hercegovina','bosnia herzegovina':'Bosznia-Hercegovina','qatar':'Katar','switzerland':'Svájc',
+  'brazil':'Brazília','morocco':'Marokkó','united states':'USA','usa':'USA','u.s.':'USA','united states of america':'USA','paraguay':'Paraguay',
   'australia':'Ausztrália','turkey':'Törökország','türkiye':'Törökország','germany':'Németország','curaçao':'Curaçao','curacao':'Curaçao',
   'netherlands':'Hollandia','japan':'Japán','ivory coast':'Elefántcsontpart','cote d\'ivoire':'Elefántcsontpart','ecuador':'Ecuador',
   'france':'Franciaország','panama':'Panama','argentina':'Argentína','peru':'Peru',
@@ -8527,7 +8527,7 @@ async function testDetailFetch(mid) {
       if((huH===m.home.toLowerCase() || eh.includes(m.home.toLowerCase().substring(0,4))) &&
          (huA===m.away.toLowerCase() || ea.includes(m.away.toLowerCase().substring(0,4)))) espnEvent = ev;
     });
-    if(!espnEvent) { alert('⚠️ Meccs nem talált ESPN-ben\n\nKereset: '+m.home+' vs '+m.away+'\n\nESPN meccsek:\n'+events.map(function(e){var c=e.competitions[0];var ts=c.competitors;return ts.map(function(t){return t.team.displayName;}).join(' vs ');}).join('\n')); return; }
+    if(!espnEvent) { showToast('⚠️ ESPN-ben nem találtam: '+m.home+' vs '+m.away); console.log('ESPN meccsek:', events.map(function(e){var c=e.competitions[0];var ts=c.competitors;return ts.map(function(t){return t.team.displayName;}).join(' vs ');})); return; }
     
     var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event='+espnEvent.id);
     if(!r2.ok) { alert('❌ Summary HTTP '+r2.status); return; }
