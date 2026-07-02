@@ -1276,6 +1276,9 @@ input:focus, textarea:focus, select:focus {
 
 /* Live ticker bands */
 .day-group-closed { display: none !important; }
+/* Csoportköri meccsek: alapból REJTETT, csak .group-open class-szal látható */
+#group_section { display: none !important; }
+#group_section.group-open { display: block !important; }
 
 /* Pts badge */
 .pts-badge { border-radius:0 !important; }
@@ -4966,9 +4969,7 @@ function renderMatchdayBanner() {
 
 // Ugrás: ÉLŐ meccs → következő tippeletlen → következő jövőbeli
 // Ciklikus navigátor állapot
-var _openDayGroups = {}; // session-szintű állapot (oldalbetöltéskor mindig zárt)
-// group_section MINDIG zárt alapból — a csoportkör lejátszódott
-// (localStorage-ból NEM töltjük vissza, hogy mindig zártan induljon)
+var _openDayGroups = {}; // session-szintű állapot napi csoportok nyitásához
 var _navLastId = null;
 var _navPhase = 0; // 0=mai tippeletlen, 1=mai élő, 2=jövőbeli tippeletlen
 
@@ -5604,14 +5605,16 @@ function renderMatches() {
 
 
   // Group section wrapper + KO section
-  var grpClosed = !_openDayGroups['group_section'];
+  // EGYSZERŰ MEGKÖZELÍTÉS: #group_section alapból display:none CSS-sel
+  // A toggle gomb JS-sel csak 'group-open' class-t ad/vesz el — semmi más
   var grpCount = mainMatches.filter(function(m){ return !m.knockout; }).length;
-  html += '<div class="date-header" style="cursor:pointer;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.07);" data-toggle-group="group_section">'
+  var isOpen = document.getElementById('group_section') && document.getElementById('group_section').classList.contains('group-open');
+  html += '<div class="date-header" style="cursor:pointer;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.07);" onclick="toggleGroupSection()">'
     + '<h2 style="color:rgba(240,244,240,0.75);">⚽ Csoportköri meccsek</h2>'
     + '<span class="date-badge">'+grpCount+' meccs</span>'
-    + '<span id="toggle_group_section" style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">'+(grpClosed?'+':'−')+'</span>'
+    + '<span id="toggle_group_section" style="margin-left:auto;font-size:20px;color:var(--gold);font-weight:900;line-height:1;">'+(isOpen?'−':'+')+'</span>'
     + '</div>';
-  html += '<div id="group_section" class="day-group'+(grpClosed?' day-group-closed':'')+'">';
+  html += '<div id="group_section"'+(isOpen?' class="group-open"':'')+'>'; 
   html += groupHtml;
   html += '</div>';
   html += koHtml;
@@ -11098,6 +11101,21 @@ function initBLPoll() {
 
 
 // Nap-csoport collapse/expand
+// ===== CSOPORTKÖRI SZEKCIÓ TOGGLE =====
+function toggleGroupSection() {
+  var el = document.getElementById('group_section');
+  var btn = document.getElementById('toggle_group_section');
+  if(!el) return;
+  var isOpen = el.classList.contains('group-open');
+  if(isOpen) {
+    el.classList.remove('group-open');
+    if(btn) btn.textContent = '+';
+  } else {
+    el.classList.add('group-open');
+    if(btn) btn.textContent = '−';
+  }
+}
+
 function toggleDayGroup(groupId) {
   var el = document.getElementById(groupId);
   if(!el) return;
