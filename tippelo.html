@@ -1463,6 +1463,18 @@ input:focus, textarea:focus, select:focus {
   </div>
 </div>
 
+<!-- SZIMULÁCIÓ: ET+11-ES ÖSSZEVONVA -->
+<div id="simModal" style="display:none;position:fixed;inset:0;background:#0d0f15;z-index:9000;overflow-y:auto;">
+  <div style="max-width:520px;margin:0 auto;min-height:100%;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#13161e;border-bottom:2px solid #00ff87;position:sticky;top:0;z-index:2;">
+      <div style="font-family:Oswald,sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:1px;">🧮 SZIMULÁCIÓ</div>
+      <button onclick="document.getElementById('simModal').style.display='none'" style="background:none;border:none;color:rgba(240,244,240,0.5);font-size:24px;cursor:pointer;line-height:1;padding:0 4px;">✕</button>
+    </div>
+    <div id="simContent" style="padding:14px 12px 60px;"></div>
+  </div>
+</div>
+
+
 <!-- GÓLLÖVŐ POPUP -->
 <div id="scorerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:260;align-items:flex-end;justify-content:center;">
   <div id="scorerModalBox" style="background:#13161e;border:1px solid rgba(0,255,135,0.2);border-top:2px solid #00ff87;width:100%;max-width:520px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
@@ -2130,6 +2142,7 @@ input:focus, textarea:focus, select:focus {
     <button id="adminBroadcastIcon" onclick="sendDaySummary()" title="📢 Napi összefoglaló küldése" style="display:none;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;align-items:center;justify-content:center;">📢</button>
     <button id="adminResultIcon" onclick="showTab('admin')" title="🏟️ Eredmény rögzítés" style="display:none;background:rgba(0,255,135,0.12);border:1px solid rgba(0,255,135,0.3);color:var(--gold);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;align-items:center;justify-content:center;">🏟️</button>
     <button id="pushBellBtn" onclick="openPushSettings()" title="Push értesítő beállítások" style="display:none;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(240,244,240,0.7);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;align-items:center;justify-content:center;position:relative;">🔔<span id="pushBellDot" style="display:none;position:absolute;top:2px;right:2px;width:7px;height:7px;background:#39ff9d;border-radius:50%;border:1.5px solid var(--bg);"></span></button>
+    <button onclick="openSimulation()" title="Szimuláció: ET+11-es összevonva" style="background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.25);color:#00ff87;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">🧮</button>
     <button onclick="openBracket()" title="Kieséses ágrajz" style="background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.25);color:#00ff87;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
         <!-- Bal oldal: 4 csapat -->
@@ -2174,7 +2187,7 @@ input:focus, textarea:focus, select:focus {
 
 <div class="nav-tabs" id="mainNavTabs" style="display:none">
   <button class="nav-tab" id="navCsoportkor" onclick="showTab('csoportkor')">⚽ Csoportkör</button>
-  <button class="nav-tab active" id="navKieseses" onclick="showTab('kieseses')">🏆 Kieséses</button>
+  <button class="nav-tab active" id="navKieseses" onclick="showTab('kieseses')">🏆 Kick-off</button>
   <button class="nav-tab" onclick="showTab('tippek')">📋 Tippek</button>
   <button class="nav-tab" onclick="showTab('ranglista')">🏅 Ranglista</button>
   <button class="nav-tab" onclick="showTab('admin')" id="navAdmin" style="display:none">🔐 Admin</button>
@@ -3980,6 +3993,7 @@ async function clearTip(mid) {
 }
 
 function showTab(t) {
+  var _prevTabForNav = activeTab;
   activeTab=t;
   // 'kieseses' és 'csoportkor' mindkettő a tab-kieseses div-ben van, szűrés JS-sel
   var tabId = (t==='csoportkor') ? 'kieseses' : t;
@@ -4003,6 +4017,8 @@ function showTab(t) {
       var top = el.getBoundingClientRect().top + window.pageYOffset - navH - 4;
       window.scrollTo({top: Math.max(0, top), behavior:'instant'});
     }, 30);
+  } else if(t==='kieseses' && _prevTabForNav==='kieseses') {
+    jumpToNextUntipped();
   } else {
     window.scrollTo({top:0,behavior:'instant'});
   }
@@ -4205,6 +4221,138 @@ function calcMatchPointsBreakdown(m, tip) {
 function calcMatchPoints(m, tip) {
   return calcMatchPointsBreakdown(m, tip).total;
 }
+
+// ===== SZIMULÁCIÓ: ET+11-es összevonva "ki jut tovább" kimenetellé =====
+// FT pontrendszer változatlan. Ha a meccs hosszabbításra/11-esre ment (FT=X),
+// az ET+11-es helyett EGY közös bónusz jár a tovább jutó csapat eltalálásáért:
+// 2 pont × szorzó (rendes kieséses kör: 2×2=4, döntő/bronz: 2×3=6),
+// DE csak akkor, ha a tippelő az FT kimenetelt (a döntetlent) is eltalálta.
+function calcMatchPointsSim(m, tip) {
+  if(!m || !tip) return 0;
+  var res = allResults[m.id];
+  if(!res) return 0;
+  var rule = getScoringRule(m.id);
+  var outcome = getTipOutcome(tip);
+  if(!outcome) return 0;
+
+  var tipSc = getTipScore(tip);
+  if(tipSc) {
+    var scoreImplied = tipSc.h > tipSc.a ? '1' : tipSc.h === tipSc.a ? 'X' : '2';
+    if(scoreImplied !== outcome) outcome = scoreImplied;
+  }
+
+  var mult = getMatchMultiplier(m);
+
+  function calcSection(outcomeOk, outcomePts, exactOk, exactPts, gdOk, gdPts, useMult, doubleOnFinal) {
+    if(!outcomeOk) return 0;
+    var base;
+    if(exactOk) base = exactPts;
+    else if(gdOk) base = gdPts;
+    else base = outcomePts;
+    if(doubleOnFinal && mult===3 && !useMult) base = base * 2;
+    return useMult ? base*mult : base;
+  }
+
+  // ===== FT (változatlan logika) =====
+  var ftOutcomeOk = rule.ft_outcome && outcome === res;
+  var realSc = allScores[m.id];
+  var ftExactOk = ftOutcomeOk && rule.ft_exact && tipSc && realSc && tipSc.h+':'+tipSc.a === realSc;
+  var ftGdOk    = ftOutcomeOk && !ftExactOk && rule.ft_gd && tipSc && realSc && isGoalDiffCorrect(tipSc, realSc);
+  var ftPts = calcSection(ftOutcomeOk, rule.pts_ft_outcome, ftExactOk, rule.pts_ft_exact, ftGdOk, rule.pts_ft_gd, rule.ft_mult, false);
+
+  // ===== Összevont "ki jut tovább" bónusz =====
+  var advBonus = 0;
+  if(m.knockout && res === 'X' && (allEtResults[m.id] || allPenResults[m.id]) && ftOutcomeOk) {
+    var etRes = allEtResults[m.id];
+    var etTip = getTipEt(tip);
+    if(!etTip && tip.etScore) {
+      var _etp = tip.etScore.split(':');
+      var _eh = parseInt(_etp[0]), _ea = parseInt(_etp[1]);
+      if(!isNaN(_eh) && !isNaN(_ea)) etTip = _eh > _ea ? '1' : _eh === _ea ? 'X' : '2';
+    }
+    var penRes = allPenResults[m.id];
+    var penTip = getTipPen(tip);
+    if(!penTip && tip.penScore) {
+      var _pep = tip.penScore.split(':');
+      var _ph = parseInt(_pep[0]), _pa = parseInt(_pep[1]);
+      if(!isNaN(_ph) && !isNaN(_pa) && _ph !== _pa) penTip = _ph > _pa ? '1' : '2';
+    }
+    // A tényleges tovább jutó: 11-es eredmény, ha volt, egyébként a hosszabbítás (ha nem X)
+    var actualAdv = penRes || (etRes && etRes !== 'X' ? etRes : null);
+    // A tippelt tovább jutó: ugyanígy levezetve a tippből
+    var tipAdv = penTip || (etTip && etTip !== 'X' ? etTip : null);
+    if(actualAdv && tipAdv && actualAdv === tipAdv) {
+      advBonus = 2 * mult;
+    }
+  }
+
+  var bonusPts = (tip.adminBonus && !isNaN(tip.adminBonus)) ? Number(tip.adminBonus) : 0;
+  return ftPts + advBonus + bonusPts;
+}
+
+function openSimulation() {
+  document.getElementById('simModal').style.display = 'flex';
+  renderSimulation();
+}
+
+function renderSimulation() {
+  var c = document.getElementById('simContent');
+  if(!c) return;
+  var vbMatches = ALL_MATCHES.filter(isVbMatch);
+  Object.values(_virtualKOMatches || {}).forEach(function(vm){
+    if(!vbMatches.some(function(x){ return x.id === vm.id; })) vbMatches.push(vm);
+  });
+  var users = new Set();
+  vbMatches.forEach(function(m){ if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){ users.add(u); }); });
+  if(!users.size) { c.innerHTML = '<div class="ldg" style="padding:40px;">Még nincs VB tipp ⏳</div>'; return; }
+
+  var affectedMatches = vbMatches.filter(function(m){
+    return m.knockout && allResults[m.id] === 'X' && (allEtResults[m.id] || allPenResults[m.id]);
+  });
+
+  var rows = [];
+  users.forEach(function(u){
+    var curPts = 0, simPts = 0;
+    vbMatches.forEach(function(m){
+      var tip = allTips[m.id] ? allTips[m.id][u] : null;
+      if(!tip || !allResults[m.id]) return;
+      curPts += calcMatchPoints(m, tip);
+      simPts += calcMatchPointsSim(m, tip);
+    });
+    rows.push({u: u, cur: curPts, sim: simPts, diff: simPts - curPts});
+  });
+  rows.sort(function(a,b){ return b.sim - a.sim || b.cur - a.cur; });
+  var curSorted = rows.slice().sort(function(a,b){ return b.cur - a.cur; });
+  var curRank = {};
+  curSorted.forEach(function(r,i){ curRank[r.u] = i+1; });
+
+  var html = '<div style="background:rgba(0,255,135,0.06);border:1px solid rgba(0,255,135,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;line-height:1.55;color:rgba(240,244,240,0.85);">';
+  html += '<b style="color:#00ff87;">Szabály:</b> FT pontrendszer változatlan. Ha a meccs hosszabbításra/11-esre ment, az ET+11-es helyett EGY közös bónusz jár a tovább jutó csapat eltalálásáért: <b>2×2=4 pont</b> (rendes kieséses kör), <b>2×3=6 pont</b> (döntő/bronz) — de csak akkor, ha az FT kimenetelt (döntetlent) is eltaláltad.<br>';
+  html += '<span style="color:rgba(240,244,240,0.55);">Érintett meccsek: ' + (affectedMatches.length ? affectedMatches.map(function(m){ return m.title||m.id; }).join(', ') : 'egyelőre nincs ilyen lezárt meccs') + '</span>';
+  html += '</div>';
+
+  html += '<div class="lb-list">';
+  rows.forEach(function(r, i){
+    var rankChange = curRank[r.u] - (i+1); // pozitív = javult a szimulációban
+    var diffColor = r.diff > 0 ? '#00ff87' : (r.diff < 0 ? '#ff5c5c' : 'rgba(240,244,240,0.4)');
+    var diffTxt = (r.diff > 0 ? '+' : '') + r.diff;
+    var rankTxt = '';
+    if(rankChange > 0) rankTxt = '<span style="color:#00ff87;font-size:11px;">▲'+rankChange+'</span>';
+    else if(rankChange < 0) rankTxt = '<span style="color:#ff5c5c;font-size:11px;">▼'+(-rankChange)+'</span>';
+    else rankTxt = '<span style="color:rgba(240,244,240,0.35);font-size:11px;">–</span>';
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;">';
+    html += '<div style="width:22px;text-align:center;font-family:Oswald,sans-serif;font-weight:700;color:rgba(240,244,240,0.5);font-size:12px;">'+(i+1)+'.</div>';
+    html += '<div style="flex:1;font-family:Oswald,sans-serif;font-size:13.5px;color:#fff;">'+r.u+'</div>';
+    html += '<div style="text-align:right;font-size:11px;color:rgba(240,244,240,0.45);">jelenlegi<br><b style="font-size:14px;color:#fff;">'+r.cur+'</b></div>';
+    html += '<div style="text-align:right;font-size:11px;color:rgba(240,244,240,0.45);">szimulált<br><b style="font-size:14px;color:var(--gold);">'+r.sim+'</b></div>';
+    html += '<div style="text-align:right;min-width:44px;font-size:12px;font-weight:700;color:'+diffColor+';">'+diffTxt+'</div>';
+    html += '<div style="min-width:30px;text-align:right;">'+rankTxt+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  c.innerHTML = html;
+}
+
 
 // Góllövő bónusz számítás: minden eltalált góllövő 1 pt (döntő/bronz: 2 pt)
 function calcScorerBonus(m, tip) {
