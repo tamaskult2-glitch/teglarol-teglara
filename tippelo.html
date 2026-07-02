@@ -699,8 +699,6 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 .team-blk.away-blk{flex-direction:row-reverse;text-align:right;}
 .team-blk .tf{font-size:26px;flex-shrink:0;}
 .team-blk .tn-wrap{min-width:0;overflow:hidden;}
-.team-tap-btn{background:none;border:none;padding:0;margin:0;width:100%;min-width:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:rgba(0,255,135,0.15);}
-.team-tap-btn:active .tn{color:#00ff87 !important;}
 .team-blk .tn{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;line-height:1.2;color:rgba(240,244,240,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
 .team-blk .tn-sub{font-size:9px;color:rgba(240,244,240,0.3);letter-spacing:0.5px;display:block;margin-top:1px;}
 .vs-block{font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;color:rgba(240,244,240,0.2);letter-spacing:3px;flex-shrink:0;}
@@ -1389,21 +1387,21 @@ input:focus, textarea:focus, select:focus {
     <div id="inviteStatus" style="display:none;margin-bottom:8px;padding:8px 12px;border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;text-align:center;"></div>
     <div id="usernameLabel" style="display:none;font-family:Oswald,sans-serif;font-size:11px;color:rgba(0,255,135,0.5);letter-spacing:0.5px;margin-bottom:4px;text-align:left;">🎮 KÍVÁNT FELHASZNÁLÓNÉV</div>
     <input type="text" id="nameInput" placeholder="NEVED (pl. Kovács Péter)" maxlength="20" autocomplete="off"
-      oninput="checkExistingUser()">
+      oninput="checkExistingUser()" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
     <input type="password" id="pwInput" placeholder="JELSZÓ" maxlength="30" autocomplete="new-password"
-      onkeydown="if(event.key==='Enter')register()">
+      onkeydown="if(event.key==='Enter')register()" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
     <!-- Meghívós regisztráció kiegészítő kérdések -->
     <div id="inviteFields" style="display:none;">
       <div style="margin:8px 0 4px;border-top:1px solid rgba(0,255,135,0.1);padding-top:10px;">
         <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(0,255,135,0.5);letter-spacing:0.5px;margin-bottom:4px;">👤 TELJES NEVED</div>
         <input type="text" id="inviteRealName" placeholder="pl. Kiss Béla" maxlength="50"
-          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;margin-bottom:8px;">
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;margin-bottom:8px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
         <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(0,255,135,0.5);letter-spacing:0.5px;margin-bottom:4px;">🤝 HONNAN ISMERED A CSOPORTOT?</div>
         <input type="text" id="inviteConnection" placeholder="pl. Robi barátja, munkatárs, stb." maxlength="100"
-          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;margin-bottom:8px;">
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;margin-bottom:8px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
         <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(0,255,135,0.5);letter-spacing:0.5px;margin-bottom:4px;">📧 ELÉRHETŐSÉGED (email / telefon)</div>
         <input type="text" id="inviteContact" placeholder="pl. kiss.bela@gmail.com vagy +36 30 ..." maxlength="100"
-          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;">
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:16px;box-sizing:border-box;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
       </div>
     </div>
     <div id="regMsg" style="font-size:12px;color:rgba(240,244,240,0.45);margin-bottom:8px;min-height:18px;"></div>
@@ -1412,11 +1410,11 @@ input:focus, textarea:focus, select:focus {
     <div id="inviteRequestSection" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,255,135,0.1);">
       <div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(0,255,135,0.6);letter-spacing:0.5px;margin-bottom:8px;text-align:center;">🔗 NINCS MEGHÍVÓD? KÉRJ EGYET!</div>
       <input type="text" id="reqName" placeholder="👤 Neved" maxlength="50"
-        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:6px;">
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:6px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
       <input type="text" id="reqContact" placeholder="📧 Email vagy telefonszám" maxlength="100"
-        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:6px;">
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:6px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
       <input type="text" id="reqConnection" placeholder="🤝 Honnan ismered a csoportot?" maxlength="100"
-        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.15);background:rgba(0,0,0,0.2);color:white;font-family:'Source Sans 3',sans-serif;font-size:14px;box-sizing:border-box;margin-bottom:8px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
       <button onclick="submitInviteRequest()" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,255,135,0.3);background:rgba(0,255,135,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">📩 MEGHÍVÓ KÉRÉSE</button>
       <div id="reqMsg" style="font-size:11px;color:rgba(240,244,240,0.35);margin-top:6px;text-align:center;min-height:16px;"></div>
     </div>
@@ -1431,7 +1429,7 @@ input:focus, textarea:focus, select:focus {
         <div style="font-size:11px;color:rgba(240,244,240,0.4);margin-bottom:8px;letter-spacing:0.5px;">Admin azonosítás szükséges</div>
         <input type="password" id="recoveryAdminPw" placeholder="Admin jelszó"
           style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.25);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:8px;"
-          onkeydown="if(event.key==='Enter')runAccountRecovery()">
+          onkeydown="if(event.key==='Enter')runAccountRecovery()" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
         <button onclick="runAccountRecovery()"
           style="width:100%;padding:8px;background:rgba(0,255,135,0.15);border:1px solid rgba(0,255,135,0.35);color:var(--gold);border-radius:8px;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;">
           🔄 KULT FIÓK VISSZAÁLLÍTÁSA
@@ -1500,7 +1498,7 @@ input:focus, textarea:focus, select:focus {
         <div id="scorerHomeTitle" style="font-family:Oswald,sans-serif;font-size:13px;font-weight:700;color:rgba(240,244,240,0.8);margin-bottom:8px;letter-spacing:1px;"></div>
         <div id="scorerHomePlayers" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
         <div style="display:flex;gap:6px;align-items:center;">
-          <input id="scorerHomeInput" type="text" placeholder="Más neve..." style="flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:6px 10px;font-size:12px;border-radius:0;">
+          <input id="scorerHomeInput" type="text" placeholder="Más neve..." style="flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:6px 10px;font-size:12px;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button onclick="scorerAddCustom('home')" style="background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:#00ff87;padding:6px 10px;font-size:12px;font-family:Oswald,sans-serif;cursor:pointer;white-space:nowrap;">+ Hozzáad</button>
         </div>
       </div>
@@ -1510,7 +1508,7 @@ input:focus, textarea:focus, select:focus {
         <div id="scorerAwayTitle" style="font-family:Oswald,sans-serif;font-size:13px;font-weight:700;color:rgba(240,244,240,0.8);margin-bottom:8px;letter-spacing:1px;"></div>
         <div id="scorerAwayPlayers" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
         <div style="display:flex;gap:6px;align-items:center;">
-          <input id="scorerAwayInput" type="text" placeholder="Más neve..." style="flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:6px 10px;font-size:12px;border-radius:0;">
+          <input id="scorerAwayInput" type="text" placeholder="Más neve..." style="flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:6px 10px;font-size:12px;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button onclick="scorerAddCustom('away')" style="background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:#00ff87;padding:6px 10px;font-size:12px;font-family:Oswald,sans-serif;cursor:pointer;white-space:nowrap;">+ Hozzáad</button>
         </div>
       </div>
@@ -2297,7 +2295,7 @@ input:focus, textarea:focus, select:focus {
               <input type="text" id="vbScorerInput" placeholder="Futballista neve (pl. Mbappé)"
                 maxlength="40" autocomplete="off"
                 style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:'Oswald',sans-serif;font-size:13px;"
-                onkeydown="if(event.key==='Enter')submitVbScorer()">
+                onkeydown="if(event.key==='Enter')submitVbScorer()" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
               <button onclick="submitVbScorer()"
                 style="padding:8px 14px;background:rgba(0,255,135,0.15);border:1px solid rgba(0,255,135,0.35);color:var(--gold);border-radius:8px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">
                 ✓ Szavaz
@@ -2307,19 +2305,6 @@ input:focus, textarea:focus, select:focus {
             <div class="vb-poll-results" id="vbScorerResults"></div>
           </div>
           </div><!-- /vbPollBody -->
-        </div>
-
-        <!-- MECCS KERESŐ -->
-        <div style="position:relative;margin:0 0 10px;">
-          <input type="text" id="matchSearch"
-            placeholder="🔍 Csapat vagy csoport keresése..."
-            oninput="filterMatches()"
-            style="width:100%;box-sizing:border-box;padding:9px 36px 9px 12px;border-radius:10px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.25);color:rgba(240,244,240,0.9);font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.3px;outline:none;transition:border-color 0.2s;"
-            onfocus="this.style.borderColor='rgba(0,255,135,0.45)'"
-            onblur="this.style.borderColor='rgba(0,255,135,0.2)'">
-          <button onclick="document.getElementById('matchSearch').value='';filterMatches()"
-            id="matchSearchClear"
-            style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(240,244,240,0.4);font-size:16px;cursor:pointer;line-height:1;padding:2px 4px;">✕</button>
         </div>
 
         <div id="koMatchesContainer"><div class="ldg"><div class="spinner"></div>TÖLTÉS...</div></div>
@@ -2345,7 +2330,7 @@ input:focus, textarea:focus, select:focus {
       <h3>🔐 Admin belépés</h3>
       <p style="color:rgba(240,244,240,0.4);font-size:12px;margin-bottom:16px;">Eredmény rögzítéséhez</p>
       <div class="ai-row">
-        <input type="password" id="adminPwInput" placeholder="Jelszó" onkeydown="if(event.key==='Enter')checkAdmin()">
+        <input type="password" id="adminPwInput" placeholder="Jelszó" onkeydown="if(event.key==='Enter')checkAdmin()" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
         <button class="btn-gold" onclick="checkAdmin()">BELÉPÉS</button>
       </div>
     </div>
@@ -2386,7 +2371,7 @@ input:focus, textarea:focus, select:focus {
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">⭐ PRO TÁMOGATÓK</span></div>
       <div class="adm-collapse-body">
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-          <input id="proAddInput" type="text" placeholder="Felhasználónév (pl. KULT)" onkeydown="if(event.key==='Enter')addProUser()" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(206,41,57,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+          <input id="proAddInput" type="text" placeholder="Felhasználónév (pl. KULT)" onkeydown="if(event.key==='Enter')addProUser()" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(206,41,57,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button onclick="addProUser()" style="padding:7px 14px;background:rgba(206,41,57,0.25);border:1px solid rgba(206,41,57,0.5);color:#f87171;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">＋ PRO</button>
         </div>
         <div id="proAdminList"></div>
@@ -2398,7 +2383,7 @@ input:focus, textarea:focus, select:focus {
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">💛 VIP TÁMOGATÓK</span></div>
       <div class="adm-collapse-body">
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-          <input id="vipAddInput" type="text" placeholder="Felhasználónév (pl. KULT)" onkeydown="if(event.key==='Enter')addVipUser()" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(0,255,135,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+          <input id="vipAddInput" type="text" placeholder="Felhasználónév (pl. KULT)" onkeydown="if(event.key==='Enter')addVipUser()" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(0,255,135,0.35);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button onclick="addVipUser()" style="padding:7px 14px;background:rgba(0,255,135,0.18);border:1px solid rgba(0,255,135,0.4);color:var(--gold);border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">＋ VIP</button>
         </div>
         <div id="vipAdminList"></div>
@@ -2410,7 +2395,7 @@ input:focus, textarea:focus, select:focus {
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(239,68,68,0.8);letter-spacing:0.5px;">⚠️ FELHASZNÁLÓ TÖRLÉSE</span></div>
       <div class="adm-collapse-body">
         <div style="display:flex;gap:8px;align-items:center;">
-          <input id="delUserInput" type="text" placeholder="Felhasználónév (pl. KT)" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+          <input id="delUserInput" type="text" placeholder="Felhasználónév (pl. KT)" style="flex:1;padding:7px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button onclick="deleteUser()" style="padding:7px 14px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:6px;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;">Törlés</button>
         </div>
       </div>
@@ -2439,7 +2424,7 @@ input:focus, textarea:focus, select:focus {
         </div>
         <div style="margin-bottom:8px;">
           <div id="fbSecretStatus" style="font-size:11px;margin-bottom:6px;"></div>
-          <input id="fbSecretInput" type="password" placeholder="Firebase Database Secret..." style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(239,68,68,0.3);border-radius:0;background:rgba(0,0,0,0.4);color:white;font-family:monospace;font-size:12px;margin-bottom:6px;">
+          <input id="fbSecretInput" type="password" placeholder="Firebase Database Secret..." style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(239,68,68,0.3);border-radius:0;background:rgba(0,0,0,0.4);color:white;font-family:monospace;font-size:12px;margin-bottom:6px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <div style="display:flex;gap:6px;">
             <button onclick="fbSecretSave()" style="flex:1;padding:7px;border-radius:0;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.1);color:#f87171;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">💾 MENTÉS</button>
             <button onclick="fbSecretTest()" style="flex:1;padding:7px;border-radius:0;border:1px solid rgba(0,255,135,0.3);background:rgba(0,255,135,0.06);color:#00ff87;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🧪 TESZT</button>
@@ -2489,22 +2474,22 @@ input:focus, textarea:focus, select:focus {
             <option value="">— Válassz meccset (vagy írd be kézzel lent) —</option>
           </select>
         </div>
-        <input id="scoringRuleMatchId" type="text" placeholder="Meccs ID (pl. R32_M74 vagy 74)" style="width:100%;padding:7px 10px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#fff;font-family:Oswald,sans-serif;font-size:13px;border-radius:0;margin-bottom:8px;">
+        <input id="scoringRuleMatchId" type="text" placeholder="Meccs ID (pl. R32_M74 vagy 74)" style="width:100%;padding:7px 10px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#fff;font-family:Oswald,sans-serif;font-size:13px;border-radius:0;margin-bottom:8px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
         <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px 8px;margin-bottom:10px;font-size:12px;align-items:center;">
           <div style="grid-column:1/-1;color:rgba(0,255,135,0.7);font-weight:700;letter-spacing:0.5px;border-bottom:1px solid rgba(0,255,135,0.2);padding-bottom:2px;">⚽ FT (90 perc)</div>
 
           <input type="checkbox" id="rule_ft_outcome" checked>
           <span style="color:#fff;">FT kimenetel (1/X/2)</span>
-          <input type="number" id="pts_ft_outcome" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#f5c518;text-align:center;">
+          <input type="number" id="pts_ft_outcome" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#f5c518;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_ft_exact" checked>
           <span style="color:#fff;">FT pontos eredmény</span>
-          <input type="number" id="pts_ft_exact" value="3" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#f5c518;text-align:center;">
+          <input type="number" id="pts_ft_exact" value="3" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#f5c518;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_ft_gd" checked>
           <span style="color:#fff;">FT gólkülönbség bónusz</span>
-          <input type="number" id="pts_ft_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#f5c518;text-align:center;">
+          <input type="number" id="pts_ft_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(245,197,24,0.3);color:#f5c518;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_ft_mult" checked>
           <span style="color:#fff;">FT szorzó (kör-szorzó)</span>
@@ -2514,15 +2499,15 @@ input:focus, textarea:focus, select:focus {
 
           <input type="checkbox" id="rule_et_outcome" checked>
           <span style="color:#fff;">ET kimenetel/végeredmény</span>
-          <input type="number" id="pts_et_outcome" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;">
+          <input type="number" id="pts_et_outcome" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_et_exact" checked>
           <span style="color:#fff;">ET pontos eredmény (végeredmény)</span>
-          <input type="number" id="pts_et_exact" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;">
+          <input type="number" id="pts_et_exact" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_et_gd" checked>
           <span style="color:#fff;">ET gólkülönbség bónusz</span>
-          <input type="number" id="pts_et_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;">
+          <input type="number" id="pts_et_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#00ff87;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_et_mult">
           <span style="color:#fff;">ET szorzó (kör-szorzó)</span>
@@ -2532,15 +2517,15 @@ input:focus, textarea:focus, select:focus {
 
           <input type="checkbox" id="rule_pen_outcome" checked>
           <span style="color:#fff;">11-es kimenetel</span>
-          <input type="number" id="pts_pen_outcome" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;">
+          <input type="number" id="pts_pen_outcome" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_pen_exact" checked>
           <span style="color:#fff;">11-es pontos eredmény</span>
-          <input type="number" id="pts_pen_exact" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;">
+          <input type="number" id="pts_pen_exact" value="1" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_pen_gd" checked>
           <span style="color:#fff;">11-es gólkülönbség bónusz</span>
-          <input type="number" id="pts_pen_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;">
+          <input type="number" id="pts_pen_gd" value="2" min="0" step="0.5" style="width:46px;padding:3px;background:rgba(0,0,0,0.4);border:1px solid rgba(205,127,50,0.4);color:#cd7f32;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
           <input type="checkbox" id="rule_pen_mult">
           <span style="color:#fff;">11-es szorzó (kör-szorzó)</span>
@@ -2592,8 +2577,8 @@ input:focus, textarea:focus, select:focus {
           1 játékos csak egyszer szerepel. Göllövő popupban ebből szedi a neveket.
         </div>
         <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
-          <input id="rosterTeamName" type="text" placeholder="Csapat neve (pl. Franciaország)" style="flex:1;min-width:140px;padding:7px 10px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#fff;font-family:Oswald,sans-serif;font-size:13px;border-radius:0;">
-          <input id="rosterTeamFlag" type="text" placeholder="🇫🇷" style="width:44px;padding:7px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:16px;text-align:center;border-radius:0;">
+          <input id="rosterTeamName" type="text" placeholder="Csapat neve (pl. Franciaország)" style="flex:1;min-width:140px;padding:7px 10px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.3);color:#fff;font-family:Oswald,sans-serif;font-size:13px;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
+          <input id="rosterTeamFlag" type="text" placeholder="🇫🇷" style="width:44px;padding:7px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:16px;text-align:center;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
         </div>
         <textarea id="rosterPlayers" placeholder="Mbappé, Dembélé, Giroud, Saliba, Hernandez, Konaté, Upamecano, Pavard, Tchouaméni, Camavinga, Griezmann&#10;&#10;Cserék: Maignan, Mike, Coman, Thuram, ..." rows="5" style="width:100%;box-sizing:border-box;padding:8px 10px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-family:monospace;font-size:12px;line-height:1.6;resize:vertical;border-radius:0;"></textarea>
         <div style="display:flex;gap:6px;margin-top:6px;">
@@ -2612,9 +2597,9 @@ input:focus, textarea:focus, select:focus {
           Adj meg slot-azonosítót és csapatnevet. Formátum: <b style="color:#00ff87;">R32_1</b> (R32-ben 1. slot), <b style="color:#00ff87;">R16_1</b>, <b style="color:#00ff87;">QF_1</b>, <b style="color:#00ff87;">SF_1</b>, <b style="color:#00ff87;">FINAL</b>, <b style="color:#00ff87;">BRONZE</b>
         </div>
         <div style="display:flex;gap:6px;margin-bottom:8px;">
-          <input id="bracketSlotId" type="text" placeholder="pl. R32_1" style="flex:0 0 90px;padding:6px 8px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:monospace;font-size:12px;border-radius:0;">
-          <input id="bracketTeamFlag" type="text" placeholder="🇫🇷" style="flex:0 0 44px;padding:6px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:16px;text-align:center;border-radius:0;">
-          <input id="bracketTeamName" type="text" placeholder="Csapat neve" style="flex:1;padding:6px 8px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-family:Oswald,sans-serif;font-size:13px;border-radius:0;">
+          <input id="bracketSlotId" type="text" placeholder="pl. R32_1" style="flex:0 0 90px;padding:6px 8px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:monospace;font-size:12px;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
+          <input id="bracketTeamFlag" type="text" placeholder="🇫🇷" style="flex:0 0 44px;padding:6px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:16px;text-align:center;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
+          <input id="bracketTeamName" type="text" placeholder="Csapat neve" style="flex:1;padding:6px 8px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:#fff;font-family:Oswald,sans-serif;font-size:13px;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button onclick="adminSaveBracketTeam()" style="padding:6px 10px;background:rgba(0,255,135,0.12);border:1px solid rgba(0,255,135,0.3);color:#00ff87;font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;border-radius:0;">✓</button>
         </div>
         <div id="bracketTeamsList" style="font-size:11px;"></div>
@@ -2641,7 +2626,7 @@ input:focus, textarea:focus, select:focus {
         <div id="pmChatArea" style="max-height:300px;overflow-y:auto;margin-bottom:8px;"></div>
         <div id="pmInputWrap" style="display:none;gap:6px;">
           <input type="text" id="pmInput" placeholder="Üzenet írása…" maxlength="500" onkeydown="if(event.key==='Enter')pmSend()"
-            style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+            style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button onclick="pmSend()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,255,135,0.4);background:rgba(0,255,135,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Küld</button>
           <button onclick="pmDeleteConvo()" style="padding:8px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:rgba(239,68,68,0.7);font-family:Oswald,sans-serif;font-size:11px;cursor:pointer;" title="Beszélgetés törlése">🗑️</button>
         </div>
@@ -2653,7 +2638,7 @@ input:focus, textarea:focus, select:focus {
       <div class="adm-collapse-body">
         <div style="display:flex;gap:6px;margin-bottom:10px;">
           <input type="text" id="inviteNote" placeholder="Kinek? (pl. Berci)" maxlength="40"
-            style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+            style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button onclick="inviteGenerate()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,255,135,0.4);background:rgba(0,255,135,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Új link</button>
         </div>
         <div id="inviteList"></div>
@@ -2677,7 +2662,7 @@ input:focus, textarea:focus, select:focus {
         <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
           <div style="font-family:Oswald,sans-serif;font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:6px;">🔑 JELSZÓ RESET (felhasználónak)</div>
           <div style="display:flex;gap:6px;">
-            <input type="text" id="resetPwUser" placeholder="Felhasználónév (pl. BERCI)" maxlength="30" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+            <input type="text" id="resetPwUser" placeholder="Felhasználónév (pl. BERCI)" maxlength="30" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
             <button onclick="adminResetPassword()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,255,135,0.3);background:rgba(0,255,135,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🔑 Reset</button>
           </div>
           <div id="resetPwMsg" style="font-size:11px;color:rgba(240,244,240,0.4);margin-top:4px;"></div>
@@ -2705,11 +2690,11 @@ input:focus, textarea:focus, select:focus {
       <div class="adm-collapse-hdr" onclick="toggleAdmSec(this)"><span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(240,244,240,0.7);letter-spacing:1px;">🔑 ADMIN JELSZÓ MÓDOSÍTÁS</span></div>
       <div class="adm-collapse-body">
         <input type="password" id="admPwOld" placeholder="Jelenlegi jelszó" maxlength="30"
-          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:6px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
         <input type="password" id="admPwNew" placeholder="Új jelszó (min. 4 karakter)" maxlength="30"
-          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:6px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
         <input type="password" id="admPwNew2" placeholder="Új jelszó mégegyszer" maxlength="30"
-          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:8px;">
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;box-sizing:border-box;margin-bottom:8px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
         <button onclick="adminChangePassword()" style="width:100%;padding:9px;border-radius:8px;border:1px solid rgba(0,255,135,0.3);background:rgba(0,255,135,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🔑 JELSZÓ MÓDOSÍTÁS</button>
         <div id="admPwMsg" style="font-size:11px;margin-top:6px;min-height:16px;text-align:center;"></div>
       </div>
@@ -2867,7 +2852,7 @@ input:focus, textarea:focus, select:focus {
             <div id="oplUserRow">
               <div style="font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:4px;font-family:Oswald,sans-serif;letter-spacing:0.5px;">FELHASZNÁLÓ</div>
               <input type="text" id="oplInpUser" placeholder="pl. KULT"
-                style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;">
+                style="width:100%;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:13px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
             </div>
             <div>
               <div style="font-size:11px;color:rgba(240,244,240,0.5);margin-bottom:4px;font-family:Oswald,sans-serif;letter-spacing:0.5px;">STÁTUSZ</div>
@@ -2911,7 +2896,7 @@ input:focus, textarea:focus, select:focus {
     <!-- Új ötlet form (rejtett) -->
     <div id="otletekAddForm" style="display:none;background:var(--card);border:1px solid var(--gold-border);border-radius:12px;padding:16px;margin-bottom:16px;">
       <div style="font-family:Oswald,sans-serif;font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px;">💡 Új fejlesztési ötlet</div>
-      <input id="otletekInpTitle" placeholder="Cím (pl. Push értesítés)" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);font-family:Oswald,sans-serif;font-size:14px;margin-bottom:8px;">
+      <input id="otletekInpTitle" placeholder="Cím (pl. Push értesítés)" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);font-family:Oswald,sans-serif;font-size:14px;margin-bottom:8px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
       <textarea id="otletekInpDesc" rows="3" placeholder="Leírás — mit csinálna pontosan?" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:8px;background:rgba(255,255,255,0.04);color:var(--text);font-family:inherit;font-size:13px;resize:vertical;margin-bottom:10px;"></textarea>
       <div style="display:flex;gap:8px;">
         <button onclick="otletekSubmit()" style="flex:1;padding:10px;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);color:#39ff9d;border-radius:8px;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✅ Beküldés</button>
@@ -2944,13 +2929,13 @@ input:focus, textarea:focus, select:focus {
     <input type="hidden" id="nyeremenyEditId">
 
     <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">MEGNEVEZÉS *</div>
-    <input id="nyeremenyNev" placeholder="pl. Üveg szamorodni" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;">
+    <input id="nyeremenyNev" placeholder="pl. Üveg szamorodni" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
     <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">FELAJÁNLÓ *</div>
-    <input id="nyeremenyFelajanlo" placeholder="pl. Kovács András" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;">
+    <input id="nyeremenyFelajanlo" placeholder="pl. Kovács András" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
     <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">ÉRTÉK (pl. 3 500 Ft)</div>
-    <input id="nyeremenyErtek" placeholder="pl. 3 500 Ft vagy becsléssel" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;">
+    <input id="nyeremenyErtek" placeholder="pl. 3 500 Ft vagy becsléssel" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;margin-bottom:10px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
 
     <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">KI KAPJA *</div>
     <select id="nyeremenyNyertes" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:#191b23;color:white;font-family:Oswald,sans-serif;font-size:14px;margin-bottom:10px;cursor:pointer;">
@@ -2966,7 +2951,7 @@ input:focus, textarea:focus, select:focus {
 
     <div id="nyeremenyCustomRow" style="display:none;margin-bottom:10px;">
       <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">EGYÉNI FELTÉTEL</div>
-      <input id="nyeremenyCustomText" placeholder="pl. Aki a döntő eredményét eltalálja" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;">
+      <input id="nyeremenyCustomText" placeholder="pl. Aki a döntő eredményét eltalálja" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(0,0,0,0.3);color:white;font-family:inherit;font-size:14px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
     </div>
 
     <div style="font-size:11px;color:rgba(240,244,240,0.45);font-family:Oswald,sans-serif;margin-bottom:4px;">KÉP FELTÖLTÉSE (opcionális)</div>
@@ -3347,43 +3332,6 @@ async function adminDeleteTip() {
   }
 }
 
-
-// ===== CSAPAT NÉV TAPINTÁS — globális event delegation (iOS Safari-kompatibilis) =====
-(function() {
-  var _lastTeamTap = 0;
-  function handleTeamTap(e) {
-    var el = e.target;
-    // Felmegyünk max 3 szinttel a DOM-ban
-    for(var i = 0; i < 4; i++) {
-      if(!el) break;
-      if(el.getAttribute && el.getAttribute('data-clickable') === 'team') {
-        e.stopPropagation();
-        e.preventDefault();
-        var now = Date.now();
-        if(now - _lastTeamTap < 350) return; // double-tap guard
-        _lastTeamTap = now;
-        openTeamPanel(el.getAttribute('data-team'), el.getAttribute('data-group'));
-        return;
-      }
-      el = el.parentNode;
-    }
-  }
-  // touchend a legmegbízhatóbb iOS Safari-ban
-  document.addEventListener('touchend', handleTeamTap, {passive: false});
-  // click fallback asztali böngészőkre
-  document.addEventListener('click', function(e) {
-    var el = e.target;
-    for(var i = 0; i < 4; i++) {
-      if(!el) break;
-      if(el.getAttribute && el.getAttribute('data-clickable') === 'team') {
-        e.stopPropagation();
-        openTeamPanel(el.getAttribute('data-team'), el.getAttribute('data-group'));
-        return;
-      }
-      el = el.parentNode;
-    }
-  });
-})();
 
 // ===== FIREBASE ADMIN SECRET KEZELŐ =====
 function fbSecretRefreshStatus() {
@@ -4555,10 +4503,12 @@ function buildScoreRow(mid, myTip, result, realScore, locked) {
       + '<span class="score-row-label">📐+🎯:</span>'
       + '<div class="score-inputs-wrap">'
       + '<input type="number" min="0" max="20" id="sh_tip_' + mid + '" placeholder="–"'
-      + ' value="' + hVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
+      + ' value="' + hVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis
+      + ' onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">'
       + '<span class="score-sep">:</span>'
       + '<input type="number" min="0" max="20" id="sa_tip_' + mid + '" placeholder="–"'
-      + ' value="' + aVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis + '>'
+      + ' value="' + aVal + '" class="score-num-input' + (myScore ? ' filled' : '') + '"' + dis
+      + ' onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">'
       + '</div>'
       + '<button class="' + btnCls + '" id="sbtn_' + mid + '" data-mid="' + mid + '" onclick="handleScoreSave(this)"' + dis + '>'
       + btnTxt + '</button>'
@@ -5567,19 +5517,19 @@ function renderMatches() {
           <div class="match-teams-row">
             <div class="team-blk">
               ${getTeamBadge(m.homeFlag, m.home)}
-              <button class="tn-wrap team-tap-btn" data-clickable="team" data-team="${m.home.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}">
-                <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.home}</span>
+              <div class="tn-wrap">
+                <span class="tn">${m.home}</span>
                 ${m.homeLabel?'<span class="tn-sub">'+m.homeLabel+'</span>':''}
-              </button>
+              </div>
             </div>
             <span class="vs-block">${liveScores[m.id] && !result ? '' : (result ? '' : 'VS')}</span>
             ${result ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:24px;font-weight:700;color:var(--gold);">'+(allScores[m.id]||result)+'</span><span style="font-size:10px;color:rgba(240,244,240,0.35);">VÉGE</span></div>' : (liveScores[m.id] ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:#39ff9d;">'+liveScores[m.id].home+' : '+liveScores[m.id].away+'</span><span style="font-size:10px;color:#39ff9d;animation:pulse 2s infinite;">⚽ '+liveScores[m.id].minute+'</span></div>' : '')}
             <div class="team-blk away-blk">
               ${getTeamBadge(m.awayFlag, m.away)}
-              <button class="tn-wrap team-tap-btn" data-clickable="team" data-team="${m.away.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}" style="text-align:right;">
-                <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.away}</span>
+              <div class="tn-wrap" style="text-align:right;">
+                <span class="tn">${m.away}</span>
                 ${m.awayLabel?'<span class="tn-sub">'+m.awayLabel+'</span>':''}
-              </button>
+              </div>
             </div>
           </div>
           ${m.knockout ? buildFtEtPenBreakdown(m) : ''}
@@ -5690,19 +5640,19 @@ function renderMatches() {
           <div class="match-teams-row">
             <div class="team-blk">
               ${getTeamBadge(m.homeFlag, m.home)}
-              <button class="tn-wrap team-tap-btn" data-clickable="team" data-team="${m.home.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}">
-                <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.home}</span>
+              <div class="tn-wrap">
+                <span class="tn">${m.home}</span>
                 ${m.homeLabel?'<span class="tn-sub">'+m.homeLabel+'</span>':''}
-              </button>
+              </div>
             </div>
             <span class="vs-block">${liveScores[m.id] && !result ? '' : (result ? '' : 'VS')}</span>
             ${result ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:24px;font-weight:700;color:var(--gold);">'+(allScores[m.id]||result)+'</span><span style="font-size:10px;color:rgba(240,244,240,0.35);">VÉGE</span></div>' : (liveScores[m.id] ? '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;"><span style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:#39ff9d;">'+liveScores[m.id].home+' : '+liveScores[m.id].away+'</span><span style="font-size:10px;color:#39ff9d;animation:pulse 2s infinite;">⚽ '+liveScores[m.id].minute+'</span></div>' : '')}
             <div class="team-blk away-blk">
               ${getTeamBadge(m.awayFlag, m.away)}
-              <button class="tn-wrap team-tap-btn" data-clickable="team" data-team="${m.away.replace(/"/g,'&quot;')}" data-group="${(m.group||'').replace(/"/g,'&quot;')}" style="text-align:right;">
-                <span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">${m.away}</span>
+              <div class="tn-wrap" style="text-align:right;">
+                <span class="tn">${m.away}</span>
                 ${m.awayLabel?'<span class="tn-sub">'+m.awayLabel+'</span>':''}
-              </button>
+              </div>
             </div>
           </div>
           ${m.knockout ? buildFtEtPenBreakdown(m) : ''}
@@ -5789,9 +5739,6 @@ function renderMatches() {
       }
     } catch(e) {}
   }
-  // ═══ KERESÉS ÚJRA-ALKALMAZÁS ═══
-  var sq = document.getElementById('matchSearch');
-  if(sq && sq.value.trim()) filterMatches();
 }
 
 function renderStats() {
@@ -6400,9 +6347,9 @@ function renderAdminMatches() {
           ${res?`<button class="rb" style="border-color:#ef4444;font-size:10px;" onclick="clearRes('${m.id}')">✕</button>`:''}
         </div>
         <div class="si">
-          <input type="number" min="0" max="20" value="${sh}" placeholder="H" id="sh_${m.id}">
+          <input type="number" min="0" max="20" value="${sh}" placeholder="H" id="sh_${m.id}" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <span>:</span>
-          <input type="number" min="0" max="20" value="${sa}" placeholder="V" id="sa_${m.id}">
+          <input type="number" min="0" max="20" value="${sa}" placeholder="V" id="sa_${m.id}" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           <button class="btn-gold" style="padding:5px 10px;font-size:11px;" onclick="saveScore('${m.id}')">✓</button>
         </div>
         ${showEt?`<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(0,255,135,0.2);">
@@ -6427,7 +6374,7 @@ function renderAdminMatches() {
           <div style="font-size:10px;color:rgba(240,244,240,0.35);font-family:Oswald,sans-serif;letter-spacing:1px;margin-bottom:5px;">👤 TIPP RÖGZÍTÉS (bármely user — FT, ET, 11-es)</div>
           <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
             <input type="text" id="atip_user_${m.id}" placeholder="Felhasználónév"
-              style="flex:1;min-width:80px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;">
+              style="flex:1;min-width:80px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           </div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
             <span style="font-size:10px;color:rgba(240,244,240,0.4);width:32px;">⚽FT</span>
@@ -6438,10 +6385,10 @@ function renderAdminMatches() {
               <option value="2">2</option>
             </select>
             <input type="text" inputmode="numeric" id="atip_h_${m.id}" placeholder="H" 
-              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
             <span style="color:rgba(240,244,240,0.3);font-size:12px;">:</span>
             <input type="text" inputmode="numeric" id="atip_a_${m.id}" placeholder="V"
-              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           </div>
           ${isKnockoutMatch(m) ? `
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
@@ -6454,18 +6401,18 @@ function renderAdminMatches() {
               <option value="2">2</option>
             </select>
             <input type="text" inputmode="numeric" id="atip_eth_${m.id}" placeholder="H"
-              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
             <span style="color:rgba(240,244,240,0.3);font-size:12px;">:</span>
             <input type="text" inputmode="numeric" id="atip_eta_${m.id}" placeholder="V"
-              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           </div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
             <span style="font-size:10px;color:rgba(205,127,50,0.7);width:32px;">🥅11</span>
             <input type="text" inputmode="numeric" id="atip_penh_${m.id}" placeholder="H"
-              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(205,127,50,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(205,127,50,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
             <span style="color:rgba(240,244,240,0.3);font-size:12px;">:</span>
             <input type="text" inputmode="numeric" id="atip_pena_${m.id}" placeholder="V"
-              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(205,127,50,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;">
+              style="width:42px;padding:5px 6px;border-radius:6px;border:1px solid rgba(205,127,50,0.3);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;text-align:center;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           </div>
           ` : ''}
           <button onclick="adminSetTip('${m.id}')"
@@ -6473,9 +6420,9 @@ function renderAdminMatches() {
           <div style="display:flex;gap:6px;align-items:center;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(239,68,68,0.2);">
             <span style="font-size:10px;color:rgba(239,68,68,0.8);flex-shrink:0;">⭐ Admin bónusz pont:</span>
             <input type="number" id="atip_bonus_${m.id}" placeholder="0" step="0.5"
-              style="width:56px;padding:5px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(239,68,68,0.35);color:#ef4444;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;text-align:center;border-radius:4px;">
+              style="width:56px;padding:5px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(239,68,68,0.35);color:#ef4444;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;text-align:center;border-radius:4px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
             <input type="text" id="atip_bonus_note_${m.id}" placeholder="Indoklás (pl. ET anomália)"
-              style="flex:1;padding:5px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(239,68,68,0.2);color:rgba(240,244,240,0.7);font-family:Oswald,sans-serif;font-size:11px;border-radius:4px;">
+              style="flex:1;padding:5px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(239,68,68,0.2);color:rgba(240,244,240,0.7);font-family:Oswald,sans-serif;font-size:11px;border-radius:4px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
           </div>
 
         </div>
@@ -6486,16 +6433,16 @@ function renderAdminMatches() {
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:5px;">
             <div style="display:flex;align-items:center;gap:4px;">
               <span style="font-size:10px;color:rgba(0,255,135,0.5);">⚡</span>
-              <input type="text" inputmode="numeric" id="aets_h_${m.id}" placeholder="H" maxlength="2" value="${allEtScores[m.id]?allEtScores[m.id].split(':')[0]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;">
+              <input type="text" inputmode="numeric" id="aets_h_${m.id}" placeholder="H" maxlength="2" value="${allEtScores[m.id]?allEtScores[m.id].split(':')[0]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
               <span style="color:rgba(255,255,255,0.3);">:</span>
-              <input type="text" inputmode="numeric" id="aets_a_${m.id}" placeholder="V" maxlength="2" value="${allEtScores[m.id]?allEtScores[m.id].split(':')[1]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;">
+              <input type="text" inputmode="numeric" id="aets_a_${m.id}" placeholder="V" maxlength="2" value="${allEtScores[m.id]?allEtScores[m.id].split(':')[1]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
               <button onclick="adminSaveEtScore('${m.id}')" style="padding:4px 8px;background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:#00ff87;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;border-radius:0;">ET ✓</button>
             </div>
             <div style="display:flex;align-items:center;gap:4px;">
               <span style="font-size:10px;color:rgba(0,255,135,0.5);">🥅</span>
-              <input type="text" inputmode="numeric" id="apens_h_${m.id}" placeholder="H" maxlength="2" value="${allPenScores[m.id]?allPenScores[m.id].split(':')[0]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;">
+              <input type="text" inputmode="numeric" id="apens_h_${m.id}" placeholder="H" maxlength="2" value="${allPenScores[m.id]?allPenScores[m.id].split(':')[0]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
               <span style="color:rgba(255,255,255,0.3);">:</span>
-              <input type="text" inputmode="numeric" id="apens_a_${m.id}" placeholder="V" maxlength="2" value="${allPenScores[m.id]?allPenScores[m.id].split(':')[1]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;">
+              <input type="text" inputmode="numeric" id="apens_a_${m.id}" placeholder="V" maxlength="2" value="${allPenScores[m.id]?allPenScores[m.id].split(':')[1]:''}" style="width:36px;padding:4px 6px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,135,0.2);color:#fff;font-family:Oswald,sans-serif;font-size:12px;text-align:center;border-radius:0;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
               <button onclick="adminSavePenScore('${m.id}')" style="padding:4px 8px;background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:#00ff87;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;border-radius:0;">11-es ✓</button>
             </div>
           </div>
@@ -6508,7 +6455,7 @@ function renderAdminMatches() {
           <div style="display:flex;gap:6px;align-items:center;">
             <input type="text" id="asc_${m.id}" placeholder="Góllövők vesszővel elválasztva (pl. Mbappé, Dembélé)"
               value="${(allScorerResults[m.id]||[]).join(', ')}"
-              style="flex:1;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:monospace;font-size:11px;">
+              style="flex:1;padding:5px 8px;border-radius:6px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:monospace;font-size:11px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">
             <button onclick="adminSaveScorers('${m.id}')"
               style="padding:5px 10px;background:rgba(0,255,135,0.12);border:1px solid rgba(0,255,135,0.3);color:#00ff87;border-radius:6px;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">⚽ Ment</button>
           </div>
@@ -7567,12 +7514,12 @@ function renderEmobMatches() {
       var _awayGroup = m.group || '';
       html += '<div class="match-body"><div class="match-teams-row">';
       html += '<div class="team-blk">'+getTeamBadge(m.homeFlag||'🏭',m.home);
-      html += '<div class="tn-wrap" data-team="'+escHtml(m.home)+'" data-group="'+escHtml(_homeGroup)+'" data-clickable="team">'
-        +'<span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">'+escHtml(m.home)+'</span>'+(m.homeLabel?'<span class="tn-sub">'+escHtml(m.homeLabel)+'</span>':'')+'</div></div>';
+      html += '<div class="tn-wrap">'
+        +'<span class="tn">'+escHtml(m.home)+'</span>'+(m.homeLabel?'<span class="tn-sub">'+escHtml(m.homeLabel)+'</span>':'')+'</div></div>';
       html += '<span class="vs-block">VS</span><span class="sc-block" style="visibility:hidden">–</span>';
       html += '<div class="team-blk away-blk">'+getTeamBadge(m.awayFlag||'🏭',m.away);
-      html += '<div class="tn-wrap" data-team="'+escHtml(m.away)+'" data-group="'+escHtml(_awayGroup)+'" data-clickable="team">'
-        +'<span class="tn" style="text-decoration:underline;text-decoration-color:rgba(0,255,135,0.3);text-underline-offset:2px;">'+escHtml(m.away)+'</span>'+(m.awayLabel?'<span class="tn-sub">'+escHtml(m.awayLabel)+'</span>':'')+'</div></div></div>';
+      html += '<div class="tn-wrap">'
+        +'<span class="tn">'+escHtml(m.away)+'</span>'+(m.awayLabel?'<span class="tn-sub">'+escHtml(m.awayLabel)+'</span>':'')+'</div></div></div>';
       // Kezdők ha van
       if((m.homeLineup&&m.homeLineup.length)||(m.awayLineup&&m.awayLineup.length)){
         html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0;font-size:11px;color:rgba(240,244,240,0.45);">';
@@ -8107,8 +8054,8 @@ function renderWatchParty() {
     html+='</div>';
   });
   html+='</div>';
-  if(myL==='egyeb'){var cl=(myVote&&myVote.locCustom)||'';html+='<div style="margin-top:10px;display:flex;gap:6px;"><input type="text" id="wpCustomLoc" value="'+escHtml(cl)+'" placeholder="Település…" maxlength="40" onkeydown="if(event.key===\'Enter\')saveWatchCustomLoc()" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:14px;"><button onclick="saveWatchCustomLoc()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(0,255,135,0.4);background:rgba(0,255,135,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">OK</button></div>';}
-  if(myL){var vn=(myVote&&myVote.venue)||'';html+='<div style="margin-top:10px;"><div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(0,255,135,0.5);margin-bottom:4px;">🍺 KOCSMA / PUB</div><div style="display:flex;gap:6px;"><input type="text" id="wpVenue" value="'+escHtml(vn)+'" placeholder="pl. Fregatt Pub" maxlength="60" onkeydown="if(event.key===\'Enter\')saveWatchVenue()" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:14px;"><button onclick="saveWatchVenue()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(0,255,135,0.4);background:rgba(0,255,135,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">OK</button></div></div>';}
+  if(myL==='egyeb'){var cl=(myVote&&myVote.locCustom)||'';html+='<div style="margin-top:10px;display:flex;gap:6px;"><input type="text" id="wpCustomLoc" value="'+escHtml(cl)+'" placeholder="Település…" maxlength="40" onkeydown="if(event.key===\'Enter\')saveWatchCustomLoc()" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:14px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"><button onclick="saveWatchCustomLoc()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(0,255,135,0.4);background:rgba(0,255,135,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">OK</button></div>';}
+  if(myL){var vn=(myVote&&myVote.venue)||'';html+='<div style="margin-top:10px;"><div style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(0,255,135,0.5);margin-bottom:4px;">🍺 KOCSMA / PUB</div><div style="display:flex;gap:6px;"><input type="text" id="wpVenue" value="'+escHtml(vn)+'" placeholder="pl. Fregatt Pub" maxlength="60" onkeydown="if(event.key===\'Enter\')saveWatchVenue()" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid rgba(0,255,135,0.25);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:14px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"><button onclick="saveWatchVenue()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(0,255,135,0.4);background:rgba(0,255,135,0.12);color:var(--gold);font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">OK</button></div></div>';}
   // BEFUTÓ összesítő
   if(tv > 0) {
     var topM=WATCH_SLOTS[0].id,topMC=0,topL=WATCH_LOCS[0].id,topLC=0;
@@ -8637,7 +8584,7 @@ function showAutoResultPopup(m) {
   var ex = document.getElementById('autoResPopup'); if(ex) ex.remove();
   var d = document.createElement('div'); d.id = 'autoResPopup';
   d.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;';
-  d.innerHTML = '<div style="width:90%;max-width:360px;background:linear-gradient(180deg,#0f2a14,#141518);border:2px solid rgba(239,68,68,0.4);border-radius:16px;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,0.5);"><div style="text-align:center;font-size:24px;margin-bottom:4px;">🏟️</div><div style="text-align:center;font-family:Oswald,sans-serif;font-size:16px;color:#ef4444;font-weight:700;margin-bottom:4px;">MECCS VÉGET ÉRT!</div><div style="text-align:center;font-size:12px;color:rgba(240,244,240,0.35);margin-bottom:4px;">API nem elérhető — manuális rögzítés</div><div style="text-align:center;font-size:14px;color:rgba(240,244,240,0.7);margin-bottom:12px;">'+(m.homeFlag||'')+' <b>'+escHtml(m.home)+'</b> vs <b>'+escHtml(m.away)+'</b> '+(m.awayFlag||'')+'</div><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;"><input type="text" inputmode="numeric" id="arH_'+m.id+'" placeholder="0" maxlength="2" style="width:50px;text-align:center;padding:10px;border-radius:10px;border:2px solid rgba(0,255,135,0.3);background:rgba(0,0,0,0.3);color:var(--gold);font-family:Oswald,sans-serif;font-size:24px;font-weight:700;"><span style="font-family:Oswald,sans-serif;font-size:20px;color:rgba(240,244,240,0.3);">:</span><input type="text" inputmode="numeric" id="arA_'+m.id+'" placeholder="0" maxlength="2" style="width:50px;text-align:center;padding:10px;border-radius:10px;border:2px solid rgba(0,255,135,0.3);background:rgba(0,0,0,0.3);color:var(--gold);font-family:Oswald,sans-serif;font-size:24px;font-weight:700;"></div><div style="display:flex;gap:8px;"><button onclick="document.getElementById(\'autoResPopup\').remove()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:rgba(240,244,240,0.5);font-family:Oswald,sans-serif;font-size:13px;cursor:pointer;">Később</button><button onclick="submitAutoResult(\''+m.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(34,197,94,0.4);background:rgba(0,255,135,0.15);color:#39ff9d;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✓ Mentés</button></div></div>';
+  d.innerHTML = '<div style="width:90%;max-width:360px;background:linear-gradient(180deg,#0f2a14,#141518);border:2px solid rgba(239,68,68,0.4);border-radius:16px;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,0.5);"><div style="text-align:center;font-size:24px;margin-bottom:4px;">🏟️</div><div style="text-align:center;font-family:Oswald,sans-serif;font-size:16px;color:#ef4444;font-weight:700;margin-bottom:4px;">MECCS VÉGET ÉRT!</div><div style="text-align:center;font-size:12px;color:rgba(240,244,240,0.35);margin-bottom:4px;">API nem elérhető — manuális rögzítés</div><div style="text-align:center;font-size:14px;color:rgba(240,244,240,0.7);margin-bottom:12px;">'+(m.homeFlag||'')+' <b>'+escHtml(m.home)+'</b> vs <b>'+escHtml(m.away)+'</b> '+(m.awayFlag||'')+'</div><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;"><input type="text" inputmode="numeric" id="arH_'+m.id+'" placeholder="0" maxlength="2" style="width:50px;text-align:center;padding:10px;border-radius:10px;border:2px solid rgba(0,255,135,0.3);background:rgba(0,0,0,0.3);color:var(--gold);font-family:Oswald,sans-serif;font-size:24px;font-weight:700;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"><span style="font-family:Oswald,sans-serif;font-size:20px;color:rgba(240,244,240,0.3);">:</span><input type="text" inputmode="numeric" id="arA_'+m.id+'" placeholder="0" maxlength="2" style="width:50px;text-align:center;padding:10px;border-radius:10px;border:2px solid rgba(0,255,135,0.3);background:rgba(0,0,0,0.3);color:var(--gold);font-family:Oswald,sans-serif;font-size:24px;font-weight:700;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div><div style="display:flex;gap:8px;"><button onclick="document.getElementById(\'autoResPopup\').remove()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:rgba(240,244,240,0.5);font-family:Oswald,sans-serif;font-size:13px;cursor:pointer;">Később</button><button onclick="submitAutoResult(\''+m.id+'\')" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(34,197,94,0.4);background:rgba(0,255,135,0.15);color:#39ff9d;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✓ Mentés</button></div></div>';
   document.body.appendChild(d);
 }
 async function submitAutoResult(mid) {
@@ -9175,72 +9122,6 @@ function updateInviteStatus() {
   }
 }
 
-// ===== MECCS KERESŐ =====
-function _normSearchStr(s) {
-  return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-}
-function filterMatches() {
-  var qRaw = (document.getElementById('matchSearch').value||'').trim();
-  var q = _normSearchStr(qRaw);
-  var clearBtn = document.getElementById('matchSearchClear');
-  if(clearBtn) clearBtn.style.display = qRaw ? 'block' : 'none';
-
-  var container = document.getElementById('matchesContainer');
-  if(!container) return;
-
-  if(!q) {
-    // Összes kártya és header visszaállítása
-    container.querySelectorAll('.match-card').forEach(function(c){ c.style.display=''; });
-    container.querySelectorAll('.date-header').forEach(function(h){ h.style.display=''; });
-    container.querySelectorAll('[id^="dg_"]').forEach(function(dg){
-      // Csak akkor nyissuk ki ha nem volt manuálisan összecsukva
-      // (a teszt napot meghagyjuk csukva)
-      if(dg.id === 'dg_20260527') return;
-      dg.style.display = '';
-    });
-    return;
-  }
-
-  // Találati halmaz a valós meccs-adatok alapján (csapatnév-kezdet, csoport, helyszín, dátum)
-  // — NEM a kártya teljes (rejtett tartalmat is tartalmazó) szövegéből keresünk!
-  var matchedIds = {};
-  ALL_MATCHES.forEach(function(m) {
-    var homeWords = _normSearchStr(m.home).split(/[\s-]+/);
-    var awayWords = _normSearchStr(m.away).split(/[\s-]+/);
-    var groupN = _normSearchStr(m.group);
-    var venueN = _normSearchStr(m.venue);
-    var dateN = _normSearchStr((m.huDate||'') + ' ' + (m.huTime||''));
-    var hit =
-      homeWords.some(function(w){ return w.length && w.indexOf(q) === 0; }) ||
-      awayWords.some(function(w){ return w.length && w.indexOf(q) === 0; }) ||
-      (groupN && groupN === q) ||
-      (venueN && venueN.indexOf(q) >= 0) ||
-      (dateN.indexOf(q) >= 0);
-    if(hit) matchedIds[m.id] = true;
-  });
-
-  // Minden dg_ div átfésülése
-  container.querySelectorAll('[id^="dg_"]').forEach(function(dg) {
-    var cards = dg.querySelectorAll('.match-card');
-    var anyVisible = false;
-    cards.forEach(function(card) {
-      var mid = card.id.replace(/^mc_/, '');
-      var show = !!matchedIds[mid];
-      card.style.display = show ? '' : 'none';
-      if(show) anyVisible = true;
-    });
-    // Nap láthatósága
-    dg.style.display = anyVisible ? '' : 'none';
-    if(anyVisible) dg.style.display = ''; // kinyit ha össze volt csukva
-
-    // Date-header: az előtte lévő testvér elem
-    var prev = dg.previousElementSibling;
-    if(prev && prev.classList.contains('date-header')) {
-      prev.style.display = anyVisible ? '' : 'none';
-    }
-  });
-}
-
 // ===== OPL (Open Points List) =====
 let oplItems = [];
 let oplEditId = null;
@@ -9361,7 +9242,7 @@ function oplRender() {
       html += '<div style="display:flex;gap:5px;margin-top:4px;">'
         +'<input type="text" id="oplCmtInp_'+item.id+'" placeholder="Megjegyzés…" maxlength="200" '
         +'onkeydown="if(event.key===\'Enter\')oplAddCmt('+item.id+')" '
-        +'style="flex:1;padding:6px 10px;border-radius:7px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;">'
+        +'style="flex:1;padding:6px 10px;border-radius:7px;border:1px solid rgba(0,255,135,0.2);background:rgba(0,0,0,0.2);color:white;font-family:Oswald,sans-serif;font-size:12px;" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">'
         +'<button onclick="oplAddCmt('+item.id+')" style="padding:6px 10px;border-radius:7px;border:1px solid rgba(0,255,135,0.35);background:rgba(0,255,135,0.1);color:var(--gold);font-family:Oswald,sans-serif;font-size:11px;font-weight:700;cursor:pointer;">Küld</button>'
         +'</div>';
     }
@@ -10877,159 +10758,6 @@ function closeScorerModal() {
   if(m) m.style.display='none';
 }
 
-// ===== CSAPAT PANEL (kattintásra csapatnévre) =====
-function openTeamPanel(teamName, group) {
-  // Összegyűjti a csapat összes meccsét és eredményét
-  var teamMatches = ALL_MATCHES.filter(function(m){
-    return isVbMatch(m) && (m.home === teamName || m.away === teamName);
-  }).sort(function(a,b){
-    return (a.huDate+a.huTime).localeCompare(b.huDate+b.huTime);
-  });
-
-  var teamFlag = '';
-  for(var i=0;i<teamMatches.length;i++){
-    if(teamMatches[i].home===teamName){ teamFlag=teamMatches[i].homeFlag||''; break; }
-    if(teamMatches[i].away===teamName){ teamFlag=teamMatches[i].awayFlag||''; break; }
-  }
-
-  // Statisztika kiszámítása
-  var stats = {p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
-  var html = '';
-  teamMatches.forEach(function(m){
-    var isHome = m.home === teamName;
-    var opp = isHome ? m.away : m.home;
-    var oppFlag = isHome ? m.awayFlag : m.homeFlag;
-    var score = allScores[m.id];
-    var result = allResults[m.id];
-    var kickoffLocked = getBudapestDate() >= (m.huDate+'T'+m.huTime).replace('T','T').substring(0,16);
-    var dateStr = m.huDate ? m.huDate.slice(5).replace('-','. ') + '.' : '';
-
-    var scoreStr = '', outcome = '', outcomeColor = '', badge = '';
-    if(score){
-      var parts = score.split(':');
-      var hg=parseInt(parts[0]), ag=parseInt(parts[1]);
-      var tg = isHome ? hg : ag, og = isHome ? ag : hg;
-      scoreStr = tg + ' – ' + og;
-      stats.p++; stats.gf+=tg; stats.ga+=og;
-      if(tg>og){ stats.w++; stats.pts+=3; outcome='GY'; outcomeColor='#39ff9d'; badge='🟢'; }
-      else if(tg<og){ stats.l++; outcome='V'; outcomeColor='#f87171'; badge='🔴'; }
-      else{ stats.d++; stats.pts++; outcome='D'; outcomeColor='rgba(240,244,240,0.5)'; badge='🟡'; }
-    }
-
-    var rowBg = outcome==='GY' ? 'background:rgba(0,255,135,0.04);' : outcome==='V' ? 'background:rgba(239,68,68,0.04);' : '';
-    html += '<div style="'+rowBg+'padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:10px;">';
-
-    // Bal: dátum + csoport
-    html += '<div style="min-width:52px;flex-shrink:0;">';
-    html += '<div style="font-size:10px;color:rgba(240,244,240,0.3);font-family:Oswald,sans-serif;">' + dateStr + '</div>';
-    if(m.group && m.group.length<=2) html += '<div style="font-size:9px;color:rgba(0,255,135,0.5);letter-spacing:1px;">' + m.group + ' csoport</div>';
-    html += '</div>';
-
-    // Közép: ellenfél
-    html += '<div style="flex:1;min-width:0;">';
-    html += '<div style="font-size:13px;font-family:Oswald,sans-serif;color:rgba(240,244,240,0.85);">';
-    html += (isHome ? 'vs ' : '@\xa0') + (oppFlag||'') + ' ' + escHtml(opp);
-    html += '</div>';
-    if(!score && kickoffLocked) html += '<div style="font-size:10px;color:rgba(240,244,240,0.3);">Eredmény ismeretlen</div>';
-    if(!score && !kickoffLocked) html += '<div style="font-size:10px;color:rgba(240,244,240,0.25);">Még nem játszották le</div>';
-    html += '</div>';
-
-    // Jobb: eredmény + kimenetel
-    html += '<div style="flex-shrink:0;text-align:right;">';
-    if(score){
-      html += '<div style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:#fff;">' + scoreStr + '</div>';
-      html += '<div style="font-size:10px;font-weight:700;color:'+outcomeColor+';font-family:Oswald,sans-serif;">' + badge + ' ' + outcome + '</div>';
-    }
-    html += '</div>';
-    html += '</div>';
-  });
-
-  if(!html) html = '<div style="padding:20px;text-align:center;color:rgba(240,244,240,0.3);">Még nem játszottak</div>';
-
-  // Statisztika összesítő sor
-  var statHtml = '<div style="display:flex;gap:16px;padding:12px 14px;background:rgba(0,255,135,0.05);border-bottom:1px solid rgba(0,255,135,0.12);">';
-  [ ['Mérkőzés',stats.p], ['Győzelem',stats.w], ['Döntetlen',stats.d], ['Vereség',stats.l],
-    ['Gól',stats.gf+'-'+stats.ga], ['Pont',stats.pts] ].forEach(function(it){
-    statHtml += '<div style="text-align:center;flex:1;">'
-      + '<div style="font-family:Oswald,sans-serif;font-size:16px;font-weight:700;color:var(--gold);">' + it[1] + '</div>'
-      + '<div style="font-size:9px;color:rgba(240,244,240,0.35);letter-spacing:0.5px;">' + it[0].toUpperCase() + '</div>'
-      + '</div>';
-  });
-  statHtml += '</div>';
-
-  // Popup megjelenítése
-  var overlay = document.getElementById('teamPanelOverlay');
-  if(!overlay){
-    overlay = document.createElement('div');
-    overlay.id = 'teamPanelOverlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:250;display:flex;align-items:flex-end;justify-content:center;';
-    overlay.onclick = function(e){ if(e.target===this) closeTeamPanel(); };
-    document.body.appendChild(overlay);
-  }
-  overlay.innerHTML = '<div style="background:#191b23;border:1px solid rgba(0,255,135,0.2);border-top:2px solid #00ff87;border-radius:0;width:100%;max-width:520px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;">'
-    // Header
-    + '<div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.07);">'
-    + '<div style="display:flex;align-items:center;gap:8px;">'
-    + '<span style="font-size:24px;">' + teamFlag + '</span>'
-    + '<div>'
-    + '<div style="font-family:Oswald,sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:1px;">' + escHtml(teamName) + '</div>'
-    + (group ? '<div style="font-size:10px;color:rgba(0,255,135,0.6);letter-spacing:1.5px;">' + group + ' CSOPORT</div>' : '')
-    + '</div>'
-    + '</div>'
-    + '<div style="display:flex;gap:8px;align-items:center;">'
-    + '<button onclick="openTeamInVB(\''+teamName.replace(/'/g,"\\'")+'\',\''+(group||'').replace(/'/g,"\\'")+'\');" style="font-size:11px;font-family:Oswald,sans-serif;padding:5px 10px;border:1px solid rgba(0,255,135,0.3);background:rgba(0,255,135,0.08);color:#00ff87;cursor:pointer;letter-spacing:0.5px;">📊 VB TÁBLA</button>'
-    + '<button onclick="closeTeamPanel()" style="background:none;border:none;color:rgba(240,244,240,0.4);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">✕</button>'
-    + '</div>'
-    + '</div>'
-    // Stat sor
-    + statHtml
-    // Meccsek lista
-    + '<div style="overflow-y:auto;flex:1;">' + html + '</div>'
-    + '</div>';
-  overlay.style.display = 'flex';
-}
-
-function closeTeamPanel() {
-  var o = document.getElementById('teamPanelOverlay');
-  if(o) o.style.display = 'none';
-}
-
-function openTeamInVB(teamName, group) {
-  closeTeamPanel();
-  showTab('gol');
-  // Rövid delay hogy a tab betöltődjön, majd scrollol a csoport tabellájára
-  setTimeout(function(){
-    renderGroupTables();
-    var container = document.getElementById('groupTablesContainer');
-    if(!container) return;
-    // Scroll a megfelelő csoportra
-    if(group){
-      var headers = container.querySelectorAll('[data-group]');
-      headers.forEach(function(el){ if(el.getAttribute('data-group')===group) el.scrollIntoView({behavior:'smooth',block:'start'}); });
-    } else {
-      container.scrollIntoView({behavior:'smooth',block:'start'});
-    }
-    // Csapat kiemelése a tabellában
-    highlightTeamInTable(teamName);
-  }, 180);
-}
-
-function highlightTeamInTable(teamName) {
-  var container = document.getElementById('groupTablesContainer');
-  if(!container) return;
-  var tds = container.querySelectorAll('td');
-  tds.forEach(function(td){
-    if(td.textContent.trim().replace(/^[^ ]+ /,'') === teamName || td.textContent.trim().endsWith(' '+teamName)){
-      var row = td.closest('tr');
-      if(row){
-        row.style.background='rgba(0,255,135,0.12)';
-        row.style.outline='1px solid rgba(0,255,135,0.3)';
-        row.scrollIntoView({behavior:'smooth',block:'center'});
-        setTimeout(function(){ row.style.background=''; row.style.outline=''; }, 2500);
-      }
-    }
-  });
-}
 
 
 var _nyeremenyKepBase64 = null;
@@ -13138,40 +12866,40 @@ setTimeout(function(){ showMotivPopup(); }, 3500);
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div><div class="cm-label">🏷️ Csoport / emoji</div>
-          <input type="text" id="cmGroup" placeholder="🧪 vagy A" class="cm-inp"></div>
+          <input type="text" id="cmGroup" placeholder="🧪 vagy A" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
         <div><div class="cm-label">🏟️ Helyszín</div>
-          <input type="text" id="cmVenue" placeholder="pl. Söpte Aréna" class="cm-inp"></div>
+          <input type="text" id="cmVenue" placeholder="pl. Söpte Aréna" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
       </div>
 
       <div><div class="cm-label">📝 Cím (opcionális)</div>
-        <input type="text" id="cmTitle" placeholder="pl. 🏆 Foca kupa" class="cm-inp"></div>
+        <input type="text" id="cmTitle" placeholder="pl. 🏆 Foca kupa" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
 
       <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:10px;">
         <div style="font-family:Oswald,sans-serif;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:1px;">🏠 HAZAI CSAPAT</div>
         <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:8px;">
           <div><div class="cm-label">Zászló/emoji</div>
-            <input type="text" id="cmHomeFlag" placeholder="🏭" class="cm-inp"></div>
+            <input type="text" id="cmHomeFlag" placeholder="🏭" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
           <div><div class="cm-label">Csapatnév</div>
-            <input type="text" id="cmHome" placeholder="Ipari taktikusok" class="cm-inp"></div>
+            <input type="text" id="cmHome" placeholder="Ipari taktikusok" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
           <div><div class="cm-label">Alcím (opcionális)</div>
-            <input type="text" id="cmHomeLabel" placeholder="A csapat" class="cm-inp"></div>
+            <input type="text" id="cmHomeLabel" placeholder="A csapat" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
         </div>
         <div style="margin-top:8px;"><div class="cm-label">Kezdők (vesszővel elválasztva)</div>
-          <input type="text" id="cmHomeLineup" placeholder="Fercsik, Hermán, Temesi..." class="cm-inp"></div>
+          <input type="text" id="cmHomeLineup" placeholder="Fercsik, Hermán, Temesi..." class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
       </div>
 
       <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:10px;">
         <div style="font-family:Oswald,sans-serif;font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:1px;">✈️ VENDÉG CSAPAT</div>
         <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:8px;">
           <div><div class="cm-label">Zászló/emoji</div>
-            <input type="text" id="cmAwayFlag" placeholder="🏭" class="cm-inp"></div>
+            <input type="text" id="cmAwayFlag" placeholder="🏭" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
           <div><div class="cm-label">Csapatnév</div>
-            <input type="text" id="cmAway" placeholder="Ipari taktikusok" class="cm-inp"></div>
+            <input type="text" id="cmAway" placeholder="Ipari taktikusok" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
           <div><div class="cm-label">Alcím (opcionális)</div>
-            <input type="text" id="cmAwayLabel" placeholder="B csapat" class="cm-inp"></div>
+            <input type="text" id="cmAwayLabel" placeholder="B csapat" class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
         </div>
         <div style="margin-top:8px;"><div class="cm-label">Kezdők (vesszővel elválasztva)</div>
-          <input type="text" id="cmAwayLineup" placeholder="Huszár, Kult, Lakatos..." class="cm-inp"></div>
+          <input type="text" id="cmAwayLineup" placeholder="Huszár, Kult, Lakatos..." class="cm-inp" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)"></div>
       </div>
 
       <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:10px;display:flex;gap:16px;align-items:center;">
