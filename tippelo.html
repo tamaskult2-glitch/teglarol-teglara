@@ -4292,6 +4292,7 @@ function calcMatchPointsSim(m, tip) {
 
 function openSimulation() {
   document.getElementById('simModal').style.display = 'flex';
+  try { renderMatches(); } catch(e){}
   renderSimulation();
 }
 
@@ -4309,6 +4310,8 @@ function renderSimulation() {
   var affectedMatches = vbMatches.filter(function(m){
     return m.knockout && allResults[m.id] === 'X' && (allEtResults[m.id] || allPenResults[m.id]);
   });
+  var koMatches = vbMatches.filter(function(m){ return m.knockout; });
+  var koPlayed = koMatches.filter(function(m){ return !!allResults[m.id]; });
 
   var rows = [];
   users.forEach(function(u){
@@ -4328,7 +4331,8 @@ function renderSimulation() {
 
   var html = '<div style="background:rgba(0,255,135,0.06);border:1px solid rgba(0,255,135,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;line-height:1.55;color:rgba(240,244,240,0.85);">';
   html += '<b style="color:#00ff87;">Szabály:</b> FT pontrendszer változatlan. Ha a meccs hosszabbításra/11-esre ment, az ET+11-es helyett EGY közös bónusz jár a tovább jutó csapat eltalálásáért: <b>2×2=4 pont</b> (rendes kieséses kör), <b>2×3=6 pont</b> (döntő/bronz) — de csak akkor, ha az FT kimenetelt (döntetlent) is eltaláltad.<br>';
-  html += '<span style="color:rgba(240,244,240,0.55);">Érintett meccsek: ' + (affectedMatches.length ? affectedMatches.map(function(m){ return m.title||m.id; }).join(', ') : 'egyelőre nincs ilyen lezárt meccs') + '</span>';
+  html += '<span style="color:rgba(240,244,240,0.55);">Érintett meccsek (döntetlen FT-n, ET/11-esre ment): ' + (affectedMatches.length ? affectedMatches.map(function(m){ return m.title||m.id; }).join(', ') : 'egyelőre nincs ilyen lezárt meccs') + '</span><br>';
+  html += '<span style="color:rgba(240,244,240,0.4);font-size:11.5px;">Diagnosztika: ' + koMatches.length + ' kieséses meccs ismert az appban, ebből ' + koPlayed.length + ' lezárt eredménnyel.</span>';
   html += '</div>';
 
   html += '<div class="lb-list">';
