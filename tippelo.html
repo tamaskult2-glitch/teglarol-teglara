@@ -4966,13 +4966,9 @@ function renderMatchdayBanner() {
 
 // Ugrás: ÉLŐ meccs → következő tippeletlen → következő jövőbeli
 // Ciklikus navigátor állapot
-var _openDayGroups = {}; // session-szintű állapot
-// group_section localStorage állapot visszaállítás (CSAK ha a user explicit nyitotta)
-try {
-  var _lsGrp = localStorage.getItem('grpSectionOpen');
-  if(_lsGrp === 'true') _openDayGroups['group_section'] = true;
-  // ha null vagy 'false' → marad false (zárt)
-} catch(e){}
+var _openDayGroups = {}; // session-szintű állapot (oldalbetöltéskor mindig zárt)
+// group_section MINDIG zárt alapból — a csoportkör lejátszódott
+// (localStorage-ból NEM töltjük vissza, hogy mindig zártan induljon)
 var _navLastId = null;
 var _navPhase = 0; // 0=mai tippeletlen, 1=mai élő, 2=jövőbeli tippeletlen
 
@@ -11115,11 +11111,7 @@ function toggleDayGroup(groupId) {
   }
   var btn = document.getElementById('toggle_'+groupId);
   if(btn) btn.textContent = isNowClosed ? '−' : '+';
-  _openDayGroups[groupId] = isNowClosed; // true = nyitva
-  // group_section állapot mentése localStorage-ba
-  if(groupId === 'group_section') {
-    try { localStorage.setItem('grpSectionOpen', isNowClosed ? 'true' : 'false'); } catch(e) {}
-  }
+  _openDayGroups[groupId] = isNowClosed; // true = nyitva (session-szintű, betöltéskor reset)
 }
 
 function buildScorerRow(mid, m) {
