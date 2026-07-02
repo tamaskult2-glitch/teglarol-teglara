@@ -5263,6 +5263,111 @@ function renderAll() {
   try { loadWatchPartyBadge(); } catch(e){}
   try { pmCheckForUser(); } catch(e){}
   if(activeTab==='bl') try { renderBLTab(); } catch(e){}
+  try { checkRoastableLosses(); } catch(e){}
+}
+
+// ===== VESZTES BESZÓLÁSOK (Claude) =====
+// Amikor egy meccs lezárul és a user rosszul tippelt, belépéskor egyszeri, cikkis popup
+// jelenik meg tőle — nem ismétlődik ugyanarra a meccsre.
+var _roastChecked = false;
+
+var ROAST_MISSED_X = [
+  "Na mi van, miért nem az X-re tippeltél? Nem arra jár a legtöbb pont?",
+  "Döntetlen lett, te meg bátran 1-re vagy 2-re szavaztál. A statisztika most csendben sír egy sarokban.",
+  "Ismét bebizonyosodott: az X létezik. Talán legközelebb kipróbálod?",
+  "Hat féle kimenetel közül választhattál volna X-et is — pont az maradt ki a listádról.",
+  "A meccs döntetlenre végződött. Te nem. Gratulálok a bátorsághoz, nem az eredményhez.",
+  "Ha lenne 'majdnem jó tipp' kategória, most dobogón állnál. De nincs ilyen kategória.",
+  "Az X néha egyszerűen csak... megtörténik. Legközelebb számolj vele, mint egy valódi lehetőséggel.",
+  "A döntetlen nem szélsőséges kimenetel, csak te kezelted annak. Ezt most a ranglista is mutatja.",
+  "Kicsit korán zártad ki az X-et a fejedben. A pálya nem kérte ki a véleményedet."
+];
+
+var ROAST_TIPPED_X_LOST = [
+  "Döntetlenre tippeltél, aztán valaki mégis nyert. Ejnye.",
+  "Az X biztonságos választásnak tűnt — legalábbis addig, amíg le nem fütyülték a meccset.",
+  "Bátran vártad a döntetlent. A pálya másképp gondolta, és nem is kérdezett vissza.",
+  "Kicsit korán ünnepelted a döntetlent — a gólok nem értettek egyet veled.",
+  "Az óvatos tipp is tud rosszul sülni. Ez most pont ez az eset volt."
+];
+
+var ROAST_GENERIC = [
+  "Ez most nem jött be. Semmi baj, a következő tippnél talán a labda is együttműködik.",
+  "A csapatod nem kapta meg az emlékeztetőt, hogy neked kellene nyerned rajtuk.",
+  "Statisztikailag ez is egy adatpont — csak épp a rossz oszlopban landolt.",
+  "Volt már jobb tippnapod is, ezt garantálom, mert ennél rosszabbat nehéz lenne összehozni.",
+  "A pálya megint nem hallgatott rád. Pedig milyen magabiztosan kattintottál rá.",
+  "Ez a tipp is bekerül a 'tanulságos pillanatok' mappába.",
+  "Ha a tippelési pontosságodat Cpk-val mérnénk, ez a meccs most kilógna a specifikációs határok közül.",
+  "Egy nulla pontos meccs is meccs — csak épp nem a győztes fajtából.",
+  "A tipped és a valóság most más útvonalon járt. Legközelebb próbáljatok egyeztetni.",
+  "Nem minden tipp tud telitalálat lenni. Ez most éppen a bizonyíték rá."
+];
+
+function _roastPickMessage(tipOutcome, realOutcome) {
+  var pool;
+  if((tipOutcome === '1' || tipOutcome === '2') && realOutcome === 'X') pool = ROAST_MISSED_X;
+  else if(tipOutcome === 'X' && realOutcome !== 'X') pool = ROAST_TIPPED_X_LOST;
+  else pool = ROAST_GENERIC;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function checkRoastableLosses() {
+  if(_roastChecked) return;
+  if(!currentUser) return;
+  _roastChecked = true; // csak egyszer, belépésenként fut le
+  try {
+    var safeName = fbSafeName(currentUser);
+    var vbMatches = ALL_MATCHES.filter(isVbMatch);
+    Object.values(_virtualKOMatches || {}).forEach(function(vm){
+      if(!vbMatches.some(function(x){ return x.id === vm.id; })) vbMatches.push(vm);
+    });
+
+    var shownKey = 'roastShown_' + safeName;
+    var shown = {};
+    try { shown = JSON.parse(localStorage.getItem(shownKey) || '{}'); } catch(e){ shown = {}; }
+
+    var newLosses = [];
+    vbMatches.forEach(function(m){
+      var res = allResults[m.id];
+      if(!res) return;
+      var tip = allTips[m.id] ? allTips[m.id][safeName] : null;
+      if(!tip) return;
+      var o = getTipOutcome(tip);
+      if(!o) return;
+      if(o === res) return; // eltalálta, nincs beszólás
+      if(shown[m.id]) return; // már megkapta ezért a meccsért
+      newLosses.push({ m: m, tip: o, res: res });
+    });
+
+    if(!newLosses.length) return;
+
+    // Mindet megjelöljük mutatottnak, hogy ne ismétlődjön később
+    newLosses.forEach(function(x){ shown[x.m.id] = true; });
+    try { localStorage.setItem(shownKey, JSON.stringify(shown)); } catch(e){}
+
+    var pick = newLosses[newLosses.length - 1];
+    var msg = _roastPickMessage(pick.tip, pick.res);
+    showRoastPopup(msg, pick.m, newLosses.length);
+  } catch(e) {}
+}
+
+function showRoastPopup(msg, m, count) {
+  var d = document.createElement('div');
+  d.id = 'roastPopup';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var extra = count > 1 ? '<div style="font-size:11px;color:rgba(240,244,240,0.4);margin-top:10px;">(és még ' + (count-1) + ' másik vesztes tippnél is elmondanám ugyanezt)</div>' : '';
+  var matchLine = m ? ('<div style="font-size:11px;color:rgba(240,244,240,0.45);margin-bottom:10px;">' + escHtml(m.home) + ' ' + (allScores[m.id]||allResults[m.id]||'') + ' ' + escHtml(m.away) + '</div>') : '';
+  d.innerHTML = '<div style="max-width:360px;width:100%;background:linear-gradient(180deg,#191b23,#13151b);border:2px solid rgba(239,68,68,0.35);border-radius:16px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">'
+    + '<div style="text-align:center;font-size:30px;margin-bottom:8px;">🗣️</div>'
+    + '<div style="text-align:center;font-family:Oswald,sans-serif;font-size:13px;letter-spacing:1.5px;color:#ef4444;font-weight:700;margin-bottom:12px;">VESZTES TIPP</div>'
+    + matchLine
+    + '<div style="text-align:center;font-size:14.5px;line-height:1.5;color:rgba(240,244,240,0.9);margin-bottom:6px;">' + escHtml(msg) + '</div>'
+    + extra
+    + '<div style="text-align:right;font-size:11.5px;color:rgba(0,255,135,0.6);font-family:Oswald,sans-serif;letter-spacing:0.5px;margin:10px 0 16px;">— Claude</div>'
+    + '<button onclick="document.getElementById(\'roastPopup\').remove()" style="width:100%;padding:11px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:rgba(239,68,68,0.12);color:#ff8a8a;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">Na jó, kikérem magamnak 😤</button>'
+    + '</div>';
+  document.body.appendChild(d);
 }
 
 
