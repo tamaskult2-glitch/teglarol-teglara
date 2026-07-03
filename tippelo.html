@@ -8466,7 +8466,12 @@ async function fetchFromESPN() {
       var statusType = comp.status && comp.status.type ? comp.status.type.name : '';
       var clock = comp.status && comp.status.displayClock ? comp.status.displayClock : '';
       var period = comp.status && comp.status.period ? comp.status.period : 0;
-      var isLive = statusType==='STATUS_IN_PROGRESS'||statusType==='STATUS_HALFTIME'||statusType==='STATUS_FIRST_HALF'||statusType==='STATUS_SECOND_HALF';
+      var isLive = statusType==='STATUS_IN_PROGRESS'||statusType==='STATUS_HALFTIME'||statusType==='STATUS_FIRST_HALF'||statusType==='STATUS_SECOND_HALF'
+        ||statusType==='STATUS_END_OF_REGULATION'||statusType==='STATUS_OVERTIME'||statusType==='STATUS_FIRST_EXTRA'||statusType==='STATUS_SECOND_EXTRA'
+        ||statusType==='STATUS_EXTRA_TIME'||statusType==='STATUS_HALFTIME_ET'||statusType==='STATUS_END_OF_EXTRA'
+        ||statusType==='STATUS_SHOOTOUT'||statusType==='STATUS_PENALTY'||statusType==='STATUS_PENALTIES'
+        ||statusType.indexOf('EXTRA')>=0||statusType.indexOf('SHOOTOUT')>=0||statusType.indexOf('PENALT')>=0
+        ||(period>=3 && statusType!=='STATUS_FINAL' && statusType.indexOf('FINAL')<0 && statusType.indexOf('FULL_TIME')<0);
       var isFT = statusType==='STATUS_FULL_TIME'||statusType==='STATUS_FINAL'
         ||statusType==='STATUS_FINAL_AET'||statusType==='STATUS_FINAL_PEN'
         ||statusType==='STATUS_FULL_PEN'||statusType==='STATUS_FULL_AET'
@@ -8477,7 +8482,7 @@ async function fetchFromESPN() {
       var home = teams.find(function(t){return t.homeAway==='home';});
       var away = teams.find(function(t){return t.homeAway==='away';});
       if(!home || !away) return;
-      var minute = isLive?(statusType==='STATUS_HALFTIME'?'Félidő':(clock||(period===1?'1. félidő':'2. félidő'))):'';
+      var minute = isLive?(statusType==='STATUS_HALFTIME'?'Félidő':(statusType.indexOf('EXTRA')>=0||period>=3?'Hosszabbítás':(statusType.indexOf('PENALT')>=0||statusType.indexOf('SHOOTOUT')>=0?'11-esek':(clock||(period===1?'1. félidő':'2. félidő'))))):'';
       results.push({
         homeName: home.team.displayName||'',
         awayName: away.team.displayName||'',
