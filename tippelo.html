@@ -3013,7 +3013,7 @@ input:focus, textarea:focus, select:focus {
 const DB_URL = 'https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app/tipp2026';
 var ADMIN_PW_HASH = null; // Firebase-ből töltődik: tipp2026/adminPwHash
 const ADMIN_USERS = ['KULT']; // Mindig admin jogú felhasználók (jelszó nélkül is)
-const POLL_MS = 8000;
+const POLL_MS = 45000; // biztonsági háló — a valós idejű frissítést az SSE (startRealtimeSync) viszi
 // localStorage kulcsok (csak session + jelszavak)
 const LS_USERS   = 'tipp2026_users';   // {safeName: hashedPw}
 const LS_SESSION = 'tipp2026_user';    // bejelentkezett felhasználó neve
@@ -3272,6 +3272,57 @@ function setStatus(s,msg) {
   if(t) t.textContent=msg;
 }
 
+// ===== VALÓS IDEJŰ (SSE) SZINKRON =====
+// A Firebase Realtime Database REST API-ja Server-Sent Events streamet is tud, ha a
+// kérés Accept: text/event-stream fejléccel megy — a natív böngésző EventSource API
+// pontosan ezt csinálja automatikusan, SDK nélkül is. Ez azt jelenti: amint BÁRMI
+// megváltozik az adatbázisban (bárki tippjel ment, admin eredményt rögzít, ESPN-auto-
+// korrekció fut), egy 'put'/'patch' esemény azonnal megérkezik — nem kell várni a
+// poll-ciklusra (ami mostantól csak biztonsági háló, jóval ritkábban fut).
+//
+// SZÁNDÉKOSAN nem duplikáljuk itt a pollData() ~20 párhuzamos lekérdezését és normalizáló
+// logikáját (proUsers/vipUsers alak-kezelés, admin jelszó self-heal, törölt user kezelés
+// stb.) — ez driftel egy második, karbantartandó adatfeldolgozó út kockázatát hordozná.
+// Ehelyett az SSE esemény egyszerűen AZONNAL újra lefuttatja a már bevált pollData()-t.
+var _sseSource = null;
+var _sseDebounceTimer = null;
+var _sseReconnectDelay = 2000;
+
+function _sseTriggerRefresh() {
+  clearTimeout(_sseDebounceTimer);
+  // Rövid debounce: ha egy admin-mentés több path-ot ír egyszerre (pl. FT+ET korrekció),
+  // ne fusson le 2-3x egymás után a pollData(), elég egyszer, a burst végén.
+  _sseDebounceTimer = setTimeout(function(){ safePollData(); }, 350);
+}
+
+function startRealtimeSync() {
+  if(typeof EventSource === 'undefined') return; // nagyon régi böngésző fallback — a poll viszi tovább
+  if(_sseSource) { try{ _sseSource.close(); }catch(e){} }
+  var url = DB_URL + '.json' + (_fbAdminParam() || '');
+  try {
+    _sseSource = new EventSource(url);
+    _sseSource.addEventListener('put', _sseTriggerRefresh);
+    _sseSource.addEventListener('patch', _sseTriggerRefresh);
+    _sseSource.onopen = function() {
+      _sseReconnectDelay = 2000; // sikeres kapcsolat után visszaáll az alap retry-idő
+      setStatus('online','Élő szinkron aktív');
+    };
+    _sseSource.onerror = function() {
+      // A böngésző EventSource natívan is újrapróbálkozik, de mobil háttérbe-kerülés után
+      // előfordulhat, hogy teljesen leáll a kapcsolat — ilyenkor kézzel is újraindítjuk,
+      // növekvő várakozással (max 30mp), a setInterval poll pedig közben biztonsági
+      // hálóként tovább viszi az appot változatlanul.
+      setStatus('loading','Újracsatlakozás…');
+      try{ _sseSource.close(); }catch(e){}
+      _sseSource = null;
+      setTimeout(startRealtimeSync, _sseReconnectDelay);
+      _sseReconnectDelay = Math.min(_sseReconnectDelay * 1.5, 30000);
+    };
+  } catch(e) {
+    // EventSource hiba esetén a sima poll (setInterval) attól függetlenül fut tovább
+  }
+}
+
 // Firebase hívások biztonságos indítása
 function safePollData() { pollData().catch(function(){}); }
 function safePollChat() {} // chat eltávolítva
@@ -3281,6 +3332,17 @@ safePollChat();
 migrateFeaturePollVotesOnce();
 setInterval(safePollData, POLL_MS);
 setInterval(safePollChat, 5000);
+startRealtimeSync();
+
+// Mobilon (Safari) háttérbe kerüléskor a böngésző felfüggesztheti az SSE kapcsolatot.
+// Amint a felhasználó visszatér az apphoz, azonnal frissítünk és újraindítjuk az élő
+// szinkront — nem kell megvárni a 45mp-es biztonsági hálót.
+document.addEventListener('visibilitychange', function() {
+  if(document.visibilityState === 'visible') {
+    safePollData();
+    startRealtimeSync();
+  }
+});
 
 setStatus('online','Szinkronizálva');
 
