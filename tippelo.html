@@ -4713,7 +4713,7 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
       + '<span style="color:rgba(240,244,240,0.4);font-size:16px;flex-shrink:0;">:</span>'
       + '<input type="text" inputmode="numeric" id="ets_a_'+m.id+'" class="score-num-input" maxlength="2" value="'+escHtml(myEtA)+'" placeholder="-"'+(etScoreLocked?' disabled':'')+' style="width:42px;flex-shrink:0;'+(etOK?'border-color:#00ff87;':'')+'" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">'
       + (realEtScore ? '<span style="font-size:11px;color:rgba(0,255,135,0.6);flex-shrink:0;">= '+realEtScore+'</span>' : '')
-      + '<button class="score-save-btn" data-mid="'+m.id+'" onclick="handleEtScoreSave(this)"'+(etScoreLocked?' disabled':'')+' style="flex:1;min-width:60px;">✓ Ment</button>'
+      + '<button class="score-save-btn'+((myEtH!==''&&myEtA!=='')?' saved':'')+'" data-mid="'+m.id+'" onclick="handleEtScoreSave(this)"'+(etScoreLocked?' disabled':'')+' style="flex:1;min-width:60px;">'+((myEtH!==''&&myEtA!=='')?'✓ Mentve':'✓ Ment')+'</button>'
       + '</div>'
       + '</div>';
   }
@@ -4740,7 +4740,7 @@ function buildKnockoutRows(m, myTip, regResult, kickoffLocked) {
       + '<span style="color:rgba(240,244,240,0.4);font-size:16px;flex-shrink:0;">:</span>'
       + '<input type="text" inputmode="numeric" id="pens_a_'+m.id+'" class="score-num-input" maxlength="2" value="'+escHtml(myPenA)+'" placeholder="-"'+(penScoreLocked?' disabled':'')+' style="width:42px;flex-shrink:0;'+(penOK?'border-color:#00ff87;':'')+'" onfocus="_scoreSaving=true" onblur="setTimeout(function(){_scoreSaving=false},1000)">'
       + (realPenScore ? '<span style="font-size:11px;color:rgba(0,255,135,0.6);flex-shrink:0;">= '+realPenScore+'</span>' : '')
-      + '<button class="score-save-btn" data-mid="'+m.id+'" onclick="handlePenScoreSave(this)"'+(penScoreLocked?' disabled':'')+' style="flex:1;min-width:60px;">✓ Ment</button>'
+      + '<button class="score-save-btn'+((myPenH!==''&&myPenA!=='')?' saved':'')+'" data-mid="'+m.id+'" onclick="handlePenScoreSave(this)"'+(penScoreLocked?' disabled':'')+' style="flex:1;min-width:60px;">'+((myPenH!==''&&myPenA!=='')?'✓ Mentve':'✓ Ment')+'</button>'
       + '</div>'
       + '</div>';
   }
@@ -10122,7 +10122,7 @@ async function handlePenScoreSave(btn) {
 // Közös, visszaigazolt mentés + automata retry ET/11-es mezőkhöz (POKA-YOKE)
 function _saveEtPenWithRetry(path, newTip, btn, inputs, h, a, successMsgPrefix, attempt) {
   return fbSet(path, newTip).then(function(){
-    _scoreSaving = false;
+    setTimeout(function(){ _scoreSaving = false; }, 1500);
     btn.disabled = false;
     btn.classList.remove('saving');
     btn.classList.add('saved');
