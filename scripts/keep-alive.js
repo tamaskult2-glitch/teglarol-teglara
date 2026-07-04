@@ -33,7 +33,12 @@ if (!URL) {
   page.on('pageerror', (err) => console.log('[oldal hiba]', err.message));
 
   console.log('→ Megnyitás:', URL);
-  await page.goto(URL, { waitUntil: 'networkidle', timeout: 60000 });
+  // FONTOS: NEM 'networkidle' — a tippelo.html szándékosan állandó SSE (EventSource)
+  // kapcsolatot tart nyitva az élő szinkronhoz, emiatt a hálózat sosem lenne "idle",
+  // a networkidle várakozás garantáltan időtúllépésbe futna. Elég, ha az oldal
+  // betöltődött és a JS elindult ('load') — a lenti waitForTimeout már úgyis
+  // biztosítja, hogy a pollData()/ESPN-korrekció lefusson.
+  await page.goto(URL, { waitUntil: 'load', timeout: 60000 });
 
   // Hagyjuk futni annyi ideig, hogy a poll lefusson és az ESPN summary lekérdezések
   // (amik önmagukban is 1-2mp-et vehetnek igénybe meccsenként) befejeződjenek.
