@@ -1,0 +1,38 @@
+name: Tippelő auto-szinkron ébren tartása
+
+# Miért kell ez?
+# A tippelo.html ESPN-egyeztető/FT-ET korrekciós logikája kliens-oldali: csak akkor
+# fut le, ha valakinek épp nyitva van a böngészőjében az oldal. Ha egy meccs éjszaka
+# ér véget és senki sincs bent, a korrekció csak akkor történik meg, amikor legközelebb
+# valaki megnyitja az appot.
+#
+# Ez a workflow 5 percenként fejnélküli (headless) Chrome-mal megnyitja magát az éles
+# GitHub Pages oldalt egy pár másodpercre — ennyi idő alatt lefut a meglévő pollData()
+# és az ESPN auto-korrekció, PONTOSAN ugyanazzal a kóddal, ami egy valódi felhasználónál
+# is fut. Nincs logika-duplikáció, nincs második karbantartandó forrás.
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # 5 percenként — módosítható, ha ritkábban/gyakrabban kellene
+  workflow_dispatch:         # kézzel is elindítható az Actions fülön "Run workflow"-val
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Node.js telepítése
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Playwright telepítése (fejnélküli Chrome)
+        run: |
+          npm install playwright
+          npx playwright install --with-deps chromium
+
+      - name: Oldal megnyitása és a szinkron lefuttatása
+        env:
+          TIPPELO_URL: ${{ vars.TIPPELO_URL }}
+          FB_ADMIN_SECRET: ${{ secrets.FB_ADMIN_SECRET }}
+        run: node scripts/keep-alive.js
