@@ -21,6 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
+      - name: Repo letöltése (checkout)
+        uses: actions/checkout@v4
+
       - name: Node.js telepítése
         uses: actions/setup-node@v4
         with:
