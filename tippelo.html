@@ -5559,14 +5559,14 @@ function renderMatches() {
   // R16 kieséses meccsek hozzáadása — ha az R32 győztes már ismert
   // Forrás: FIFA.com hivatalos R32/R16 struktúra
   var R16_STRUCTURE = [
-    { m:89, hSrc:74, aSrc:77, huDate:'2026-07-05', huTime:'03:00', venue:'Philadelphia'  },
+    { m:89, hSrc:74, aSrc:77, huDate:'2026-07-04', huTime:'23:00', venue:'Philadelphia'  },
     { m:90, hSrc:73, aSrc:75, huDate:'2026-07-04', huTime:'19:00', venue:'Houston'        },
-    { m:91, hSrc:76, aSrc:78, huDate:'2026-07-06', huTime:'02:00', venue:'New Jersey'     },
-    { m:92, hSrc:79, aSrc:80, huDate:'2026-07-06', huTime:'06:00', venue:'Mexico City'    },
-    { m:93, hSrc:83, aSrc:84, huDate:'2026-07-07', huTime:'01:00', venue:'Dallas'         },
-    { m:94, hSrc:81, aSrc:82, huDate:'2026-07-07', huTime:'06:00', venue:'Seattle'        },
-    { m:95, hSrc:86, aSrc:88, huDate:'2026-07-07', huTime:'22:00', venue:'Atlanta'        },
-    { m:96, hSrc:85, aSrc:87, huDate:'2026-07-08', huTime:'02:00', venue:'Vancouver'      },
+    { m:91, hSrc:76, aSrc:78, huDate:'2026-07-05', huTime:'22:00', venue:'New Jersey'     },
+    { m:92, hSrc:79, aSrc:80, huDate:'2026-07-06', huTime:'02:00', venue:'Mexico City'    },
+    { m:93, hSrc:83, aSrc:84, huDate:'2026-07-06', huTime:'21:00', venue:'Dallas'         },
+    { m:94, hSrc:81, aSrc:82, huDate:'2026-07-07', huTime:'02:00', venue:'Seattle'        },
+    { m:95, hSrc:86, aSrc:88, huDate:'2026-07-07', huTime:'18:00', venue:'Atlanta'        },
+    { m:96, hSrc:85, aSrc:87, huDate:'2026-07-07', huTime:'22:00', venue:'Vancouver'      },
   ];
   var r16Ids = new Set(mainMatches.filter(function(m){ return m.id&&m.id.startsWith('R16_'); }).map(function(m){ return m.id; }));
   R16_STRUCTURE.forEach(function(slot) {
