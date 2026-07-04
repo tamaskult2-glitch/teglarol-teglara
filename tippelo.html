@@ -320,11 +320,12 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
   .page-wrapper{padding:12px 12px 80px;}
 }
 /* Bajnokok fala – dekoratív háttér */
-.wc-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+.wc-bg{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;
   -webkit-mask-image:radial-gradient(ellipse 62% 72% at 50% 44%,transparent 38%,#000 92%);
   mask-image:radial-gradient(ellipse 62% 72% at 50% 44%,transparent 38%,#000 92%);}
 .wc-bg span{position:absolute;font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
-  letter-spacing:1px;color:rgba(0,255,135,0.14);white-space:nowrap;user-select:none;}
+  letter-spacing:1px;color:rgba(0,255,135,0.14);white-space:nowrap;user-select:none;
+  text-shadow:0 1px 4px rgba(0,0,0,0.85),0 0 8px rgba(0,0,0,0.5);}
 .header-content{position:relative;z-index:3;}
 .trophy-svg{width:60px;height:auto;display:block;margin:0 auto 6px;
   filter:drop-shadow(0 3px 11px rgba(0,255,135,0.45));animation:trophyFloat 4s ease-in-out infinite;}
@@ -758,7 +759,11 @@ header p { margin-top:5px;font-size:11px;color:rgba(240,244,240,0.3);letter-spac
 }
 .score-save-btn:hover{background:rgba(0,255,135,0.22);}
 .score-save-btn.saved{background:rgba(0,255,135,0.15);border-color:rgba(0,255,135,0.4);color:#39ff9d;}
+.score-save-btn.saving{background:rgba(245,197,24,0.12);border-color:rgba(245,197,24,0.4);color:#f5c518;opacity:0.85;cursor:wait;}
+.score-save-btn.save-error{background:rgba(239,68,68,0.18);border-color:#ef4444;color:#ff8a8a;animation:saveErrShake 0.4s;}
 .score-save-btn:disabled{opacity:0.3;cursor:default;}
+@keyframes saveErrShake{0%,100%{transform:translateX(0);}20%{transform:translateX(-4px);}40%{transform:translateX(4px);}60%{transform:translateX(-3px);}80%{transform:translateX(3px);}}
+.score-num-input.input-error{border-color:#ef4444 !important;background:rgba(239,68,68,0.1) !important;animation:saveErrShake 0.4s;}
 .pts-badge{display:inline-block;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:6px;background:rgba(0,255,135,0.12);color:var(--gold);border:1px solid rgba(0,255,135,0.25);}
 .pts-badge.pts3{background:rgba(0,255,135,0.15);color:#39ff9d;border-color:rgba(0,255,135,0.35);}
 .result-footer{padding:4px 14px 10px;display:flex;justify-content:center;gap:8px;align-items:center;}
@@ -4425,72 +4430,105 @@ async function submitTip(mid,tip,phase) {
 }
 
 // ===== SCORE MENTÉS - egyetlen belépési pont =====
+// POKA-YOKE: a gomb csak akkor mutat "✓ Mentve"-t, ha a Firebase-írás VALÓBAN
+// visszaigazolta a mentést — soha nem optimista feltételezés. Hiba esetén a
+// gomb és a mezők is jól láthatóan (piros, remegő) jelzik, hogy NEM mentődött,
+// és automatikusan újrapróbálja 2x, mielőtt feladná.
 function handleScoreSave(btn) {
-  // Az input értékeket KÖZVETLENÜL a gomb szomszédjából olvassuk
   var mid = btn.getAttribute('data-mid');
   if(!mid) return;
-  
-  // Inputok keresése a DOM-ban
+
   var scoreRow = btn.closest ? btn.closest('.score-row') : btn.parentNode;
   var hEl = scoreRow ? scoreRow.querySelector('#sh_tip_'+mid) : document.getElementById('sh_tip_'+mid);
   var aEl = scoreRow ? scoreRow.querySelector('#sa_tip_'+mid) : document.getElementById('sa_tip_'+mid);
-  
+
   var hVal = hEl ? hEl.value : '';
   var aVal = aEl ? aEl.value : '';
 
+  function flagBlocked(msg) {
+    showToast(msg);
+    var origTxt = btn.textContent;
+    btn.classList.add('save-error');
+    btn.textContent = '⚠️ Nem mentve!';
+    [hEl, aEl].forEach(function(el){ if(el) el.classList.add('input-error'); });
+    setTimeout(function(){
+      btn.classList.remove('save-error');
+      btn.textContent = origTxt;
+      [hEl, aEl].forEach(function(el){ if(el) el.classList.remove('input-error'); });
+    }, 2800);
+  }
+
   if(!currentUser){document.getElementById('regModal').style.display='flex';return;}
   var m = ALL_MATCHES.find(function(x){return x.id===mid;}) || _virtualKOMatches[mid];
-  if(m && isKickoffPassed(m.huDate,m.huTime) && !mid.startsWith('CM_TEST_')){showToast('⏰ A meccs már elkezdett!');return;}
-  if(allResults[mid]){showToast('⛔ Már ismert az eredmény!');return;}
-  if(hVal===''||aVal===''){showToast('⚠️ Írd be mindkét számot!');return;}
-  
+  if(m && isKickoffPassed(m.huDate,m.huTime) && !mid.startsWith('CM_TEST_')){ flagBlocked('⏰ A meccs már elkezdett!'); return; }
+  if(allResults[mid]){ flagBlocked('⛔ Már ismert az eredmény!'); return; }
+  if(hVal===''||aVal===''){ flagBlocked('⚠️ Írd be mindkét számot!'); return; }
+
   var hN = parseInt(hVal), aN = parseInt(aVal);
-  if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){showToast('⚠️ 0-20 közötti szám!');return;}
-  
+  if(isNaN(hN)||isNaN(aN)||hN<0||aN<0||hN>20||aN>20){ flagBlocked('⚠️ 0-20 közötti szám!'); return; }
+
   var scoreOutcome = hN>aN?'1':hN===aN?'X':'2';
   if(!allTips[mid]) allTips[mid]={};
-  
+
   // Megőrizzük a meglévő tippet (1/X/2)
   var existing = allTips[mid][fbSafeName(currentUser)] || {};
   var existingOutcome = getTipOutcome(existing);
   var existingEt = getTipEt(existing);
   var existingPen = getTipPen(existing);
-  
+
   // Validáció: az eredmény egyezzen a kimenetellel
   if(existingOutcome && existingOutcome !== scoreOutcome) {
     var labels = {'1':'hazai győzelem (1)','X':'döntetlen (X)','2':'vendég győzelem (2)'};
-    showToast('⚠️ A '+hN+':'+aN+' eredmény nem egyezik a tippeddel: '+labels[existingOutcome]+'!');
+    flagBlocked('⚠️ A '+hN+':'+aN+' nem egyezik a tippeddel ('+labels[existingOutcome]+')! Módosítsd a tippet vagy az eredményt.');
     return;
   }
-  
-  var newTip = {o: existingOutcome||scoreOutcome, h:hN, a:aN};
+
+  var newTip = {o: existingOutcome||scoreOutcome, h:hN, a:aN, ts: Date.now()};
   if(existingEt) newTip.et = existingEt;
   if(existingPen) newTip.pen = existingPen;
   allTips[mid][fbSafeName(currentUser)] = newTip;
 
-  // AZONNALI UI visszajelzés - Firebase ELŐTT
-  btn.classList.add('saved');
-  btn.textContent = '✓ Mentve';
-  if(hEl){hEl.classList.add('filled');hEl.value=hN;}
-  if(aEl){aEl.classList.add('filled');aEl.value=aN;}
-  
-  // Toast megjelenítés
-  showToast('🎯 ' + hN + ':' + aN + ' elmentve!');
-  
-  // Lock: renderMatches ne törölje a kártyát
+  if(hEl){hEl.classList.add('filled');hEl.value=hN;hEl.classList.remove('input-error');}
+  if(aEl){aEl.classList.add('filled');aEl.value=aN;aEl.classList.remove('input-error');}
+
+  // Közbenső, jól látható "mentés folyamatban" állapot — amíg nincs visszaigazolás
+  btn.disabled = true;
+  btn.classList.remove('saved','save-error');
+  btn.classList.add('saving');
+  btn.textContent = '💾 Mentés…';
+
   _scoreSaving = true;
-  newTip.ts = Date.now();
-  
   renderStats(); renderUserBar();
-  
-  // Firebase mentés async (nem várjuk meg - UI már frissítve)
-  setTimeout(function(){ _scoreSaving=false; }, 3000);
+
+  _saveScoreWithRetry(mid, newTip, btn, hEl, aEl, 0);
+}
+
+function _saveScoreWithRetry(mid, newTip, btn, hEl, aEl, attempt) {
   fbSet('tips/'+mid+'/'+fbSafeName(currentUser), newTip)
     .then(function(){
-      if(activeTab==='tippek') buildTippTable();
+      btn.disabled = false;
+      btn.classList.remove('saving');
+      btn.classList.add('saved');
+      btn.textContent = '✓ Mentve';
+      showToast('🎯 ' + newTip.h + ':' + newTip.a + ' elmentve!');
+      setTimeout(function(){ _scoreSaving=false; }, 3000);
+      if(activeTab==='tippek') try{ buildTippTable(); }catch(e){}
     })
     .catch(function(){
-      // Helyi allTips már frissítve, Firebase nélkül is működik
+      if(attempt < 2) {
+        // Automatikus újrapróbálkozás (átmeneti hálózati hiba esetén) — a felhasználónak
+        // ehhez semmit nem kell tennie, csendben próbálkozunk újra 2x.
+        setTimeout(function(){ _saveScoreWithRetry(mid, newTip, btn, hEl, aEl, attempt+1); }, 1000*(attempt+1));
+        return;
+      }
+      // Végleges hiba — eltéveszthetetlen, tartós jelzés + újrapróbálható gomb
+      _scoreSaving = false;
+      btn.disabled = false;
+      btn.classList.remove('saving');
+      btn.classList.add('save-error');
+      btn.textContent = '❌ Nem sikerült! Koppints újra';
+      [hEl, aEl].forEach(function(el){ if(el) el.classList.add('input-error'); });
+      showToast('❌ Mentés sikertelen — nincs net? Koppints újra a gombra!');
     });
 }
 
@@ -8735,11 +8773,11 @@ async function checkAutoResults() {
         allScores[localMatch.id] = score;
         autoSaved++;
         showToast('🤖 Auto: '+localMatch.home+' '+score+' '+localMatch.away);
-        // Kieséses meccsnél ET/Pen/Góllövők auto-fetch (ha döntetlen 90min)
-        if(localMatch.knockout && result === 'X') {
+        // Kieséses meccsnél MINDIG a részletes (period-alapú) útvonal fusson —
+        // a "result==='X'" nem megbízható jelzés, mert h/a itt még a kumulált
+        // (FT+ET összevont) ESPN-eredmény, nem a 90 perces állás.
+        if(localMatch.knockout) {
           autoFetchKnockoutDetails(localMatch, ar);
-        } else if(localMatch.knockout) {
-          autoFetchKnockoutScorers(localMatch, ar);
         }
         // Kieséses meccsnél esemény adatok (gólok, lapok, cserék, felállás)
         if(localMatch.knockout && ar.espnId) {
@@ -10042,8 +10080,10 @@ async function adminSavePenScore(mid) {
 // ET score mentés
 async function handleEtScoreSave(btn) {
   var mid = btn.getAttribute('data-mid');
-  var h = parseInt((document.getElementById('ets_h_'+mid)||{}).value);
-  var a = parseInt((document.getElementById('ets_a_'+mid)||{}).value);
+  var hIn = document.getElementById('ets_h_'+mid);
+  var aIn = document.getElementById('ets_a_'+mid);
+  var h = parseInt((hIn||{}).value);
+  var a = parseInt((aIn||{}).value);
   if(isNaN(h)||isNaN(a)||h<0||a<0||h>20||a>20) { showToast('⚠️ Érvénytelen eredmény!'); return; }
   if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
   var existing = allTips[mid] && allTips[mid][fbSafeName(currentUser)];
@@ -10053,24 +10093,18 @@ async function handleEtScoreSave(btn) {
   newTip.ts = Date.now();
   if(!allTips[mid]) allTips[mid]={};
   allTips[mid][fbSafeName(currentUser)] = newTip;
-  try {
-    _scoreSaving = true;
-    await fbSet('tips/'+mid+'/'+fbSafeName(currentUser), newTip);
-    // Inputokat helyben frissítjük — nem renderelünk újra
-    var hIn = document.getElementById('ets_h_'+mid);
-    var aIn = document.getElementById('ets_a_'+mid);
-    if(hIn) { hIn.value = h; hIn.style.borderColor='rgba(0,255,135,0.5)'; }
-    if(aIn) { aIn.value = a; aIn.style.borderColor='rgba(0,255,135,0.5)'; }
-    showToast('⚡ ET eredmény mentve: '+h+':'+a);
-  } catch(e) { showToast('❌ Hiba: '+e.message); }
-  finally { setTimeout(function(){ _scoreSaving=false; }, 800); }
+  _scoreSaving = true;
+  btn.disabled = true; btn.classList.remove('saved','save-error'); btn.classList.add('saving'); btn.textContent='💾…';
+  await _saveEtPenWithRetry('tips/'+mid+'/'+fbSafeName(currentUser), newTip, btn, [hIn,aIn], h, a, '⚡ ET eredmény mentve: ', 0);
 }
 
 // Pen score mentés
 async function handlePenScoreSave(btn) {
   var mid = btn.getAttribute('data-mid');
-  var h = parseInt((document.getElementById('pens_h_'+mid)||{}).value);
-  var a = parseInt((document.getElementById('pens_a_'+mid)||{}).value);
+  var hIn = document.getElementById('pens_h_'+mid);
+  var aIn = document.getElementById('pens_a_'+mid);
+  var h = parseInt((hIn||{}).value);
+  var a = parseInt((aIn||{}).value);
   if(isNaN(h)||isNaN(a)||h<0||a<0||h>20||a>20) { showToast('⚠️ Érvénytelen eredmény!'); return; }
   if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
   var existing = allTips[mid] && allTips[mid][fbSafeName(currentUser)];
@@ -10080,16 +10114,35 @@ async function handlePenScoreSave(btn) {
   newTip.ts = Date.now();
   if(!allTips[mid]) allTips[mid]={};
   allTips[mid][fbSafeName(currentUser)] = newTip;
-  try {
-    _scoreSaving = true;
-    await fbSet('tips/'+mid+'/'+fbSafeName(currentUser), newTip);
-    var hIn = document.getElementById('pens_h_'+mid);
-    var aIn = document.getElementById('pens_a_'+mid);
-    if(hIn) { hIn.value = h; hIn.style.borderColor='rgba(0,255,135,0.5)'; }
-    if(aIn) { aIn.value = a; aIn.style.borderColor='rgba(0,255,135,0.5)'; }
-    showToast('🥅 11-es eredmény mentve: '+h+':'+a);
-  } catch(e) { showToast('❌ Hiba: '+e.message); }
-  finally { setTimeout(function(){ _scoreSaving=false; }, 800); }
+  _scoreSaving = true;
+  btn.disabled = true; btn.classList.remove('saved','save-error'); btn.classList.add('saving'); btn.textContent='💾…';
+  await _saveEtPenWithRetry('tips/'+mid+'/'+fbSafeName(currentUser), newTip, btn, [hIn,aIn], h, a, '🥅 11-es eredmény mentve: ', 0);
+}
+
+// Közös, visszaigazolt mentés + automata retry ET/11-es mezőkhöz (POKA-YOKE)
+function _saveEtPenWithRetry(path, newTip, btn, inputs, h, a, successMsgPrefix, attempt) {
+  return fbSet(path, newTip).then(function(){
+    _scoreSaving = false;
+    btn.disabled = false;
+    btn.classList.remove('saving');
+    btn.classList.add('saved');
+    btn.textContent = '✓ Mentve';
+    inputs.forEach(function(el){ if(el){ el.classList.remove('input-error'); el.style.borderColor='rgba(0,255,135,0.5)'; } });
+    showToast(successMsgPrefix + h + ':' + a);
+  }).catch(function(){
+    if(attempt < 2) {
+      return new Promise(function(resolve){
+        setTimeout(function(){ resolve(_saveEtPenWithRetry(path, newTip, btn, inputs, h, a, successMsgPrefix, attempt+1)); }, 1000*(attempt+1));
+      });
+    }
+    _scoreSaving = false;
+    btn.disabled = false;
+    btn.classList.remove('saving');
+    btn.classList.add('save-error');
+    btn.textContent = '❌ Újra!';
+    inputs.forEach(function(el){ if(el) el.classList.add('input-error'); });
+    showToast('❌ Mentés sikertelen — nincs net? Koppints újra!');
+  });
 }
 
 
@@ -10164,6 +10217,25 @@ async function autoFetchKnockoutDetails(localMatch, ar) {
     if(awayT.linescores) awayT.linescores.forEach(function(p){ awayPeriods.push(parseInt(p.displayValue)||0); });
 
     var hasPeriods = homePeriods.length > 0;
+
+    // ===== FT (90 perces) EREDMÉNY KORREKCIÓJA =====
+    // Az ESPN "score" mezője a meccs VÉGÉN a kumulált (FT+ET+Pen összevont) eredményt
+    // adja, ezt mentette el korábban a hívó kód FT-eredményként — ez itt a period-bontás
+    // (linescores[0]+[1] = 90 perc) alapján felülírja a helyes 90 perces állással.
+    // Pl.: FT=1:1, ET=2:1 → ESPN "score"=3:2 lenne hibásan elmentve; itt lesz 1:1-re javítva.
+    if(hasPeriods && homePeriods.length >= 2) {
+      var h90fix = (homePeriods[0]||0) + (homePeriods[1]||0);
+      var a90fix = (awayPeriods[0]||0) + (awayPeriods[1]||0);
+      var score90fix = h90fix + ':' + a90fix;
+      if(allScores[localMatch.id] !== score90fix) {
+        var result90fix = h90fix>a90fix ? '1' : h90fix===a90fix ? 'X' : '2';
+        allResults[localMatch.id] = result90fix;
+        allScores[localMatch.id] = score90fix;
+        fbSet('results/'+localMatch.id, result90fix).catch(function(){});
+        fbSet('scores/'+localMatch.id, score90fix).catch(function(){});
+        console.log('🤖 Auto FT-korrekció (kumulált→90perc): '+localMatch.home+' '+score90fix+' '+localMatch.away);
+      }
+    }
 
     // ET eredmény: periódus 2 (index 2-3 = ET1+ET2)
     if(hasPeriods && homePeriods.length >= 3 && !allEtResults[localMatch.id]) {
