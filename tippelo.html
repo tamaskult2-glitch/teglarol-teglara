@@ -10054,9 +10054,26 @@ function renderBracket() {
 }
 
 async function adminSaveEtScore(mid) {
-  var h = parseInt((document.getElementById('aets_h_'+mid)||{}).value);
-  var a = parseInt((document.getElementById('aets_a_'+mid)||{}).value);
+  var hIn = document.getElementById('aets_h_'+mid);
+  var aIn = document.getElementById('aets_a_'+mid);
+  var h = parseInt((hIn||{}).value);
+  var a = parseInt((aIn||{}).value);
   if(isNaN(h)||isNaN(a)) { showToast('⚠️ Adj meg érvényes ET eredményt!'); return; }
+
+  // POKA-YOKE: a valós ET (kumulált) eredmény egyik csapatnál sem lehet kisebb,
+  // mint a rögzített FT eredmény — gólt nem lehet "elvenni" hosszabbításban.
+  var realFt = allScores[mid];
+  if(realFt) {
+    var ftParts = realFt.split(':');
+    var ftH = parseInt(ftParts[0]), ftA = parseInt(ftParts[1]);
+    if(!isNaN(ftH) && !isNaN(ftA) && (h < ftH || a < ftA)) {
+      showToast('⚠️ Az ET ('+h+':'+a+') nem lehet kisebb, mint az FT ('+ftH+':'+ftA+')!');
+      [hIn, aIn].forEach(function(el){ if(el) el.classList.add('input-error'); });
+      setTimeout(function(){ [hIn, aIn].forEach(function(el){ if(el) el.classList.remove('input-error'); }); }, 2800);
+      return;
+    }
+  }
+
   allEtScores[mid] = h+':'+a;
   try {
     await fbSet('etScores/'+mid, h+':'+a);
@@ -10088,6 +10105,24 @@ async function handleEtScoreSave(btn) {
   if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
   var existing = allTips[mid] && allTips[mid][fbSafeName(currentUser)];
   if(!existing) { showToast('⚠️ Előbb adj le ET kimenetelt!'); return; }
+
+  // POKA-YOKE: az ET (hosszabbítás utáni, kumulált) eredmény egyik csapatnál sem
+  // lehet KISEBB, mint a saját FT (90 perces) tipped — gólt nem lehet "elvenni".
+  var ftScore = getTipScore(existing);
+  if(ftScore && (h < ftScore.h || a < ftScore.a)) {
+    showToast('⚠️ Az ET ('+h+':'+a+') nem lehet kisebb, mint az FT tipped ('+ftScore.h+':'+ftScore.a+')!');
+    btn.classList.add('save-error');
+    var origTxt = btn.textContent;
+    btn.textContent = '⚠️ Nem mentve!';
+    [hIn, aIn].forEach(function(el){ if(el) el.classList.add('input-error'); });
+    setTimeout(function(){
+      btn.classList.remove('save-error');
+      btn.textContent = origTxt;
+      [hIn, aIn].forEach(function(el){ if(el) el.classList.remove('input-error'); });
+    }, 2800);
+    return;
+  }
+
   var newTip = Object.assign({}, existing);
   newTip.etScore = h+':'+a;
   newTip.ts = Date.now();
