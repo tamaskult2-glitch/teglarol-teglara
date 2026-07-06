@@ -9947,11 +9947,11 @@ var R32_STRUCTURE = [
 function detectRound(m) {
   var g = (m.group||m.title||'').toLowerCase().trim();
   if(/bronz|3rd|harmadik/i.test(g)) return 'BRONZE';
-  if(/^döntő$|^final$/i.test(g)) return 'FINAL';
-  if(/elődöntő|semifinal/i.test(g)) return 'SF';
-  if(/negyeddöntő|quarter/i.test(g)) return 'QF';
-  if(/tizenhatod|r16/i.test(g)) return 'R16';
-  if(/nyolcaddöntő|r32/i.test(g)) return 'R32';
+  if(/^döntő$|^final$|^fin$/i.test(g)) return 'FINAL';
+  if(/elődöntő|semifinal|^sf$/i.test(g)) return 'SF';
+  if(/negyeddöntő|quarter|^qf$/i.test(g)) return 'QF';
+  if(/tizenhatod|^r16$/i.test(g)) return 'R16';
+  if(/nyolcaddöntő|^r32$/i.test(g)) return 'R32';
   return null;
 }
 
