@@ -3156,6 +3156,11 @@ const _authParam   = p => (_isAdminPath(p) || isAdminUnlocked) ? _fbAdminParam()
 
 const fbGet  = async p => { const r=await fetch(DB_URL+'/'+p+'.json'+(_fbAdminParam()||''), {cache:'no-store'}); if(!r.ok) throw new Error(r.status); return r.json(); };
 const fbSet  = async (p,v) => { const auth=_authParam(p); const r=await fetch(DB_URL+'/'+p+'.json'+auth,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); if(!r.ok) throw new Error('FB írási hiba ('+r.status+') — nincs admin secret?'); return r.json(); };
+// PATCH: csak a megadott mezőket frissíti egy csomóponton, a testvér mezőket (pl. egy
+// közös tipp-objektum többi adatát) NEM írja felül — ez zárja ki a "read-modify-write"
+// versenyhelyzetet, ahol egy elavult helyi másolat visszaírása törölné a közben mentett
+// más mezőket (pl. ET eredmény törlődik egy később mentett 11-es eredménytől).
+const fbPatch = async (p,v) => { const auth=_authParam(p); const r=await fetch(DB_URL+'/'+p+'.json'+auth,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); if(!r.ok) throw new Error('FB írási hiba ('+r.status+') — nincs admin secret?'); return r.json(); };
 const fbDel  = async p => fetch(DB_URL+'/'+p+'.json'+_authParam(p),{method:'DELETE'});
 const fbPush = async (p,v) => { const auth=_authParam(p); const r=await fetch(DB_URL+'/'+p+'.json'+auth,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return r.json(); };
 
@@ -4562,11 +4567,11 @@ function handleScoreSave(btn) {
   _scoreSaving = true;
   renderStats(); renderUserBar();
 
-  _saveScoreWithRetry(mid, newTip, btn, hEl, aEl, 0);
+  _saveScoreWithRetry(mid, {o: newTip.o, h: newTip.h, a: newTip.a, ts: newTip.ts}, newTip, btn, hEl, aEl, 0);
 }
 
-function _saveScoreWithRetry(mid, newTip, btn, hEl, aEl, attempt) {
-  fbSet('tips/'+mid+'/'+fbSafeName(currentUser), newTip)
+function _saveScoreWithRetry(mid, patchData, newTip, btn, hEl, aEl, attempt) {
+  fbPatch('tips/'+mid+'/'+fbSafeName(currentUser), patchData)
     .then(function(){
       btn.disabled = false;
       btn.classList.remove('saving');
@@ -4580,7 +4585,7 @@ function _saveScoreWithRetry(mid, newTip, btn, hEl, aEl, attempt) {
       if(attempt < 2) {
         // Automatikus újrapróbálkozás (átmeneti hálózati hiba esetén) — a felhasználónak
         // ehhez semmit nem kell tennie, csendben próbálkozunk újra 2x.
-        setTimeout(function(){ _saveScoreWithRetry(mid, newTip, btn, hEl, aEl, attempt+1); }, 1000*(attempt+1));
+        setTimeout(function(){ _saveScoreWithRetry(mid, patchData, newTip, btn, hEl, aEl, attempt+1); }, 1000*(attempt+1));
         return;
       }
       // Végleges hiba — eltéveszthetetlen, tartós jelzés + újrapróbálható gomb
@@ -5704,17 +5709,17 @@ function renderMatches() {
 
   // === QF / SF / DÖNTŐ / BRONZ BRACKET ===
   var QF_STRUCTURE = [
-    { m:97,  hSrc:'R16_M89', aSrc:'R16_M90', huDate:'2026-07-10', huTime:'01:00', venue:'Boston'      },
+    { m:97,  hSrc:'R16_M89', aSrc:'R16_M90', huDate:'2026-07-09', huTime:'22:00', venue:'Boston'      },
     { m:98,  hSrc:'R16_M93', aSrc:'R16_M94', huDate:'2026-07-10', huTime:'21:00', venue:'Los Angeles'  },
-    { m:99,  hSrc:'R16_M91', aSrc:'R16_M92', huDate:'2026-07-11', huTime:'03:00', venue:'Miami'        },
+    { m:99,  hSrc:'R16_M91', aSrc:'R16_M92', huDate:'2026-07-11', huTime:'23:00', venue:'Miami'        },
     { m:100, hSrc:'R16_M95', aSrc:'R16_M96', huDate:'2026-07-12', huTime:'03:00', venue:'Kansas City'  },
   ];
   var SF_STRUCTURE = [
-    { m:101, hSrc:'QF_M97',  aSrc:'QF_M98',  huDate:'2026-07-15', huTime:'01:00', venue:'Dallas'   },
-    { m:102, hSrc:'QF_M99',  aSrc:'QF_M100', huDate:'2026-07-16', huTime:'01:00', venue:'Atlanta'  },
+    { m:101, hSrc:'QF_M97',  aSrc:'QF_M98',  huDate:'2026-07-14', huTime:'21:00', venue:'Dallas'   },
+    { m:102, hSrc:'QF_M99',  aSrc:'QF_M100', huDate:'2026-07-15', huTime:'21:00', venue:'Atlanta'  },
   ];
   var FINAL_STRUCTURE = [
-    { m:103, hSrc:'SF_M101', aSrc:'SF_M102', huDate:'2026-07-19', huTime:'03:00', venue:'Miami',       group:'BRONZE', isLoser:true  },
+    { m:103, hSrc:'SF_M101', aSrc:'SF_M102', huDate:'2026-07-18', huTime:'23:00', venue:'Miami',       group:'BRONZE', isLoser:true  },
     { m:104, hSrc:'SF_M101', aSrc:'SF_M102', huDate:'2026-07-19', huTime:'21:00', venue:'New Jersey',  group:'FINAL',  isLoser:false },
   ];
 
@@ -10192,7 +10197,7 @@ async function handleEtScoreSave(btn) {
   allTips[mid][fbSafeName(currentUser)] = newTip;
   _scoreSaving = true;
   btn.disabled = true; btn.classList.remove('saved','save-error'); btn.classList.add('saving'); btn.textContent='💾…';
-  await _saveEtPenWithRetry('tips/'+mid+'/'+fbSafeName(currentUser), newTip, btn, [hIn,aIn], h, a, '⚡ ET eredmény mentve: ', 0);
+  await _saveEtPenWithRetry('tips/'+mid+'/'+fbSafeName(currentUser), {etScore: newTip.etScore, ts: newTip.ts}, btn, [hIn,aIn], h, a, '⚡ ET eredmény mentve: ', 0);
 }
 
 // Pen score mentés
@@ -10213,12 +10218,12 @@ async function handlePenScoreSave(btn) {
   allTips[mid][fbSafeName(currentUser)] = newTip;
   _scoreSaving = true;
   btn.disabled = true; btn.classList.remove('saved','save-error'); btn.classList.add('saving'); btn.textContent='💾…';
-  await _saveEtPenWithRetry('tips/'+mid+'/'+fbSafeName(currentUser), newTip, btn, [hIn,aIn], h, a, '🥅 11-es eredmény mentve: ', 0);
+  await _saveEtPenWithRetry('tips/'+mid+'/'+fbSafeName(currentUser), {penScore: newTip.penScore, ts: newTip.ts}, btn, [hIn,aIn], h, a, '🥅 11-es eredmény mentve: ', 0);
 }
 
 // Közös, visszaigazolt mentés + automata retry ET/11-es mezőkhöz (POKA-YOKE)
-function _saveEtPenWithRetry(path, newTip, btn, inputs, h, a, successMsgPrefix, attempt) {
-  return fbSet(path, newTip).then(function(){
+function _saveEtPenWithRetry(path, patchData, btn, inputs, h, a, successMsgPrefix, attempt) {
+  return fbPatch(path, patchData).then(function(){
     setTimeout(function(){ _scoreSaving = false; }, 1500);
     btn.disabled = false;
     btn.classList.remove('saving');
@@ -10229,7 +10234,7 @@ function _saveEtPenWithRetry(path, newTip, btn, inputs, h, a, successMsgPrefix, 
   }).catch(function(){
     if(attempt < 2) {
       return new Promise(function(resolve){
-        setTimeout(function(){ resolve(_saveEtPenWithRetry(path, newTip, btn, inputs, h, a, successMsgPrefix, attempt+1)); }, 1000*(attempt+1));
+        setTimeout(function(){ resolve(_saveEtPenWithRetry(path, patchData, btn, inputs, h, a, successMsgPrefix, attempt+1)); }, 1000*(attempt+1));
       });
     }
     _scoreSaving = false;
