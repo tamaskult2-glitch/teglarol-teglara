@@ -4449,45 +4449,65 @@ async function submitTip(mid,tip,phase) {
   if(allEtResults[mid] && phase==='et'){showToast('⛔ Hosszabbítás eredménye már ismert!');return;}
   if(allPenResults[mid] && phase==='pen'){showToast('⛔ 11-es eredmény már ismert!');return;}
   if(!allTips[mid]) allTips[mid]={};
-  const existing = allTips[mid][fbSafeName(currentUser)];
-  const existingScore = getTipScore(existing);
-  const existingEt = getTipEt(existing);
-  const existingPen = getTipPen(existing);
-  const existingOut = getTipOutcome(existing);
+  const existing = allTips[mid][fbSafeName(currentUser)] || {};
 
-  // Új tipp objektum: megőrizzük a többi mezőt
-  let newTip = existingScore ? {o: existingOut, h:existingScore.h, a:existingScore.a} : (existingOut ? {o: existingOut} : {});
-  if(existingEt) newTip.et = existingEt;
-  if(existingPen) newTip.pen = existingPen;
-  // Góllövők megőrzése
-  if(existing && existing.scorers) newTip.scorers = existing.scorers;
+  // patchData: CSAK a ténylegesen változó mezők — fbPatch-csel megy, nem írja felül
+  // a testvér mezőket (pl. scorers, vagy amit épp ez a rekonstrukció nem ismerne).
+  // null érték = Firebase-ben törli az adott mezőt (shallow merge szemantika).
+  var patchData = { ts: Date.now() };
+  var localTip = Object.assign({}, existing); // helyi cache-hez (azonnali UI-frissítés)
 
   if(phase==='o') {
-    newTip.o = tip;
+    patchData.o = tip; localTip.o = tip;
     // Ha az új kimenetel nem egyezik a meglévő pontos eredménnyel → töröljük a score-t
-    if(newTip.h !== undefined && newTip.a !== undefined) {
-      var scoreImpliedOutcome = newTip.h > newTip.a ? '1' : newTip.h === newTip.a ? 'X' : '2';
+    if(existing.h !== undefined && existing.a !== undefined) {
+      var scoreImpliedOutcome = existing.h > existing.a ? '1' : existing.h === existing.a ? 'X' : '2';
       if(scoreImpliedOutcome !== tip) {
-        delete newTip.h;
-        delete newTip.a;
+        patchData.h = null; patchData.a = null;
+        delete localTip.h; delete localTip.a;
       }
     }
-    // Ha 90 perces tipp már nem X, töröljük az ET-t és pen-t
-    if(tip !== 'X') { delete newTip.et; delete newTip.pen; }
+    // Ha a 90 perces tipp már nem X, az EGÉSZ ET/Pen ág (kimenetel ÉS szám is) érvénytelen
+    if(tip !== 'X') {
+      patchData.et = null; patchData.pen = null;
+      patchData.etScore = null; patchData.penScore = null;
+      delete localTip.et; delete localTip.pen; delete localTip.etScore; delete localTip.penScore;
+    }
   } else if(phase==='et') {
-    newTip.et = tip;
-    // Ha az ET tipp már nem X, töröljük a pen-t
-    if(tip !== 'X') { delete newTip.pen; }
+    patchData.et = tip; localTip.et = tip;
+    // Ha az ET tipp már nem X, a Pen ág (kimenetel ÉS szám is) érvénytelen
+    if(tip !== 'X') {
+      patchData.pen = null; patchData.penScore = null;
+      delete localTip.pen; delete localTip.penScore;
+    }
+    // Ha van már mentett ET-szám, de az ellentmond az új kimenetel-tippnek, töröljük
+    if(existing.etScore) {
+      var etP = existing.etScore.split(':');
+      var etH = parseInt(etP[0]), etA = parseInt(etP[1]);
+      var impliedEt = etH > etA ? '1' : etH === etA ? 'X' : '2';
+      if(!isNaN(etH) && !isNaN(etA) && impliedEt !== tip) {
+        patchData.etScore = null; delete localTip.etScore;
+      }
+    }
   } else if(phase==='pen') {
-    newTip.pen = tip;
+    patchData.pen = tip; localTip.pen = tip;
+    // Ha van már mentett 11-es szám, de az ellentmond az új kimenetel-tippnek, töröljük
+    if(existing.penScore) {
+      var penP = existing.penScore.split(':');
+      var penH = parseInt(penP[0]), penA = parseInt(penP[1]);
+      var impliedPen = penH > penA ? '1' : '2';
+      if(!isNaN(penH) && !isNaN(penA) && impliedPen !== tip) {
+        patchData.penScore = null; delete localTip.penScore;
+      }
+    }
   }
 
-  newTip.ts = Date.now();
-  allTips[mid][fbSafeName(currentUser)]=newTip;
+  localTip.ts = patchData.ts;
+  allTips[mid][fbSafeName(currentUser)]=localTip;
   if(!_scoreSaving) try{renderMatches();}catch(e){}
   renderStats(); renderUserBar();
   try {
-    await fbSet('tips/'+mid+'/'+fbSafeName(currentUser),newTip);
+    await fbPatch('tips/'+mid+'/'+fbSafeName(currentUser), patchData);
     var toastMsg = phase==='o' ? (tip==='1'?'🔵 Hazai!':tip==='X'?'🟡 Döntetlen!':'🔴 Vendég!')
                  : phase==='et' ? ('⚡ Hosszabbítás: '+tip)
                  : ('🥅 11-es: '+tip);
@@ -6874,33 +6894,53 @@ async function adminSetTip(mid) {
 }
 
 async function setResult(mid,tip){
-  try{await fbSet('results/'+mid,tip);showToast('✅ '+tip+' rögzítve');await pollData();}
+  try{
+    await fbSet('results/'+mid,tip);
+    showToast('✅ '+tip+' rögzítve');
+    // Ha az FT eredmény nem X, akkor sem ET, sem Pen adatnak nincs értelme → mind törlődik
+    if(tip !== 'X') {
+      await fbDel('etResults/'+mid).catch(function(){});
+      await fbDel('etScores/'+mid).catch(function(){});
+      await fbDel('penResults/'+mid).catch(function(){});
+      await fbDel('penScores/'+mid).catch(function(){});
+    }
+    await pollData();
+  }
   catch(e){showToast('❌ Hiba!');}
 }
 async function clearRes(mid){
   try{
     await fbDel('results/'+mid);
-    // Knockout meccsnél töröljük az ET és Pen eredményeket is, mert már nincs értelmük
+    await fbDel('scores/'+mid).catch(function(){});
+    // Knockout meccsnél töröljük az ET és Pen adatokat is, mert már nincs értelmük
     var m = ALL_MATCHES.find(function(x){return x.id===mid;});
     if(m && isKnockoutMatch(m)) {
       await fbDel('etResults/'+mid).catch(function(){});
+      await fbDel('etScores/'+mid).catch(function(){});
       await fbDel('penResults/'+mid).catch(function(){});
+      await fbDel('penScores/'+mid).catch(function(){});
     }
     showToast('🗑️ Törölve');await pollData();renderAdminMatches();
   } catch(e){}
 }
 async function setEtResult(mid,tip){
   try{await fbSet('etResults/'+mid,tip);showToast('⚡ Hosszabbítás: '+tip);
-    // Ha az ET eredmény nem X, akkor a pen eredmény értelmetlen → töröljük
-    if(tip !== 'X') { await fbDel('penResults/'+mid).catch(function(){}); }
+    // Ha az ET eredmény nem X, akkor a 11-es GYŐZTES és a 11-es EREDMÉNY (szám) is
+    // értelmetlen → mindkettőt töröljük, nem csak az egyiket.
+    if(tip !== 'X') {
+      await fbDel('penResults/'+mid).catch(function(){});
+      await fbDel('penScores/'+mid).catch(function(){});
+    }
     await pollData();}
   catch(e){showToast('❌ Hiba!');}
 }
 async function clearEtRes(mid){
   try{
     await fbDel('etResults/'+mid);
-    // Ha töröljük az ET-t, a pen is törlődik
+    await fbDel('etScores/'+mid).catch(function(){});
+    // Ha töröljük az ET-t, a 11-es adatok (győztes ÉS eredmény) is törlődnek
     await fbDel('penResults/'+mid).catch(function(){});
+    await fbDel('penScores/'+mid).catch(function(){});
     showToast('🗑️ Hosszabbítás törölve');await pollData();renderAdminMatches();
   } catch(e){}
 }
@@ -10127,6 +10167,12 @@ async function adminSaveEtScore(mid) {
   var a = parseInt((aIn||{}).value);
   if(isNaN(h)||isNaN(a)) { showToast('⚠️ Adj meg érvényes ET eredményt!'); return; }
 
+  // POKA-YOKE: ET eredmény csak akkor lehetséges, ha az FT VALÓBAN döntetlen (X) volt.
+  if(allResults[mid] !== 'X') {
+    showToast('⚠️ ET csak akkor lehetséges, ha az FT döntetlen (X) volt!');
+    return;
+  }
+
   // POKA-YOKE: a valós ET (kumulált) eredmény egyik csapatnál sem lehet kisebb,
   // mint a rögzített FT eredmény — gólt nem lehet "elvenni" hosszabbításban.
   var realFt = allScores[mid];
@@ -10153,6 +10199,12 @@ async function adminSavePenScore(mid) {
   var h = parseInt((document.getElementById('apens_h_'+mid)||{}).value);
   var a = parseInt((document.getElementById('apens_a_'+mid)||{}).value);
   if(isNaN(h)||isNaN(a)) { showToast('⚠️ Adj meg érvényes 11-es eredményt!'); return; }
+  // POKA-YOKE: 11-es eredmény csak akkor lehetséges, ha a hosszabbítás VALÓBAN
+  // döntetlen (X) volt — ellenkező esetben a meccs már eldőlt, nincs 11-es.
+  if(allEtResults[mid] !== 'X') {
+    showToast('⚠️ 11-es csak akkor lehetséges, ha a hosszabbítás döntetlen (X) volt!');
+    return;
+  }
   allPenScores[mid] = h+':'+a;
   try {
     await fbSet('penScores/'+mid, h+':'+a);
@@ -10211,6 +10263,24 @@ async function handlePenScoreSave(btn) {
   if(!currentUser) { showToast('⚠️ Jelentkezz be!'); return; }
   var existing = allTips[mid] && allTips[mid][fbSafeName(currentUser)];
   if(!existing) { showToast('⚠️ Előbb adj le 11-es kimenetelt!'); return; }
+
+  function flagPenError(msg) {
+    showToast(msg);
+    [hIn, aIn].forEach(function(el){ if(el) el.classList.add('input-error'); });
+    setTimeout(function(){ [hIn, aIn].forEach(function(el){ if(el) el.classList.remove('input-error'); }); }, 2800);
+  }
+
+  // POKA-YOKE: 11-es rúgásoknál döntetlen fizikailag lehetetlen (hirtelen halál dönt),
+  // és a beírt szám nem mondhat ellent a korábban leadott 1/2 kimenetel-tippnek.
+  if(h === a) { flagPenError('⚠️ 11-esek nem végződhetnek döntetlenre!'); return; }
+  var existingPenOutcome = getTipPen(existing);
+  var scoreImpliedPen = h > a ? '1' : '2';
+  if(existingPenOutcome && existingPenOutcome !== scoreImpliedPen) {
+    var penLabels = {'1':'hazai nyer 11-esekkel','2':'vendég nyer 11-esekkel'};
+    flagPenError('⚠️ A '+h+':'+a+' nem egyezik a tippeddel ('+penLabels[existingPenOutcome]+')!');
+    return;
+  }
+
   var newTip = Object.assign({}, existing);
   newTip.penScore = h+':'+a;
   newTip.ts = Date.now();
