@@ -1387,6 +1387,28 @@ input:focus, textarea:focus, select:focus {
   .match-card { border-radius:0; }
 }
 
+/* ===== ÁGRAJZ (valódi bracket-fa, összekötő vonalakkal) ===== */
+.bracket-tree{display:flex;overflow-x:auto;overflow-y:hidden;padding:8px 20px 24px 4px;-webkit-overflow-scrolling:touch;gap:0;}
+.bracket-col{display:flex;flex-direction:column;flex-shrink:0;width:148px;margin-right:34px;}
+.bracket-col-title{text-align:center;font-family:'Oswald',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:1.5px;color:rgba(0,255,135,0.55);text-transform:uppercase;margin-bottom:10px;white-space:nowrap;}
+.bracket-slots{display:flex;flex-direction:column;justify-content:space-around;flex:1;}
+.bracket-match{position:relative;display:flex;flex-direction:column;padding:2px 20px 2px 0;}
+.bracket-match::after{
+  content:'';position:absolute;right:0;top:25%;bottom:25%;width:20px;
+  border-top:1.5px solid rgba(0,255,135,0.28);border-right:1.5px solid rgba(0,255,135,0.28);border-bottom:1.5px solid rgba(0,255,135,0.28);
+  border-top-right-radius:5px;border-bottom-right-radius:5px;
+}
+.bracket-col:last-child .bracket-match::after,
+.bracket-match.bracket-noline::after{display:none;}
+.bracket-team{display:flex;align-items:center;gap:5px;padding:5px 7px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);font-family:'Oswald',sans-serif;font-size:10.5px;color:rgba(240,244,240,0.75);margin-bottom:2px;border-radius:4px;white-space:nowrap;overflow:hidden;}
+.bracket-team:last-child{margin-bottom:0;}
+.bracket-team .bflag{font-size:13px;flex-shrink:0;}
+.bracket-team .bname{flex:1;overflow:hidden;text-overflow:ellipsis;}
+.bracket-team.bwin{background:rgba(0,255,135,0.1);border-color:rgba(0,255,135,0.4);color:#fff;font-weight:700;}
+.bracket-team.btbd{opacity:0.32;font-size:9px;}
+.bracket-score{margin-left:auto;font-size:10.5px;color:rgba(0,255,135,0.7);flex-shrink:0;padding-left:4px;}
+.bracket-match-live{position:absolute;top:-7px;right:14px;font-size:8px;color:#00ff87;background:#0d0f15;padding:0 4px;animation:pulse 1.5s infinite;}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>if(typeof emailjs!=='undefined')emailjs.init('0k7yH8d4u-BjgACd1');</script>
@@ -10093,112 +10115,78 @@ function openBracket() {
   renderBracket();
 }
 
+// Vizuális sorrend: minden kör 2-esével egymás mellé kerül úgy, hogy a következő
+// kör slotja pontosan a köztük lévő pár alá/fölé kerüljön (klasszikus bracket-nézet).
+var BRACKET_R32_ORDER = [74,77,73,75,76,78,79,80,83,84,81,82,86,88,85,87];
+var BRACKET_R16_ORDER = [89,90,93,94,91,92,95,96];
+var BRACKET_QF_ORDER  = [97,98,99,100];
+var BRACKET_SF_ORDER  = [101,102];
+
+function _bracketFindMatch(prefix, num) {
+  var id = prefix+'_M'+num;
+  return _virtualKOMatches[id] || ALL_MATCHES.find(function(x){ return x.id===id; }) || null;
+}
+
+function _bracketTeamHtml(name, flag, isWin, sc) {
+  var known = !!name;
+  return '<div class="bracket-team'+(isWin?' bwin':'')+(known?'':' btbd')+'">'
+    + '<span class="bflag">'+(known?(flag||'🏳'):'')+'</span>'
+    + '<span class="bname">'+(known?escHtml(name):'TBD')+'</span>'
+    + (sc!==null&&sc!==undefined?'<span class="bracket-score">'+escHtml(sc)+'</span>':'')
+    + '</div>';
+}
+
+function _bracketMatchHtml(m, noLine) {
+  var res = m ? allResults[m.id] : null;
+  var score = m ? allScores[m.id] : null;
+  var win = m ? getMatchWinner(m) : null;
+  var isLive = !!(m && liveScores[m.id] && !res);
+  var hw = !!(win && m && win.name===m.home);
+  var aw = !!(win && m && win.name===m.away);
+  var scoreParts = score ? score.split(':') : null;
+
+  var html = '<div class="bracket-match'+(noLine?' bracket-noline':'')+'">';
+  if(isLive) html += '<span class="bracket-match-live">🔴 ÉLŐ</span>';
+  html += _bracketTeamHtml(m?m.home:null, m?m.homeFlag:'', hw, scoreParts?scoreParts[0]:null);
+  html += _bracketTeamHtml(m?m.away:null, m?m.awayFlag:'', aw, scoreParts?scoreParts[1]:null);
+  html += '</div>';
+  return html;
+}
+
 function renderBracket() {
   var container = document.getElementById('bracketContent');
   if(!container) return;
-  var groups = null;
-  try { groups = buildGroupStandings(); } catch(e) {}
-  var bestThirds = groups ? getBestThirds(groups) : [];
-  _usedThirds = {};
+  // A csoportállásokból még nyitott R32 slotokat a renderMatches() már feloldotta
+  // és eltárolta a _virtualKOMatches-ben — itt csak felolvassuk, nem számolunk újra.
+  try { buildGroupStandings(); } catch(e) {}
 
-  var html = '<div style="font-size:10px;color:rgba(0,255,135,0.4);letter-spacing:1px;margin-bottom:12px;padding:0 4px;">⚡ Automatikusan frissül a csoportállásokból</div>';
+  var html = '<div style="font-size:10px;color:rgba(0,255,135,0.4);letter-spacing:1px;margin-bottom:10px;padding:0 4px;">⚡ Automatikusan frissül · húzd oldalra a további körökért →</div>';
+  html += '<div class="bracket-tree">';
 
-  // R32
-  html += '<div style="font-family:Oswald,sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(0,255,135,0.55);margin-bottom:8px;padding-left:8px;border-left:2px solid #00ff87;">⚡ ROUND OF 32</div>';
-  html += '<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:20px;">';
-
-  R32_STRUCTURE.forEach(function(slot) {
-    var hTeam = slot.home ? {name:slot.home, flag:slot.homeFlag||''} : resolveSlot(slot.h, groups, bestThirds);
-    var aTeam = slot.away ? {name:slot.away, flag:slot.awayFlag||''} : resolveSlot(slot.a, groups, bestThirds);
-    var koMatch = ALL_MATCHES.find(function(m){
-      return m.knockout && !m.id.startsWith('CM_TEST_') &&
-        ((hTeam&&m.home===hTeam.name)||(aTeam&&m.away===aTeam.name));
-    });
-    var result = koMatch?allResults[koMatch.id]:null;
-    var score  = koMatch?allScores[koMatch.id]:null;
-    var isLive = koMatch&&liveScores[koMatch.id]&&!result;
-    var winner = koMatch?getMatchWinner(koMatch):null;
-    var homeWon = winner&&koMatch&&winner.name===koMatch.home;
-    var awayWon = winner&&koMatch&&winner.name===koMatch.away;
-    var border = result?'rgba(0,255,135,0.2)':isLive?'#00ff87':'rgba(255,255,255,0.07)';
-    var bg     = result?'rgba(0,255,135,0.03)':isLive?'rgba(0,255,135,0.06)':'rgba(255,255,255,0.02)';
-
-    html += '<div style="border:1px solid '+border+';background:'+bg+';overflow:hidden;">';
-    html += '<div style="display:flex;align-items:center;padding:3px 8px;background:rgba(0,0,0,0.2);gap:6px;">';
-    html += '<span style="font-family:Oswald,sans-serif;font-size:9px;color:rgba(0,255,135,0.45);">M'+slot.m+'</span>';
-    html += '<span style="font-size:9px;color:rgba(240,244,240,0.2);">'+slot.date+(slot.venue?' · '+slot.venue:'')+'</span>';
-    if(score) html += '<span style="margin-left:auto;font-family:Oswald,sans-serif;font-size:10px;color:rgba(0,255,135,0.65);">'+score+'</span>';
-    if(isLive) html += '<span style="margin-left:auto;font-size:9px;color:#00ff87;animation:pulse 1.5s infinite;">🔴 ÉLŐ</span>';
-    html += '</div>';
-
-    function teamRow(team, slotLabel, won, border2) {
-      var known = !!team;
-      var name  = team ? team.name : slotLabel;
-      var flag  = team ? (team.flag||'🏳') : '';
-      var r = '<div style="display:flex;align-items:center;gap:7px;padding:6px 10px;'+border2+(won?'background:rgba(0,255,135,0.06);':'')+'">';
-      r += '<span style="font-size:16px;flex-shrink:0;opacity:'+(known?'1':'0.25')+';">'+(flag||'🏳')+'</span>';
-      r += '<span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;font-weight:'+(won?'700':'400')+';color:'+(known?(won?'#fff':'rgba(240,244,240,0.8)'):'rgba(240,244,240,0.2)')+';'+(known?'':'font-size:10px;')+'">'+escHtml(name)+'</span>';
-      if(won) r += '<span style="font-size:10px;">🏆</span>';
-      r += '</div>';
-      return r;
-    }
-    html += teamRow(hTeam, slot.h, homeWon, 'border-bottom:1px solid rgba(255,255,255,0.04);');
-    html += teamRow(aTeam, slot.a, awayWon, '');
-    html += '</div>';
-  });
-
-  html += '</div>';
-
-  // R16, QF, SF, Final, Bronze — rögzített admin adatokból
-  var laterRounds = [
-    {key:'R16',label:'⚡ R16 — 16-os kör',slots:['R16_1','R16_2','R16_3','R16_4','R16_5','R16_6','R16_7','R16_8']},
-    {key:'QF', label:'🔥 Negyeddöntő',     slots:['QF_1','QF_2','QF_3','QF_4']},
-    {key:'SF', label:'⭐ Elődöntő',         slots:['SF_1','SF_2']},
-    {key:'FINAL',label:'🏆 Döntő',          slots:['FINAL_1']},
-    {key:'BRONZE',label:'🥉 Bronzmeccs',    slots:['BRONZE_1']},
+  var cols = [
+    {title:'⚡ Round of 32', order: BRACKET_R32_ORDER, prefix:'R32'},
+    {title:'R16',            order: BRACKET_R16_ORDER, prefix:'R16'},
+    {title:'🔥 Negyeddöntő', order: BRACKET_QF_ORDER,  prefix:'QF'},
+    {title:'⭐ Elődöntő',     order: BRACKET_SF_ORDER,  prefix:'SF'},
   ];
 
-  laterRounds.forEach(function(round) {
-    var koRound = ALL_MATCHES.filter(function(m){ return m.knockout&&!m.id.startsWith('CM_TEST_')&&detectRound(m)===round.key; });
-    var slotData = round.slots.filter(function(s){ return !!allBracketTeams[s]; });
-    if(!koRound.length && !slotData.length) return;
-
-    html += '<div style="font-family:Oswald,sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(0,255,135,0.55);margin-bottom:8px;padding-left:8px;border-left:2px solid #00ff87;">'+round.label+'</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px;">';
-
-    koRound.forEach(function(m){
-      var res=allResults[m.id],score=allScores[m.id],win=getMatchWinner(m);
-      var hw=win&&win.name===m.home,aw=win&&win.name===m.away;
-      var border=res?'rgba(0,255,135,0.2)':'rgba(255,255,255,0.07)';
-      html += '<div style="border:1px solid '+border+';overflow:hidden;">';
-      html += '<div style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.04);'+(hw?'background:rgba(0,255,135,0.06);':'')+'">';
-      html += '<span style="font-size:16px;">'+(m.homeFlag||'🏳')+'</span><span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;font-weight:'+(hw?700:400)+';color:'+(hw?'#fff':'rgba(240,244,240,0.8)')+';">'+escHtml(m.home)+'</span>';
-      if(score) html += '<span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(0,255,135,0.65);">'+score.split(':')[0]+'</span>';
-      if(hw) html += '<span style="font-size:10px;margin-left:4px;">🏆</span>';
-      html += '</div><div style="display:flex;align-items:center;gap:7px;padding:6px 10px;'+(aw?'background:rgba(0,255,135,0.06);':'')+'">';
-      html += '<span style="font-size:16px;">'+(m.awayFlag||'🏳')+'</span><span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;font-weight:'+(aw?700:400)+';color:'+(aw?'#fff':'rgba(240,244,240,0.8)')+';">'+escHtml(m.away)+'</span>';
-      if(score) html += '<span style="font-family:Oswald,sans-serif;font-size:12px;color:rgba(0,255,135,0.65);">'+score.split(':')[1]+'</span>';
-      if(aw) html += '<span style="font-size:10px;margin-left:4px;">🏆</span>';
-      html += '</div></div>';
+  cols.forEach(function(col){
+    html += '<div class="bracket-col"><div class="bracket-col-title">'+col.title+'</div><div class="bracket-slots">';
+    col.order.forEach(function(num){
+      html += _bracketMatchHtml(_bracketFindMatch(col.prefix, num), false);
     });
-
-    for(var i=0;i<round.slots.length;i+=2) {
-      var t1=allBracketTeams[round.slots[i]], t2=allBracketTeams[round.slots[i+1]];
-      if(!t1&&!t2) continue;
-      html += '<div style="border:1px solid rgba(255,255,255,0.07);overflow:hidden;">';
-      [t1,t2].forEach(function(t,idx){
-        var border3=idx===0?'border-bottom:1px solid rgba(255,255,255,0.04);':'';
-        html += '<div style="display:flex;align-items:center;gap:7px;padding:6px 10px;'+border3+'">';
-        if(t) html += '<span style="font-size:16px;">'+(t.flag||'🏳')+'</span><span style="flex:1;font-family:Oswald,sans-serif;font-size:12px;color:#fff;">'+escHtml(t.name)+'</span>';
-        else  html += '<span style="font-size:10px;color:rgba(240,244,240,0.2);flex:1;">⏳ TBD</span>';
-        html += '</div>';
-      });
-      html += '</div>';
-    }
-
-    html += '</div>';
+    html += '</div></div>';
   });
 
+  // Döntő + Bronzmeccs — nem folytatódik tovább, saját kis oszlop
+  var finalM  = _bracketFindMatch('FIN', 104);
+  var bronzeM = _bracketFindMatch('FIN', 103);
+  html += '<div class="bracket-col" style="margin-right:4px;justify-content:center;">'
+    + '<div class="bracket-col-title">🏆 Döntő</div><div style="margin-bottom:28px;">'+_bracketMatchHtml(finalM, true)+'</div>'
+    + '<div class="bracket-col-title">🥉 Bronzmeccs</div><div>'+_bracketMatchHtml(bronzeM, true)+'</div>'
+    + '</div>';
+
+  html += '</div>';
   container.innerHTML = html;
 }
 
