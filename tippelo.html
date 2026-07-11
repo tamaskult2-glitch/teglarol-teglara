@@ -3499,15 +3499,22 @@ function isVbMatch(m) {
 
 // ===== #4: STREAK SZÁMLÁLÓ =====
 function getUserStreak(safeName) {
-  var matches = ALL_MATCHES.filter(function(m){ return isVbMatch(m) && allResults[m.id] && allTips[m.id] && allTips[m.id][safeName]; });
+  var matches = ALL_MATCHES.filter(function(m){ return isVbMatch(m); });
+  Object.values(_virtualKOMatches||{}).forEach(function(vm){
+    if(!matches.some(function(x){ return x.id===vm.id; })) matches.push(vm);
+  });
+  matches = matches.filter(function(m){
+    if(!allTips[m.id] || !allTips[m.id][safeName]) return false;
+    return getActualAdvancer(m) !== null;
+  });
   matches.sort(function(a,b){ return (b.huDate+b.huTime).localeCompare(a.huDate+a.huTime); });
   var streak = 0;
   for(var i=0; i<matches.length; i++){
     var m = matches[i];
     var tip = allTips[m.id][safeName];
-    var o = getTipOutcome(tip);
-    var res = allResults[m.id];
-    if(o === res) streak++;
+    var actualAdv = getActualAdvancer(m);
+    var tippedAdv = getTippedAdvancer(m, tip);
+    if(tippedAdv !== null && tippedAdv === actualAdv) streak++;
     else break;
   }
   return streak;
@@ -4093,6 +4100,33 @@ function getTipOutcome(t){ return t && typeof t==='object' ? t.o : t; }
 function getTipScore(t){ return t && typeof t==='object' && t.h!==undefined ? {h:t.h,a:t.a} : null; }
 function getTipEt(t){ return t && typeof t==='object' && t.et ? t.et : null; }
 function getTipPen(t){ return t && typeof t==='object' && t.pen ? t.pen : null; }
+
+// ===== TOVÁBB JUTÁS alapú helyesség (ranglista pontosság %-hoz) =====
+// Kieséses meccsnél a "helyes tipp" nem a 90 perces kimenetel, hanem a TÉNYLEGES
+// tovább jutó csapat — ehhez FT-nél döntetlen esetén az ET-t, ET-nél is döntetlen
+// esetén a 11-est kell figyelembe venni (mindkét oldalon: valós adat és tipp is).
+function getActualAdvancer(m) {
+  var res = allResults[m.id];
+  if(!res) return null;
+  if(res !== 'X') return res;
+  if(!m.knockout) return 'X'; // csoportmeccsen a döntetlen simán döntetlen, nincs "tovább jutás"
+  var penRes = allPenResults[m.id];
+  if(penRes) return penRes;
+  var etRes = allEtResults[m.id];
+  if(etRes && etRes !== 'X') return etRes;
+  return null; // FT döntetlen ismert, de az ET/11-es még nem — a meccs valójában még nem dőlt el
+}
+function getTippedAdvancer(m, tip) {
+  var o = getTipOutcome(tip);
+  if(!o) return null;
+  if(o !== 'X') return o;
+  if(!m.knockout) return 'X';
+  var pen = getTipPen(tip);
+  if(pen) return pen;
+  var et = getTipEt(tip);
+  if(et && et !== 'X') return et;
+  return null; // döntetlent tippelt, de nem folytatta ET/11-es tippel
+}
 function isKnockoutMatch(m){ return !!(m && m.knockout); }
 
 // Szorzó: csoportkör=1x, kiesési=2x, döntő=3x
@@ -6106,19 +6140,19 @@ function renderStats() {
   vbMatches.forEach(m=>{
     const tip=allTips[m.id]?.[fbSafeName(currentUser)];
     const res=allResults[m.id];
-    const sc=allScores[m.id];
     if(tip&&getTipOutcome(tip)){
       tipped++;
       if(res){
-        resolved++;
         var mPts = calcMatchPoints(m, tip);
         pts += mPts;
-        const outcome=getTipOutcome(tip);
-        const tipSc=getTipScore(tip);
-        // score overrides outcome for correct counting
-        var effectiveOutcome = outcome;
-        if(tipSc) { var implied = tipSc.h>tipSc.a?'1':tipSc.h===tipSc.a?'X':'2'; if(implied!==outcome) effectiveOutcome=implied; }
-        if(effectiveOutcome===res) correct++;
+        // Pontosság — kieséses meccsnél a TÉNYLEGES tovább jutó csapat számít,
+        // csak akkor "lezárt", ha az ismert (FT, vagy ha kellett, ET/11-es is).
+        var actualAdv = getActualAdvancer(m);
+        if(actualAdv !== null) {
+          resolved++;
+          var tippedAdv = getTippedAdvancer(m, tip);
+          if(tippedAdv !== null && tippedAdv === actualAdv) correct++;
+        }
       }
     }
   });
@@ -6198,13 +6232,21 @@ function renderLeaderboard() {
       if(outcome){
         tot++;
         if(res){
-          resolved++;
           var mPts = calcMatchPoints(m, tip);
           pts += mPts;
-          if(outcome===res) correct++;
-          // Pontos eredmény számláló (szorzó nélkül)
+          // Pontos eredmény számláló (szorzó nélkül, FT alapján)
           var tipSc=getTipScore(tip);
           if(tipSc&&realSc&&tipSc.h+':'+tipSc.a===realSc) exact++;
+
+          // Pontosság % — kieséses meccsnél a TÉNYLEGES tovább jutó csapat számít,
+          // nem csak a 90 perces kimenetel. Csak akkor "lezárt", ha a valós tovább
+          // jutó is ismert (FT-nél, vagy ha kellett, ET/11-es is).
+          var actualAdv = getActualAdvancer(m);
+          if(actualAdv !== null) {
+            resolved++;
+            var tippedAdv = getTippedAdvancer(m, tip);
+            if(tippedAdv !== null && tippedAdv === actualAdv) correct++;
+          }
         } else pend++;
       }
     });
