@@ -5477,6 +5477,7 @@ function renderAll() {
   if(activeTab==='bl') try { renderBLTab(); } catch(e){}
   try { checkRoastableLosses(); } catch(e){}
   try { checkManualRoasts(); } catch(e){}
+  try { checkFinalPushPopup(); } catch(e){}
 }
 
 // ===== VESZTES BESZÓLÁSOK (Claude) =====
@@ -5672,6 +5673,164 @@ async function renderRoastLog() {
         + '</div>';
     }).join('');
   } catch(e) { el.innerHTML = '<div style="font-size:12px;color:#ef4444;">Hiba a napló betöltésekor.</div>'; }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DÖNTŐ ELŐTTI SZEMÉLYES BUZDÍTÁS / BESZÓLÁS POPUP
+// A döntő napján, egyszer felhasználónként, a saját ranglista-helyzet
+// alapján (dobogóhoz mért pontkülönbség vs. a döntőn még megszerezhető
+// maximális pont, a döntő 3x szorzójával számolva).
+// ═══════════════════════════════════════════════════════════════════
+var _finalPushChecked = false;
+
+// Egy meccsen még maximálisan megszerezhető pont (FT+ET+Pen, exact score, szorzóval)
+function calcMaxMatchPoints(m) {
+  var mult = getMatchMultiplier(m);
+  var rule = getScoringRule(m.id);
+  var maxFt = rule.ft_mult ? rule.pts_ft_exact * mult : rule.pts_ft_exact;
+  if(!m.knockout) return maxFt;
+  var maxEt  = rule.et_mult  ? rule.pts_et_exact  * mult : rule.pts_et_exact;
+  var maxPen = rule.pen_mult ? rule.pts_pen_exact * mult : rule.pts_pen_exact;
+  return maxFt + maxEt + maxPen;
+}
+
+var FINAL_PUSH_SAFE_TOP3 = [
+  "{rank}. helyen állsz, és olyan bebiztosított a pozíciód, hogy ha most valaki maximális pontot szerezne a döntőn, akkor sem tudna beérni. Dőlj hátra, élvezd a meccset — a dobogó gyakorlatilag a zsebedben van.",
+  "Vezeted a mezőnyt ({rank}. hely), és matematikailag nem tudnak utolérni, még a döntő 3x szorzójával sem. Ez a fajta biztonság ritka luxus egy ilyen szoros bajnokságban.",
+  "Nyugodtan tippelhetsz akár X-re is szórakozásból — a helyezésed ettől függetlenül stabil. Aki utolérne, ahhoz maximális pont kéne tőle és nulla tőled, az pedig nem fog összejönni.",
+  "A táblázat tetején biztonságban vagy: a döntő szorzója sem elég ahhoz, hogy bárki beérjen. Ülj le, nézd a meccset popcornnal, a munka java már meg van csinálva."
+];
+
+var FINAL_PUSH_SHAKY_TOP3 = [
+  "Bent vagy a dobogón ({rank}. hely), DE a döntő 3x szorzója miatt ez a helyzet simán felborulhat egyetlen rossz tipptől. Ne lazsálj — koncentrálj, mint egy utolsó negyedórás meccsen 0-0-nál.",
+  "{rank}. hely — szép, de nem bebiztosított. A döntőn akár {maxSwing} pont is gazdát cserélhet, szóval a mostani előnyöd papíron sokkal kisebb, mint ahogy kinéz.",
+  "Vezetsz, de a mögötted lévők még simán utolérhetnek, ha te mellélősz és ők betalálnak. Ez a döntő nem a lazítás meccse — most kell igazán élesben tippelni.",
+  "A dobogó jelenleg a tiéd, de a 3x szorzó miatt ez papírvékony biztonság. Egy pontos ET vagy 11-es tipp mögötted, és lecsúszol — vigyázz."
+];
+
+var FINAL_PUSH_CHASING = [
+  "{rank}. vagy, {gap} ponttal a dobogó mögött — DE a döntőn a szorzó miatt akár {maxSwing} pont is becsúszhat egyetlen jó tippből. Ez pontosan az a meccs, ami miatt érdemes maradni a végéig.",
+  "Nincs bent a top3-ban, de ne dőlj ki: {gap} pont a hátrányod, a döntőn viszont ennél jóval több forog kockán a 3x szorzóval. Ha a FT+ET+11-es mindegyikét eltalálod, simán fordíthatsz.",
+  "Matekailag még minden nyitott — {gap} pont lemaradás egy olyan meccs előtt, ahol {maxSwing} pont is a tét. Ez a fajta esély nem jön ki minden fordulóban, használd ki.",
+  "A dobogó még elérhető távolságban van ({gap} pont), és a döntő 3x szorzója pont arra való, hogy az ilyen hátrányokat egy este alatt ledolgozd. Tippelj bátran, de okosan."
+];
+
+var FINAL_PUSH_OUT = [
+  "Sajnálattal jelentem: matematikailag nincs esélyed a dobogóra, még akkor sem, ha a döntőn hibátlanul, FT+ET+11-esben is telibe találsz. De legalább a tippedet szépen és pontosan add le — a becsület azért megmarad. 😏",
+  "A Cpk-d ebben a bajnokságban most éppen a specifikációs határokon kívül landolt — a dobogó ezúttal kimarad. Semmi baj, lesz még torna, ahol jobban beállítod a folyamatot.",
+  "Ha a tippelési pontosságodat egy hibalehetőség-elemzésbe (FMEA) tennénk, a dobogó-esély kockázati száma most nulla — a döntő eredménye ezen már nem változtat. Tippelj nyugodtan, presztízsért.",
+  "Statisztikailag ez most nem jött össze: a maximális megszerezhető pont sem elég a felzárkózáshoz. A jó hír: jövőre újra kezdődik minden, tiszta lappal."
+];
+
+function _finalPushPickMessage(category, ctx) {
+  var pool = category === 'SAFE_TOP3' ? FINAL_PUSH_SAFE_TOP3
+    : category === 'SHAKY_TOP3' ? FINAL_PUSH_SHAKY_TOP3
+    : category === 'CHASING' ? FINAL_PUSH_CHASING
+    : FINAL_PUSH_OUT;
+  var raw = pool[Math.floor(Math.random() * pool.length)];
+  return raw
+    .replace(/\{rank\}/g, ctx.rank)
+    .replace(/\{gap\}/g, ctx.gap)
+    .replace(/\{maxSwing\}/g, ctx.maxSwing);
+}
+
+function showFinalPushPopup(msg, category, m, ctx) {
+  var theme = {
+    SAFE_TOP3:  { border:'rgba(245,197,24,0.5)',  label:'🏆 BIZTOS DOBOGÓ',      labelColor:'#f5c518', btnBorder:'rgba(245,197,24,0.4)', btnBg:'rgba(245,197,24,0.12)', btnColor:'#f5c518', btnText:'Köszi, tudom 😎' },
+    SHAKY_TOP3: { border:'rgba(245,158,11,0.5)',  label:'⚠️ INGATAG DOBOGÓ',     labelColor:'#f59e0b', btnBorder:'rgba(245,158,11,0.4)', btnBg:'rgba(245,158,11,0.12)', btnColor:'#f59e0b', btnText:'Vettem, koncentrálok 💪' },
+    CHASING:    { border:'rgba(0,255,135,0.5)',   label:'🔥 MÉG MINDEN NYITOTT',  labelColor:'#00ff87', btnBorder:'rgba(0,255,135,0.4)',  btnBg:'rgba(0,255,135,0.12)',  btnColor:'#00ff87', btnText:'Hajrá, megyek tippelni! 🚀' },
+    OUT:        { border:'rgba(239,68,68,0.35)',  label:'💀 MATEMATIKAILAG KIESETT', labelColor:'#ef4444', btnBorder:'rgba(239,68,68,0.35)', btnBg:'rgba(239,68,68,0.12)', btnColor:'#ff8a8a', btnText:'Na jó, kikérem magamnak 😤' }
+  }[category] || { border:'rgba(255,255,255,0.2)', label:'🏆 DÖNTŐ', labelColor:'#fff', btnBorder:'rgba(255,255,255,0.2)', btnBg:'rgba(255,255,255,0.08)', btnColor:'#fff', btnText:'Oké' };
+
+  var matchLine = m ? ('<div style="font-size:11px;color:rgba(240,244,240,0.45);margin-bottom:10px;">🏆 ' + escHtml(m.home) + ' – ' + escHtml(m.away) + ' · ' + escHtml(m.huTime||'') + '</div>') : '';
+
+  var d = document.createElement('div');
+  d.id = 'finalPushPopup';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;';
+  d.innerHTML = '<div style="max-width:380px;width:100%;background:linear-gradient(180deg,#191b23,#13151b);border:2px solid ' + theme.border + ';border-radius:16px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">'
+    + '<div style="text-align:center;font-size:30px;margin-bottom:8px;">🏆</div>'
+    + '<div style="text-align:center;font-family:Oswald,sans-serif;font-size:13px;letter-spacing:1.5px;color:' + theme.labelColor + ';font-weight:700;margin-bottom:12px;">' + theme.label + '</div>'
+    + matchLine
+    + '<div style="text-align:center;font-size:14.5px;line-height:1.55;color:rgba(240,244,240,0.9);margin-bottom:6px;">' + escHtml(msg) + '</div>'
+    + '<div style="text-align:right;font-size:11.5px;color:rgba(0,255,135,0.6);font-family:Oswald,sans-serif;letter-spacing:0.5px;margin:10px 0 16px;">— Gólszagló</div>'
+    + '<button onclick="document.getElementById(\'finalPushPopup\').remove()" style="width:100%;padding:11px;border-radius:10px;border:1px solid ' + theme.btnBorder + ';background:' + theme.btnBg + ';color:' + theme.btnColor + ';font-family:Oswald,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">' + escHtml(theme.btnText) + '</button>'
+    + '</div>';
+  document.body.appendChild(d);
+}
+
+function checkFinalPushPopup() {
+  if(_finalPushChecked) return;
+  if(!currentUser) return;
+  _finalPushChecked = true; // csak egyszer fut le belépésenként (a Firebase-hívás és a localStorage-check ettől függetlenül véd)
+  try {
+    var vbMatches = ALL_MATCHES.filter(isVbMatch);
+    Object.values(_virtualKOMatches || {}).forEach(function(vm){
+      if(!vbMatches.some(function(x){ return x.id === vm.id; })) vbMatches.push(vm);
+    });
+
+    // Csak akkor releváns, ha MA van egy még le nem játszott DÖNTŐ (3x szorzós, nem bronzmeccs)
+    var today = getBudapestToday();
+    var finalMatch = vbMatches.find(function(m){
+      if(allResults[m.id]) return false;
+      if(m.huDate !== today) return false;
+      if(getMatchMultiplier(m) !== 3) return false;
+      var label = (m.group || '') + ' ' + (m.title || '');
+      return /döntő/i.test(label) && !/bronz|3rd/i.test(label);
+    });
+    if(!finalMatch) return;
+
+    var safeName = fbSafeName(currentUser);
+    var shownKey = 'finalPushShown_' + safeName;
+    if(localStorage.getItem(shownKey) === finalMatch.id) return; // ezért a döntőért már megkapta
+
+    // Résztvevők (akik tippeltek legalább egy VB meccsre)
+    var users = new Set();
+    vbMatches.forEach(function(m){ if(allTips[m.id]) Object.keys(allTips[m.id]).forEach(function(u){ users.add(u); }); });
+    if(!users.has(safeName)) return; // nincs mit mondani annak, aki még nem tippelt semmire
+
+    // Jelenlegi állás (lezárt meccsek pontjai alapján, ugyanaz a logika, mint a ranglistánál)
+    var sc = [];
+    users.forEach(function(u){
+      var pts = 0;
+      vbMatches.forEach(function(m){
+        var tip = allTips[m.id] ? allTips[m.id][u] : null;
+        if(!tip || !allResults[m.id]) return;
+        pts += calcMatchPoints(m, tip);
+      });
+      sc.push({ u: u, pts: pts });
+    });
+    sc.sort(function(a,b){ return b.pts - a.pts; });
+
+    var myIndex = sc.findIndex(function(s){ return s.u === safeName; });
+    if(myIndex === -1) return;
+    var myRank = myIndex + 1;
+    var myPts = sc[myIndex].pts;
+    var thirdPts  = sc.length >= 3 ? sc[2].pts : sc[sc.length - 1].pts;
+    var fourthPts = sc.length >= 4 ? sc[3].pts : null;
+
+    // Még hátralévő (eredmény nélküli) meccsekből maximálisan megszerezhető pont, szorzóval
+    var remaining = vbMatches.filter(function(m){ return !allResults[m.id]; });
+    var maxSwing = remaining.reduce(function(sum, m){ return sum + calcMaxMatchPoints(m); }, 0);
+
+    var category, gap;
+    if(myRank <= 3) {
+      gap = fourthPts !== null ? (myPts - fourthPts) : maxSwing;
+      category = (gap > maxSwing) ? 'SAFE_TOP3' : 'SHAKY_TOP3';
+    } else {
+      gap = thirdPts - myPts;
+      category = (gap <= maxSwing) ? 'CHASING' : 'OUT';
+    }
+
+    var ctx = { rank: myRank, gap: gap, maxSwing: maxSwing };
+    var msg = _finalPushPickMessage(category, ctx);
+    showFinalPushPopup(msg, category, finalMatch, ctx);
+    localStorage.setItem(shownKey, finalMatch.id);
+
+    fbPush('finalPushLog', {
+      toSafe: safeName, toName: currentUser, category: category, rank: myRank,
+      pts: myPts, gap: gap, maxSwing: maxSwing, msg: msg, ts: Date.now(), matchId: finalMatch.id
+    }).catch(function(){});
+  } catch(e) {}
 }
 
 
