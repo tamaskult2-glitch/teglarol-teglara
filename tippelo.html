@@ -5758,10 +5758,41 @@ function showFinalPushPopup(msg, category, m, ctx) {
   document.body.appendChild(d);
 }
 
+// Diagnosztikai segéd — böngésző konzolból hívható: debugFinalPush()
+// Kiírja, hogy a rendszer talál-e ma döntőt, és ha igen, milyen kategóriát számolna a bejelentkezett userhez,
+// anélkül hogy ténylegesen megjelenítené a popupot vagy módosítaná a localStorage/Firebase állapotot.
+function debugFinalPush() {
+  var out = { currentUser: currentUser, today: getBudapestToday() };
+  var vbMatches = ALL_MATCHES.filter(isVbMatch);
+  Object.values(_virtualKOMatches || {}).forEach(function(vm){
+    if(!vbMatches.some(function(x){ return x.id === vm.id; })) vbMatches.push(vm);
+  });
+  out.totalVbMatches = vbMatches.length;
+  out.customMatchesLoaded = (typeof _customMatches !== 'undefined') ? _customMatches.length : 'n/a';
+  var todayMatches = vbMatches.filter(function(m){ return m.huDate === out.today; });
+  out.todayMatches = todayMatches.map(function(m){
+    return { id: m.id, group: m.group, title: m.title, mult: getMatchMultiplier(m), hasResult: !!allResults[m.id], knockout: !!m.knockout };
+  });
+  var finalMatch = todayMatches.find(function(m){
+    if(allResults[m.id]) return false;
+    if(getMatchMultiplier(m) !== 3) return false;
+    var label = (m.group || '') + ' ' + (m.title || '');
+    return /döntő/i.test(label) && !/bronz|3rd/i.test(label);
+  });
+  out.finalMatchFound = finalMatch ? finalMatch.id : null;
+  if(currentUser) {
+    var safeName = fbSafeName(currentUser);
+    out.shownFlag = localStorage.getItem('finalPushShown_' + safeName);
+    out.hasAnyTip = vbMatches.some(function(m){ return allTips[m.id] && allTips[m.id][safeName]; });
+  }
+  console.log('🏆 debugFinalPush:', out);
+  return out;
+}
+
 function checkFinalPushPopup() {
-  if(_finalPushChecked) return;
+  if(_finalPushChecked) return; // csak akkor true, ha MÁR sikeresen megmutattuk (lásd lent) — nem "megpróbáltuk"
   if(!currentUser) return;
-  _finalPushChecked = true; // csak egyszer fut le belépésenként (a Firebase-hívás és a localStorage-check ettől függetlenül véd)
+  if(document.getElementById('finalPushPopup')) return; // ne torlódjon egymásra popup
   try {
     var vbMatches = ALL_MATCHES.filter(isVbMatch);
     Object.values(_virtualKOMatches || {}).forEach(function(vm){
@@ -5781,7 +5812,7 @@ function checkFinalPushPopup() {
 
     var safeName = fbSafeName(currentUser);
     var shownKey = 'finalPushShown_' + safeName;
-    if(localStorage.getItem(shownKey) === finalMatch.id) return; // ezért a döntőért már megkapta
+    if(localStorage.getItem(shownKey) === finalMatch.id) { _finalPushChecked = true; return; } // ezért a döntőért már megkapta
 
     // Résztvevők (akik tippeltek legalább egy VB meccsre)
     var users = new Set();
@@ -5825,6 +5856,7 @@ function checkFinalPushPopup() {
     var msg = _finalPushPickMessage(category, ctx);
     showFinalPushPopup(msg, category, finalMatch, ctx);
     localStorage.setItem(shownKey, finalMatch.id);
+    _finalPushChecked = true; // csak MOST zárjuk le — sikeres megjelenítés után, nem korábban
 
     fbPush('finalPushLog', {
       toSafe: safeName, toName: currentUser, category: category, rank: myRank,
