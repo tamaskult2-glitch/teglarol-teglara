@@ -161,16 +161,16 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 5 tégla frissítve (2026. júl. 15.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 5 tégla frissítve (2026. júl. 27.)
 
 📊 Mai frissítések:
-• 🟢 ÚJ MEGVALÓSULT ígéret: a Szuverenitásvédelmi Hivatal megszüntetése ma hatályba lépett (jún.30-i törvény, Magyar Közlönyben kihirdetve)
-• ⚖️ Alaptörvény 17. módosítás elfogadva (júl.13, 139 igen): megszünteti Sulyok Tamás köztársasági elnöki megbízatását, ha aláírja – jelenleg nyitott ügy, AB-normakontroll is szóba került
-• 🏛️ Nemzeti Vagyonvisszaszerzési Hivatal (NVVH): törvényjavaslat benyújtva (júl.10, Ruff Bálint), vitatva az Országgyűlésben
-• 🔄 Folytatódnak az állami intézményi személycserék: MÁV-igazgatóság, Szerencsejáték Zrt., Creative Hungary, NAV – valamint Szijjártó Péter lemondott mandátumáról
-• ⛽ Üzemanyagár: a védett ár kivezetése óta (jún.27.) a piaci árak a korábbi védett árszint közelébe/fölé emelkedtek (benzin ~601 Ft/l, dízel ~615 Ft/l)
+• ⚖️ Legfőbb ügyész lemondott: Nagy Gábor Bálint júl.22-én benyújtotta lemondását, megbízatása 2026. aug.25-ével szűnik meg – Magyar Péter: "Uraim, ki lesz a következő?"
+• 🏛️ NVVH: az Országgyűlés júl.27-28-i rendkívüli ülésén tárgyalja a bővített hatáskörű törvényjavaslatot, a zárószavazás kedden (júl.28) várható; elfogadás esetén a hivatal felállása őszre várható
+• 💰 Magyar Péter bejelentette: a NAV visszakapja a vagyonosodási vizsgálatok önálló elrendelésének jogkörét
+• 🎓 KEKVA-reform: Görög Márta ismertette az egyetemi/közérdekű vagyonkezelő alapítványok átalakítását – állami vagyon visszakerül, 16 kekva megszűnik júl.31-én
+• 🏛️ Ma új alkotmánybírót választ a parlament Hende Csaba helyére
 
-📊 101 tégla | 5 megvalósult | 70 bejelentve | 26 ígéret
+📊 101 tégla | 8 megvalósult | 68 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -206,24 +206,24 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 5 tégla frissítve (2026. júl. 15.)
+    dbInput.value = `🧱 5 tégla frissítve (2026. júl. 27.)
 
 📊 Mai frissítések:
-• 🟢 ÚJ MEGVALÓSULT ígéret: a Szuverenitásvédelmi Hivatal megszüntetése ma hatályba lépett (jún.30-i törvény, Magyar Közlönyben kihirdetve)
-• ⚖️ Alaptörvény 17. módosítás elfogadva (júl.13, 139 igen): megszünteti Sulyok Tamás köztársasági elnöki megbízatását, ha aláírja – jelenleg nyitott ügy, AB-normakontroll is szóba került
-• 🏛️ Nemzeti Vagyonvisszaszerzési Hivatal (NVVH): törvényjavaslat benyújtva (júl.10, Ruff Bálint), vitatva az Országgyűlésben
-• 🔄 Folytatódnak az állami intézményi személycserék: MÁV-igazgatóság, Szerencsejáték Zrt., Creative Hungary, NAV – valamint Szijjártó Péter lemondott mandátumáról
-• ⛽ Üzemanyagár: a védett ár kivezetése óta (jún.27.) a piaci árak a korábbi védett árszint közelébe/fölé emelkedtek (benzin ~601 Ft/l, dízel ~615 Ft/l)
+• ⚖️ Legfőbb ügyész lemondott: Nagy Gábor Bálint júl.22-én benyújtotta lemondását, megbízatása 2026. aug.25-ével szűnik meg – Magyar Péter: "Uraim, ki lesz a következő?"
+• 🏛️ NVVH: az Országgyűlés júl.27-28-i rendkívüli ülésén tárgyalja a bővített hatáskörű törvényjavaslatot, a zárószavazás kedden (júl.28) várható; elfogadás esetén a hivatal felállása őszre várható
+• 💰 Magyar Péter bejelentette: a NAV visszakapja a vagyonosodási vizsgálatok önálló elrendelésének jogkörét
+• 🎓 KEKVA-reform: Görög Márta ismertette az egyetemi/közérdekű vagyonkezelő alapítványok átalakítását – állami vagyon visszakerül, 16 kekva megszűnik júl.31-én
+• 🏛️ Ma új alkotmánybírót választ a parlament Hende Csaba helyére
 
-📊 101 tégla | 5 megvalósult | 70 bejelentve | 26 ígéret
+📊 101 tégla | 8 megvalósult | 68 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. jún. 21.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. júl. 27.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag piaci ára a védett ár alá süllyedt (635/655 Ft), kivezetés jún. 23-án szavazásra kerülhet
+• Üzemanyag: a védett ár kivezetése (jún.27.) óta piaci ár érvényes, a korábbi védett árszint fölé emelkedett (benzin ~597 Ft/l, dízel ~618 Ft/l)
 • Élelmiszer, rezsi összehasonlítás
 • TISZA ígéretek hatásvizsgálata
 
