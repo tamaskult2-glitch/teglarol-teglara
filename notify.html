@@ -161,16 +161,15 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 5 tégla frissítve (2026. júl. 27.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 4 tégla frissítve (2026. aug. 3.)
 
 📊 Mai frissítések:
-• ⚖️ Legfőbb ügyész lemondott: Nagy Gábor Bálint júl.22-én benyújtotta lemondását, megbízatása 2026. aug.25-ével szűnik meg – Magyar Péter: "Uraim, ki lesz a következő?"
-• 🏛️ NVVH: az Országgyűlés júl.27-28-i rendkívüli ülésén tárgyalja a bővített hatáskörű törvényjavaslatot, a zárószavazás kedden (júl.28) várható; elfogadás esetén a hivatal felállása őszre várható
-• 💰 Magyar Péter bejelentette: a NAV visszakapja a vagyonosodási vizsgálatok önálló elrendelésének jogkörét
-• 🎓 KEKVA-reform: Görög Márta ismertette az egyetemi/közérdekű vagyonkezelő alapítványok átalakítását – állami vagyon visszakerül, 16 kekva megszűnik júl.31-én
-• 🏛️ Ma új alkotmánybírót választ a parlament Hende Csaba helyére
+• 🟢 ÚJ MEGVALÓSULT ígéret: júl.28-án az Országgyűlés elfogadta az NVVH felállításáról szóló törvényt (143 igen, 47 nem), amely még aznap este megjelent a Magyar Közlönyben
+• 🔥 Tűzifa áfacsökkentés megerősítve: Kármán András pénzügyminiszter szerint a 27%-os áfa 5%-ra csökken ősztől
+• 🏫 Magyar Péter megerősítette a 100 000 Ft-os iskolakezdési támogatást is
+• ⚖️ Nincs még bejelentett utód a lemondott legfőbb ügyész helyére
 
-📊 101 tégla | 8 megvalósult | 68 bejelentve | 25 ígéret
+📊 101 tégla | 9 megvalósult | 67 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -206,24 +205,23 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 5 tégla frissítve (2026. júl. 27.)
+    dbInput.value = `🧱 4 tégla frissítve (2026. aug. 3.)
 
 📊 Mai frissítések:
-• ⚖️ Legfőbb ügyész lemondott: Nagy Gábor Bálint júl.22-én benyújtotta lemondását, megbízatása 2026. aug.25-ével szűnik meg – Magyar Péter: "Uraim, ki lesz a következő?"
-• 🏛️ NVVH: az Országgyűlés júl.27-28-i rendkívüli ülésén tárgyalja a bővített hatáskörű törvényjavaslatot, a zárószavazás kedden (júl.28) várható; elfogadás esetén a hivatal felállása őszre várható
-• 💰 Magyar Péter bejelentette: a NAV visszakapja a vagyonosodási vizsgálatok önálló elrendelésének jogkörét
-• 🎓 KEKVA-reform: Görög Márta ismertette az egyetemi/közérdekű vagyonkezelő alapítványok átalakítását – állami vagyon visszakerül, 16 kekva megszűnik júl.31-én
-• 🏛️ Ma új alkotmánybírót választ a parlament Hende Csaba helyére
+• 🟢 ÚJ MEGVALÓSULT ígéret: júl.28-án az Országgyűlés elfogadta az NVVH felállításáról szóló törvényt (143 igen, 47 nem), amely még aznap este megjelent a Magyar Közlönyben
+• 🔥 Tűzifa áfacsökkentés megerősítve: Kármán András pénzügyminiszter szerint a 27%-os áfa 5%-ra csökken ősztől
+• 🏫 Magyar Péter megerősítette a 100 000 Ft-os iskolakezdési támogatást is
+• ⚖️ Nincs még bejelentett utód a lemondott legfőbb ügyész helyére
 
-📊 101 tégla | 8 megvalósult | 68 bejelentve | 25 ígéret
+📊 101 tégla | 9 megvalósult | 67 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. júl. 27.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. aug. 3.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: a védett ár kivezetése (jún.27.) óta piaci ár érvényes, a korábbi védett árszint fölé emelkedett (benzin ~597 Ft/l, dízel ~618 Ft/l)
+• Üzemanyag: a védett ár kivezetése (jún.27.) óta piaci ár érvényes, folyamatosan emelkedik (benzin ~601 Ft/l, dízel ~657 Ft/l, aug.1.)
 • Élelmiszer, rezsi összehasonlítás
 • TISZA ígéretek hatásvizsgálata
 
