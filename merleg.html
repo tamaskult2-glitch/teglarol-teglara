@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mérleg | Tegláról-téglára</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #F4F1EC;
+  color: #1A1918;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #e8405a 0%, #c0183a 100%);
+  border-radius: 20px;
+  color: white;
+}
+
+.header h1 {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.header p {
+  font-size: 18px;
+  opacity: 0.95;
+}
+
+.intro {
+  max-width: 800px;
+  margin: 0 auto 40px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4A4947;
+}
+
+.category-section {
+  max-width: 1000px;
+  margin: 0 auto 50px;
+}
+
+.category-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #1A1918;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-icon {
+  font-size: 28px;
+}
+
+.dev-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(30,25,20,0.06), 0 8px 24px rgba(30,25,20,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.dev-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30,25,20,0.1), 0 12px 32px rgba(30,25,20,0.08);
+}
+
+.dev-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.05)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.05)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 120px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 16px;
+}
+.dev-card > * { position: relative; z-index: 1; }
+
+.dev-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dev-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1A1918;
+  flex: 1;
+  min-width: 200px;
+}
+
+.dev-date {
+  font-size: 13px;
+  color: #4A4947;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dev-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.badge-kedvezo {
+  background: #E8F5E9;
+  color: #1e7e34;
+}
+
+.badge-kedvezotlen {
+  background: #FCE8EA;
+  color: #c0183a;
+}
+
+.dev-desc {
+  font-size: 15px;
+  color: #4A4947;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.dev-source {
+  font-size: 13px;
+  color: #4A4947;
+  padding-top: 12px;
+  border-top: 1px solid #E0E0E0;
+}
+
+.dev-source a {
+  color: #e8405a;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.dev-source a:hover {
+  text-decoration: underline;
+}
+
+.back-link {
+  display: inline-block;
+  margin: 40px auto;
+  padding: 12px 24px;
+  background: #e8405a;
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.back-link:hover {
+  background: #c0183a;
+}
+
+.footer-note {
+  max-width: 800px;
+  margin: 40px auto;
+  text-align: center;
+  font-size: 14px;
+  color: #4A4947;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .header h1 { font-size: 28px; }
+  .dev-title { font-size: 16px; }
+}
+
+/* ===== DARK MODE ===== */
+body.dark {
+  background: #121212;
+  color: #E8E4DD;
+}
+body.dark .header {
+  background: linear-gradient(135deg, #a0102a 0%, #7a0a1e 100%);
+}
+body.dark .intro { color: #A8A4A0; }
+body.dark .category-title { color: #E8E4DD; }
+body.dark .dev-card {
+  background: #1E1E1E;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.2);
+}
+body.dark .dev-title { color: #E8E4DD; }
+body.dark .dev-date { color: #A8A4A0; }
+body.dark .dev-desc { color: #A8A4A0; }
+body.dark .dev-source { color: #888; border-top-color: #333; }
+body.dark .footer-note { color: #888; }
+body.dark .back-link { color: #e8405a; }
+body.dark .badge-kedvezo { background: #1a2a1a; color: #4caf50; }
+body.dark .badge-kedvezotlen { background: #2a1a1c; color: #ef5350; }
+body.dark .dev-card::before {
+  background-image: url("data:image/svg+xml,%3Csvg width='200' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='40' fill='rgba(192,24,58,0.10)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3Ctext x='10' y='85' fill='rgba(192,24,58,0.10)' font-size='11' font-weight='700' transform='rotate(-15 100 60)' letter-spacing='0.4'%3Eteglarol-teglara.hu%3C/text%3E%3C/svg%3E");
+}
+
+/* Dark mode toggle gomb */
+#darkToggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 999;
+  background: #c0183a;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: background 0.2s;
+}
+#darkToggle:hover { background: #a0102a; }
+</style>
+</head>
+<body>
+
+<button id="darkToggle" onclick="toggleDark()" title="Sötét/Világos mód">🌙</button>
+
+<div class="header">
+  <h1>⚖️ Mérleg</h1>
+  <p>Egyéb fejlemények a kormányváltás óta – nem TISZA-ígéretek, hanem tényszerű, mindkét irányú hírek</p>
+</div>
+
+<div class="intro">
+  <p>
+    A teglarol-teglara.hu fő táblája kizárólag a TISZA kampányígéreteinek beváltását követi. Ez az oldal ettől
+    független: azokat a fontosabb, az elmúlt hónapokban történt eseményeket gyűjti össze – <strong>kedvezőket és
+    kedvezőtleneket egyaránt</strong> –, amelyek nem konkrét kampányígéretek teljesítéséről szólnak, hanem az ország
+    általános helyzetét árnyalják. Minden tétel dátummal és forrással szerepel, értékelés vagy következtetés nélkül –
+    azt, hogy ez alapján "mikor volt jobb", mindenki maga döntse el.
+  </p>
+</div>
+
+<!-- KEDVEZŐ FEJLEMÉNYEK -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🟢</span>
+    Kedvező fejlemények
+  </h2>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">EU: felszabadulhat a befagyasztott források nagy része</div>
+      <div class="dev-date">2026.07.28</div>
+    </div>
+    <div class="dev-badge badge-kedvezo">Kedvező</div>
+    <div class="dev-desc">
+      Az EU Tanácsa (Ecofin) elfogadta Magyarország felülvizsgált Helyreállítási és Ellenállóképességi Tervét (RRF),
+      ami kb. 10 milliárd euró (6,5 Mrd vissza nem térítendő + 3,5 Mrd hitel) kifizetését teszi lehetővé. A tágabb
+      becslés szerint összesen akár 17 milliárd euró korábban visszatartott uniós forrás válhat elérhetővé. A
+      kifizetés feltétele, hogy a kormány aug. 31-ig teljesítse a vállalt mérföldköveket; a tényleges pénzmozgás
+      2026 utolsó negyedévében indulhat.
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/07/forras-europai-unio-magyarorszag-milliard" target="_blank">vg.hu</a>,
+      <a href="https://index.hu/belfold/2026/07/10/magyarorszag-europai-unio-helyreallitasi-alap-rrf-unios-forrasok-ecofin-szavazas/" target="_blank">index.hu</a>
+    </div>
+  </div>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">Magyarország csatlakozott az Európai Ügyészséghez (EPPO)</div>
+      <div class="dev-date">2026 nyara</div>
+    </div>
+    <div class="dev-badge badge-kedvezo">Kedvező</div>
+    <div class="dev-desc">
+      Az Európai Bizottság jóváhagyta Magyarország csatlakozását az Európai Ügyészséghez, miután az ország 2026
+      májusában kérelmezte a felvételét. Ez az EU szerint az uniós források felszabadításának egyik korábban
+      elvárt feltétele volt.
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://www.penzcentrum.hu/gazdasag/20260710/az-ecofin-elfogadta-a-magyar-helyreallitasi-tervet-1201974" target="_blank">penzcentrum.hu</a>
+    </div>
+  </div>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">7-es cikkely szerinti eljárás: várható lezárás ősszel</div>
+      <div class="dev-date">2026.06.19</div>
+    </div>
+    <div class="dev-badge badge-kedvezo">Kedvező</div>
+    <div class="dev-desc">
+      Magyar Péter miniszterelnök és Roberta Metsola, az Európai Parlament elnöke brüsszeli megbeszélésükön
+      megállapodtak abban, hogy a Magyarország ellen 2018 óta folyó, alapértékek megsértése miatt indított 7-es
+      cikkely szerinti eljárás lezárása október-november tájékára várható. A végleges döntés még nem született meg.
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://hang.hu/eu/magyar-peter-szerint-mar-oktoberre-megszunhet-a-7-es-cikkely-szerinti-eljaras-189810" target="_blank">hang.hu</a>,
+      <a href="https://www.economx.hu/belfold/2026/06/18/magyar-peter-roberta-metsola-hetes-cikkely-eljaras-lezaras-europai-parlament/" target="_blank">economx.hu</a>
+    </div>
+  </div>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">Erősödő forint, csökkenő infláció (tavasz-nyár eleje)</div>
+      <div class="dev-date">2026 tavasz – jún.</div>
+    </div>
+    <div class="dev-badge badge-kedvezo">Kedvező</div>
+    <div class="dev-desc">
+      A forint a tavaszi 380-as euró-szintről 355 Ft körüli, közel négyéves csúcsra erősödött. Az éves infláció
+      2026 nyarán 1,7–2,1% között alakult (KSH), a Magyar Nemzeti Bank folytatta a kamatcsökkentési ciklust
+      (6,00%-ról 5,75%-ra 2026 nyár végén). A GKI fogyasztói bizalmi indexe májusban az elmúlt 30 év
+      legnagyobb mértékben emelkedett.
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://www.penzcentrum.hu/gazdasag/20260720/ilyen-kilatasokkal-vag-neki-2026-masodik-felenek-a-magyar-gazdasag-vegre-beindul-a-gdp-novekedes-1202484" target="_blank">penzcentrum.hu</a>,
+      <a href="https://allampapirkalkulator.hu/arfolyam/eurhuf" target="_blank">allampapirkalkulator.hu</a>
+    </div>
+  </div>
+</div>
+
+<!-- KEDVEZŐTLEN FEJLEMÉNYEK -->
+<div class="category-section">
+  <h2 class="category-title">
+    <span class="category-icon">🔴</span>
+    Kedvezőtlen fejlemények
+  </h2>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">Paksi Atomerőmű: aszály miatti leállások</div>
+      <div class="dev-date">2026.08.01</div>
+    </div>
+    <div class="dev-badge badge-kedvezotlen">Kedvezőtlen</div>
+    <div class="dev-desc">
+      A Duna alacsony vízállása miatt a kormány rendkívüli intézkedéseket hirdetett: augusztus 1-jén leállt a
+      Paksi Atomerőmű 1. blokkjának utolsó működő turbinagenerátora, korábban a 3. blokk leállítása is
+      megkezdődött. A termelés a normál 2000 megawattos szint helyett 480 megawattra esett vissza, a
+      kormány a tehervasúti forgalom korlátozását is fontolóra vette.
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/08/tisza-kormany-rendkivuli-intezkedesei-magyar-peter-paks" target="_blank">vg.hu</a>,
+      <a href="https://egerhirek.hu/2026/07/31/szombaton-brutto-6-forinttal-emelkedik-a-gazolaj-ara/gazdasag/egerhirek" target="_blank">egerhirek.hu</a>
+    </div>
+  </div>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">Folyamatosan emelkedő üzemanyagárak</div>
+      <div class="dev-date">2026.06.27 óta</div>
+    </div>
+    <div class="dev-badge badge-kedvezotlen">Kedvezőtlen</div>
+    <div class="dev-desc">
+      A védett üzemanyagár kivezetése (jún.27.) óta a benzin és a dízel piaci ára több lépcsőben, folyamatosan
+      emelkedett: 2026. aug. 1-jén a 95-ös benzin átlagára már kb. 601 Ft/liter, a gázolajé kb. 657 Ft/liter volt –
+      mindkettő magasabb, mint a korábbi hatósági védett ár. (Ugyanez a téglák és a Pénztárcaindex kalkulátorban
+      is nyomon követhető.)
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://www.autonavigator.hu/autosvilag_hirei/aremelessel-indul-az-augusztus-a-benzinkutakon-ennyibe-kerulhet-a-tankolas-szombattol" target="_blank">autonavigator.hu</a>,
+      <a href="https://www.economx.hu/magyar-gazdasag/2026/07/31/dragulas-gazolaj-benzin-tankolas-uzemanyag/" target="_blank">economx.hu</a>
+    </div>
+  </div>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">Gyengülő forint a nyár második felében</div>
+      <div class="dev-date">2026.08.02</div>
+    </div>
+    <div class="dev-badge badge-kedvezotlen">Kedvezőtlen</div>
+    <div class="dev-desc">
+      A tavaszi 355 Ft/euró körüli szintekről a forint a nyár második felében ismét gyengülni kezdett, augusztus
+      elején 362–370 Ft/euró sávban mozgott. Elemzők szerint ebben szerepet játszott az ország energiaellátásával
+      kapcsolatos bizonytalanság (a paksi vízhiány-krízis) is.
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://index.hu/gazdasag/2026/08/02/forint-forintarfolyam-devizaarfolyam-devizapiac-dollar-euro/" target="_blank">index.hu</a>
+    </div>
+  </div>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">A GDP-növekedés elmarad a kampányban jelzett ütemtől</div>
+      <div class="dev-date">2026 nyár – előrejelzés</div>
+    </div>
+    <div class="dev-badge badge-kedvezotlen">Kedvezőtlen</div>
+    <div class="dev-desc">
+      Az Egyensúly Intézet friss előrejelzése szerint a magyar gazdaság 2026-ban kb. 1,5%-kal, 2027-ben kb.
+      2,6%-kal nőhet – ez elegendő a korábbi stagnálás megtöréséhez, de elmarad a választási kampányban
+      többször említett, kb. 3%-os növekedési céltól.
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://tudastar.money.hu/hir/20260428/visszaterhet-400-forintos-euro-gazdasagi-elorejelzes-2026-2027/" target="_blank">money.hu</a>
+    </div>
+  </div>
+
+  <div class="dev-card">
+    <div class="dev-header">
+      <div class="dev-title">A tervezettnél nagyobb költségvetési hiány</div>
+      <div class="dev-date">2026 nyár</div>
+    </div>
+    <div class="dev-badge badge-kedvezotlen">Kedvezőtlen</div>
+    <div class="dev-desc">
+      Sajtóhírek szerint a kormány a 2026-os büdzsé eredeti, tavalyi elfogadásakor tervezettnél nagyobb
+      költségvetési hiánnyal számol. Pontos, hivatalos új hiánycél egyelőre nem ismert.
+    </div>
+    <div class="dev-source">
+      Forrás: <a href="https://www.penzcentrum.hu/gazdasag/20260710/az-ecofin-elfogadta-a-magyar-helyreallitasi-tervet-1201974" target="_blank">penzcentrum.hu</a>
+    </div>
+  </div>
+</div>
+
+<div style="text-align: center;">
+  <a href="/" class="back-link">← Vissza a főoldalra</a>
+</div>
+
+<div class="footer-note">
+  <p>
+    <strong>Fontos:</strong> Ez az oldal nem a TISZA-ígéretek teljesülését méri (arra a főoldal téglái szolgálnak),
+    hanem a kormányváltás óta történt egyéb, közéletileg jelentős fejleményeket gyűjti össze – szándékosan
+    mindkét irányból, értékelés nélkül. A besorolás (kedvező/kedvezőtlen) a hír tárgyára vonatkozik (pl. áremelkedés
+    kedvezőtlen, forráslehívás kedvező), nem politikai állásfoglalás. A lista nem teljes körű, és folyamatosan
+    bővül.
+  </p>
+</div>
+
+<script>
+// ===== AUTO DARK MODE =====
+function checkAutoDark() {
+  const now = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
+  const h = now.getHours();
+  const isNight = (h >= 20 || h < 6);
+
+  const manual = localStorage.getItem('merleg_dark_manual');
+  if (manual === null) {
+    if (isNight) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }
+  updateToggleIcon();
+}
+
+function updateToggleIcon() {
+  const isDark = document.body.classList.contains('dark');
+  const btn = document.getElementById('darkToggle');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
+function toggleDark() {
+  const isDark = document.body.classList.contains('dark');
+  if (isDark) {
+    document.body.classList.remove('dark');
+    localStorage.setItem('merleg_dark_manual', 'light');
+  } else {
+    document.body.classList.add('dark');
+    localStorage.setItem('merleg_dark_manual', 'dark');
+  }
+  updateToggleIcon();
+}
+
+checkAutoDark();
+setInterval(checkAutoDark, 60000);
+</script>
+</body>
+</html>
