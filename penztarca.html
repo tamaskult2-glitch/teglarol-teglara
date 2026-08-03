@@ -1005,7 +1005,7 @@ body.dark .price-card::before {
     <h3 style="font-size: 20px; margin-bottom: 16px; opacity: 0.95;">Tipikus 4 fős család havi bevásárlása</h3>
     <p style="font-size: 15px; opacity: 0.9; line-height: 1.6;">
       Az alábbi kalkuláció egy átlagos magyar család havi alapvető kiadásait mutatja be. 
-      Az árak a 2026. május 9-i (áradás előtti) árszintet tükrözik.
+      A kosár tételei a 2026. május 9-i (áradás előtti) árszintet tükrözik; az összesítőben az "áradás után" csempe a jelenlegi (2026. aug. 1-jei) árakkal újraszámolt kosarat mutatja.
     </p>
   </div>
 
@@ -1074,6 +1074,36 @@ body.dark .price-card::before {
       <div style="font-size: 16px; opacity: 0.95;">Ft/hó (↓ 27%)</div>
     </div>
 
+  </div>
+
+  <!-- Összesítő kártyák - jelenlegi árakkal -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 24px;">
+
+    <!-- Áradás után (jelenleg) -->
+    <div style="background: linear-gradient(135deg, #e8405a 0%, #a30f2e 100%); border-radius: 20px; padding: 32px; color: white; text-align: center; box-shadow: 0 8px 24px rgba(232, 64, 90, 0.3);">
+      <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 12px;">Áradás után (jelenleg)</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">289.200</div>
+      <div style="font-size: 16px; opacity: 0.95;">Ft/hó</div>
+    </div>
+
+    <!-- TISZA ígéret -->
+    <div style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); border-radius: 20px; padding: 32px; color: white; text-align: center; box-shadow: 0 8px 24px rgba(40, 167, 69, 0.3);">
+      <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 12px;">TISZA ígéret</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">209.000</div>
+      <div style="font-size: 16px; opacity: 0.95;">Ft/hó</div>
+    </div>
+
+    <!-- Megtakarítás (jelenlegi árakhoz képest) -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 32px; color: white; text-align: center; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);">
+      <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 12px;">Megtakarítás</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">80.200</div>
+      <div style="font-size: 16px; opacity: 0.95;">Ft/hó (↓ 28%)</div>
+    </div>
+
+  </div>
+
+  <div style="font-size: 13px; color: #888; text-align: center; margin-top: 16px;">
+    "Áradás után" kosár: a fenti tételek 2026. aug. 1-jei árszinten – az üzemanyagár a piaci ár kivezetése óta emelkedett (200 l/hó × 601 Ft/l = 120.200 Ft), a többi tétel (rezsi, gyógyszer, élelmiszer) a KSH havi fogyasztói árindexei szerint az elmúlt hónapokban lényegében nem változott az áradás előtti szinthez képest.
   </div>
 
   <!-- Éves megtakarítás -->
