@@ -161,15 +161,15 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 4 tégla frissítve (2026. aug. 3.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 3 tégla frissítve (2026. aug. 22.)
 
 📊 Mai frissítések:
-• 🟢 ÚJ MEGVALÓSULT ígéret: júl.28-án az Országgyűlés elfogadta az NVVH felállításáról szóló törvényt (143 igen, 47 nem), amely még aznap este megjelent a Magyar Közlönyben
-• 🔥 Tűzifa áfacsökkentés megerősítve: Kármán András pénzügyminiszter szerint a 27%-os áfa 5%-ra csökken ősztől
-• 🏫 Magyar Péter megerősítette a 100 000 Ft-os iskolakezdési támogatást is
-• ⚖️ Nincs még bejelentett utód a lemondott legfőbb ügyész helyére
+• 🏛️ Baka András aug.19-én hivatalosan is átvette a köztársasági elnöki jogköröket – lezárult az átmeneti időszak
+• 🎒 Aug.24-én utalják az iskolakezdési támogatás első, 50 000 Ft-os részletét 293 700 családnak (403 000+ gyermek)
+• 🔥 Tűzifa áfacsökkentés: 16 milliárd Ft-os idei, 114 milliárd Ft-os összesített költségvetési hatás derült ki
+• 🏢 NVVH: megkezdődött a 96+68 pályázat szakmai értékelése, a menetrend változatlan (szept. eleje)
 
-📊 101 tégla | 9 megvalósult | 67 bejelentve | 25 ígéret
+📊 101 tégla | 10 megvalósult | 66 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -205,23 +205,23 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 4 tégla frissítve (2026. aug. 3.)
+    dbInput.value = `🧱 3 tégla frissítve (2026. aug. 22.)
 
 📊 Mai frissítések:
-• 🟢 ÚJ MEGVALÓSULT ígéret: júl.28-án az Országgyűlés elfogadta az NVVH felállításáról szóló törvényt (143 igen, 47 nem), amely még aznap este megjelent a Magyar Közlönyben
-• 🔥 Tűzifa áfacsökkentés megerősítve: Kármán András pénzügyminiszter szerint a 27%-os áfa 5%-ra csökken ősztől
-• 🏫 Magyar Péter megerősítette a 100 000 Ft-os iskolakezdési támogatást is
-• ⚖️ Nincs még bejelentett utód a lemondott legfőbb ügyész helyére
+• 🏛️ Baka András aug.19-én hivatalosan is átvette a köztársasági elnöki jogköröket – lezárult az átmeneti időszak
+• 🎒 Aug.24-én utalják az iskolakezdési támogatás első, 50 000 Ft-os részletét 293 700 családnak (403 000+ gyermek)
+• 🔥 Tűzifa áfacsökkentés: 16 milliárd Ft-os idei, 114 milliárd Ft-os összesített költségvetési hatás derült ki
+• 🏢 NVVH: megkezdődött a 96+68 pályázat szakmai értékelése, a menetrend változatlan (szept. eleje)
 
-📊 101 tégla | 9 megvalósult | 67 bejelentve | 25 ígéret
+📊 101 tégla | 10 megvalósult | 66 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. aug. 3.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. aug. 22.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: a védett ár kivezetése (jún.27.) óta piaci ár érvényes, folyamatosan emelkedik (benzin ~601 Ft/l, dízel ~657 Ft/l, aug.1.)
+• Üzemanyag: aug.19-től stabilan 592 Ft/l (benzin), 681 Ft/l (dízel), azóta nincs újabb nagykereskedelmi árváltozás
 • Élelmiszer, rezsi összehasonlítás
 • TISZA ígéretek hatásvizsgálata
 
