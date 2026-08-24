@@ -4120,6 +4120,81 @@ const descriptions = {
 const overlay = document.getElementById("modalOverlay");
 const modalClose = document.getElementById("modalClose");
 
+// ── RRF szupermérföldkövek tételes állapota (csak az "Uniós források" tégla popupjához) ──
+function renderMilestonesHTML() {
+  const groups = [
+    { name: "Igazságszolgáltatás függetlensége", status: "vitatott", items: [
+      "Országos Bírói Tanács (OBT) megerősítése az OBH-val szemben",
+      "Bírói függetlenség megerősítése a Kúrián",
+      "Előzetes döntéshozatali eljárás akadályainak megszüntetése",
+      "Állami szervek AB-hoz fordulásának visszavonása"
+    ]},
+    { name: "Korrupcióellenes intézkedések", status: "teljesült", items: [
+      "Integritás Hatóság felállítása",
+      "Korrupcióellenes Munkacsoport",
+      "Ügyészségi döntések bírósági felülvizsgálata",
+      "Vagyonnyilatkozatok körének kiterjesztése",
+      "Közérdekű vagyonkezelő alapítványok szabályozása",
+      "Adatbázis a közkiadásokról"
+    ]},
+    { name: "Közbeszerzési reformok", status: "teljesült", items: [
+      "Egyajánlatos eljárások monitoring eszköze",
+      "Elektronikus Közbeszerzési Rendszer (EKR) fejlesztése",
+      "EKR kiegészítése alvállalkozói adatokkal",
+      "Közbeszerzési keretrendszer előkészítése",
+      "Közbeszerzési keretrendszer működésbe lépése"
+    ]},
+    { name: "Audit- és ellenőrzési mechanizmusok", status: "teljesült", items: [
+      "Helyreállítási terv kontrollja és nyomon követése",
+      "Kohéziós alapok kontrollja és nyomon követése",
+      "Iránymutatás az összeférhetetlenségről",
+      "Csalás- és korrupcióellenes stratégia",
+      "Csalás és korrupció elleni cselekvési terv",
+      "Arachne kockázatértékelő rendszer alkalmazása",
+      "Jelentés az Arachne használatáról",
+      "Belső Ellenőrzési és Integritási Igazgatóság",
+      "EUTAF megerősítése",
+      "OLAF-fal való együttműködés megerősítése",
+      "Adattárrendszer a végrehajtásról",
+      "EUTAF ellenőrzési stratégia"
+    ]}
+  ];
+
+  const pill = (status) => status === "teljesült"
+    ? '<span class="badge badge-done" style="font-size:11px;padding:2px 8px;white-space:nowrap;">✅ Teljesült</span>'
+    : '<span class="badge badge-yes" style="font-size:11px;padding:2px 8px;white-space:nowrap;">🟡 Vitatott</span>';
+
+  const groupsHTML = groups.map(g => `
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:700;color:var(--text-main);">${g.name}</span>
+        ${pill(g.status)}
+      </div>
+      <ul style="margin:0;padding-left:20px;">
+        ${g.items.map(i => `<li style="font-size:13px;color:var(--text-secondary);line-height:1.6;">${i}</li>`).join("")}
+      </ul>
+    </div>
+  `).join("");
+
+  return `
+    <div style="margin-top:6px;padding-top:20px;border-top:1px solid var(--border-subtle);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:15px;font-weight:700;color:var(--text-main);">📋 27 szupermérföldkő – tételes állapot</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text-secondary);">22 / 27</span>
+      </div>
+      <div style="height:6px;background:var(--bg-main);border-radius:999px;overflow:hidden;margin-bottom:18px;">
+        <div style="height:100%;width:81%;background:#7ED957;border-radius:999px;"></div>
+      </div>
+      ${groupsHTML}
+      <div style="font-size:11.5px;color:var(--text-secondary);font-style:italic;line-height:1.5;margin-top:4px;">
+        A tételes lista 2022 óta rögzített, változatlan; az egyes tételek státusza a legutóbb elérhető összesítő
+        értékelés (Portfolio.hu, 2026.06.25.) alapján – a hivatalos, tételes EU-státusz az
+        <a href="https://ec.europa.eu/economy_finance/recovery-and-resilience-scoreboard/" target="_blank" rel="noopener" style="color:#c0183a;">EU Recovery and Resilience Scoreboard</a>-on ellenőrizhető.
+      </div>
+    </div>
+  `;
+}
+
 function openModal(item) {
  const title = item["TiSZa ígéret"] || "Nincs cím";
  const cat = item["Kategória"];
@@ -4144,6 +4219,12 @@ function openModal(item) {
    const focusEl = document.getElementById('modalTitle');
    if (focusEl) focusEl.focus();
  }, 100);
+
+ // Tételes mérföldkő-állapot csak az EU-forrásokról szóló téglánál
+ const extraEl = document.getElementById("modalExtra");
+ if (extraEl) {
+   extraEl.innerHTML = (title === "Uniós források felszabadítása") ? renderMilestonesHTML() : "";
+ }
 
  // Update PDF link to use item's source link
  const pdfLink = document.querySelector('.modal-pdf-link');
@@ -4276,7 +4357,7 @@ function getMiniCharts() {
  },
 
  "Uniós források felszabadítása": () => {
- return `<div class="viz-title">Befagyasztott EU-források</div> <div class="mini-row"><span class="mini-label">Kohéziós</span><span class="mini-bar"><span class="mini-bar-fill" style="width:85%;background:#FF6B6B;"></span></span><span class="mini-value">~6800 Mrd</span></div> <div class="mini-row"><span class="mini-label">Helyreáll.</span><span class="mini-bar"><span class="mini-bar-fill" style="width:15%;background:#FF9933;"></span></span><span class="mini-value">~1200 Mrd</span></div> <div class="mini-row"><span class="mini-label">Összesen</span><span class="mini-bar"><span class="mini-bar-fill" style="width:100%;background:#c0183a;"></span></span><span class="mini-value">~8000 Mrd</span></div> <div style="font-size:10px;color:var(--text-secondary);margin-top:6px;font-style:italic;">TISZA: aug. végéig döntés</div>`;
+ return `<div class="viz-title">EU-források (Mrd €)</div> <div class="mini-row"><span class="mini-label">RRF</span><span class="mini-bar"><span class="mini-bar-fill" style="width:100%;background:#c0183a;"></span></span><span class="mini-value">10,0</span></div> <div class="mini-row"><span class="mini-label">Kohézió</span><span class="mini-bar"><span class="mini-bar-fill" style="width:42%;background:#FF9933;"></span></span><span class="mini-value">4,2</span></div> <div class="mini-row"><span class="mini-label">Akadémiai</span><span class="mini-bar"><span class="mini-bar-fill" style="width:22%;background:#d4856a;"></span></span><span class="mini-value">2,2</span></div> <div class="mini-row" style="margin-top:8px;"><span class="mini-label">Mérföldkő</span><span class="mini-bar"><span class="mini-bar-fill" style="width:81%;background:#7ED957;"></span></span><span class="mini-value">22/27</span></div> <div style="font-size:10px;color:var(--text-secondary);margin-top:8px;font-weight:600;">Határidő – kifizetés:</div> <div style="font-size:10px;color:var(--text-secondary);line-height:1.5;">aug.31 mérföldkő → szept.30 kérelem → dec.31 folyósítás</div> <div style="font-size:10px;color:var(--text-secondary);margin-top:6px;font-style:italic;">Elakadva: bírói függetlenségi tételek (OBT/Kúria) · Portfolio.hu, 2026.06.25.</div>`;
  },
 
  "Pedagógusbérek rendezése": () => {
