@@ -161,12 +161,12 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Frissítve (2026. aug. 24.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 2 tégla frissítve (2026. aug. 28.)
 
 📊 Mai frissítések:
-• 🎒 Ma utalják az iskolakezdési támogatás első, 50 000 Ft-os részletét 293 700 családnak (403 000+ gyermek)
-• 🇪🇺 Az "Uniós források felszabadítása" tégla teljesen frissült: 16,4 Mrd € megállapodás, júl.10-i Ecofin-jóváhagyás, aug.2-i EPPO-csatlakozás
-• 🆕 ÚJ funkció: a téglára kattintva most már tételesen látható mind a 27 uniós "szupermérföldkő" állapota (22/27 teljesült)
+• 🏢 Megválasztották az NVVH vezetőit: Unger Anna Róza az elnök (137 igen), Tasnády Katalin a nyomozati elnökhelyettes (139 igen) – megbízatásuk szept.1-jén kezdődik
+• 💰 Új feljelentések: Covid-lélegeztetőgép-beszerzések és a Kommentár Alapítvány állami támogatása ügyében; elindult az MNB egykori vezetése elleni vizsgálóbizottság is
+• ⛽ Üzemanyagár: benzin változatlan 592 Ft/l, a dízel 681-ről 677 Ft/l-re csökkent
 
 📊 101 tégla | 10 megvalósult | 66 bejelentve | 25 ígéret
 
@@ -204,22 +204,22 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 Frissítve (2026. aug. 24.)
+    dbInput.value = `🧱 2 tégla frissítve (2026. aug. 28.)
 
 📊 Mai frissítések:
-• 🎒 Ma utalják az iskolakezdési támogatás első, 50 000 Ft-os részletét 293 700 családnak (403 000+ gyermek)
-• 🇪🇺 Az "Uniós források felszabadítása" tégla teljesen frissült: 16,4 Mrd € megállapodás, júl.10-i Ecofin-jóváhagyás, aug.2-i EPPO-csatlakozás
-• 🆕 ÚJ funkció: a téglára kattintva most már tételesen látható mind a 27 uniós "szupermérföldkő" állapota (22/27 teljesült)
+• 🏢 Megválasztották az NVVH vezetőit: Unger Anna Róza az elnök (137 igen), Tasnády Katalin a nyomozati elnökhelyettes (139 igen) – megbízatásuk szept.1-jén kezdődik
+• 💰 Új feljelentések: Covid-lélegeztetőgép-beszerzések és a Kommentár Alapítvány állami támogatása ügyében; elindult az MNB egykori vezetése elleni vizsgálóbizottság is
+• ⛽ Üzemanyagár: benzin változatlan 592 Ft/l, a dízel 681-ről 677 Ft/l-re csökkent
 
 📊 101 tégla | 10 megvalósult | 66 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. aug. 22.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. aug. 28.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: aug.19-től stabilan 592 Ft/l (benzin), 681 Ft/l (dízel), azóta nincs újabb nagykereskedelmi árváltozás
+• Üzemanyag: benzin 592 Ft/l (változatlan), dízel 677 Ft/l (enyhén csökkent)
 • Élelmiszer, rezsi összehasonlítás
 • TISZA ígéretek hatásvizsgálata
 
