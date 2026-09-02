@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🏆 Gólszagló BL26/27</title>
+<style>
+  :root{
+    --bl-navy:#0a0c2e;
+    --bl-navy2:#141a4a;
+    --bl-blue:#0038ff;
+    --bl-cyan:#00c8ff;
+    --bl-gold:#c9a038;
+    --bl-white:#f4f6ff;
+    --bl-grey:#9aa0c8;
+    --bl-green:#1fae5e;
+    --bl-red:#e0333f;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:linear-gradient(180deg,var(--bl-navy) 0%,var(--bl-navy2) 100%);
+    color:var(--bl-white);
+    min-height:100vh;
+  }
+  header.bl-header{
+    padding:18px 14px 14px;
+    text-align:center;
+    background:radial-gradient(ellipse at top,rgba(0,56,255,.35),transparent 70%);
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  header.bl-header h1{
+    margin:0;
+    font-size:22px;
+    letter-spacing:.5px;
+    background:linear-gradient(90deg,var(--bl-cyan),var(--bl-gold));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  header.bl-header .sub{
+    font-size:12px;
+    color:var(--bl-grey);
+    margin-top:4px;
+  }
+  nav.bl-tabs{
+    display:flex;
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:var(--bl-navy2);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    overflow-x:auto;
+  }
+  nav.bl-tabs button{
+    flex:1;
+    min-width:110px;
+    padding:12px 8px;
+    background:none;
+    border:none;
+    color:var(--bl-grey);
+    font-size:13px;
+    font-weight:600;
+    border-bottom:3px solid transparent;
+  }
+  nav.bl-tabs button.active{
+    color:var(--bl-white);
+    border-bottom-color:var(--bl-cyan);
+  }
+  main{padding:12px;max-width:900px;margin:0 auto;}
+  section.tab-panel{display:none;}
+  section.tab-panel.active{display:block;}
+  .card{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    padding:14px;
+    margin-bottom:12px;
+  }
+  .card h2{margin:0 0 10px;font-size:15px;color:var(--bl-cyan);}
+  table.bl-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.bl-table th,table.bl-table td{padding:6px 4px;text-align:center;}
+  table.bl-table th{color:var(--bl-grey);font-weight:600;border-bottom:1px solid rgba(255,255,255,.15);}
+  table.bl-table td.team-cell{text-align:left;font-weight:600;}
+  table.bl-table tr.zone-topeight td.team-cell{border-left:3px solid var(--bl-green);}
+  table.bl-table tr.zone-playoff td.team-cell{border-left:3px solid var(--bl-gold);}
+  table.bl-table tr.zone-out td.team-cell{border-left:3px solid var(--bl-red);opacity:.6;}
+  .match-row{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.06);
+    flex-wrap:wrap;
+  }
+  .match-row .teams{flex:1;min-width:160px;font-size:13.5px;font-weight:600;}
+  .match-row .meta{font-size:10.5px;color:var(--bl-grey);width:100%;order:5;margin-top:2px;}
+  .tip-outcome{display:flex;gap:4px;}
+  .tip-outcome button{
+    padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.05);color:var(--bl-white);font-size:12px;font-weight:700;
+  }
+  .tip-outcome button.selected{background:var(--bl-blue);border-color:var(--bl-cyan);}
+  .tip-score input{
+    width:34px;text-align:center;border-radius:6px;border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.08);color:var(--bl-white);font-size:13px;padding:5px 2px;
+  }
+  .advancer-pick{
+    display:flex;gap:6px;width:100%;order:6;margin-top:6px;
+    padding-top:6px;border-top:1px dashed rgba(255,255,255,.15);
+  }
+  .advancer-pick .label{font-size:11px;color:var(--bl-gold);width:100%;margin-bottom:3px;}
+  .advancer-pick button{
+    flex:1;padding:6px 4px;border-radius:8px;border:1px solid var(--bl-gold);
+    background:rgba(201,160,56,.1);color:var(--bl-white);font-size:11.5px;font-weight:700;
+  }
+  .advancer-pick button.selected{background:var(--bl-gold);color:var(--bl-navy);}
+  .save-state{font-size:10px;color:var(--bl-grey);width:100%;order:7;}
+  .save-state.ok{color:var(--bl-green);}
+  .save-state.err{color:var(--bl-red);font-weight:700;}
+  .placeholder-note{
+    font-size:12px;color:var(--bl-grey);background:rgba(255,255,255,.03);
+    border:1px dashed rgba(255,255,255,.15);border-radius:10px;padding:10px;
+  }
+  .admin-only{display:none;}
+  body.is-admin .admin-only{display:block;}
+</style>
+</head>
+<body>
+
+<header class="bl-header">
+  <h1>🏆 Gólszagló BL26/27</h1>
+  <div class="sub" id="hdrSubtitle">2026–2027-es UEFA-Bajnokok Ligája · ligaszakasz: 2026. szept. 8. – 2027. jan. 27.</div>
+</header>
+
+<nav class="bl-tabs">
+  <button data-tab="tab-liga" class="active">⚽ Ligaszakasz</button>
+  <button data-tab="tab-tabla">📊 Tabella</button>
+  <button data-tab="tab-playoff">🎯 Rájátszás</button>
+  <button data-tab="tab-ko">🏆 Kieséses</button>
+  <button data-tab="tab-szabalyok">ℹ️ Szabályok</button>
+  <button data-tab="tab-admin" class="admin-only">🔧 Admin</button>
+</nav>
+
+<main>
+
+  <!-- LIGASZAKASZ TAB: 8 forduló, minden meccs tippelhető -->
+  <section id="tab-liga" class="tab-panel active">
+    <div class="card">
+      <h2>Ligaszakasz — 8 forduló</h2>
+      <div id="ligaStatusNote" class="placeholder-note">
+        A sorsolás megvolt (2026.08.27, Monaco). Az <b>1. forduló mérkőzései valósak</b> (szept. 8–10).
+        A 2–8. forduló pontos párosítása még feltöltés alatt — a dátumok már a hivatalos naptár szerint szerepelnek.
+      </div>
+      <div id="ligaMatchesContainer"></div>
+    </div>
+  </section>
+
+  <!-- TABLA TAB -->
+  <section id="tab-tabla" class="tab-panel">
+    <div class="card">
+      <h2>Ligaszakasz tabella</h2>
+      <div style="font-size:11px;color:var(--bl-grey);margin-bottom:8px;">
+        🟢 1–8. hely: egyenes ági nyolcaddöntő &nbsp;|&nbsp; 🟡 9–24. hely: rájátszás &nbsp;|&nbsp; 🔴 25–36. hely: kiesik
+      </div>
+      <table class="bl-table" id="standingsTable">
+        <thead><tr><th>#</th><th style="text-align:left">Csapat</th><th>M</th><th>Gy</th><th>D</th><th>V</th><th>G</th><th>GK</th><th>Pt</th></tr></thead>
+        <tbody id="standingsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RÁJÁTSZÁS TAB (playoff, 9-24. hely) -->
+  <section id="tab-playoff" class="tab-panel">
+    <div class="card">
+      <h2>Rájátszás (9–24. hely)</h2>
+      <div class="placeholder-note">A rájátszás párosításai a ligaszakasz lezárása után generálódnak automatikusan a tabella állása alapján. Időpont: 2027. febr. 16–17. és febr. 23–24.</div>
+      <div id="playoffMatchesContainer"></div>
+    </div>
+  </section>
+
+  <!-- KIESÉSES TAB: Ro16 -> QF -> SF -> Döntő -->
+  <section id="tab-ko" class="tab-panel">
+    <div class="card">
+      <h2>Kieséses szakasz</h2>
+      <div class="placeholder-note">
+        Nyolcaddöntő: márc. 9–10. és 16–17. · Negyeddöntő: ápr. 6–7. és 13–14. · Elődöntő: ápr. 27–28. és máj. 4–5. ·
+        <b>Döntő: 2027. jún. 5., Metropolitano Stadion (Madrid)</b>.<br><br>
+        <b>FT pontozás</b> a megszokott (kimenetel / pontos eredmény / gólkülönbség-bónusz).
+        Ha a rendes játékidő döntetlen, a tipp kiegészül egy <b>„Ki jut tovább?”</b> választással — ezt hosszabbítás
+        vagy tizenegyespárbaj dönti el, és <u>ez</u> számít, nem a pontos hosszabbításos eredmény.
+      </div>
+      <div id="koMatchesContainer"></div>
+    </div>
+  </section>
+
+  <!-- SZABÁLYOK TAB -->
+  <section id="tab-szabalyok" class="tab-panel">
+    <div class="card">
+      <h2>⚽ Játékmenet</h2>
+      <p style="font-size:13px;line-height:1.6;color:var(--bl-white);">
+        <b>Ligaszakasz (szept–jan):</b> 36 csapat, 8 forduló. Minden csapat 8 különböző ellenfelet kap
+        (4 kalapból 2-2-t, félig otthon, félig idegenben) — nincs klasszikus 4-es csoport, egy közös tabella van.<br><br>
+        <b>Utána a tabella dönt:</b><br>
+        🟢 1–8. hely → egyenesen a nyolcaddöntőbe<br>
+        🟡 9–24. hely → rájátszás (oda-visszavágó, 9. a 24.-kel, 10. a 23.-dal, stb.) — a 8 győztes csatlakozik a nyolcaddöntőhöz<br>
+        🔴 25–36. hely → kiesik a tornából<br><br>
+        <b>Onnantól egyenes kiesés:</b> nyolcaddöntő → negyeddöntő → elődöntő → döntő.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Pontozás — ligaszakasz és minden csoport jellegű meccs</h2>
+      <p style="font-size:13px;line-height:1.6;color:var(--bl-white);">
+        A rendes játékidő (FT) eredményére tippelsz kimenetellel (1/X/2) + pontos eredménnyel. A pontozás
+        <b>lépcsőzetes</b> — mindig a legjobb találat számít, nem adódnak össze:
+      </p>
+      <table class="bl-table" style="margin-top:6px;">
+        <thead><tr><th style="text-align:left">Találat</th><th>Pont</th></tr></thead>
+        <tbody>
+          <tr><td class="team-cell">Kimenetel eltalálva (1/X/2)</td><td>1</td></tr>
+          <tr><td class="team-cell">+ Gólkülönbség is stimmel (felülírja az előzőt)</td><td>2</td></tr>
+          <tr><td class="team-cell">Pontos eredmény (felülír mindent)</td><td>3</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>🏆 Pontozás — kieséses szakasz (nyolcaddöntőtől a döntőig)</h2>
+      <p style="font-size:13px;line-height:1.6;color:var(--bl-white);">
+        A FT-pontozás <b>ugyanaz, mint fent</b> — ez mindig jár, függetlenül attól, mi történik utána.<br><br>
+        Ha a rendes játékidő <b>döntetlen</b>, a meccs folytatódik (hosszabbítás, majd szükség esetén 11-es),
+        és <b>ekkor jön képbe egy külön tipp</b>: <b>„Ki jut tovább?”</b> — ezt nem a pontos hosszabbítási
+        eredményre kell megadni, hanem egyszerűen megtippelni, melyik csapat megy tovább.
+      </p>
+      <table class="bl-table" style="margin-top:6px;">
+        <thead><tr><th style="text-align:left">Találat</th><th>Pont</th></tr></thead>
+        <tbody>
+          <tr><td class="team-cell">Ki jut tovább — eltalálva</td><td>2</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:var(--bl-grey);margin-top:8px;">
+        Ez a pont <b>a FT-pontszám mellé, külön</b> jár — a kettő nem zárja ki egymást. Azt, hogy ténylegesen
+        ki jutott tovább, mindig egyetlen, központi szabály dönti el: rendes idő → ha az is döntetlen, a
+        hosszabbítás összesített (FT+ET) eredménye → ha az is döntetlen, a tizenegyespárbaj győztese.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>📐 Példák — ligaszakasz (és minden meccs FT-je)</h2>
+      <p style="font-size:12px;color:var(--bl-gold);margin-bottom:6px;">Valós végeredmény: <b>Real Madrid 2–1 Bayern</b></p>
+      <table class="bl-table">
+        <thead><tr><th style="text-align:left">Tipped</th><th style="text-align:left">Mi történt</th><th>Pont</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="team-cell">3–1</td>
+            <td style="text-align:left;font-size:11.5px;">Kimenetel (hazai gy.) stimmel, de a gólkülönbség (+2) nem egyezik a valóssal (+1), és nem is pontos</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td class="team-cell">1–0</td>
+            <td style="text-align:left;font-size:11.5px;">Kimenetel stimmel ÉS a gólkülönbség is (+1 = +1) — ez felülírja az 1 pontot, de nem pontos eredmény</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td class="team-cell">2–1</td>
+            <td style="text-align:left;font-size:11.5px;">Pontos eredmény — ez felülír mindent</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td class="team-cell">1–1 vagy 0–1</td>
+            <td style="text-align:left;font-size:11.5px;">Rossz kimenetelt tippeltél (döntetlen / vendég győzelem a valós hazai győzelem helyett)</td>
+            <td>0</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:11.5px;color:var(--bl-grey);margin-top:8px;">
+        💡 Fontos csapda: döntetlen (X) tippnél a gólkülönbség <b>mindig</b> stimmel, hiszen X-nél a különbség
+        mindig 0 — tehát ha valós is X, egy nem pontos X-tipp (pl. 2–2 egy valós 1–1 helyett) sosem ér csak
+        1 pontot, automatikusan a 2 pontos gólkülönbség-szintre ugrik.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>📐 Példák — kieséses meccs</h2>
+
+      <p style="font-size:12px;color:var(--bl-gold);margin:4px 0 4px;">1) Nincs döntetlen — a „ki jut tovább” kérdés fel sem merül</p>
+      <p style="font-size:11.5px;line-height:1.55;color:var(--bl-white);">
+        Valós FT: <b>Man City 2–0 Porto</b> (a City simán, rendes időben jut tovább).<br>
+        Tipp: <b>2–0</b> → pontos eredmény → <b>3 pont</b>. Advancer-tipp nem is jelenik meg ennél a meccsnél, mert nem volt döntetlen.
+      </p>
+
+      <p style="font-size:12px;color:var(--bl-gold);margin:12px 0 4px;">2) Döntetlen FT, a hosszabbításban/11-esben dől el, ki jut tovább</p>
+      <p style="font-size:11.5px;line-height:1.55;color:var(--bl-white);">
+        Valós FT: <b>PSG 1–1 Inter</b>, utána a hosszabbítás/11-es alapján a <b>PSG jut tovább</b>.<br>
+        • Tipp FT <b>2–2</b> (X, de nem pontos) + advancer <b>PSG</b> → FT: 2 pont (X-nél mindig jár a GD-bónusz is) + advancer: 2 pont → <b>összesen 4 pont</b><br>
+        • Tipp FT <b>1–1</b> (pontos) + advancer <b>PSG</b> → FT: 3 pont + advancer: 2 pont → <b>összesen 5 pont</b><br>
+        • Tipp FT <b>1–1</b> (pontos) + advancer <b>Inter</b> (rossz) → FT: 3 pont + advancer: 0 pont → <b>összesen 3 pont</b>
+      </p>
+
+      <p style="font-size:12px;color:var(--bl-gold);margin:12px 0 4px;">3) A két pontozás egymástól teljesen független</p>
+      <p style="font-size:11.5px;line-height:1.55;color:var(--bl-white);">
+        Valós FT: <b>Arsenal 0–0 Dortmund</b>, a hosszabbítás után <b>Dortmund jut tovább</b>.<br>
+        Tipp FT <b>2–0</b> (rossz kimenetel, hazai győzelmet tippeltél döntetlen helyett) + advancer <b>Dortmund</b> (eltalálva) →
+        FT: 0 pont (hibás kimenetel) + advancer: 2 pont → <b>összesen 2 pont</b>.<br>
+        Vagyis egy elrontott pontos eredmény tipp mellett is bezsebelheted az advancer-pontot, ha a továbbjutót eltaláltad.
+      </p>
+    </div>
+  </section>
+
+  <!-- ADMIN TAB -->
+  <section id="tab-admin" class="tab-panel admin-only">
+    <div class="card">
+      <h2>Admin — eredmény rögzítés</h2>
+      <div class="placeholder-note">
+        Poka-yoke elv: a végeredményt (FT / ET / 11-es) mindig a <code>deriveAdvancer()</code> központi függvény
+        dolgozza fel — ez az EGYETLEN hely, ami eldönti ki jutott tovább. Minden mentés (kézi admin mentés és
+        a leendő ESPN auto-fetch is) ezt hívja meg, hogy ne legyen kétféle logika ugyanarra a kérdésre.
+      </div>
+      <div id="adminMatchList"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* =====================================================================
+   GÓLSZAGLÓ BL26/27 — ADATMODELL
+   ===================================================================== */
+
+// --- Firebase REST API (ugyanaz a projekt, ÚJ, elkülönített path,
+//     hogy ne keveredjen a VB (tipp2026) adataival) ---
+const FB_BASE = "https://teglarol-teglara-voting-default-rtdb.europe-west1.firebasedatabase.app";
+const FB_ROOT = "blTipp2627"; // <-- új, elkülönített gyökér a BL 26/27 adatoknak
+
+function fbSafeName(name){
+  // Ugyanaz a logika, mint a VB tippelőben: NEM uppercase-el (KULT !== Kult a Firebase kulcsokban)
+  return String(name || "").trim().replace(/[.#$\[\]\/]/g, "_");
+}
+
+async function fbGet(path){
+  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`);
+  if(!res.ok) throw new Error(`Firebase GET hiba: ${path}`);
+  return res.json();
+}
+async function fbSet(path, value){
+  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+    method:"PUT", body: JSON.stringify(value)
+  });
+  if(!res.ok) throw new Error(`Firebase SET hiba: ${path}`);
+  return res.json();
+}
+async function fbPatch(path, value){
+  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+    method:"PATCH", body: JSON.stringify(value)
+  });
+  if(!res.ok) throw new Error(`Firebase PATCH hiba: ${path}`);
+  return res.json();
+}
+
+/* =====================================================================
+   CSAPATOK — a 2026.08.27-i valós sorsolás mezőnye (36 csapat).
+   A kalap (pot) mező ahol a sajtóban explicit megerősítve volt, azt
+   használja; a többinél "?" jelzi, hogy a pontos kalap nincs
+   megerősítve szövegesen (a kalap-infografikák képként vannak fent,
+   azokat nem tudtam kiolvasni) — a pot mező amúgy sem befolyásolja a
+   pontozást vagy a mérkőzés-adatokat, csak tájékoztató jellegű.
+   ===================================================================== */
+const TEAMS_REAL = [
+  // 1. kalap — teljesen megerősítve
+  {id:"PSG",  name:"Paris Saint-Germain", pot:1},
+  {id:"BAY",  name:"Bayern München",      pot:1},
+  {id:"RMA",  name:"Real Madrid",         pot:1},
+  {id:"LIV",  name:"Liverpool",           pot:1},
+  {id:"INT",  name:"Inter",               pot:1},
+  {id:"MCI",  name:"Manchester City",     pot:1},
+  {id:"ARS",  name:"Arsenal",             pot:1},
+  {id:"BAR",  name:"Barcelona",           pot:1},
+  {id:"ATM",  name:"Atlético Madrid",     pot:1},
+  // 3. kalap — sajtóban név szerint megerősítve
+  {id:"LEI",  name:"RB Leipzig",          pot:3},
+  {id:"VIL",  name:"Villarreal",          pot:3},
+  {id:"GAL",  name:"Galatasaray",         pot:3},
+  // 4. kalap — sajtóban név szerint megerősítve (playoffból jutott csapatok)
+  {id:"AEK",  name:"AEK Athén",           pot:4},
+  {id:"SLB",  name:"Slovan Bratislava",   pot:4},
+  {id:"FEN",  name:"Fenerbahce",          pot:4},
+  {id:"VIK",  name:"Viking",              pot:4},
+  // Pontos kalap nem megerősített (2-4 kalap valamelyike) — csak a
+  // mezőny névsora biztos, forrás: nemzetisport.hu / index.hu / csakfoci.hu
+  {id:"CLB",  name:"Club Brugge",         pot:0},
+  {id:"AVL",  name:"Aston Villa",         pot:0},
+  {id:"LASK", name:"LASK",                pot:0},
+  {id:"POR",  name:"FC Porto",            pot:0},
+  {id:"DOR",  name:"Borussia Dortmund",   pot:0},
+  {id:"LIL",  name:"Lille",               pot:0},
+  {id:"BET",  name:"Betis",               pot:0},
+  {id:"FEY",  name:"Feyenoord",           pot:0},
+  {id:"STU",  name:"VfB Stuttgart",       pot:0},
+  {id:"NAP",  name:"Napoli",              pot:0},
+  {id:"SPO",  name:"Sporting CP",         pot:0},
+  {id:"ROM",  name:"AS Roma",             pot:0},
+  {id:"PSV",  name:"PSV Eindhoven",       pot:0},
+  {id:"SHA",  name:"Sahtar Donyeck",      pot:0},
+  {id:"BOD",  name:"Bodø/Glimt",          pot:0},
+  {id:"MUN",  name:"Manchester United",   pot:0},
+  {id:"SAB",  name:"Sabah Baku",          pot:0},
+  {id:"COM",  name:"Como",                pot:0},
+  {id:"SLA",  name:"Slavia Praha",        pot:0},
+  {id:"LEN",  name:"Lens",                pot:0}
+];
+// Visszafelé kompatibilitás — a régi kódrészletek TEAMS_PLACEHOLDER-t hívják
+const TEAMS_PLACEHOLDER = TEAMS_REAL;
+
+// --- Pontozási alapértékek (FT változatlan, ET/11-es helyett "ki jut tovább") ---
+const SCORING_DEFAULTS = {
+  ft: { outcome: 1, exactScore: 3, gdBonus: 2 }, // jelenlegi (VB-ből változatlanul átvéve)
+  advancer: { correct: 2 } // ÚJ: kieséses meccsen "ki jut tovább" helyes tipp pontja
+};
+
+/* =====================================================================
+   KÖZPONTI, EGYETLEN FORRÁSÚ LOGIKA: KI JUTOTT TOVÁBB?
+   Ez a FÜGGVÉNY az egyetlen hely, ahol ez eldől — admin kézi mentés ÉS
+   a jövőbeli ESPN auto-fetch is EZT hívja meg, sose duplikálja a logikát.
+   ===================================================================== */
+function deriveAdvancer(match){
+  // match: { teamHome, teamAway, ftHome, ftAway, etHome, etAway, penHome, penAway }
+  const hasFt  = match.ftHome  != null && match.ftAway  != null;
+  const hasEt  = match.etHome  != null && match.etAway  != null;
+  const hasPen = match.penHome != null && match.penAway != null;
+
+  if(!hasFt) return null; // nincs még eredmény rögzítve
+
+  // 1) Rendes játékidő eldöntötte
+  if(match.ftHome !== match.ftAway){
+    return match.ftHome > match.ftAway ? "home" : "away";
+  }
+
+  // 2) FT döntetlen -> hosszabbítás (ET = kumulált FT+ET eredmény, mint a VB-nél)
+  if(hasEt){
+    if(match.etHome !== match.etAway){
+      return match.etHome > match.etAway ? "home" : "away";
+    }
+    // ET is döntetlen -> tizenegyesek kellenek
+  }
+
+  // 3) Tizenegyespárbaj dönt
+  if(hasPen){
+    if(match.penHome === match.penAway){
+      // validációs hiba: 11-es nem végződhet döntetlenre - poka-yoke jelzés a hívó oldalon
+      return { error: "PEN_DRAW_INVALID" };
+    }
+    return match.penHome > match.penAway ? "home" : "away";
+  }
+
+  // FT döntetlen, de még nincs ET/11-es rögzítve -> egyelőre eldöntetlen
+  return null;
+}
+
+/* Validáció: ET eredmény egyik csapatnál sem lehet kisebb, mint az FT
+   (mert az ET a kumulált 90+hosszabbítás eredmény, poka-yoke szabály a VB-ből átvéve) */
+function validateEtAgainstFt(match){
+  if(match.etHome == null || match.etAway == null) return true;
+  if(match.ftHome == null || match.ftAway == null) return true;
+  return match.etHome >= match.ftHome && match.etAway >= match.ftAway;
+}
+
+/* =====================================================================
+   PONTOZÁSI MOTOR
+   ===================================================================== */
+
+// FT pontozás: kimenetel -> gólkülönbség-bónusz felülírja -> pontos eredmény felülír mindent
+function calcFtPoints(tip, real, rules = SCORING_DEFAULTS.ft){
+  if(real.ftHome == null || real.ftAway == null) return { points:0, detail:"nincs eredmény" };
+  const realOutcome = real.ftHome === real.ftAway ? "X" : (real.ftHome > real.ftAway ? "1" : "2");
+  const tipOutcome  = tip.scoreHome === tip.scoreAway ? "X" : (tip.scoreHome > tip.scoreAway ? "1" : "2");
+
+  let points = 0, detail = [];
+
+  if(tipOutcome === realOutcome){
+    points += rules.outcome;
+    detail.push(`kimenetel +${rules.outcome}`);
+
+    const realGd = real.ftHome - real.ftAway;
+    const tipGd  = tip.scoreHome - tip.scoreAway;
+    if(realGd === tipGd){
+      points = rules.gdBonus; // FELÜLÍRJA a kimenetel pontot, nem hozzáadódik
+      detail = [`gólkülönbség-bónusz (felülír) = ${rules.gdBonus}`];
+    }
+
+    if(tip.scoreHome === real.ftHome && tip.scoreAway === real.ftAway){
+      points = rules.exactScore; // a pontos eredmény mindent felülír
+      detail = [`pontos eredmény (felülír) = ${rules.exactScore}`];
+    }
+  } else {
+    detail.push("kimenetel hibás, 0 pont");
+  }
+
+  return { points, detail: detail.join(", ") };
+}
+
+// Kieséses szakasz "ki jut tovább" pontozás — FÜGGETLEN a FT pontos eredmény tippjétől
+function calcAdvancerPoints(advancerTip, match, rules = SCORING_DEFAULTS.advancer){
+  const real = deriveAdvancer(match);
+  if(real == null || (real && real.error)) return { points:0, detail:"még nem dőlt el" };
+  if(!advancerTip) return { points:0, detail:"nincs tipp" };
+  const correct = advancerTip === real;
+  return {
+    points: correct ? rules.correct : 0,
+    detail: correct ? `helyes „ki jut tovább” tipp +${rules.correct}` : "helytelen „ki jut tovább” tipp"
+  };
+}
+
+// Kieséses meccs teljes pontszáma = FT pontozás + advancer pontozás, EGYMÁSTÓL FÜGGETLENÜL összeadva
+function calcKnockoutMatchPoints(tip, match){
+  const ftResult = calcFtPoints(tip, match, SCORING_DEFAULTS.ft);
+  const advResult = calcAdvancerPoints(tip.advancerTip, match, SCORING_DEFAULTS.advancer);
+  return {
+    total: ftResult.points + advResult.points,
+    ftDetail: ftResult.detail,
+    advDetail: advResult.detail
+  };
+}
+
+/* =====================================================================
+   ADMIN MENTÉS — minden mentési útvonal a deriveAdvancer()-en át fut
+   ===================================================================== */
+async function adminSaveMatchResult(matchId, patch){
+  try{
+    const current = (await fbGet(`matches/${matchId}`)) || {};
+    const merged = { ...current, ...patch };
+
+    if(!validateEtAgainstFt(merged)){
+      showSaveState(matchId, "err", "Hiba: ET nem lehet kisebb, mint az FT!");
+      return false;
+    }
+
+    const advancer = deriveAdvancer(merged);
+    if(advancer && advancer.error === "PEN_DRAW_INVALID"){
+      showSaveState(matchId, "err", "Hiba: a tizenegyespárbaj nem végződhet döntetlenre!");
+      return false;
+    }
+
+    merged.advancer = advancer; // <- EGYETLEN forrásból számolt mező, mindig újraszámolva mentéskor
+    await fbSet(`matches/${matchId}`, merged);
+    showSaveState(matchId, "ok", "✓ Mentve");
+    recalcTipsForMatch(matchId, merged);
+    return true;
+  } catch(err){
+    showSaveState(matchId, "err", "Hiba a mentésnél, újrapróbálás...");
+    console.error(err);
+    return false;
+  }
+}
+
+async function autoFetchKnockoutResult(matchId, espnData){
+  // TODO: ESPN parsing, ugyanúgy adminSaveMatchResult(matchId, {...}) hívással zárva.
+}
+
+function recalcTipsForMatch(matchId, match){
+  // TODO: az adott meccsre leadott összes user tipp újraértékelése és pontszám frissítése Firebase-ben.
+}
+
+/* =====================================================================
+   MINIMÁLIS BEJELENTKEZÉS (session-szintű, memóriában tartva)
+   ===================================================================== */
+let CURRENT_USER = null;
+let IS_ADMIN = false;
+
+function setCurrentUser(name, isAdmin){
+  CURRENT_USER = fbSafeName(name);
+  IS_ADMIN = !!isAdmin;
+  document.body.classList.toggle("is-admin", IS_ADMIN);
+  document.getElementById("hdrSubtitle").textContent =
+    `Bejelentkezve: ${name}${isAdmin ? " (admin)" : ""} · ligaszakasz: 2026. szept. 8. – 2027. jan. 27.`;
+}
+
+/* =====================================================================
+   MECCSEK — 1. FORDULÓ: VALÓS PÁROSÍTÁS (2026.08.27-i sorsolás alapján)
+   Forrás: eredmenyek.com / nemzetisport.hu — dátum: 2026. szept. 8–10.
+   A 2–8. forduló még csak dátum szerint van rögzítve, a pontos
+   párosítás feltöltése folyamatban (a kalap-infografikák képként
+   vannak csak fent a forrásoknál).
+   ===================================================================== */
+const ROUND_DATES = {
+  1: "2026-09-08", // szept. 8-10.
+  2: "2026-10-13", // okt. 13-14.
+  3: "2026-10-20", // okt. 20-21.
+  4: "2026-11-03", // nov. 3-4.
+  5: "2026-11-24", // nov. 24-25.
+  6: "2026-12-08", // dec. 8-9.
+  7: "2027-01-19", // jan. 19-20.
+  8: "2027-01-27"  // jan. 27. (egyszerre minden meccs)
+};
+
+function team(id){ return TEAMS_REAL.find(t=>t.id===id); }
+
+// 1. forduló valós meccsei (18 db, a sorsolás után publikált menetrend alapján)
+const ROUND1_FIXTURES = [
+  ["CLB","AVL","2026-09-08"], ["AEK","LASK","2026-09-08"], ["INT","RMA","2026-09-08"],
+  ["POR","MCI","2026-09-08"], ["DOR","VIL","2026-09-08"], ["LIL","BET","2026-09-08"],
+  ["BAR","FEY","2026-09-09"], ["STU","VIK","2026-09-09"], ["ATM","LIV","2026-09-09"],
+  ["PSG","SLB","2026-09-09"], ["NAP","ARS","2026-09-09"], ["SPO","GAL","2026-09-09"],
+  ["FEN","ROM","2026-09-10"], ["PSV","SHA","2026-09-10"], ["BAY","BOD","2026-09-10"],
+  ["MUN","SAB","2026-09-10"], ["COM","LEI","2026-09-10"], ["SLA","LEN","2026-09-10"]
+];
+
+function buildRound1Matches(){
+  return ROUND1_FIXTURES.map(([homeId,awayId,date],i)=>{
+    const home = team(homeId), away = team(awayId);
+    return {
+      id: `L1_${String(i+1).padStart(2,"0")}`,
+      stage: "league",
+      matchday: 1,
+      huDate: date,
+      teamHome: home ? home.name : homeId,
+      teamAway: away ? away.name : awayId,
+      homeId, awayId,
+      ftHome:null, ftAway:null
+    };
+  });
+}
+
+// 2-8. forduló: egyelőre csak "TBD" placeholder sorok, a dátum már valós,
+// a pontos ellenfél-párosítás admin oldalon (vagy a következő frissítéskor)
+// töltendő fel — poka-yoke okból SOSEM generálunk kitalált párosítást.
+function buildTbdRoundMatches(round){
+  const matches = [];
+  for(let i=0;i<18;i++){
+    matches.push({
+      id: `L${round}_${String(i+1).padStart(2,"0")}`,
+      stage: "league",
+      matchday: round,
+      huDate: ROUND_DATES[round],
+      teamHome: "TBD", teamAway: "TBD",
+      homeId: null, awayId: null,
+      ftHome:null, ftAway:null,
+      isTbd: true
+    });
+  }
+  return matches;
+}
+
+function generateAllLeagueMatches(){
+  let matches = buildRound1Matches();
+  for(let r=2;r<=8;r++){
+    matches = matches.concat(buildTbdRoundMatches(r));
+  }
+  return matches;
+}
+
+let LEAGUE_MATCHES = generateAllLeagueMatches();
+let LOCAL_RESULTS = {};
+let LOCAL_TIPS = {};
+
+/* =====================================================================
+   LIGASZAKASZ TABELLA SZÁMÍTÁS
+   ===================================================================== */
+function computeStandings(matches, teams){
+  const table = {};
+  teams.forEach(t=> table[t.id] = { ...t, played:0, won:0, draw:0, lost:0, gf:0, ga:0, gd:0, points:0 });
+
+  matches.filter(m=>m.stage==="league" && m.ftHome!=null && m.ftAway!=null).forEach(m=>{
+    const h = table[m.homeId], a = table[m.awayId];
+    if(!h || !a) return;
+    h.played++; a.played++;
+    h.gf += m.ftHome; h.ga += m.ftAway;
+    a.gf += m.ftAway; a.ga += m.ftHome;
+    if(m.ftHome > m.ftAway){ h.won++; a.lost++; h.points+=3; }
+    else if(m.ftHome < m.ftAway){ a.won++; h.lost++; a.points+=3; }
+    else { h.draw++; a.draw++; h.points++; a.points++; }
+  });
+
+  Object.values(table).forEach(t=> t.gd = t.gf - t.ga);
+  return Object.values(table).sort((x,y)=>
+    y.points - x.points || y.gd - x.gd || y.gf - x.gf
+  );
+}
+
+/* =====================================================================
+   RENDER: LIGASZAKASZ MECCSEK
+   ===================================================================== */
+function renderLeagueMatches(){
+  const container = document.getElementById("ligaMatchesContainer");
+  const byRound = {};
+  LEAGUE_MATCHES.forEach(m=> (byRound[m.matchday] ??= []).push(m));
+
+  container.innerHTML = Object.keys(byRound).sort((a,b)=>a-b).map(round=>{
+    const isTbd = byRound[round][0] && byRound[round][0].isTbd;
+    return `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--bl-gold);font-weight:700;margin-bottom:4px;">
+        ${round}. forduló <span style="color:var(--bl-grey);font-weight:400;">(${byRound[round][0].huDate})</span>
+        ${isTbd ? '<span style="color:var(--bl-red);font-weight:400;"> — párosítás még nincs feltöltve</span>' : ''}
+      </div>
+      ${isTbd
+        ? `<div class="placeholder-note">A(z) ${round}. forduló pontos párosítása még nincs feltöltve — a dátum már valós, de a csapatpárok admin oldalon rögzítendők, amint elérhető a hivatalos menetrend.</div>`
+        : byRound[round].map(m=>renderMatchRow(m,false)).join("")}
+    </div>
+  `;}).join("");
+}
+
+function renderMatchRow(match, isKnockout){
+  const tip = LOCAL_TIPS[match.id] || {};
+  return `
+  <div class="match-row" data-match-id="${match.id}">
+    <div class="teams">${match.teamHome} – ${match.teamAway}</div>
+    <div class="tip-outcome" data-role="outcome">
+      <button data-val="1" class="${tip.outcomeTip==='1'?'selected':''}">1</button>
+      <button data-val="X" class="${tip.outcomeTip==='X'?'selected':''}">X</button>
+      <button data-val="2" class="${tip.outcomeTip==='2'?'selected':''}">2</button>
+    </div>
+    <div class="tip-score">
+      <input type="number" min="0" max="20" data-role="scoreHome" value="${tip.scoreHome ?? ''}">
+      :
+      <input type="number" min="0" max="20" data-role="scoreAway" value="${tip.scoreAway ?? ''}">
+    </div>
+    ${isKnockout ? `
+    <div class="advancer-pick">
+      <div class="label">Ki jut tovább? (ha a rendes játékidő döntetlen, ET/11-es dönt)</div>
+      <button data-val="home" class="${tip.advancerTip==='home'?'selected':''}">${match.teamHome}</button>
+      <button data-val="away" class="${tip.advancerTip==='away'?'selected':''}">${match.teamAway}</button>
+    </div>` : ``}
+    <div class="save-state" data-save-state="tip-${match.id}"></div>
+  </div>`;
+}
+
+function bindTipHandlers(containerId){
+  const container = document.getElementById(containerId);
+  container.addEventListener("click", (e)=>{
+    const row = e.target.closest(".match-row");
+    if(!row) return;
+    const matchId = row.dataset.matchId;
+    const tip = LOCAL_TIPS[matchId] || (LOCAL_TIPS[matchId] = {});
+
+    if(e.target.closest("[data-role='outcome']") && e.target.tagName === "BUTTON"){
+      tip.outcomeTip = e.target.dataset.val;
+      row.querySelectorAll("[data-role='outcome'] button").forEach(b=>
+        b.classList.toggle("selected", b.dataset.val === tip.outcomeTip));
+      saveTip(matchId, tip);
+    }
+    if(e.target.closest(".advancer-pick") && e.target.tagName === "BUTTON"){
+      tip.advancerTip = e.target.dataset.val;
+      row.querySelectorAll(".advancer-pick button").forEach(b=>
+        b.classList.toggle("selected", b.dataset.val === tip.advancerTip));
+      saveTip(matchId, tip);
+    }
+  });
+  container.addEventListener("change", (e)=>{
+    const row = e.target.closest(".match-row");
+    if(!row) return;
+    const matchId = row.dataset.matchId;
+    const tip = LOCAL_TIPS[matchId] || (LOCAL_TIPS[matchId] = {});
+    if(e.target.dataset.role === "scoreHome") tip.scoreHome = Number(e.target.value);
+    if(e.target.dataset.role === "scoreAway") tip.scoreAway = Number(e.target.value);
+    saveTip(matchId, tip);
+  });
+}
+
+async function saveTip(matchId, tip){
+  if(!CURRENT_USER){
+    showTipSaveState(matchId, "err", "Előbb jelentkezz be!");
+    return;
+  }
+  try{
+    await fbSet(`tips/${CURRENT_USER}/${matchId}`, tip);
+    showTipSaveState(matchId, "ok", "✓ Tipp mentve");
+  } catch(err){
+    showTipSaveState(matchId, "err", "Hiba, próbáld újra");
+    console.error(err);
+  }
+}
+function showTipSaveState(matchId, state, msg){
+  const el = document.querySelector(`[data-save-state="tip-${matchId}"]`);
+  if(!el) return;
+  el.textContent = msg;
+  el.className = `save-state ${state}`;
+}
+
+function renderStandings(){
+  const standings = computeStandings(LEAGUE_MATCHES, TEAMS_REAL);
+  const tbody = document.getElementById("standingsBody");
+  tbody.innerHTML = standings.map((t,i)=>{
+    const zone = i<8 ? "zone-topeight" : (i<24 ? "zone-playoff" : "zone-out");
+    return `<tr class="${zone}">
+      <td>${i+1}</td><td class="team-cell">${t.name}</td>
+      <td>${t.played}</td><td>${t.won}</td><td>${t.draw}</td><td>${t.lost}</td>
+      <td>${t.gf}:${t.ga}</td><td>${t.gd>0?'+':''}${t.gd}</td><td>${t.points}</td>
+    </tr>`;
+  }).join("");
+  return standings;
+}
+
+function generatePlayoffPairings(standings){
+  const seeded = standings.slice(8,16);
+  const unseeded = standings.slice(16,24);
+  if(seeded.length < 8 || unseeded.length < 8) return [];
+  return seeded.map((s,i)=>({
+    id:`PO_${i+1}`,
+    stage:"playoff",
+    teamHome: unseeded[unseeded.length-1-i].name,
+    teamAway: s.name,
+    teamHomeReturn: s.name, teamAwayReturn: unseeded[unseeded.length-1-i].name,
+    ftHome:null, ftAway:null
+  }));
+}
+
+function renderPlaceholderNote(containerId, text){
+  const el = document.getElementById(containerId);
+  if(el) el.innerHTML = `<div class="placeholder-note">${text}</div>`;
+}
+
+function renderPlayoffTab(standings){
+  const allPlayed = LEAGUE_MATCHES.filter(m=>!m.isTbd).every(m=>m.ftHome!=null) && !LEAGUE_MATCHES.some(m=>m.isTbd);
+  if(!allPlayed){
+    renderPlaceholderNote("playoffMatchesContainer",
+      "A rájátszás párosítása csak a ligaszakasz mind a 8 fordulójának lejátszása után generálódik.");
+    return;
+  }
+  const pairs = generatePlayoffPairings(standings);
+  document.getElementById("playoffMatchesContainer").innerHTML = pairs.map(p=>renderMatchRow(p,true)).join("");
+}
+
+function renderKnockoutTab(standings){
+  const allPlayed = LEAGUE_MATCHES.filter(m=>!m.isTbd).every(m=>m.ftHome!=null) && !LEAGUE_MATCHES.some(m=>m.isTbd);
+  if(!allPlayed){
+    renderPlaceholderNote("koMatchesContainer",
+      "A nyolcaddöntő ágrajza a ligaszakasz és a rájátszás lezárása után épül fel (1-8. hely + 8 rájátszás-győztes).");
+    return;
+  }
+  const topEight = standings.slice(0,8);
+  const ro16 = [];
+  for(let i=0;i<4;i++){
+    ro16.push({
+      id:`RO16_${i+1}`, stage:"ro16",
+      teamHome: topEight[i].name, teamAway: `Rájátszás győztese #${i+1}`,
+      ftHome:null, ftAway:null
+    });
+  }
+  document.getElementById("koMatchesContainer").innerHTML =
+    `<div class="placeholder-note" style="margin-bottom:10px;">
+      Minta-ágrajz (1-8. hely vs. rájátszás-győztesek) — a végleges párosítás a rájátszás
+      lezárása után, a hivatalos UEFA-sorsolási szabály szerint kerül helyettesítésre.
+    </div>` + ro16.map(m=>renderMatchRow(m,true)).join("");
+}
+
+function renderAdminPanel(){
+  const container = document.getElementById("adminMatchList");
+  container.innerHTML = LEAGUE_MATCHES.filter(m=>!m.isTbd).slice(0,18).map(m=>`
+    <div class="match-row" data-match-id="${m.id}">
+      <div class="teams">${m.teamHome} – ${m.teamAway} <span style="color:var(--bl-grey);font-size:10px;">(${m.matchday}. forduló, ${m.huDate})</span></div>
+      <div class="tip-score">
+        FT: <input type="number" min="0" max="20" data-admin-role="ftHome" value="${m.ftHome ?? ''}">
+        : <input type="number" min="0" max="20" data-admin-role="ftAway" value="${m.ftAway ?? ''}">
+      </div>
+      <div class="tip-score">
+        ET: <input type="number" min="0" max="20" data-admin-role="etHome" value="${m.etHome ?? ''}">
+        : <input type="number" min="0" max="20" data-admin-role="etAway" value="${m.etAway ?? ''}">
+      </div>
+      <div class="tip-score">
+        11-es: <input type="number" min="0" max="20" data-admin-role="penHome" value="${m.penHome ?? ''}">
+        : <input type="number" min="0" max="20" data-admin-role="penAway" value="${m.penAway ?? ''}">
+      </div>
+      <button data-action="save-result" style="order:4;padding:6px 10px;border-radius:8px;border:1px solid var(--bl-cyan);background:rgba(0,200,255,.1);color:var(--bl-white);">Mentés</button>
+      <div class="save-state" data-save-state="${m.id}"></div>
+    </div>
+  `).join("");
+
+  container.addEventListener("click", async (e)=>{
+    if(e.target.dataset.action !== "save-result") return;
+    const row = e.target.closest(".match-row");
+    const matchId = row.dataset.matchId;
+    const patch = {};
+    row.querySelectorAll("[data-admin-role]").forEach(inp=>{
+      if(inp.value !== "") patch[inp.dataset.adminRole] = Number(inp.value);
+    });
+    const ok = await adminSaveMatchResult(matchId, patch);
+    if(ok){
+      const match = LEAGUE_MATCHES.find(m=>m.id===matchId);
+      if(match) Object.assign(match, patch);
+      renderStandings();
+    }
+  }, { once:true });
+}
+
+function showSaveState(matchId, state, msg){
+  const el = document.querySelector(`[data-save-state="${matchId}"]`);
+  if(!el) return;
+  el.textContent = msg;
+  el.className = `save-state ${state}`;
+}
+
+/* =====================================================================
+   INIT / TAB VÁLTÁS
+   ===================================================================== */
+document.querySelectorAll("nav.bl-tabs button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("nav.bl-tabs button").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll("section.tab-panel").forEach(s=>s.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+function renderAll(){
+  renderLeagueMatches();
+  const standings = renderStandings();
+  renderPlayoffTab(standings);
+  renderKnockoutTab(standings);
+  renderAdminPanel();
+}
+
+bindTipHandlers("ligaMatchesContainer");
+bindTipHandlers("playoffMatchesContainer");
+bindTipHandlers("koMatchesContainer");
+
+setCurrentUser("Teszt Felhasználó", false);
+renderAll();
+</script>
+</body>
+</html>
