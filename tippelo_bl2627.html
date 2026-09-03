@@ -93,6 +93,11 @@
     flex-wrap:wrap;
   }
   .match-row .teams{flex:1;min-width:160px;font-size:13.5px;font-weight:600;}
+  .team-badge{display:inline-flex;align-items:center;gap:2px;font-size:13px;}
+  .team-badge .badge-initials{
+    font-size:9px;font-weight:800;color:var(--bl-navy);background:var(--bl-cyan);
+    border-radius:5px;padding:1px 3px;letter-spacing:.3px;
+  }
   .match-row .meta{font-size:10.5px;color:var(--bl-grey);width:100%;order:5;margin-top:2px;}
   .tip-outcome{display:flex;gap:4px;}
   .tip-outcome button{
@@ -123,6 +128,8 @@
   }
   .admin-only{display:none;}
   body.is-admin .admin-only{display:block;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;}
+  .modal-box{background:var(--bl-navy2);border:1px solid rgba(0,200,255,.28);border-radius:18px;padding:32px 24px;max-width:340px;width:100%;text-align:center;}
 </style>
 </head>
 <body>
@@ -130,13 +137,49 @@
 <header class="bl-header">
   <h1>🏆 Gólszagló BL26/27</h1>
   <div class="sub" id="hdrSubtitle">2026–2027-es UEFA-Bajnokok Ligája · ligaszakasz: 2026. szept. 8. – 2027. jan. 27.</div>
+  <div id="loggedInBar" style="display:none;margin-top:6px;font-size:11px;color:var(--bl-grey);">
+    <span id="loggedInAs"></span> · <span id="logoutLink" style="color:var(--bl-cyan);cursor:pointer;text-decoration:underline;">kijelentkezés</span>
+  </div>
 </header>
+
+<!-- REGISZTRÁCIÓ / BELÉPÉS MODAL — a VB Gólszagló mintáját követve:
+     hash-elt jelszó, Firebase cross-device auth (userAuth/{safeName}),
+     admin-felismerés (KULT), jelszó-reset admin által. -->
+<div class="modal-overlay" id="regModal">
+  <div class="modal-box">
+    <div style="font-size:34px;margin-bottom:6px;">🏆</div>
+    <h2 id="regTitle" style="margin:0 0 6px;font-family:inherit;color:var(--bl-cyan);letter-spacing:.5px;">REGISZTRÁCIÓ</h2>
+    <p id="regSubtitle" style="font-size:12.5px;color:var(--bl-grey);margin:0 0 14px;">Válassz nevet és jelszót.<br>Legközelebb ugyanezzel léphetsz be.</p>
+    <input type="text" id="nameInput" placeholder="NEVED" maxlength="20" autocomplete="off"
+      oninput="checkExistingUser()"
+      style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+    <input type="password" id="pwInput" placeholder="JELSZÓ" maxlength="30" autocomplete="new-password"
+      onkeydown="if(event.key==='Enter')register()"
+      style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+    <div id="regMsg" style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;min-height:16px;"></div>
+    <button onclick="register()" id="regBtn" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--bl-cyan);background:rgba(0,200,255,.14);color:var(--bl-white);font-size:14px;font-weight:700;cursor:pointer;">BELÉPEK →</button>
+    <div style="margin-top:10px;font-size:11px;color:var(--bl-grey);">Ha már van fiókod, add meg a neved és jelszavad.</div>
+    <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;">
+      <span onclick="var p=document.getElementById('recoveryPanel');p.style.display=p.style.display==='none'?'block':'none';"
+        style="font-size:11px;color:var(--bl-grey);cursor:pointer;text-decoration:underline;">🔑 Elfelejtett jelszó (admin-visszaállítás)</span>
+      <div id="recoveryPanel" style="display:none;margin-top:8px;padding:10px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1);border-radius:8px;">
+        <div style="font-size:10.5px;color:var(--bl-grey);margin-bottom:6px;">Admin jelszó szükséges a reset kéréséhez</div>
+        <input type="password" id="recoveryAdminPw" placeholder="Admin jelszó"
+          style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.2);color:var(--bl-white);font-size:12.5px;box-sizing:border-box;margin-bottom:6px;"
+          onkeydown="if(event.key==='Enter')runAccountRecovery()">
+        <button onclick="runAccountRecovery()" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--bl-gold);background:rgba(201,160,56,.12);color:var(--bl-white);font-size:12px;font-weight:700;cursor:pointer;">Jelszó törlése erre a névre</button>
+        <div id="recoveryMsg" style="font-size:10.5px;color:var(--bl-grey);margin-top:6px;min-height:14px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <nav class="bl-tabs">
   <button data-tab="tab-liga" class="active">⚽ Ligaszakasz</button>
   <button data-tab="tab-tabla">📊 Tabella</button>
   <button data-tab="tab-playoff">🎯 Rájátszás</button>
   <button data-tab="tab-ko">🏆 Kieséses</button>
+  <button data-tab="tab-ranglista">🏅 Ranglista</button>
   <button data-tab="tab-szabalyok">ℹ️ Szabályok</button>
   <button data-tab="tab-admin" class="admin-only">🔧 Admin</button>
 </nav>
@@ -148,8 +191,8 @@
     <div class="card">
       <h2>Ligaszakasz — 8 forduló</h2>
       <div id="ligaStatusNote" class="placeholder-note">
-        A sorsolás megvolt (2026.08.27, Monaco). Az <b>1. forduló mérkőzései valósak</b> (szept. 8–10).
-        A 2–8. forduló pontos párosítása még feltöltés alatt — a dátumok már a hivatalos naptár szerint szerepelnek.
+        A sorsolás megvolt (2026.08.27, Monaco), a menetrend hivatalos UEFA.com forrásból (2026.08.29.) van feltöltve.
+        <b>Mind a 8 forduló, mind a 144 mérkőzés valós</b> — csapatpárok és pontos dátumok szerint.
       </div>
       <div id="ligaMatchesContainer"></div>
     </div>
@@ -190,6 +233,14 @@
         vagy tizenegyespárbaj dönti el, és <u>ez</u> számít, nem a pontos hosszabbításos eredmény.
       </div>
       <div id="koMatchesContainer"></div>
+    </div>
+  </section>
+
+  <!-- RANGLISTA TAB -->
+  <section id="tab-ranglista" class="tab-panel">
+    <div class="card">
+      <h2>🏅 Ranglista</h2>
+      <div id="leaderboardContainer"></div>
     </div>
   </section>
 
@@ -359,57 +410,63 @@ async function fbPatch(path, value){
 
 /* =====================================================================
    CSAPATOK — a 2026.08.27-i valós sorsolás mezőnye (36 csapat).
-   A kalap (pot) mező ahol a sajtóban explicit megerősítve volt, azt
-   használja; a többinél "?" jelzi, hogy a pontos kalap nincs
-   megerősítve szövegesen (a kalap-infografikák képként vannak fent,
-   azokat nem tudtam kiolvasni) — a pot mező amúgy sem befolyásolja a
-   pontozást vagy a mérkőzés-adatokat, csak tájékoztató jellegű.
+   CSAPATOK — HIVATALOS UEFA.COM FORRÁSBÓL (2026.08.29-i cikk, a teljes
+   ligaszakasz menetrendjét közölte mind a 8 fordulóra). Ez a végleges,
+   megbízható lista — a korábbi két próbálkozás (egyik túl hiányos, másik
+   egy téves cikkre épült) ezzel felülíródik.
+   A "flag" mező az adott csapat országának zászlaja — ikonként ezt
+   használjuk (ugyanúgy, mint a VB Gólszaglóban a homeFlag/awayFlag).
    ===================================================================== */
 const TEAMS_REAL = [
-  // 1. kalap — teljesen megerősítve
-  {id:"PSG",  name:"Paris Saint-Germain", pot:1},
-  {id:"BAY",  name:"Bayern München",      pot:1},
-  {id:"RMA",  name:"Real Madrid",         pot:1},
-  {id:"LIV",  name:"Liverpool",           pot:1},
-  {id:"INT",  name:"Inter",               pot:1},
-  {id:"MCI",  name:"Manchester City",     pot:1},
-  {id:"ARS",  name:"Arsenal",             pot:1},
-  {id:"BAR",  name:"Barcelona",           pot:1},
-  {id:"ATM",  name:"Atlético Madrid",     pot:1},
-  // 3. kalap — sajtóban név szerint megerősítve
-  {id:"LEI",  name:"RB Leipzig",          pot:3},
-  {id:"VIL",  name:"Villarreal",          pot:3},
-  {id:"GAL",  name:"Galatasaray",         pot:3},
-  // 4. kalap — sajtóban név szerint megerősítve (playoffból jutott csapatok)
-  {id:"AEK",  name:"AEK Athén",           pot:4},
-  {id:"SLB",  name:"Slovan Bratislava",   pot:4},
-  {id:"FEN",  name:"Fenerbahce",          pot:4},
-  {id:"VIK",  name:"Viking",              pot:4},
-  // Pontos kalap nem megerősített (2-4 kalap valamelyike) — csak a
-  // mezőny névsora biztos, forrás: nemzetisport.hu / index.hu / csakfoci.hu
-  {id:"CLB",  name:"Club Brugge",         pot:0},
-  {id:"AVL",  name:"Aston Villa",         pot:0},
-  {id:"LASK", name:"LASK",                pot:0},
-  {id:"POR",  name:"FC Porto",            pot:0},
-  {id:"DOR",  name:"Borussia Dortmund",   pot:0},
-  {id:"LIL",  name:"Lille",               pot:0},
-  {id:"BET",  name:"Betis",               pot:0},
-  {id:"FEY",  name:"Feyenoord",           pot:0},
-  {id:"STU",  name:"VfB Stuttgart",       pot:0},
-  {id:"NAP",  name:"Napoli",              pot:0},
-  {id:"SPO",  name:"Sporting CP",         pot:0},
-  {id:"ROM",  name:"AS Roma",             pot:0},
-  {id:"PSV",  name:"PSV Eindhoven",       pot:0},
-  {id:"SHA",  name:"Sahtar Donyeck",      pot:0},
-  {id:"BOD",  name:"Bodø/Glimt",          pot:0},
-  {id:"MUN",  name:"Manchester United",   pot:0},
-  {id:"SAB",  name:"Sabah Baku",          pot:0},
-  {id:"COM",  name:"Como",                pot:0},
-  {id:"SLA",  name:"Slavia Praha",        pot:0},
-  {id:"LEN",  name:"Lens",                pot:0}
+  {id:"AEK", name:"AEK Athén",           flag:"🇬🇷"},
+  {id:"LASK",name:"LASK",                flag:"🇦🇹"},
+  {id:"CLB", name:"Club Brugge",         flag:"🇧🇪"},
+  {id:"AVL", name:"Aston Villa",         flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {id:"DOR", name:"Borussia Dortmund",   flag:"🇩🇪"},
+  {id:"VIL", name:"Villarreal",          flag:"🇪🇸"},
+  {id:"POR", name:"FC Porto",            flag:"🇵🇹"},
+  {id:"MCI", name:"Manchester City",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {id:"LIL", name:"Lille",               flag:"🇫🇷"},
+  {id:"BET", name:"Real Betis",          flag:"🇪🇸"},
+  {id:"RMA", name:"Real Madrid",         flag:"🇪🇸"},
+  {id:"INT", name:"Internazionale",      flag:"🇮🇹"},
+  {id:"BAR", name:"FC Barcelona",        flag:"🇪🇸"},
+  {id:"FEY", name:"Feyenoord",           flag:"🇳🇱"},
+  {id:"STU", name:"VfB Stuttgart",       flag:"🇩🇪"},
+  {id:"VIK", name:"Viking",              flag:"🇳🇴"},
+  {id:"LIV", name:"Liverpool",           flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {id:"ATM", name:"Atlético Madrid",     flag:"🇪🇸"},
+  {id:"PSG", name:"Paris Saint-Germain", flag:"🇫🇷"},
+  {id:"SLB", name:"Slovan Bratislava",   flag:"🇸🇰"},
+  {id:"SPO", name:"Sporting CP",         flag:"🇵🇹"},
+  {id:"GAL", name:"Galatasaray",         flag:"🇹🇷"},
+  {id:"NAP", name:"SSC Napoli",          flag:"🇮🇹"},
+  {id:"ARS", name:"Arsenal",             flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {id:"FEN", name:"Fenerbahce",          flag:"🇹🇷"},
+  {id:"ROM", name:"AS Roma",             flag:"🇮🇹"},
+  {id:"PSV", name:"PSV Eindhoven",       flag:"🇳🇱"},
+  {id:"SHA", name:"Sahtar Donyeck",      flag:"🇺🇦"},
+  {id:"COM", name:"Como",                flag:"🇮🇹"},
+  {id:"LEI", name:"RB Leipzig",          flag:"🇩🇪"},
+  {id:"BAY", name:"Bayern München",      flag:"🇩🇪"},
+  {id:"BOD", name:"Bodø/Glimt",          flag:"🇳🇴"},
+  {id:"MUN", name:"Manchester United",   flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {id:"SAB", name:"Sabah",               flag:"🇦🇿"},
+  {id:"SLA", name:"Slavia Praha",        flag:"🇨🇿"},
+  {id:"LEN", name:"Lens",                flag:"🇫🇷"}
 ];
 // Visszafelé kompatibilitás — a régi kódrészletek TEAMS_PLACEHOLDER-t hívják
 const TEAMS_PLACEHOLDER = TEAMS_REAL;
+
+// Rövid, kör alakú "ikon" minden csapathoz — a VB-ben ott volt az országzászló
+// a csapatnév mellett; itt a klub országának zászlaját + a klubnév iniciáléit
+// használjuk (nincs külső logó-API-függőség, mindig megjelenik).
+function teamBadge(teamIdOrName){
+  const t = TEAMS_REAL.find(x=>x.id===teamIdOrName || x.name===teamIdOrName);
+  if(!t) return "";
+  const initials = t.name.replace(/[^A-ZÁÉÍÓÖŐÚÜŰ ]/gi,"").split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+  return `<span class="team-badge" title="${t.name}">${t.flag}<span class="badge-initials">${initials}</span></span>`;
+}
 
 // --- Pontozási alapértékek (FT változatlan, ET/11-es helyett "ki jut tovább") ---
 const SCORING_DEFAULTS = {
@@ -552,6 +609,22 @@ async function adminSaveMatchResult(matchId, patch){
   }
 }
 
+// Rögzített eredmény teljes törlése (FT+ET+11-es+advancer) — admin bármikor
+// visszavonhatja egy elrontott bevitelt, időkorlát nélkül (ellentétben a
+// user tippek törlésével, amit kick-offig engedünk csak).
+async function adminDeleteMatchResult(matchId){
+  try{
+    await fbSet(`matches/${matchId}`, null);
+    showSaveState(matchId, "ok", "🗑️ Eredmény törölve");
+    recalcTipsForMatch(matchId, {});
+    return true;
+  } catch(err){
+    showSaveState(matchId, "err", "Hiba a törlésnél, próbáld újra");
+    console.error(err);
+    return false;
+  }
+}
+
 async function autoFetchKnockoutResult(matchId, espnData){
   // TODO: ESPN parsing, ugyanúgy adminSaveMatchResult(matchId, {...}) hívással zárva.
 }
@@ -561,25 +634,251 @@ function recalcTipsForMatch(matchId, match){
 }
 
 /* =====================================================================
-   MINIMÁLIS BEJELENTKEZÉS (session-szintű, memóriában tartva)
+   REGISZTRÁCIÓ / BELÉPÉS — a VB Gólszagló rendszeréből átemelve:
+   - jelszó soha nem megy nyílt szövegben Firebase-be, csak simpleHash()
+   - userAuth/{safeName} = az EGYETLEN igazságforrás a jelszóra (cross-device)
+   - localStorage csak gyorsítótár, hogy ne kelljen minden belépésnél
+     Firebase-t hívni ismert eszközön
+   - admin-felismerés: KULT néven (ADMIN_USERS) VAGY admin jelszóval
+   - jelszó-reset: admin a passwordReset/{safe} flaget állítja be, a user
+     következő belépésekor az új jelszó felülírja a régit
+   SZÁNDÉKOSAN KIHAGYVA a VB meghívó-token alrendszere (invite-request,
+   email-kérés, deletedUsers-ellenőrzés) — az egy már futó, éles közösség
+   migrációjához kellett ott, itt friss appnál nincs rá szükség. Ha mégis
+   kell, jelezd, és portolom azt is.
    ===================================================================== */
+const LS_USERS   = "bl2627_users";   // {safeName: hashedPw} — helyi gyorsítótár
+const LS_SESSION = "bl2627_user";    // bejelentkezett felhasználó neve
+const ADMIN_USERS = ["KULT"];        // mindig admin jogú név(ek), jelszó nélkül is felismerve belépéskor
+let ADMIN_PW_HASH = null;            // Firebase-ből töltődik (adminPwHash), fallback lentebb
+
 let CURRENT_USER = null;
 let IS_ADMIN = false;
 
-function setCurrentUser(name, isAdmin){
-  CURRENT_USER = fbSafeName(name);
-  IS_ADMIN = !!isAdmin;
-  document.body.classList.toggle("is-admin", IS_ADMIN);
-  document.getElementById("hdrSubtitle").textContent =
-    `Bejelentkezve: ${name}${isAdmin ? " (admin)" : ""} · ligaszakasz: 2026. szept. 8. – 2027. jan. 27.`;
+function lsGet(key){ try{ return JSON.parse(localStorage.getItem(key)||"null"); }catch(e){ return null; } }
+function lsSet(key,val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+function getUsers(){ return lsGet(LS_USERS) || {}; }
+function saveUsers(u){ lsSet(LS_USERS, u); }
+
+// Ugyanaz az egyszerű hash-függvény, mint a VB-ben — NEM kriptográfiai erősségű,
+// de a cél itt csak az, hogy a jelszó ne menjen nyílt szövegben Firebase-be.
+function simpleHash(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0; }
+  return h.toString(36);
 }
 
+function isHardcodeAdmin(name){
+  return name && ADMIN_USERS.indexOf(fbSafeName(name).toUpperCase()) >= 0;
+}
+
+// Gépelés közbeni visszajelzés: ismert név esetén "BELÉPÉS", újnál "REGISZTRÁCIÓ"
+async function checkExistingUser(){
+  const n = document.getElementById("nameInput").value.trim().toUpperCase();
+  const title = document.getElementById("regTitle");
+  const subtitle = document.getElementById("regSubtitle");
+  const btn = document.getElementById("regBtn");
+  const msg = document.getElementById("regMsg");
+  if(n.length < 2) return;
+  const users = getUsers();
+  const safe = fbSafeName(n);
+  const knownLocally = !!users[n];
+  const isAdminName = isHardcodeAdmin(n);
+  let knownInFirebase = false;
+  if(!knownLocally && !isAdminName){
+    try{ knownInFirebase = !!(await fbGet(`userAuth/${safe}`)); }catch(e){}
+  }
+  if(knownLocally || knownInFirebase || isAdminName){
+    title.textContent = "BELÉPÉS";
+    subtitle.textContent = "Üdv vissza! Add meg a jelszavad.";
+    btn.textContent = "BELÉPEK →";
+    msg.textContent = "✓ Ismert felhasználó";
+    msg.style.color = "var(--bl-green)";
+  } else {
+    title.textContent = "REGISZTRÁCIÓ";
+    subtitle.textContent = "Új fiók – válassz jelszót.";
+    btn.textContent = "FIÓK LÉTREHOZÁSA →";
+    msg.textContent = "";
+  }
+}
+
+async function register(){
+  const n = document.getElementById("nameInput").value.trim().toUpperCase();
+  const pw = document.getElementById("pwInput").value.trim();
+  const msg = document.getElementById("regMsg");
+  if(!n || n.length < 2){ msg.textContent = "⚠️ Legalább 2 karakteres név kell!"; msg.style.color="var(--bl-red)"; return; }
+  if(!pw || pw.length < 3){ msg.textContent = "⚠️ Legalább 3 karakteres jelszó kell!"; msg.style.color="var(--bl-red)"; return; }
+
+  const users = getUsers();
+  const hashed = simpleHash(pw);
+  const safe = fbSafeName(n);
+
+  // Admin: admin jelszóval VAGY a korábban nála rögzített jelszóval mindig bejut
+  if(isHardcodeAdmin(n)){
+    const adminHash = ADMIN_PW_HASH || "-uzxjkk"; // fallback, ha a Firebase-ből még nem töltődött be
+    if(hashed === adminHash || hashed === users[n]){
+      users[n] = hashed; saveUsers(users);
+      finishLogin(n, hashed);
+      return;
+    }
+  }
+
+  if(users[n]){
+    // Ismert ezen az eszközön — jelszó-ellenőrzés
+    if(users[n] !== hashed){
+      // Esetleg admin resetelte a jelszavát — ellenőrizzük
+      try{
+        const resetFlag = await fbGet(`passwordReset/${safe}`);
+        if(resetFlag){
+          users[n] = hashed; saveUsers(users);
+          await fbPatch("passwordReset", {[safe]: null}).catch(()=>{});
+          finishLogin(n, hashed);
+          msg.textContent = "🔑 Jelszó frissítve!"; msg.style.color="var(--bl-green)";
+          return;
+        }
+      }catch(e){}
+      msg.textContent = "❌ Hibás jelszó!"; msg.style.color="var(--bl-red)";
+      return;
+    }
+    finishLogin(n, hashed);
+    return;
+  }
+
+  // Nem ismert ezen az eszközön — Firebase-ben nézzük meg (cross-device belépés / új regisztráció)
+  msg.textContent = "⏳ Ellenőrzés…"; msg.style.color = "var(--bl-grey)";
+  try{
+    const resetFlag = await fbGet(`passwordReset/${safe}`).catch(()=>null);
+    const fbHash = await fbGet(`userAuth/${safe}`).catch(()=>null);
+
+    if(resetFlag){
+      users[n] = hashed; saveUsers(users);
+      await fbPatch("passwordReset", {[safe]: null}).catch(()=>{});
+      finishLogin(n, hashed);
+      msg.textContent = "🔑 Jelszó frissítve!"; msg.style.color="var(--bl-green)";
+      return;
+    }
+    if(fbHash){
+      if(fbHash === hashed){
+        users[n] = hashed; saveUsers(users);
+        finishLogin(n, hashed);
+      } else {
+        msg.textContent = "❌ Hibás jelszó!"; msg.style.color="var(--bl-red)";
+      }
+      return;
+    }
+    // Teljesen új név — regisztráció
+    users[n] = hashed; saveUsers(users);
+    finishLogin(n, hashed);
+  }catch(err){
+    msg.textContent = "❌ Kapcsolati hiba: " + err.message; msg.style.color="var(--bl-red)";
+  }
+}
+
+function finishLogin(n, pwHash){
+  CURRENT_USER = fbSafeName(n);
+  IS_ADMIN = isHardcodeAdmin(n);
+  document.body.classList.toggle("is-admin", IS_ADMIN);
+  localStorage.setItem(LS_SESSION, n);
+
+  document.getElementById("regModal").style.display = "none";
+  const bar = document.getElementById("loggedInBar");
+  if(bar){
+    bar.style.display = "block";
+    document.getElementById("loggedInAs").textContent = `Bejelentkezve: ${n}${IS_ADMIN ? " (admin)" : ""}`;
+  }
+
+  const safe = fbSafeName(n);
+  fbSet(`users/${safe}`, { name:n, joined:new Date().toISOString().slice(0,10) }).catch(()=>{});
+  if(pwHash) fbSet(`userAuth/${safe}`, pwHash).catch(()=>{});
+  ALL_USERS[safe] = { name:n };
+
+  // Saját korábbi tippek betöltése a helyi (UI-jelölő) állapotba
+  Object.keys(ALL_TIPS).forEach(matchId=>{
+    const myTip = ALL_TIPS[matchId][safe];
+    if(myTip) LOCAL_TIPS[matchId] = myTip;
+  });
+
+  renderAll();
+}
+
+function changeName(){
+  localStorage.removeItem(LS_SESSION);
+  CURRENT_USER = null; IS_ADMIN = false;
+  document.body.classList.remove("is-admin");
+  document.getElementById("regModal").style.display = "flex";
+  const bar = document.getElementById("loggedInBar");
+  if(bar) bar.style.display = "none";
+  document.getElementById("nameInput").value = "";
+  document.getElementById("pwInput").value = "";
+  document.getElementById("regMsg").textContent = "";
+}
+
+// Admin-jelszóval indított jelszó-reset egy adott névre (a user következő
+// belépésekor az új jelszava felülírja a régit — l. register() resetFlag ág)
+async function runAccountRecovery(){
+  const targetName = document.getElementById("nameInput").value.trim().toUpperCase();
+  const adminPw = document.getElementById("recoveryAdminPw").value.trim();
+  const msg = document.getElementById("recoveryMsg");
+  if(!targetName || targetName.length < 2){
+    msg.textContent = "⚠️ Előbb írd be a nevet, aminek a jelszavát reseteled!"; msg.style.color="var(--bl-red)";
+    return;
+  }
+  const adminHash = ADMIN_PW_HASH || "-uzxjkk";
+  if(simpleHash(adminPw) !== adminHash){
+    msg.textContent = "❌ Hibás admin jelszó!"; msg.style.color="var(--bl-red)";
+    return;
+  }
+  try{
+    await fbSet(`passwordReset/${fbSafeName(targetName)}`, true);
+    msg.textContent = `✓ ${targetName} jelszava resetelve — legközelebbi belépésnél az új jelszó lesz érvényes.`;
+    msg.style.color = "var(--bl-green)";
+  }catch(e){
+    msg.textContent = "❌ Hiba a mentésnél."; msg.style.color="var(--bl-red)";
+  }
+}
+
+// Automatikus belépés, ha ismert a session ebből a böngészőből + admin jelszó-hash betöltése Firebase-ből
+async function initAuth(){
+  try{ ADMIN_PW_HASH = (await fbGet("adminPwHash")) || "-uzxjkk"; }catch(e){ ADMIN_PW_HASH = "-uzxjkk"; }
+
+  const savedName = localStorage.getItem(LS_SESSION);
+  if(savedName){
+    CURRENT_USER = fbSafeName(savedName);
+    IS_ADMIN = isHardcodeAdmin(savedName);
+    document.body.classList.toggle("is-admin", IS_ADMIN);
+    document.getElementById("regModal").style.display = "none";
+    const bar = document.getElementById("loggedInBar");
+    if(bar){
+      bar.style.display = "block";
+      document.getElementById("loggedInAs").textContent = `Bejelentkezve: ${savedName}${IS_ADMIN ? " (admin)" : ""}`;
+    }
+  }
+
+  await loadAllData(); // mindenki tippje + a rögzített eredmények — enélkül a ranglista üres lenne
+
+  // A saját korábbi tippjeink betöltése a helyi (UI-jelölő) állapotba is,
+  // hogy visszatéréskor lássuk, mit tippeltünk korábban (nem csak a ranglistán).
+  if(CURRENT_USER){
+    Object.keys(ALL_TIPS).forEach(matchId=>{
+      const myTip = ALL_TIPS[matchId][CURRENT_USER];
+      if(myTip) LOCAL_TIPS[matchId] = myTip;
+    });
+  }
+
+  renderAll();
+}
+
+document.getElementById("nameInput").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") document.getElementById("pwInput").focus();
+});
+document.getElementById("logoutLink").addEventListener("click", changeName);
+
 /* =====================================================================
-   MECCSEK — 1. FORDULÓ: VALÓS PÁROSÍTÁS (2026.08.27-i sorsolás alapján)
-   Forrás: eredmenyek.com / nemzetisport.hu — dátum: 2026. szept. 8–10.
-   A 2–8. forduló még csak dátum szerint van rögzítve, a pontos
-   párosítás feltöltése folyamatban (a kalap-infografikák képként
-   vannak csak fent a forrásoknál).
+   MECCSEK — VALÓS PÁROSÍTÁSOK (2026.08.27-i sorsolás alapján)
+   6. forduló: TELJES, megbízható forrásból (MTI/goal.com cikk, mind a 18
+   mérkőzést név szerint közölte). 1. forduló: 2 mérkőzés külön forrásból
+   megerősítve (Real Madrid, Liverpool csapathírei). A többi forduló/meccs
+   egyelőre TBD — poka-yoke okból SOSEM generálunk kitalált párosítást.
    ===================================================================== */
 const ROUND_DATES = {
   1: "2026-09-08", // szept. 8-10.
@@ -594,24 +893,86 @@ const ROUND_DATES = {
 
 function team(id){ return TEAMS_REAL.find(t=>t.id===id); }
 
-// 1. forduló valós meccsei (18 db, a sorsolás után publikált menetrend alapján)
-const ROUND1_FIXTURES = [
-  ["CLB","AVL","2026-09-08"], ["AEK","LASK","2026-09-08"], ["INT","RMA","2026-09-08"],
-  ["POR","MCI","2026-09-08"], ["DOR","VIL","2026-09-08"], ["LIL","BET","2026-09-08"],
-  ["BAR","FEY","2026-09-09"], ["STU","VIK","2026-09-09"], ["ATM","LIV","2026-09-09"],
-  ["PSG","SLB","2026-09-09"], ["NAP","ARS","2026-09-09"], ["SPO","GAL","2026-09-09"],
-  ["FEN","ROM","2026-09-10"], ["PSV","SHA","2026-09-10"], ["BAY","BOD","2026-09-10"],
-  ["MUN","SAB","2026-09-10"], ["COM","LEI","2026-09-10"], ["SLA","LEN","2026-09-10"]
-];
+/* =====================================================================
+   TELJES MENETREND — UEFA.com hivatalos cikke (2026.08.29.) alapján,
+   mind a 8 forduló, mind a 144 mérkőzés. [home, away, dátum]
+   ===================================================================== */
+const ALL_ROUND_FIXTURES = {
+  1: [
+    ["AEK","LASK","2026-09-08","18:45"], ["CLB","AVL","2026-09-08","18:45"], ["DOR","VIL","2026-09-08","21:00"],
+    ["POR","MCI","2026-09-08","21:00"], ["LIL","BET","2026-09-08","21:00"], ["RMA","INT","2026-09-08","21:00"],
+    ["BAR","FEY","2026-09-09","18:45"], ["STU","VIK","2026-09-09","18:45"], ["LIV","ATM","2026-09-09","21:00"],
+    ["PSG","SLB","2026-09-09","21:00"], ["SPO","GAL","2026-09-09","21:00"], ["NAP","ARS","2026-09-09","21:00"],
+    ["FEN","ROM","2026-09-10","18:45"], ["PSV","SHA","2026-09-10","18:45"], ["COM","LEI","2026-09-10","21:00"],
+    ["BAY","BOD","2026-09-10","21:00"], ["MUN","SAB","2026-09-10","21:00"], ["SLA","LEN","2026-09-10","21:00"]
+  ],
+  2: [
+    ["LEN","SPO","2026-10-13","18:45"], ["SAB","SLA","2026-10-13","18:45"], ["ARS","LIL","2026-10-13","21:00"],
+    ["ATM","MUN","2026-10-13","21:00"], ["INT","CLB","2026-10-13","21:00"], ["GAL","BAR","2026-10-13","21:00"],
+    ["LEI","PSV","2026-10-13","21:00"], ["VIK","BAY","2026-10-13","21:00"], ["VIL","NAP","2026-10-13","21:00"],
+    ["FEY","COM","2026-10-14","18:45"], ["LASK","LIV","2026-10-14","18:45"], ["ROM","RMA","2026-10-14","21:00"],
+    ["AVL","FEN","2026-10-14","21:00"], ["SHA","AEK","2026-10-14","21:00"], ["BOD","DOR","2026-10-14","21:00"],
+    ["MCI","PSG","2026-10-14","21:00"], ["BET","POR","2026-10-14","21:00"], ["SLB","STU","2026-10-14","21:00"]
+  ],
+  3: [
+    ["FEN","SLA","2026-10-20","18:45"], ["SAB","DOR","2026-10-20","18:45"], ["ROM","SLB","2026-10-20","21:00"],
+    ["POR","PSV","2026-10-20","21:00"], ["LIV","VIL","2026-10-20","21:00"], ["MCI","AEK","2026-10-20","21:00"],
+    ["PSG","BAR","2026-10-20","21:00"], ["NAP","BOD","2026-10-20","21:00"], ["STU","ATM","2026-10-20","21:00"],
+    ["COM","MUN","2026-10-21","18:45"], ["LIL","GAL","2026-10-21","18:45"], ["AVL","VIK","2026-10-21","21:00"],
+    ["CLB","LEN","2026-10-21","21:00"], ["BAY","ARS","2026-10-21","21:00"], ["INT","SHA","2026-10-21","21:00"],
+    ["RMA","LEI","2026-10-21","21:00"], ["BET","FEY","2026-10-21","21:00"], ["SPO","LASK","2026-10-21","21:00"]
+  ],
+  4: [
+    ["SHA","SPO","2026-11-03","18:45"], ["GAL","STU","2026-11-03","18:45"], ["ATM","BAY","2026-11-03","21:00"],
+    ["BAR","AVL","2026-11-03","21:00"], ["FEY","INT","2026-11-03","21:00"], ["BOD","LIL","2026-11-03","21:00"],
+    ["LASK","SLB","2026-11-03","21:00"], ["MUN","ROM","2026-11-03","21:00"], ["VIL","PSG","2026-11-03","21:00"],
+    ["AEK","RMA","2026-11-04","18:45"], ["FEN","LIV","2026-11-04","18:45"], ["DOR","BET","2026-11-04","21:00"],
+    ["POR","NAP","2026-11-04","21:00"], ["PSV","CLB","2026-11-04","21:00"], ["LEI","MCI","2026-11-04","21:00"],
+    ["LEN","COM","2026-11-04","21:00"], ["SLA","ARS","2026-11-04","21:00"], ["VIK","SAB","2026-11-04","21:00"]
+  ],
+  5: [
+    ["BOD","LASK","2026-11-24","18:45"], ["GAL","AVL","2026-11-24","18:45"], ["ARS","DOR","2026-11-24","21:00"],
+    ["COM","AEK","2026-11-24","21:00"], ["FEY","POR","2026-11-24","21:00"], ["MCI","NAP","2026-11-24","21:00"],
+    ["LEI","LEN","2026-11-24","21:00"], ["RMA","PSV","2026-11-24","21:00"], ["SLB","BET","2026-11-24","21:00"],
+    ["SAB","BAR","2026-11-25","18:45"], ["SLA","VIL","2026-11-25","18:45"], ["ATM","VIK","2026-11-25","21:00"],
+    ["CLB","LIV","2026-11-25","21:00"], ["INT","STU","2026-11-25","21:00"], ["SHA","FEN","2026-11-25","21:00"],
+    ["LIL","BAY","2026-11-25","21:00"], ["PSG","ROM","2026-11-25","21:00"], ["SPO","MUN","2026-11-25","21:00"]
+  ],
+  6: [
+    ["VIK","FEY","2026-12-08","18:45"], ["VIL","SAB","2026-12-08","18:45"], ["AEK","GAL","2026-12-08","21:00"],
+    ["ROM","SPO","2026-12-08","21:00"], ["AVL","PSG","2026-12-08","21:00"], ["BAR","MCI","2026-12-08","21:00"],
+    ["BAY","SLA","2026-12-08","21:00"], ["MUN","LEI","2026-12-08","21:00"], ["NAP","CLB","2026-12-08","21:00"],
+    ["BET","COM","2026-12-09","18:45"], ["SLB","SHA","2026-12-09","18:45"], ["ARS","RMA","2026-12-09","21:00"],
+    ["DOR","INT","2026-12-09","21:00"], ["LASK","FEN","2026-12-09","21:00"], ["LIV","POR","2026-12-09","21:00"],
+    ["PSV","ATM","2026-12-09","21:00"], ["LEN","BOD","2026-12-09","21:00"], ["STU","LIL","2026-12-09","21:00"]
+  ],
+  7: [
+    ["BOD","ATM","2027-01-19","18:45"], ["GAL","FEY","2027-01-19","18:45"], ["AEK","ROM","2027-01-19","21:00"],
+    ["AVL","DOR","2027-01-19","21:00"], ["INT","LIV","2027-01-19","21:00"], ["POR","SLA","2027-01-19","21:00"],
+    ["LIL","SLB","2027-01-19","21:00"], ["RMA","LASK","2027-01-19","21:00"], ["STU","CLB","2027-01-19","21:00"],
+    ["FEN","VIL","2027-01-20","18:45"], ["SAB","NAP","2027-01-20","18:45"], ["COM","PSG","2027-01-20","21:00"],
+    ["MUN","BAY","2027-01-20","21:00"], ["LEI","SHA","2027-01-20","21:00"], ["LEN","MCI","2027-01-20","21:00"],
+    ["BET","ARS","2027-01-20","21:00"], ["SPO","BAR","2027-01-20","21:00"], ["VIK","PSV","2027-01-20","21:00"]
+  ],
+  8: [
+    ["ARS","SAB","2027-01-27","21:00"], ["ROM","LIL","2027-01-27","21:00"], ["ATM","FEN","2027-01-27","21:00"],
+    ["DOR","AEK","2027-01-27","21:00"], ["CLB","BOD","2027-01-27","21:00"], ["BAY","BET","2027-01-27","21:00"],
+    ["BAR","COM","2027-01-27","21:00"], ["SHA","RMA","2027-01-27","21:00"], ["FEY","LEI","2027-01-27","21:00"],
+    ["LASK","POR","2027-01-27","21:00"], ["LIV","LEN","2027-01-27","21:00"], ["MCI","SPO","2027-01-27","21:00"],
+    ["PSG","GAL","2027-01-27","21:00"], ["PSV","STU","2027-01-27","21:00"], ["SLA","AVL","2027-01-27","21:00"],
+    ["NAP","VIK","2027-01-27","21:00"], ["VIL","MUN","2027-01-27","21:00"], ["SLB","INT","2027-01-27","21:00"]
+  ]
+};
 
-function buildRound1Matches(){
-  return ROUND1_FIXTURES.map(([homeId,awayId,date],i)=>{
+function buildRealRoundMatches(round, fixtures){
+  return fixtures.map(([homeId,awayId,date,time],i)=>{
     const home = team(homeId), away = team(awayId);
     return {
-      id: `L1_${String(i+1).padStart(2,"0")}`,
+      id: `L${round}_${String(i+1).padStart(2,"0")}`,
       stage: "league",
-      matchday: 1,
+      matchday: round,
       huDate: date,
+      huTime: time || "21:00",
       teamHome: home ? home.name : homeId,
       teamAway: away ? away.name : awayId,
       homeId, awayId,
@@ -620,30 +981,10 @@ function buildRound1Matches(){
   });
 }
 
-// 2-8. forduló: egyelőre csak "TBD" placeholder sorok, a dátum már valós,
-// a pontos ellenfél-párosítás admin oldalon (vagy a következő frissítéskor)
-// töltendő fel — poka-yoke okból SOSEM generálunk kitalált párosítást.
-function buildTbdRoundMatches(round){
-  const matches = [];
-  for(let i=0;i<18;i++){
-    matches.push({
-      id: `L${round}_${String(i+1).padStart(2,"0")}`,
-      stage: "league",
-      matchday: round,
-      huDate: ROUND_DATES[round],
-      teamHome: "TBD", teamAway: "TBD",
-      homeId: null, awayId: null,
-      ftHome:null, ftAway:null,
-      isTbd: true
-    });
-  }
-  return matches;
-}
-
 function generateAllLeagueMatches(){
-  let matches = buildRound1Matches();
-  for(let r=2;r<=8;r++){
-    matches = matches.concat(buildTbdRoundMatches(r));
+  let matches = [];
+  for(let r=1;r<=8;r++){
+    matches = matches.concat(buildRealRoundMatches(r, ALL_ROUND_FIXTURES[r]));
   }
   return matches;
 }
@@ -651,6 +992,40 @@ function generateAllLeagueMatches(){
 let LEAGUE_MATCHES = generateAllLeagueMatches();
 let LOCAL_RESULTS = {};
 let LOCAL_TIPS = {};
+let ALL_TIPS = {};    // {matchId: {safeName: tip}} — MINDENKI tippje, ranglistához kell
+let ALL_USERS = {};   // {safeName: {name, joined}} — a users/ Firebase-ágból
+
+// Mindenki tippjének + a rögzített eredményeknek betöltése Firebase-ből.
+// Enélkül csak a saját tipped és a saját munkameneted eredmény-mentései
+// látszanának — a ranglistához MINDENKI adatára szükség van.
+async function loadAllData(){
+  try{
+    const [tipsData, matchesData, usersData] = await Promise.all([
+      fbGet("tips").catch(()=>null),
+      fbGet("matches").catch(()=>null),
+      fbGet("users").catch(()=>null)
+    ]);
+    ALL_TIPS = tipsData || {};
+    ALL_USERS = usersData || {};
+
+    if(matchesData){
+      LEAGUE_MATCHES.forEach(m=>{
+        const saved = matchesData[m.id];
+        if(saved) Object.assign(m, saved); // ftHome/ftAway/etHome/etAway/penHome/penAway/advancer
+      });
+    }
+  }catch(e){ console.error("loadAllData hiba:", e); }
+}
+
+// Kick-off ellenőrzés — a huDate+huTime magyar (CET/CEST) idő szerinti kezdést
+// hasonlítja a jelenlegi időhöz. Ez zárja le a tippelést és ez alapján
+// engedélyezett a tipp/eredmény törlése is (l. lentebb a saveTip/adminSaveMatchResult mellett).
+function isKickoffPassed(huDate, huTime){
+  try{
+    const kickoff = new Date(`${huDate}T${huTime}:00+01:00`); // közelítő CET; a nyári/téli idő eltérés max 1 óra, ez itt elhanyagolható biztonsági ráhagyás
+    return Date.now() >= kickoff.getTime();
+  }catch(e){ return false; }
+}
 
 /* =====================================================================
    LIGASZAKASZ TABELLA SZÁMÍTÁS
@@ -685,41 +1060,50 @@ function renderLeagueMatches(){
   LEAGUE_MATCHES.forEach(m=> (byRound[m.matchday] ??= []).push(m));
 
   container.innerHTML = Object.keys(byRound).sort((a,b)=>a-b).map(round=>{
-    const isTbd = byRound[round][0] && byRound[round][0].isTbd;
+    const all = byRound[round];
+    const real = all.filter(m=>!m.isTbd);
+    const tbdCount = all.length - real.length;
     return `
     <div style="margin-bottom:14px;">
       <div style="font-size:12px;color:var(--bl-gold);font-weight:700;margin-bottom:4px;">
-        ${round}. forduló <span style="color:var(--bl-grey);font-weight:400;">(${byRound[round][0].huDate})</span>
-        ${isTbd ? '<span style="color:var(--bl-red);font-weight:400;"> — párosítás még nincs feltöltve</span>' : ''}
+        ${round}. forduló
       </div>
-      ${isTbd
-        ? `<div class="placeholder-note">A(z) ${round}. forduló pontos párosítása még nincs feltöltve — a dátum már valós, de a csapatpárok admin oldalon rögzítendők, amint elérhető a hivatalos menetrend.</div>`
-        : byRound[round].map(m=>renderMatchRow(m,false)).join("")}
+      ${real.map(m=>renderMatchRow(m,false)).join("")}
+      ${tbdCount > 0
+        ? `<div class="placeholder-note">${real.length > 0 ? `+ még ${tbdCount} mérkőzés` : `Mind a ${tbdCount} mérkőzés`} ebből a fordulóból még nincs feltöltve — a dátum már valós, de a csapatpárok admin oldalon rögzítendők, amint elérhető a hivatalos menetrend.</div>`
+        : ``}
     </div>
   `;}).join("");
 }
 
 function renderMatchRow(match, isKnockout){
   const tip = LOCAL_TIPS[match.id] || {};
+  const homeBadge = match.isTbd ? "" : teamBadge(match.homeId || match.teamHome);
+  const awayBadge = match.isTbd ? "" : teamBadge(match.awayId || match.teamAway);
+  const locked = !match.isTbd && isKickoffPassed(match.huDate, match.huTime);
+  const dis = locked ? "disabled" : "";
+  const hasTip = tip.outcomeTip || tip.scoreHome != null || tip.scoreAway != null || tip.advancerTip;
   return `
   <div class="match-row" data-match-id="${match.id}">
-    <div class="teams">${match.teamHome} – ${match.teamAway}</div>
+    <div class="teams">${homeBadge} ${match.teamHome} – ${match.teamAway} ${awayBadge}</div>
+    <div class="meta">📅 ${match.huDate} · ⏰ ${match.huTime || "21:00"}${locked ? ' · <span style="color:var(--bl-red);">🔒 Lezárva (kezdés megtörtént)</span>' : ''}</div>
     <div class="tip-outcome" data-role="outcome">
-      <button data-val="1" class="${tip.outcomeTip==='1'?'selected':''}">1</button>
-      <button data-val="X" class="${tip.outcomeTip==='X'?'selected':''}">X</button>
-      <button data-val="2" class="${tip.outcomeTip==='2'?'selected':''}">2</button>
+      <button data-val="1" class="${tip.outcomeTip==='1'?'selected':''}" ${dis}>1</button>
+      <button data-val="X" class="${tip.outcomeTip==='X'?'selected':''}" ${dis}>X</button>
+      <button data-val="2" class="${tip.outcomeTip==='2'?'selected':''}" ${dis}>2</button>
     </div>
     <div class="tip-score">
-      <input type="number" min="0" max="20" data-role="scoreHome" value="${tip.scoreHome ?? ''}">
+      <input type="number" min="0" max="20" data-role="scoreHome" value="${tip.scoreHome ?? ''}" ${dis}>
       :
-      <input type="number" min="0" max="20" data-role="scoreAway" value="${tip.scoreAway ?? ''}">
+      <input type="number" min="0" max="20" data-role="scoreAway" value="${tip.scoreAway ?? ''}" ${dis}>
     </div>
     ${isKnockout ? `
     <div class="advancer-pick">
       <div class="label">Ki jut tovább? (ha a rendes játékidő döntetlen, ET/11-es dönt)</div>
-      <button data-val="home" class="${tip.advancerTip==='home'?'selected':''}">${match.teamHome}</button>
-      <button data-val="away" class="${tip.advancerTip==='away'?'selected':''}">${match.teamAway}</button>
+      <button data-val="home" class="${tip.advancerTip==='home'?'selected':''}" ${dis}>${match.teamHome}</button>
+      <button data-val="away" class="${tip.advancerTip==='away'?'selected':''}" ${dis}>${match.teamAway}</button>
     </div>` : ``}
+    ${!locked && hasTip ? `<button data-action="delete-tip" style="order:6;margin-top:6px;padding:5px 10px;border-radius:8px;border:1px solid var(--bl-red);background:rgba(224,51,63,.1);color:var(--bl-white);font-size:11px;">🗑️ Tipp törlése</button>` : ``}
     <div class="save-state" data-save-state="tip-${match.id}"></div>
   </div>`;
 }
@@ -744,6 +1128,9 @@ function bindTipHandlers(containerId){
         b.classList.toggle("selected", b.dataset.val === tip.advancerTip));
       saveTip(matchId, tip);
     }
+    if(e.target.dataset.action === "delete-tip"){
+      deleteTip(matchId);
+    }
   });
   container.addEventListener("change", (e)=>{
     const row = e.target.closest(".match-row");
@@ -756,19 +1143,55 @@ function bindTipHandlers(containerId){
   });
 }
 
+// A meccs-objektum megkeresése minden fő listából (liga / rájátszás-minta / KO-minta),
+// hogy a kick-off ellenőrzés a ténylegesen renderelt sorra vonatkozzon.
+function findMatchById(matchId){
+  return LEAGUE_MATCHES.find(m=>m.id===matchId) || null;
+}
+
 async function saveTip(matchId, tip){
   if(!CURRENT_USER){
     showTipSaveState(matchId, "err", "Előbb jelentkezz be!");
+    document.getElementById("regModal").style.display = "flex";
+    return;
+  }
+  const match = findMatchById(matchId);
+  if(match && isKickoffPassed(match.huDate, match.huTime)){
+    showTipSaveState(matchId, "err", "🔒 A meccs már elkezdődött, tipp nem menthető.");
+    renderAll(); // UI szinkronba hozása (letiltott mezők), ha időközben lejárt a kick-off
     return;
   }
   try{
-    await fbSet(`tips/${CURRENT_USER}/${matchId}`, tip);
+    await fbSet(`tips/${matchId}/${CURRENT_USER}`, tip);
+    if(!ALL_TIPS[matchId]) ALL_TIPS[matchId] = {};
+    ALL_TIPS[matchId][CURRENT_USER] = tip; // helyi állapot is frissül, hogy a ranglista azonnal lássa
     showTipSaveState(matchId, "ok", "✓ Tipp mentve");
   } catch(err){
     showTipSaveState(matchId, "err", "Hiba, próbáld újra");
     console.error(err);
   }
 }
+
+// Tipp törlése — csak kick-offig engedélyezett (ugyanaz a védelem, mint a mentésnél).
+async function deleteTip(matchId){
+  if(!CURRENT_USER) return;
+  const match = findMatchById(matchId);
+  if(match && isKickoffPassed(match.huDate, match.huTime)){
+    showTipSaveState(matchId, "err", "🔒 A meccs már elkezdődött, tipp nem törölhető.");
+    return;
+  }
+  try{
+    await fbSet(`tips/${matchId}/${CURRENT_USER}`, null);
+    delete LOCAL_TIPS[matchId];
+    if(ALL_TIPS[matchId]) delete ALL_TIPS[matchId][CURRENT_USER];
+    showTipSaveState(matchId, "ok", "🗑️ Tipp törölve");
+    renderAll();
+  } catch(err){
+    showTipSaveState(matchId, "err", "Hiba a törlésnél, próbáld újra");
+    console.error(err);
+  }
+}
+
 function showTipSaveState(matchId, state, msg){
   const el = document.querySelector(`[data-save-state="tip-${matchId}"]`);
   if(!el) return;
@@ -782,12 +1205,81 @@ function renderStandings(){
   tbody.innerHTML = standings.map((t,i)=>{
     const zone = i<8 ? "zone-topeight" : (i<24 ? "zone-playoff" : "zone-out");
     return `<tr class="${zone}">
-      <td>${i+1}</td><td class="team-cell">${t.name}</td>
+      <td>${i+1}</td><td class="team-cell">${teamBadge(t.id)} ${t.name}</td>
       <td>${t.played}</td><td>${t.won}</td><td>${t.draw}</td><td>${t.lost}</td>
       <td>${t.gf}:${t.ga}</td><td>${t.gd>0?'+':''}${t.gd}</td><td>${t.points}</td>
     </tr>`;
   }).join("");
   return standings;
+}
+
+/* =====================================================================
+   TIPPELŐK RANGLISTÁJA — a VB Gólszagló renderLeaderboard()-jából átemelve,
+   a BL pontozási logikára (calcFtPoints / calcKnockoutMatchPoints) igazítva.
+   A VB-only extrák (élő rangsorváltozás nyilak ESPN-hez kötve, heti
+   MVP/bukta jelvény, nyereményösszeg bankjegyekben) szándékosan kimaradtak —
+   itt nincs élő adatforrás és nincs tétpénz-koncepció. Ha mégis kellenek,
+   szólj és portolom azokat is.
+   ===================================================================== */
+
+// Egy adott user egy adott meccsre leadott tippjének pontja — liga meccsen
+// csak FT, kieséses szakaszban FT + "ki jut tovább" (a két rész független).
+function calcTipPoints(match, tip){
+  if(!tip) return 0;
+  if(match.stage === "league") return calcFtPoints(tip, match, SCORING_DEFAULTS.ft).points;
+  return calcKnockoutMatchPoints(tip, match).total;
+}
+
+function computeLeaderboard(){
+  const users = new Set();
+  Object.values(ALL_TIPS).forEach(matchTips=> Object.keys(matchTips||{}).forEach(u=>users.add(u)));
+
+  const rows = [];
+  users.forEach(safe=>{
+    let pts=0, tipped=0, pending=0, exact=0;
+    LEAGUE_MATCHES.forEach(m=>{
+      const tip = ALL_TIPS[m.id] ? ALL_TIPS[m.id][safe] : null;
+      if(!tip) return;
+      const hasFt = m.ftHome!=null && m.ftAway!=null;
+      if(!hasFt){ pending++; return; }
+      tipped++;
+      pts += calcTipPoints(m, tip);
+      if(tip.scoreHome === m.ftHome && tip.scoreAway === m.ftAway) exact++;
+    });
+    const displayName = (ALL_USERS[safe] && ALL_USERS[safe].name) || safe;
+    rows.push({ safe, name:displayName, pts, tipped, pending, exact });
+  });
+
+  rows.sort((a,b)=> b.pts-a.pts || b.exact-a.exact || b.tipped-a.tipped);
+  return rows;
+}
+
+function renderLeaderboardTab(){
+  const container = document.getElementById("leaderboardContainer");
+  const rows = computeLeaderboard();
+
+  if(!rows.length){
+    container.innerHTML = `<div class="placeholder-note">Még senki nem adott le tippet — a ranglista az első tippek után jelenik meg.</div>`;
+    return;
+  }
+
+  const med = ["🥇","🥈","🥉"];
+  container.innerHTML = rows.map((r,i)=>{
+    const me = r.safe === CURRENT_USER;
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.06);${me ? "background:rgba(0,200,255,.07);border-radius:8px;" : ""}">
+      <div style="width:28px;text-align:center;font-size:${i<3?'18px':'13px'};font-weight:700;color:${i<3?'var(--bl-gold)':'var(--bl-grey)'};">${i<3?med[i]:(i+1)+"."}</div>
+      <div style="flex:1;font-size:13.5px;font-weight:600;">${escapeHtml(r.name)}${me ? ' <span style="color:var(--bl-cyan);font-size:11px;">(te)</span>' : ''}</div>
+      <div style="text-align:right;">
+        <div style="font-size:16px;font-weight:800;color:var(--bl-white);">${r.pts} <span style="font-size:11px;font-weight:400;color:var(--bl-grey);">pt</span></div>
+        <div style="font-size:10.5px;color:var(--bl-grey);">${r.tipped} tipp${r.exact>0?` · 🎯 ${r.exact} pontos`:""}${r.pending>0?` · ${r.pending} várja`:""}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function escapeHtml(s){
+  return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
 function generatePlayoffPairings(standings){
@@ -845,42 +1337,78 @@ function renderKnockoutTab(standings){
 
 function renderAdminPanel(){
   const container = document.getElementById("adminMatchList");
-  container.innerHTML = LEAGUE_MATCHES.filter(m=>!m.isTbd).slice(0,18).map(m=>`
-    <div class="match-row" data-match-id="${m.id}">
-      <div class="teams">${m.teamHome} – ${m.teamAway} <span style="color:var(--bl-grey);font-size:10px;">(${m.matchday}. forduló, ${m.huDate})</span></div>
-      <div class="tip-score">
-        FT: <input type="number" min="0" max="20" data-admin-role="ftHome" value="${m.ftHome ?? ''}">
-        : <input type="number" min="0" max="20" data-admin-role="ftAway" value="${m.ftAway ?? ''}">
-      </div>
-      <div class="tip-score">
-        ET: <input type="number" min="0" max="20" data-admin-role="etHome" value="${m.etHome ?? ''}">
-        : <input type="number" min="0" max="20" data-admin-role="etAway" value="${m.etAway ?? ''}">
-      </div>
-      <div class="tip-score">
-        11-es: <input type="number" min="0" max="20" data-admin-role="penHome" value="${m.penHome ?? ''}">
-        : <input type="number" min="0" max="20" data-admin-role="penAway" value="${m.penAway ?? ''}">
-      </div>
-      <button data-action="save-result" style="order:4;padding:6px 10px;border-radius:8px;border:1px solid var(--bl-cyan);background:rgba(0,200,255,.1);color:var(--bl-white);">Mentés</button>
-      <div class="save-state" data-save-state="${m.id}"></div>
-    </div>
-  `).join("");
+  const realMatches = LEAGUE_MATCHES.filter(m=>!m.isTbd);
+  const byRound = {};
+  realMatches.forEach(m=> (byRound[m.matchday] ??= []).push(m));
 
+  container.innerHTML = Object.keys(byRound).sort((a,b)=>a-b).map(round=>`
+    <div style="margin-bottom:10px;">
+      <div style="font-size:12px;color:var(--bl-gold);font-weight:700;margin:10px 0 4px;">${round}. forduló</div>
+      ${byRound[round].map(m=>`
+      <div class="match-row" data-match-id="${m.id}">
+        <div class="teams">${teamBadge(m.homeId)} ${m.teamHome} – ${m.teamAway} ${teamBadge(m.awayId)}</div>
+        <div class="meta">📅 ${m.huDate} · ⏰ ${m.huTime || "21:00"}</div>
+        <div class="tip-score">
+          FT: <input type="number" min="0" max="20" data-admin-role="ftHome" value="${m.ftHome ?? ''}">
+          : <input type="number" min="0" max="20" data-admin-role="ftAway" value="${m.ftAway ?? ''}">
+        </div>
+        <div class="tip-score">
+          ET: <input type="number" min="0" max="20" data-admin-role="etHome" value="${m.etHome ?? ''}">
+          : <input type="number" min="0" max="20" data-admin-role="etAway" value="${m.etAway ?? ''}">
+        </div>
+        <div class="tip-score">
+          11-es: <input type="number" min="0" max="20" data-admin-role="penHome" value="${m.penHome ?? ''}">
+          : <input type="number" min="0" max="20" data-admin-role="penAway" value="${m.penAway ?? ''}">
+        </div>
+        <div style="order:4;display:flex;gap:6px;width:100%;margin-top:4px;">
+          <button data-action="save-result" style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--bl-cyan);background:rgba(0,200,255,.1);color:var(--bl-white);">Mentés</button>
+          ${(m.ftHome!=null || m.etHome!=null || m.penHome!=null)
+            ? `<button data-action="delete-result" style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--bl-red);background:rgba(224,51,63,.1);color:var(--bl-white);">🗑️ Eredmény törlése</button>`
+            : ``}
+        </div>
+        <div class="save-state" data-save-state="${m.id}"></div>
+      </div>
+      `).join("")}
+    </div>
+  `).join("") || `<div class="placeholder-note">Még nincs rögzített valós párosítás.</div>`;
+}
+
+// Egyszer, delegálással bekötött admin-eseménykezelő (nem renderAdminPanel-en belül,
+// hogy ne torlódjanak listenerek minden újrarenderelésnél — poka-yoke javítás).
+function bindAdminHandlers(){
+  const container = document.getElementById("adminMatchList");
   container.addEventListener("click", async (e)=>{
-    if(e.target.dataset.action !== "save-result") return;
+    const action = e.target.dataset.action;
+    if(action !== "save-result" && action !== "delete-result") return;
     const row = e.target.closest(".match-row");
     const matchId = row.dataset.matchId;
-    const patch = {};
-    row.querySelectorAll("[data-admin-role]").forEach(inp=>{
-      if(inp.value !== "") patch[inp.dataset.adminRole] = Number(inp.value);
-    });
-    const ok = await adminSaveMatchResult(matchId, patch);
-    if(ok){
-      const match = LEAGUE_MATCHES.find(m=>m.id===matchId);
-      if(match) Object.assign(match, patch);
-      renderStandings();
+
+    if(action === "save-result"){
+      const patch = {};
+      row.querySelectorAll("[data-admin-role]").forEach(inp=>{
+        if(inp.value !== "") patch[inp.dataset.adminRole] = Number(inp.value);
+      });
+      const ok = await adminSaveMatchResult(matchId, patch);
+      if(ok){
+        const match = LEAGUE_MATCHES.find(m=>m.id===matchId);
+        if(match) Object.assign(match, patch);
+        renderStandings();
+        renderAdminPanel();
+      }
     }
-  }, { once:true });
+
+    if(action === "delete-result"){
+      const ok = await adminDeleteMatchResult(matchId);
+      if(ok){
+        const match = LEAGUE_MATCHES.find(m=>m.id===matchId);
+        if(match){ match.ftHome=null; match.ftAway=null; match.etHome=null; match.etAway=null; match.penHome=null; match.penAway=null; match.advancer=null; }
+        renderStandings();
+        renderAdminPanel();
+      }
+    }
+  });
 }
+
 
 function showSaveState(matchId, state, msg){
   const el = document.querySelector(`[data-save-state="${matchId}"]`);
@@ -907,14 +1435,16 @@ function renderAll(){
   renderPlayoffTab(standings);
   renderKnockoutTab(standings);
   renderAdminPanel();
+  renderLeaderboardTab();
 }
 
 bindTipHandlers("ligaMatchesContainer");
 bindTipHandlers("playoffMatchesContainer");
 bindTipHandlers("koMatchesContainer");
+bindAdminHandlers();
 
-setCurrentUser("Teszt Felhasználó", false);
-renderAll();
+document.getElementById("regModal").style.display = "flex"; // alapból belépésre vár
+initAuth(); // ha van mentett session, automatikusan beléptet + betölti az admin jelszó-hash-t; renderAll()-t is meghívja
 </script>
 </body>
 </html>
