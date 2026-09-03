@@ -439,6 +439,16 @@
   <!-- ADMIN TAB -->
   <section id="tab-admin" class="tab-panel admin-only">
     <div class="card">
+      <h2>🧹 Adattisztítás</h2>
+      <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">
+        A régi (már javított) tipp-mentési útvonalból maradt Firebase-ben pár hibás bejegyzés —
+        ez okozta, hogy a ranglistán meccs-ID-k jelentek meg felhasználóként. A gomb egyszer
+        futtatva megkeresi és törli ezeket, a valós tippeket nem érinti.
+      </div>
+      <button onclick="cleanupLegacyTips()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--bl-red);background:rgba(224,51,63,.1);color:var(--bl-white);font-size:13px;font-weight:700;cursor:pointer;">🧹 Hibás tipp-adat törlése</button>
+      <div id="cleanupMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
+    </div>
+    <div class="card">
       <h2>☕ Támogatás rögzítése</h2>
       <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">Havi cél: 6 500 Ft. Kattints, ha beérkezett egy Revolut/banki utalás.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -1473,9 +1483,53 @@ function calcTipPoints(match, tip){
   return calcKnockoutMatchPoints(tip, match).total;
 }
 
+// Admin: a régi (tips/{user}/{matchId}) útvonal-sorrendből maradt hibás
+// bejegyzések megkeresése és törlése. Csak a tips/ gyökér alatti,
+// ÉRVÉNYTELEN (nem valós meccs-ID) kulcsokat törli — a helyes szerkezetű,
+// valós tippeket nem érinti.
+async function cleanupLegacyTips(){
+  const msg = document.getElementById("cleanupMsg");
+  msg.textContent = "⏳ Ellenőrzés…"; msg.style.color = "var(--bl-grey)";
+  try{
+    const data = await fbGet("tips");
+    if(!data){ msg.textContent = "✓ Nincs tipp-adat, nincs mit tisztítani."; msg.style.color="var(--bl-green)"; return; }
+
+    const validMatchIds = new Set(LEAGUE_MATCHES.map(m=>m.id));
+    const badKeys = Object.keys(data).filter(k=>!validMatchIds.has(k));
+
+    if(badKeys.length === 0){
+      msg.textContent = "✓ Nincs hibás bejegyzés, minden rendben."; msg.style.color="var(--bl-green)";
+      return;
+    }
+
+    for(const key of badKeys){
+      await fbSet(`tips/${key}`, null);
+    }
+    msg.textContent = `🧹 ${badKeys.length} hibás bejegyzés törölve: ${badKeys.join(", ")}`;
+    msg.style.color = "var(--bl-green)";
+    await loadAllData();
+    renderAll();
+  }catch(e){
+    msg.textContent = "❌ Hiba a tisztításnál: " + e.message; msg.style.color="var(--bl-red)";
+  }
+}
+
 function computeLeaderboard(){
+  // Poka-yoke védelem: csak olyan ALL_TIPS-kulcsot dolgozunk fel, ami egy
+  // VALÓS meccs-ID (LEAGUE_MATCHES-ben szereplő). A korábbi (már javított)
+  // tips/{user}/{matchId} útvonal-sorrendből maradt Firebase-ben pár régi
+  // teszt-bejegyzés tips/KULT/L1_01 formában — enélkül a védelem nélkül a
+  // "KULT" alatti "L1_01" stb. meccs-kulcsokat tévesen felhasználónak nézné
+  // a ranglista. (Ezt a maradék régi adatot érdemes törölni Firebase-ből
+  // a matches/tips ág alatt, de a UI-t ettől függetlenül nem szabad, hogy
+  // eltorzítsa.)
+  const validMatchIds = new Set(LEAGUE_MATCHES.map(m=>m.id));
+
   const users = new Set();
-  Object.values(ALL_TIPS).forEach(matchTips=> Object.keys(matchTips||{}).forEach(u=>users.add(u)));
+  Object.keys(ALL_TIPS).forEach(matchId=>{
+    if(!validMatchIds.has(matchId)) return; // eldobjuk, ha nem valós meccs-ID
+    Object.keys(ALL_TIPS[matchId] || {}).forEach(u=>users.add(u));
+  });
 
   const rows = [];
   users.forEach(safe=>{
