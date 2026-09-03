@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🏆 Gólszagló BL26/27</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>if(typeof emailjs!=='undefined')emailjs.init('0k7yH8d4u-BjgACd1');</script>
 <style>
   :root{
     --bl-navy:#0a0c2e;
@@ -140,7 +142,55 @@
   <div id="loggedInBar" style="display:none;margin-top:6px;font-size:11px;color:var(--bl-grey);">
     <span id="loggedInAs"></span> · <span id="logoutLink" style="color:var(--bl-cyan);cursor:pointer;text-decoration:underline;">kijelentkezés</span>
   </div>
+  <button onclick="openSupportModal()" style="margin-top:8px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:12px;font-weight:700;cursor:pointer;">☕ Támogass</button>
 </header>
+
+<!-- TÁMOGATÁS MODAL — a VB Gólszaglóból átemelve (Revolut link, QR, IBAN, havi gyűjtőméter) -->
+<div id="supportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);z-index:250;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--bl-navy2);border:1px solid rgba(201,160,56,.3);border-radius:20px;padding:30px 26px;max-width:340px;width:100%;text-align:center;position:relative;max-height:90vh;overflow-y:auto;">
+    <button onclick="document.getElementById('supportModal').style.display='none'"
+      style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.08);border:none;color:var(--bl-grey);font-size:16px;width:28px;height:28px;border-radius:50%;cursor:pointer;">✕</button>
+    <div style="font-size:38px;margin-bottom:8px;">🏆</div>
+    <div style="font-size:18px;color:var(--bl-gold);letter-spacing:1.5px;font-weight:700;margin-bottom:8px;">TÁMOGASD A PROJEKTET!</div>
+    <div style="font-size:12.5px;color:var(--bl-grey);line-height:1.6;margin-bottom:18px;">
+      Ez az oldal a <a href="https://teglarol-teglara.hu" target="_blank" style="color:var(--bl-gold);text-decoration:none;font-weight:600;">teglarol-teglara.hu</a> projekt része.<br>
+      Fenntartása havi Claude Pro előfizetést igényel.
+    </div>
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-size:13px;font-weight:700;padding:7px 16px;border-radius:30px;border:1.5px solid rgba(201,160,56,.35);color:var(--bl-white);text-decoration:none;">250 Ft</a>
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-size:13px;font-weight:700;padding:7px 16px;border-radius:30px;border:1.5px solid var(--bl-gold);background:rgba(201,160,56,.15);color:var(--bl-gold);text-decoration:none;">500 Ft</a>
+      <a href="https://revolut.me/tamsd0pex" target="_blank" style="font-size:13px;font-weight:700;padding:7px 16px;border-radius:30px;border:1.5px solid rgba(201,160,56,.35);color:var(--bl-white);text-decoration:none;">Több ☕</a>
+    </div>
+    <a href="https://revolut.me/tamsd0pex" target="_blank"
+      style="display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(0,0,0,.3);border:1.5px solid rgba(201,160,56,.4);border-radius:12px;padding:10px 20px;color:var(--bl-gold);font-size:13px;font-weight:700;letter-spacing:.5px;text-decoration:none;margin-bottom:14px;">
+      💳 Revolut link → revolut.me/tamsd0pex
+    </a>
+    <div id="supMeterWrap">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--bl-grey);margin-bottom:4px;">
+        <span>🎯 Havi cél: 6 500 Ft</span>
+        <span><span id="supAmt">–</span> / 6 500 Ft</span>
+      </div>
+      <div style="height:8px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden;">
+        <div id="supBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--bl-gold),#e8c766);transition:width .3s;"></div>
+      </div>
+      <div id="supSub" style="font-size:10.5px;color:var(--bl-grey);margin-top:4px;">Töltés...</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:14px 0;color:rgba(255,255,255,.2);font-size:10.5px;">
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.1);"></div>
+      Nem Revolutos? Banki utalás:
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.1);"></div>
+    </div>
+    <div style="background:rgba(0,0,0,.25);border:1px solid rgba(201,160,56,.2);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
+      <div style="font-size:9.5px;color:var(--bl-grey);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">IBAN (Revolut)</div>
+      <div style="font-size:14px;font-weight:700;color:var(--bl-gold);letter-spacing:1px;word-break:break-all;">LT60 3250 0126 4002 3496</div>
+      <div style="font-size:9.5px;color:var(--bl-grey);margin-top:4px;">BIC: REVOLT21</div>
+      <button onclick="navigator.clipboard.writeText('LT6032500126400234960')" style="margin-top:8px;background:rgba(201,160,56,.1);border:1px solid rgba(201,160,56,.25);color:var(--bl-grey);border-radius:6px;padding:4px 12px;font-size:10.5px;cursor:pointer;">📋 Másolás</button>
+    </div>
+    <div id="sup-qr" style="margin-top:14px;display:inline-block;border-radius:10px;border:3px solid var(--bl-gold);padding:6px;background:white;"></div>
+    <div style="font-size:9px;color:var(--bl-grey);letter-spacing:1px;text-transform:uppercase;margin-top:6px;">revolut.me/tamsd0pex</div>
+    <div style="font-size:11px;color:var(--bl-grey);margin-top:14px;">Köszönjük! 🙏 Minden forint segít.</div>
+  </div>
+</div>
 
 <!-- REGISZTRÁCIÓ / BELÉPÉS MODAL — a VB Gólszagló mintáját követve:
      hash-elt jelszó, Firebase cross-device auth (userAuth/{safeName}),
@@ -150,15 +200,43 @@
     <div style="font-size:34px;margin-bottom:6px;">🏆</div>
     <h2 id="regTitle" style="margin:0 0 6px;font-family:inherit;color:var(--bl-cyan);letter-spacing:.5px;">REGISZTRÁCIÓ</h2>
     <p id="regSubtitle" style="font-size:12.5px;color:var(--bl-grey);margin:0 0 14px;">Válassz nevet és jelszót.<br>Legközelebb ugyanezzel léphetsz be.</p>
+    <div id="inviteStatus" style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;font-size:11.5px;text-align:center;"></div>
+    <div id="usernameLabel" style="display:none;font-size:10.5px;color:var(--bl-cyan);letter-spacing:.5px;margin-bottom:4px;text-align:left;">🎮 KÍVÁNT FELHASZNÁLÓNÉV</div>
     <input type="text" id="nameInput" placeholder="NEVED" maxlength="20" autocomplete="off"
       oninput="checkExistingUser()"
       style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:14px;box-sizing:border-box;margin-bottom:8px;">
     <input type="password" id="pwInput" placeholder="JELSZÓ" maxlength="30" autocomplete="new-password"
       onkeydown="if(event.key==='Enter')register()"
       style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+    <!-- Meghívós regisztráció kiegészítő mezői — csak ?invite=TOKEN linkkel érkezve látszik -->
+    <div id="inviteFields" style="display:none;">
+      <div style="margin:8px 0 4px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;">
+        <div style="font-size:10.5px;color:var(--bl-cyan);letter-spacing:.5px;margin-bottom:4px;text-align:left;">👤 TELJES NEVED</div>
+        <input type="text" id="inviteRealName" placeholder="pl. Kiss Béla" maxlength="50"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--bl-white);font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+        <div style="font-size:10.5px;color:var(--bl-cyan);letter-spacing:.5px;margin-bottom:4px;text-align:left;">🤝 HONNAN ISMERED A CSOPORTOT?</div>
+        <input type="text" id="inviteConnection" placeholder="pl. Robi barátja, munkatárs, stb." maxlength="100"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--bl-white);font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+        <div style="font-size:10.5px;color:var(--bl-cyan);letter-spacing:.5px;margin-bottom:4px;text-align:left;">📧 ELÉRHETŐSÉGED (email / telefon)</div>
+        <input type="text" id="inviteContact" placeholder="pl. kiss.bela@gmail.com vagy +36 30 ..." maxlength="100"
+          style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--bl-white);font-size:14px;box-sizing:border-box;">
+      </div>
+    </div>
     <div id="regMsg" style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;min-height:16px;"></div>
     <button onclick="register()" id="regBtn" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--bl-cyan);background:rgba(0,200,255,.14);color:var(--bl-white);font-size:14px;font-weight:700;cursor:pointer;">BELÉPEK →</button>
     <div style="margin-top:10px;font-size:11px;color:var(--bl-grey);">Ha már van fiókod, add meg a neved és jelszavad.</div>
+    <!-- Meghívó kérése — ha nincs invite linkkel érkező user -->
+    <div id="inviteRequestSection" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);">
+      <div style="font-size:11px;color:var(--bl-cyan);letter-spacing:.5px;margin-bottom:8px;text-align:center;">🔗 NINCS MEGHÍVÓD? KÉRJ EGYET!</div>
+      <input type="text" id="reqName" placeholder="👤 Neved" maxlength="50"
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--bl-white);font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+      <input type="text" id="reqContact" placeholder="📧 Email vagy telefonszám" maxlength="100"
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--bl-white);font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+      <input type="text" id="reqConnection" placeholder="🤝 Honnan ismered a csoportot?" maxlength="100"
+        style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--bl-white);font-size:13px;box-sizing:border-box;margin-bottom:8px;">
+      <button onclick="submitInviteRequest()" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--bl-gold);background:rgba(201,160,56,.12);color:var(--bl-white);font-size:12.5px;font-weight:700;cursor:pointer;">📩 MEGHÍVÓ KÉRÉSE</button>
+      <div id="reqMsg" style="font-size:11px;color:var(--bl-grey);margin-top:6px;text-align:center;min-height:15px;"></div>
+    </div>
     <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;">
       <span onclick="var p=document.getElementById('recoveryPanel');p.style.display=p.style.display==='none'?'block':'none';"
         style="font-size:11px;color:var(--bl-grey);cursor:pointer;text-decoration:underline;">🔑 Elfelejtett jelszó (admin-visszaállítás)</span>
@@ -361,6 +439,29 @@
   <!-- ADMIN TAB -->
   <section id="tab-admin" class="tab-panel admin-only">
     <div class="card">
+      <h2>☕ Támogatás rögzítése</h2>
+      <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">Havi cél: 6 500 Ft. Kattints, ha beérkezett egy Revolut/banki utalás.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="addSupportAmount(250)" style="background:rgba(201,160,56,.1);border:1px solid rgba(201,160,56,.3);color:var(--bl-gold);border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;">+250 Ft</button>
+        <button onclick="addSupportAmount(500)" style="background:rgba(201,160,56,.1);border:1px solid rgba(201,160,56,.3);color:var(--bl-gold);border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;">+500 Ft</button>
+        <button onclick="addSupportAmountCustom()" style="background:rgba(201,160,56,.1);border:1px solid rgba(201,160,56,.3);color:var(--bl-gold);border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;">+Egyéni</button>
+      </div>
+      <div id="supAdminMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
+    </div>
+    <div class="card">
+      <h2>🔗 Meghívók</h2>
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <input type="text" id="inviteNote" placeholder="Megjegyzés (kinek szól ez a link)"
+          style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;">
+        <button onclick="inviteGenerate()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--bl-cyan);background:rgba(0,200,255,.12);color:var(--bl-white);font-size:13px;font-weight:700;white-space:nowrap;">+ Új link</button>
+      </div>
+      <div id="inviteList"></div>
+    </div>
+    <div class="card">
+      <h2>📩 Beérkezett meghívó-kérések</h2>
+      <div id="inviteReqList"></div>
+    </div>
+    <div class="card">
       <h2>Admin — eredmény rögzítés</h2>
       <div class="placeholder-note">
         Poka-yoke elv: a végeredményt (FT / ET / 11-es) mindig a <code>deriveAdvancer()</code> központi függvény
@@ -405,6 +506,15 @@ async function fbPatch(path, value){
     method:"PATCH", body: JSON.stringify(value)
   });
   if(!res.ok) throw new Error(`Firebase PATCH hiba: ${path}`);
+  return res.json();
+}
+// POST — Firebase automatikusan generál egy egyedi kulcsot (pl. lista jellegű
+// bejegyzésekhez, mint az inviteRequests). A válasz {name: "-Nxyz..."} alakú.
+async function fbPush(path, value){
+  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+    method:"POST", body: JSON.stringify(value)
+  });
+  if(!res.ok) throw new Error(`Firebase PUSH hiba: ${path}`);
   return res.json();
 }
 
@@ -642,15 +752,17 @@ function recalcTipsForMatch(matchId, match){
    - admin-felismerés: KULT néven (ADMIN_USERS) VAGY admin jelszóval
    - jelszó-reset: admin a passwordReset/{safe} flaget állítja be, a user
      következő belépésekor az új jelszó felülírja a régit
-   SZÁNDÉKOSAN KIHAGYVA a VB meghívó-token alrendszere (invite-request,
-   email-kérés, deletedUsers-ellenőrzés) — az egy már futó, éles közösség
-   migrációjához kellett ott, itt friss appnál nincs rá szükség. Ha mégis
-   kell, jelezd, és portolom azt is.
+   - MEGHÍVÓS regisztráció (most már ez is át van emelve): új név csak
+     ?invite=TOKEN linkkel regisztrálhat, plusz mezőkkel (teljes név,
+     kapcsolat, elérhetőség); aki nem rendelkezik linkkel, kérhet egyet
+     egy mini-formmal (submitInviteRequest), ami e-mailben (EmailJS) és
+     Firebase-ben is jelzi az adminnak.
    ===================================================================== */
 const LS_USERS   = "bl2627_users";   // {safeName: hashedPw} — helyi gyorsítótár
 const LS_SESSION = "bl2627_user";    // bejelentkezett felhasználó neve
 const ADMIN_USERS = ["KULT"];        // mindig admin jogú név(ek), jelszó nélkül is felismerve belépéskor
 let ADMIN_PW_HASH = null;            // Firebase-ből töltődik (adminPwHash), fallback lentebb
+const activeInviteToken = new URLSearchParams(window.location.search).get("invite") || "";
 
 let CURRENT_USER = null;
 let IS_ADMIN = false;
@@ -703,7 +815,8 @@ async function checkExistingUser(){
 }
 
 async function register(){
-  const n = document.getElementById("nameInput").value.trim().toUpperCase();
+  const rawName = document.getElementById("nameInput").value.trim(); // eredeti, ahogy beírta — ez jelenik meg mindenhol
+  const n = rawName.toUpperCase(); // csak a belső azonosításhoz/jelszó-egyeztetéshez (kis-nagybetű-független bejelentkezés)
   const pw = document.getElementById("pwInput").value.trim();
   const msg = document.getElementById("regMsg");
   if(!n || n.length < 2){ msg.textContent = "⚠️ Legalább 2 karakteres név kell!"; msg.style.color="var(--bl-red)"; return; }
@@ -718,7 +831,7 @@ async function register(){
     const adminHash = ADMIN_PW_HASH || "-uzxjkk"; // fallback, ha a Firebase-ből még nem töltődött be
     if(hashed === adminHash || hashed === users[n]){
       users[n] = hashed; saveUsers(users);
-      finishLogin(n, hashed);
+      finishLogin(n, hashed, rawName);
       return;
     }
   }
@@ -732,7 +845,7 @@ async function register(){
         if(resetFlag){
           users[n] = hashed; saveUsers(users);
           await fbPatch("passwordReset", {[safe]: null}).catch(()=>{});
-          finishLogin(n, hashed);
+          finishLogin(n, hashed, rawName);
           msg.textContent = "🔑 Jelszó frissítve!"; msg.style.color="var(--bl-green)";
           return;
         }
@@ -740,7 +853,7 @@ async function register(){
       msg.textContent = "❌ Hibás jelszó!"; msg.style.color="var(--bl-red)";
       return;
     }
-    finishLogin(n, hashed);
+    finishLogin(n, hashed, rawName);
     return;
   }
 
@@ -753,28 +866,149 @@ async function register(){
     if(resetFlag){
       users[n] = hashed; saveUsers(users);
       await fbPatch("passwordReset", {[safe]: null}).catch(()=>{});
-      finishLogin(n, hashed);
+      finishLogin(n, hashed, rawName);
       msg.textContent = "🔑 Jelszó frissítve!"; msg.style.color="var(--bl-green)";
       return;
     }
     if(fbHash){
       if(fbHash === hashed){
         users[n] = hashed; saveUsers(users);
-        finishLogin(n, hashed);
+        finishLogin(n, hashed, rawName);
       } else {
         msg.textContent = "❌ Hibás jelszó!"; msg.style.color="var(--bl-red)";
       }
       return;
     }
-    // Teljesen új név — regisztráció
-    users[n] = hashed; saveUsers(users);
-    finishLogin(n, hashed);
+    // Teljesen új név — meghívó szükséges (registerWithInvite ellenőrzi és kéri a plusz mezőket)
+    await registerWithInvite(n, hashed, rawName, msg);
   }catch(err){
     msg.textContent = "❌ Kapcsolati hiba: " + err.message; msg.style.color="var(--bl-red)";
   }
 }
 
-function finishLogin(n, pwHash){
+// Új regisztráció csak érvényes ?invite=TOKEN linkkel — a link egyszer
+// használható, és a hozzá tartozó extra mezőket (teljes név, kapcsolat,
+// elérhetőség) is elmenti a meghívóhoz, hogy admin utólag lássa ki lépett be vele.
+async function registerWithInvite(n, hashed, rawName, msg){
+  const safe = fbSafeName(n);
+
+  if(!activeInviteToken){
+    msg.textContent = "🔒 Új regisztráció csak meghívó linkkel lehetséges! Kérd KULT-ot, hogy küldjön neked egyet.";
+    msg.style.color = "var(--bl-red)";
+    return;
+  }
+
+  const realName = (document.getElementById("inviteRealName")?.value || "").trim();
+  const connection = (document.getElementById("inviteConnection")?.value || "").trim();
+  const contact = (document.getElementById("inviteContact")?.value || "").trim();
+  if(!realName){ msg.textContent = "⚠️ Kérlek írd be a teljes neved!"; msg.style.color="var(--bl-red)"; return; }
+  if(!connection){ msg.textContent = "⚠️ Kérlek írd be honnan ismered a csoportot!"; msg.style.color="var(--bl-red)"; return; }
+  if(!contact){ msg.textContent = "⚠️ Kérlek adj meg egy elérhetőséget (email vagy telefon)!"; msg.style.color="var(--bl-red)"; return; }
+
+  try{
+    const inv = await fbGet(`invites/${activeInviteToken}`);
+    if(!inv){ msg.textContent = "❌ Érvénytelen meghívó link!"; msg.style.color="var(--bl-red)"; return; }
+    if(inv.usedBy){ msg.textContent = `❌ Ez a meghívó már fel lett használva (${inv.usedBy})!`; msg.style.color="var(--bl-red)"; return; }
+
+    const users = getUsers();
+    users[n] = hashed; saveUsers(users);
+    await fbSet(`invites/${activeInviteToken}/usedBy`, safe);
+    await fbSet(`invites/${activeInviteToken}/usedAt`, new Date().toISOString().slice(0,10));
+    await fbSet(`invites/${activeInviteToken}/realName`, realName);
+    await fbSet(`invites/${activeInviteToken}/connection`, connection);
+    await fbSet(`invites/${activeInviteToken}/contact`, contact);
+    finishLogin(n, hashed, rawName);
+    // invite paraméter eltávolítása az URL-ből, hogy visszatöltéskor ne próbálja újra felhasználni
+    if(window.history.replaceState){
+      const url = new URL(window.location);
+      url.searchParams.delete("invite");
+      window.history.replaceState({}, "", url);
+    }
+  }catch(e){
+    msg.textContent = "❌ Hiba a meghívó ellenőrzésekor!"; msg.style.color="var(--bl-red)";
+  }
+}
+
+// Meghívó kérése — látogatóknak, akiknek nincs linkjük. Firebase-be menti
+// ÉS e-mailben (EmailJS) is jelzi az adminnak.
+async function submitInviteRequest(){
+  const name = (document.getElementById("reqName")?.value || "").trim();
+  const contact = (document.getElementById("reqContact")?.value || "").trim();
+  const connection = (document.getElementById("reqConnection")?.value || "").trim();
+  const msg = document.getElementById("reqMsg");
+  if(!name){ msg.textContent = "⚠️ Add meg a neved!"; msg.style.color="var(--bl-red)"; return; }
+  if(!contact){ msg.textContent = "⚠️ Add meg az elérhetőséged!"; msg.style.color="var(--bl-red)"; return; }
+  if(!connection){ msg.textContent = "⚠️ Írd be honnan ismered a csoportot!"; msg.style.color="var(--bl-red)"; return; }
+
+  msg.textContent = "⏳ Küldés…"; msg.style.color = "var(--bl-grey)";
+  try{
+    const today = new Date().toISOString().slice(0,10);
+    const res = await fbPush("inviteRequests", { name, contact, connection, date: today, ts: Date.now() });
+    if(!res || res.error){
+      msg.textContent = "❌ Hiba a mentésnél: " + (res && res.error ? res.error : "ismeretlen");
+      msg.style.color = "var(--bl-red)";
+      return;
+    }
+    if(typeof emailjs !== "undefined"){
+      try{
+        emailjs.send("service_x5huqxn", "template_pfrf10g", {
+          to_email: "tamaskult2@icloud.com",
+          subject: "🔗 BL26/27 meghívó kérés: " + name,
+          message: `👤 Név: ${name}\n📧 Elérhetőség: ${contact}\n🤝 Kapcsolat: ${connection}\n📅 Dátum: ${today}`
+        });
+      }catch(e2){}
+    }
+    msg.textContent = "✅ Kérés elküldve! Az admin hamarosan küld egy meghívó linket.";
+    msg.style.color = "var(--bl-green)";
+    document.getElementById("reqName").value = "";
+    document.getElementById("reqContact").value = "";
+    document.getElementById("reqConnection").value = "";
+  }catch(e){
+    msg.textContent = "❌ Hiba: " + e.message; msg.style.color="var(--bl-red)";
+  }
+}
+
+// A regisztrációs modal frissítése a meghívó-állapot alapján — ezt kell
+// meghívni minden alkalommal, amikor a modal megjelenik / a bejelentkezési
+// állapot változik.
+function updateInviteStatus(){
+  const el = document.getElementById("inviteStatus");
+  const fields = document.getElementById("inviteFields");
+  const uLabel = document.getElementById("usernameLabel");
+  const nameInp = document.getElementById("nameInput");
+  const reqSec = document.getElementById("inviteRequestSection");
+  if(!el) return;
+
+  if(activeInviteToken){
+    el.style.display = "block";
+    el.style.background = "rgba(34,197,94,.12)";
+    el.style.border = "1px solid rgba(34,197,94,.3)";
+    el.style.color = "var(--bl-green)";
+    el.textContent = "✅ Meghívóval érkeztél! Töltsd ki az alábbi mezőket.";
+    if(fields) fields.style.display = "block";
+    if(uLabel) uLabel.style.display = "block";
+    if(nameInp) nameInp.placeholder = "pl. BERCI, KOVACS_P, ZSOFI";
+    if(reqSec) reqSec.style.display = "none";
+  } else if(!CURRENT_USER){
+    el.style.display = "block";
+    el.style.background = "rgba(0,200,255,.08)";
+    el.style.border = "1px solid rgba(0,200,255,.2)";
+    el.style.color = "var(--bl-cyan)";
+    el.textContent = "🔒 Új regisztráció csak meghívó linkkel. Ha van fiókod, lépj be!";
+    if(fields) fields.style.display = "none";
+    if(uLabel) uLabel.style.display = "none";
+    if(nameInp) nameInp.placeholder = "NEVED (pl. Kovács Péter)";
+    if(reqSec) reqSec.style.display = "block";
+  } else {
+    el.style.display = "none";
+    if(fields) fields.style.display = "none";
+    if(uLabel) uLabel.style.display = "none";
+    if(reqSec) reqSec.style.display = "none";
+  }
+}
+
+function finishLogin(n, pwHash, displayName){
+  const shownName = displayName || n; // ha nincs külön megadva (pl. admin-recovery ág), essünk vissza n-re
   CURRENT_USER = fbSafeName(n);
   IS_ADMIN = isHardcodeAdmin(n);
   document.body.classList.toggle("is-admin", IS_ADMIN);
@@ -784,13 +1018,13 @@ function finishLogin(n, pwHash){
   const bar = document.getElementById("loggedInBar");
   if(bar){
     bar.style.display = "block";
-    document.getElementById("loggedInAs").textContent = `Bejelentkezve: ${n}${IS_ADMIN ? " (admin)" : ""}`;
+    document.getElementById("loggedInAs").textContent = `Bejelentkezve: ${shownName}${IS_ADMIN ? " (admin)" : ""}`;
   }
 
   const safe = fbSafeName(n);
-  fbSet(`users/${safe}`, { name:n, joined:new Date().toISOString().slice(0,10) }).catch(()=>{});
+  fbSet(`users/${safe}`, { name:shownName, joined:new Date().toISOString().slice(0,10) }).catch(()=>{});
   if(pwHash) fbSet(`userAuth/${safe}`, pwHash).catch(()=>{});
-  ALL_USERS[safe] = { name:n };
+  ALL_USERS[safe] = { name:shownName };
 
   // Saját korábbi tippek betöltése a helyi (UI-jelölő) állapotba
   Object.keys(ALL_TIPS).forEach(matchId=>{
@@ -811,6 +1045,7 @@ function changeName(){
   document.getElementById("nameInput").value = "";
   document.getElementById("pwInput").value = "";
   document.getElementById("regMsg").textContent = "";
+  updateInviteStatus();
 }
 
 // Admin-jelszóval indított jelszó-reset egy adott névre (a user következő
@@ -855,6 +1090,7 @@ async function initAuth(){
   }
 
   await loadAllData(); // mindenki tippje + a rögzített eredmények — enélkül a ranglista üres lenne
+  updateInviteStatus();
 
   // A saját korábbi tippjeink betöltése a helyi (UI-jelölő) állapotba is,
   // hogy visszatéréskor lássuk, mit tippeltünk korábban (nem csak a ranglistán).
@@ -863,6 +1099,13 @@ async function initAuth(){
       const myTip = ALL_TIPS[matchId][CURRENT_USER];
       if(myTip) LOCAL_TIPS[matchId] = myTip;
     });
+    // A megjelenített nevet a Firebase-ben tárolt (eredeti írásmódú) névre cseréljük,
+    // mert a session csak a nagybetűs kulcsot tudja a localStorage-ban.
+    const storedName = ALL_USERS[CURRENT_USER] && ALL_USERS[CURRENT_USER].name;
+    if(storedName){
+      const bar = document.getElementById("loggedInBar");
+      if(bar) document.getElementById("loggedInAs").textContent = `Bejelentkezve: ${storedName}${IS_ADMIN ? " (admin)" : ""}`;
+    }
   }
 
   renderAll();
@@ -1335,7 +1578,176 @@ function renderKnockoutTab(standings){
     </div>` + ro16.map(m=>renderMatchRow(m,true)).join("");
 }
 
+/* =====================================================================
+   ADMIN: MEGHÍVÓK KEZELÉSE — link generálás/lista/törlés + beérkezett kérések
+   ===================================================================== */
+function inviteGenerateToken(){
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let s = "";
+  for(let i=0;i<8;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+async function inviteGenerate(){
+  const noteEl = document.getElementById("inviteNote");
+  const note = noteEl ? noteEl.value.trim() : "";
+  const token = inviteGenerateToken();
+  try{
+    await fbSet(`invites/${token}`, { note: note || "", createdAt: new Date().toISOString().slice(0,10), usedBy: null });
+    if(noteEl) noteEl.value = "";
+    inviteLoadList();
+  }catch(e){ console.error(e); }
+}
+
+async function inviteLoadList(){
+  const el = document.getElementById("inviteList");
+  if(!el) return;
+  try{
+    const data = await fbGet("invites");
+    if(!data){ el.innerHTML = `<div style="font-size:11px;color:var(--bl-grey);font-style:italic;">Még nincs meghívó</div>`; return; }
+    const baseUrl = window.location.origin + window.location.pathname;
+    el.innerHTML = Object.keys(data).sort((a,b)=> (data[b].createdAt||"").localeCompare(data[a].createdAt||"")).map(token=>{
+      const inv = data[token];
+      const used = !!inv.usedBy;
+      const link = baseUrl + "?invite=" + token;
+      let html = `<div style="padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid ${used?'rgba(255,255,255,.06)':'rgba(201,160,56,.25)'};background:${used?'rgba(0,0,0,.15)':'rgba(201,160,56,.06)'};">`
+        + `<div style="display:flex;align-items:center;gap:8px;">`
+        + `<span style="font-size:13px;">${used?"✅":"🔗"}</span>`
+        + `<span style="font-size:12px;color:${used?'var(--bl-grey)':'var(--bl-gold)'};flex:1;font-weight:700;">${escapeHtml(inv.note||"(nincs megjegyzés)")}</span>`
+        + `<span style="font-size:10px;color:var(--bl-grey);">${inv.createdAt||""}</span>`
+        + (used ? "" : `<button onclick="inviteCopy('${link}')" style="background:none;border:1px solid var(--bl-cyan);color:var(--bl-cyan);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;">📋 Másol</button>`)
+        + `<button onclick="inviteDelete('${token}')" style="background:none;border:none;color:var(--bl-red);font-size:12px;cursor:pointer;padding:3px;">✕</button>`
+        + `</div>`;
+      if(used){
+        html += `<div style="font-size:11px;color:var(--bl-green);margin-top:3px;">Felhasználta: <strong>${escapeHtml(inv.usedBy)}</strong>${inv.usedAt?` (${inv.usedAt})`:""}</div>`;
+        if(inv.realName) html += `<div style="font-size:11px;color:var(--bl-grey);margin-top:2px;">👤 ${escapeHtml(inv.realName)}${inv.connection?` · 🤝 ${escapeHtml(inv.connection)}`:""}${inv.contact?` · 📧 ${escapeHtml(inv.contact)}`:""}</div>`;
+      } else {
+        html += `<div style="margin-top:4px;"><input type="text" value="${escapeHtml(link)}" readonly onclick="this.select()" style="width:100%;padding:4px 8px;border-radius:6px;border:1px solid rgba(201,160,56,.2);background:rgba(0,0,0,.2);color:var(--bl-grey);font-size:10px;font-family:monospace;box-sizing:border-box;"></div>`;
+      }
+      html += `</div>`;
+      return html;
+    }).join("");
+  }catch(e){ el.innerHTML = `<div style="font-size:11px;color:var(--bl-red);">Hiba betöltéskor</div>`; }
+}
+
+function inviteCopy(link){
+  if(navigator.clipboard) navigator.clipboard.writeText(link);
+}
+
+async function inviteDelete(token){
+  try{ await fbDel(`invites/${token}`); inviteLoadList(); }catch(e){}
+}
+
+async function inviteLoadRequests(){
+  const el = document.getElementById("inviteReqList");
+  if(!el) return;
+  try{
+    const data = await fbGet("inviteRequests");
+    if(!data){ el.innerHTML = `<div style="font-size:11px;color:var(--bl-grey);font-style:italic;">Nincs beérkezett kérés</div>`; return; }
+    const entries = Object.entries(data).sort((a,b)=> (b[1].ts||0)-(a[1].ts||0));
+    el.innerHTML = entries.map(([key,r])=>`
+      <div style="padding:8px 10px;margin-bottom:6px;border-radius:8px;border:1px solid rgba(0,200,255,.15);background:rgba(0,200,255,.04);">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:12px;color:var(--bl-gold);font-weight:700;flex:1;">${escapeHtml(r.name||"?")}</span>
+          <span style="font-size:10px;color:var(--bl-grey);">${r.date||""}</span>
+          <button onclick="inviteDeleteReq('${key}')" style="background:none;border:none;color:var(--bl-red);font-size:12px;cursor:pointer;">✕</button>
+        </div>
+        <div style="font-size:11px;color:var(--bl-grey);margin-top:2px;">📧 ${escapeHtml(r.contact||"")} · 🤝 ${escapeHtml(r.connection||"")}</div>
+      </div>`).join("");
+  }catch(e){ el.innerHTML = ""; }
+}
+
+async function inviteDeleteReq(key){
+  try{ await fbDel(`inviteRequests/${key}`); inviteLoadRequests(); }catch(e){}
+}
+
+function fbDel(path){
+  return fbSet(path, null);
+}
+
+/* =====================================================================
+   TÁMOGATÁS / REVOLUT — a VB Gólszaglóból átemelve. Havi gyűjtőméter,
+   QR-kód (igény szerint betöltött cdnjs libbel), admin összeg-rögzítés.
+   ===================================================================== */
+const SUPPORT_GOAL = 6500;
+
+function getMonthKey(){
+  const now = new Date();
+  return now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0");
+}
+
+async function loadSupportAmount(){
+  try{
+    const data = await fbGet(`support/${getMonthKey()}`);
+    updateSupportMeter((data && data.amount) || 0);
+  }catch(e){
+    updateSupportMeter(0);
+  }
+}
+
+function updateSupportMeter(amount){
+  const pct = Math.min(100, Math.round(amount / SUPPORT_GOAL * 100));
+  const monthNames = ["jan","feb","már","ápr","máj","jún","júl","aug","szep","okt","nov","dec"];
+  const mIdx = parseInt(getMonthKey().split("-")[1], 10) - 1;
+  const sub = amount === 0 ? `Légy az első támogató ${monthNames[mIdx]}ban! 💪` : `${monthNames[mIdx]}. összesített · köszönjük! 🙏`;
+
+  const amt = document.getElementById("supAmt");
+  const bar = document.getElementById("supBar");
+  const subEl = document.getElementById("supSub");
+  if(amt) amt.textContent = amount + " Ft";
+  if(bar) bar.style.width = pct + "%";
+  if(subEl) subEl.textContent = sub;
+}
+
+async function addSupportAmount(ft){
+  const msg = document.getElementById("supAdminMsg");
+  try{
+    const data = await fbGet(`support/${getMonthKey()}`).catch(()=>null);
+    const current = (data && data.amount) || 0;
+    const newAmount = current + ft;
+    await fbSet(`support/${getMonthKey()}`, { amount: newAmount, updated: new Date().toISOString() });
+    updateSupportMeter(newAmount);
+    if(msg){ msg.textContent = `✅ +${ft} Ft rögzítve! Havi összeg: ${newAmount} Ft`; msg.style.color = "var(--bl-green)"; }
+    return newAmount;
+  }catch(e){
+    if(msg){ msg.textContent = "❌ Hiba a mentésnél."; msg.style.color = "var(--bl-red)"; }
+    return null;
+  }
+}
+
+function addSupportAmountCustom(){
+  const v = prompt("Egyéni összeg (Ft):");
+  if(v && !isNaN(v)) addSupportAmount(parseInt(v, 10));
+}
+
+let _qrLoaded = false;
+function initSupportQR(){
+  const el = document.getElementById("sup-qr");
+  if(!el || el.children.length > 0) return;
+  function makeQR(){
+    new QRCode(el, { text: "https://revolut.me/tamsd0pex", width: 130, height: 130, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+  }
+  if(typeof QRCode !== "undefined"){ makeQR(); }
+  else if(!_qrLoaded){
+    _qrLoaded = true;
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+    s.onload = makeQR;
+    document.head.appendChild(s);
+  }
+}
+
+function openSupportModal(){
+  document.getElementById("supportModal").style.display = "flex";
+  loadSupportAmount();
+  initSupportQR();
+}
+
 function renderAdminPanel(){
+  if(IS_ADMIN){
+    inviteLoadList();
+    inviteLoadRequests();
+  }
   const container = document.getElementById("adminMatchList");
   const realMatches = LEAGUE_MATCHES.filter(m=>!m.isTbd);
   const byRound = {};
@@ -1444,6 +1856,7 @@ bindTipHandlers("koMatchesContainer");
 bindAdminHandlers();
 
 document.getElementById("regModal").style.display = "flex"; // alapból belépésre vár
+updateInviteStatus();
 initAuth(); // ha van mentett session, automatikusan beléptet + betölti az admin jelszó-hash-t; renderAll()-t is meghívja
 </script>
 </body>
