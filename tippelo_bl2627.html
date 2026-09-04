@@ -89,41 +89,103 @@
   table.bl-table tr.zone-topeight td.team-cell{border-left:3px solid var(--bl-green);}
   table.bl-table tr.zone-playoff td.team-cell{border-left:3px solid var(--bl-gold);}
   table.bl-table tr.zone-out td.team-cell{border-left:3px solid var(--bl-red);opacity:.6;}
-  .match-row{
-    display:flex;align-items:center;gap:8px;
-    padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.06);
-    flex-wrap:wrap;
+
+  /* ===== MECCS-CSEMPE — a VB Gólszagló .match-card mintája, BL színekkel ===== */
+  .match-card{
+    background:rgba(255,255,255,.035);border:1px solid rgba(0,200,255,.14);
+    border-radius:12px;margin-bottom:10px;overflow:hidden;
+    transition:border-color .2s;
   }
-  .match-row .teams{flex:1;min-width:160px;font-size:13.5px;font-weight:600;}
+  .match-card.locked{border-color:rgba(224,51,63,.25);}
+  .match-card.has-result{border-color:rgba(31,174,94,.3);}
+  .match-meta{
+    font-size:10.5px;color:var(--bl-grey);padding:7px 12px;
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    border-bottom:1px solid rgba(255,255,255,.05);
+  }
+  .grp-tag{background:rgba(201,160,56,.12);color:var(--bl-gold);padding:1px 7px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.5px;}
+  .time-tag{font-size:13px;font-weight:700;color:var(--bl-white);}
+  .locked-badge{font-size:9px;color:var(--bl-red);background:rgba(224,51,63,.1);border:1px solid rgba(224,51,63,.25);padding:1px 6px;border-radius:8px;margin-left:auto;}
+  .done-badge{font-size:9px;color:var(--bl-green);background:rgba(31,174,94,.1);border:1px solid rgba(31,174,94,.25);padding:1px 6px;border-radius:8px;margin-left:auto;}
+  .match-body{padding:10px 12px 12px;}
+  .match-teams-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .team-blk{display:flex;align-items:center;gap:7px;flex:1;min-width:0;}
+  .team-blk.away-blk{flex-direction:row-reverse;text-align:right;}
+  .team-blk .tf{font-size:22px;flex-shrink:0;}
+  .team-blk .tn{font-size:13px;font-weight:700;color:var(--bl-white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+  .vs-block{font-size:11px;font-weight:700;color:rgba(240,244,240,.25);letter-spacing:2px;flex-shrink:0;padding:0 4px;}
+  .result-score{font-size:20px;font-weight:800;color:var(--bl-gold);flex-shrink:0;padding:0 6px;}
+  .tip-buttons{display:flex;gap:6px;}
+  .tip-btn{
+    flex:1;padding:10px 4px;border-radius:8px;border:1.5px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.03);color:var(--bl-white);font-size:16px;font-weight:800;
+    cursor:pointer;transition:all .15s;
+  }
+  .tip-btn.hb{border-color:rgba(0,56,255,.35);}
+  .tip-btn.db{border-color:rgba(154,160,200,.3);}
+  .tip-btn.ab{border-color:rgba(224,51,63,.35);}
+  .tip-btn.hb.sel{background:var(--bl-blue);border-color:var(--bl-cyan);}
+  .tip-btn.db.sel{background:#5a5f7a;border-color:#8a90b5;}
+  .tip-btn.ab.sel{background:var(--bl-red);border-color:#ff6b75;}
+  .tip-btn.correct{background:var(--bl-green)!important;border-color:var(--bl-green)!important;}
+  .tip-btn.wrong-sel{background:var(--bl-red)!important;border-color:var(--bl-red)!important;opacity:.65;}
+  .tip-btn.cr-result:not(.sel){border-color:var(--bl-green)!important;}
+  .match-card.locked .tip-btn{cursor:default;pointer-events:none;opacity:.55;}
+  .score-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.1);}
+  .score-row-label{font-size:10.5px;color:var(--bl-grey);white-space:nowrap;}
+  .score-num-input{
+    width:40px;height:40px;text-align:center;border-radius:8px;
+    border:1.5px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);
+    color:var(--bl-white);font-size:19px;font-weight:800;flex-shrink:0;
+  }
+  .score-num-input.filled{border-color:rgba(31,174,94,.4);background:rgba(31,174,94,.07);}
+  .score-num-input:disabled{opacity:.35;}
+  .score-num-input::-webkit-inner-spin-button,.score-num-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  .score-sep{font-size:18px;font-weight:800;color:rgba(255,255,255,.2);flex-shrink:0;}
+  .score-save-btn{
+    margin-left:auto;padding:0 14px;height:40px;border-radius:8px;
+    background:rgba(0,200,255,.12);border:1.5px solid rgba(0,200,255,.3);
+    color:var(--bl-cyan);font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;
+  }
+  .score-save-btn.saved{background:rgba(31,174,94,.12);border-color:rgba(31,174,94,.3);color:var(--bl-green);}
+  .score-save-btn:disabled{opacity:.35;cursor:default;}
+  .del-tip-btn{
+    background:rgba(224,51,63,.1);border:1.5px solid rgba(224,51,63,.25);color:var(--bl-red);
+    border-radius:8px;width:40px;height:40px;font-size:15px;cursor:pointer;flex-shrink:0;
+  }
+  .result-footer{font-size:11px;color:var(--bl-grey);text-align:center;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.08);}
+  .pts-badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:8px;background:rgba(31,174,94,.12);color:var(--bl-green);font-size:11px;font-weight:700;}
+
+  /* Admin eredmény-rögzítő táblázat sorai — külön koncepció a fenti meccs-csempétől */
+  .match-row{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .match-row .teams{flex:1;min-width:160px;font-size:13px;font-weight:600;}
+  .tip-score{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--bl-grey);}
+  .tip-score input{
+    width:34px;text-align:center;border-radius:6px;border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.08);color:var(--bl-white);font-size:13px;padding:5px 2px;
+  }
   .team-badge{display:inline-flex;align-items:center;gap:2px;font-size:13px;}
   .team-badge .badge-initials{
     font-size:9px;font-weight:800;color:var(--bl-navy);background:var(--bl-cyan);
     border-radius:5px;padding:1px 3px;letter-spacing:.3px;
   }
-  .match-row .meta{font-size:10.5px;color:var(--bl-grey);width:100%;order:5;margin-top:2px;}
-  .tip-outcome{display:flex;gap:4px;}
-  .tip-outcome button{
-    padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
-    background:rgba(255,255,255,.05);color:var(--bl-white);font-size:12px;font-weight:700;
-  }
-  .tip-outcome button.selected{background:var(--bl-blue);border-color:var(--bl-cyan);}
-  .tip-score input{
-    width:34px;text-align:center;border-radius:6px;border:1px solid rgba(255,255,255,.2);
-    background:rgba(255,255,255,.08);color:var(--bl-white);font-size:13px;padding:5px 2px;
-  }
   .advancer-pick{
-    display:flex;gap:6px;width:100%;order:6;margin-top:6px;
-    padding-top:6px;border-top:1px dashed rgba(255,255,255,.15);
+    display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.1);flex-wrap:wrap;
   }
   .advancer-pick .label{font-size:11px;color:var(--bl-gold);width:100%;margin-bottom:3px;}
   .advancer-pick button{
-    flex:1;padding:6px 4px;border-radius:8px;border:1px solid var(--bl-gold);
-    background:rgba(201,160,56,.1);color:var(--bl-white);font-size:11.5px;font-weight:700;
+    flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--bl-gold);
+    background:rgba(201,160,56,.1);color:var(--bl-white);font-size:12px;font-weight:700;cursor:pointer;
   }
   .advancer-pick button.selected{background:var(--bl-gold);color:var(--bl-navy);}
-  .save-state{font-size:10px;color:var(--bl-grey);width:100%;order:7;}
+  .advancer-pick button:disabled{opacity:.4;cursor:default;}
+  .save-state{font-size:10px;color:var(--bl-grey);margin-top:5px;}
   .save-state.ok{color:var(--bl-green);}
   .save-state.err{color:var(--bl-red);font-weight:700;}
+
   .placeholder-note{
     font-size:12px;color:var(--bl-grey);background:rgba(255,255,255,.03);
     border:1px dashed rgba(255,255,255,.15);border-radius:10px;padding:10px;
@@ -438,6 +500,31 @@
 
   <!-- ADMIN TAB -->
   <section id="tab-admin" class="tab-panel">
+    <div class="card">
+      <h2>🔑 Jelszó reset (felhasználónak)</h2>
+      <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">
+        Ha valaki elfelejtette a jelszavát, itt is resetelheted (ugyanaz, mint a bejelentkezési
+        modal alján lévő "Elfelejtett jelszó" — csak itt nem kell hozzá az ő jelszavuk).
+        Utána bármilyen jelszóval be tud lépni ugyanazzal a névvel.
+      </div>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="resetPwUser" placeholder="Felhasználónév (pl. BERCI)" maxlength="30"
+          style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;">
+        <button onclick="adminResetPassword()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">🔑 Reset</button>
+      </div>
+      <div id="resetPwMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
+    </div>
+    <div class="card">
+      <h2>🔑 Admin jelszó módosítása</h2>
+      <input type="password" id="admPwOld" placeholder="Jelenlegi admin jelszó" maxlength="30"
+        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+      <input type="password" id="admPwNew" placeholder="Új jelszó (min. 4 karakter)" maxlength="30"
+        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;box-sizing:border-box;margin-bottom:6px;">
+      <input type="password" id="admPwNew2" placeholder="Új jelszó mégegyszer" maxlength="30"
+        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;box-sizing:border-box;margin-bottom:8px;">
+      <button onclick="adminChangePassword()" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:13px;font-weight:700;cursor:pointer;">🔑 Jelszó módosítása</button>
+      <div id="admPwMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;text-align:center;"></div>
+    </div>
     <div class="card">
       <h2>🧹 Adattisztítás</h2>
       <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">
@@ -1348,6 +1435,24 @@ function renderLeagueMatches(){
   `;}).join("");
 }
 
+// A tipp-gomb (1/X/2) CSS osztálya — a VB bc() logikája: kiválasztva, és ha
+// van eredmény, zöld (talált) / piros (mellétippelt) / halvány zöld keret
+// (ez lett volna a helyes, ha nem ezt választotta).
+function tipBtnClass(val, base, tip, match){
+  let c = "tip-btn " + base;
+  const hasResult = match.ftHome != null && match.ftAway != null;
+  const result = hasResult ? (match.ftHome === match.ftAway ? "X" : (match.ftHome > match.ftAway ? "1" : "2")) : null;
+  const myOut = tip.outcomeTip;
+  if(myOut === val){
+    if(result && result === val) c += " sel correct";
+    else if(result && result !== val) c += " sel wrong-sel";
+    else c += " sel";
+  } else if(result === val){
+    c += " cr-result";
+  }
+  return c;
+}
+
 function renderMatchRow(match, isKnockout){
   const tip = LOCAL_TIPS[match.id] || {};
   const homeBadge = match.isTbd ? "" : teamBadge(match.homeId || match.teamHome);
@@ -1355,63 +1460,107 @@ function renderMatchRow(match, isKnockout){
   const locked = !match.isTbd && isKickoffPassed(match.huDate, match.huTime);
   const dis = locked ? "disabled" : "";
   const hasTip = tip.outcomeTip || tip.scoreHome != null || tip.scoreAway != null || tip.advancerTip;
+  const hasResult = match.ftHome != null && match.ftAway != null;
+
+  const hVal = tip.scoreHome != null ? String(tip.scoreHome) : "";
+  const aVal = tip.scoreAway != null ? String(tip.scoreAway) : "";
+  const filled = tip.scoreHome != null && tip.scoreAway != null;
+
+  // Eredmény-sáv: pontszám, amit ez a tipp ért, ha már ismert a végeredmény
+  let resultFooter = "";
+  if(hasResult && (tip.outcomeTip || filled)){
+    const pts = calcTipPoints(match, tip);
+    resultFooter = `<div class="result-footer">Erre a tippre: <span class="pts-badge">${pts>0?"+"+pts:"0"} pt</span></div>`;
+  }
+
   return `
-  <div class="match-row" data-match-id="${match.id}">
-    <div class="teams">${homeBadge} ${match.teamHome} – ${match.teamAway} ${awayBadge}</div>
-    <div class="meta">📅 ${match.huDate} · ⏰ ${match.huTime || "21:00"}${locked ? ' · <span style="color:var(--bl-red);">🔒 Lezárva (kezdés megtörtént)</span>' : ''}</div>
-    <div class="tip-outcome" data-role="outcome">
-      <button data-val="1" class="${tip.outcomeTip==='1'?'selected':''}" ${dis}>1</button>
-      <button data-val="X" class="${tip.outcomeTip==='X'?'selected':''}" ${dis}>X</button>
-      <button data-val="2" class="${tip.outcomeTip==='2'?'selected':''}" ${dis}>2</button>
+  <div class="match-card${hasResult?" has-result":""}${locked?" locked":""}" data-match-id="${match.id}">
+    <div class="match-meta">
+      <span class="time-tag">${match.huTime || "21:00"}</span>
+      <span class="grp-tag">${match.matchday ? match.matchday+". forduló" : (match.stage||"")}</span>
+      <span style="color:var(--bl-grey);">${match.huDate}</span>
+      ${hasResult ? '<span class="done-badge">🔒 VÉGE</span>' : (locked ? '<span class="locked-badge">⏰ ZÁRVA</span>' : '')}
     </div>
-    <div class="tip-score">
-      <input type="number" min="0" max="20" data-role="scoreHome" value="${tip.scoreHome ?? ''}" ${dis}>
-      :
-      <input type="number" min="0" max="20" data-role="scoreAway" value="${tip.scoreAway ?? ''}" ${dis}>
+    <div class="match-body">
+      <div class="match-teams-row">
+        <div class="team-blk">
+          <span class="tf">${homeBadge}</span>
+          <span class="tn">${match.teamHome}</span>
+        </div>
+        ${hasResult
+          ? `<span class="result-score">${match.ftHome} : ${match.ftAway}</span>`
+          : `<span class="vs-block">VS</span>`}
+        <div class="team-blk away-blk">
+          <span class="tf">${awayBadge}</span>
+          <span class="tn">${match.teamAway}</span>
+        </div>
+      </div>
+
+      <div class="tip-buttons" data-role="outcome">
+        <button data-val="1" class="${tipBtnClass('1','hb',tip,match)}" ${dis}>1</button>
+        <button data-val="X" class="${tipBtnClass('X','db',tip,match)}" ${dis}>X</button>
+        <button data-val="2" class="${tipBtnClass('2','ab',tip,match)}" ${dis}>2</button>
+      </div>
+
+      <div class="score-row">
+        <span class="score-row-label">Pontos:</span>
+        <input type="number" min="0" max="20" data-role="scoreHome" placeholder="–" value="${hVal}" class="score-num-input${filled?' filled':''}" ${dis}>
+        <span class="score-sep">:</span>
+        <input type="number" min="0" max="20" data-role="scoreAway" placeholder="–" value="${aVal}" class="score-num-input${filled?' filled':''}" ${dis}>
+        <button data-action="save-score" class="score-save-btn${filled?' saved':''}" ${dis}>${filled?'✓ Mentve':'Mentés'}</button>
+        ${!locked && hasTip ? `<button data-action="delete-tip" class="del-tip-btn" title="Tipp törlése">🗑️</button>` : ``}
+      </div>
+
+      ${isKnockout ? `
+      <div class="advancer-pick">
+        <div class="label">Ki jut tovább? (ha a rendes játékidő döntetlen, ET/11-es dönt)</div>
+        <button data-val="home" class="${tip.advancerTip==='home'?'selected':''}" ${dis}>${match.teamHome}</button>
+        <button data-val="away" class="${tip.advancerTip==='away'?'selected':''}" ${dis}>${match.teamAway}</button>
+      </div>` : ``}
+
+      ${resultFooter}
+      <div class="save-state" data-save-state="tip-${match.id}"></div>
     </div>
-    ${isKnockout ? `
-    <div class="advancer-pick">
-      <div class="label">Ki jut tovább? (ha a rendes játékidő döntetlen, ET/11-es dönt)</div>
-      <button data-val="home" class="${tip.advancerTip==='home'?'selected':''}" ${dis}>${match.teamHome}</button>
-      <button data-val="away" class="${tip.advancerTip==='away'?'selected':''}" ${dis}>${match.teamAway}</button>
-    </div>` : ``}
-    ${!locked && hasTip ? `<button data-action="delete-tip" style="order:6;margin-top:6px;padding:5px 10px;border-radius:8px;border:1px solid var(--bl-red);background:rgba(224,51,63,.1);color:var(--bl-white);font-size:11px;">🗑️ Tipp törlése</button>` : ``}
-    <div class="save-state" data-save-state="tip-${match.id}"></div>
   </div>`;
 }
 
 function bindTipHandlers(containerId){
   const container = document.getElementById(containerId);
   container.addEventListener("click", (e)=>{
-    const row = e.target.closest(".match-row");
-    if(!row) return;
-    const matchId = row.dataset.matchId;
+    const card = e.target.closest(".match-card");
+    if(!card) return;
+    const matchId = card.dataset.matchId;
     const tip = LOCAL_TIPS[matchId] || (LOCAL_TIPS[matchId] = {});
 
+    // 1/X/2 gomb — a VB mintájára AZONNAL menti a kimenetelt (nem kell külön Mentés)
     if(e.target.closest("[data-role='outcome']") && e.target.tagName === "BUTTON"){
       tip.outcomeTip = e.target.dataset.val;
-      row.querySelectorAll("[data-role='outcome'] button").forEach(b=>
-        b.classList.toggle("selected", b.dataset.val === tip.outcomeTip));
+      saveTip(matchId, tip);
+    }
+    // Pontos eredmény mentése — külön gomb, csak akkor ment, ha rákattintanak
+    if(e.target.dataset.action === "save-score"){
+      const row = e.target.closest(".score-row");
+      const h = row.querySelector("[data-role='scoreHome']").value;
+      const a = row.querySelector("[data-role='scoreAway']").value;
+      if(h === "" || a === ""){
+        showTipSaveState(matchId, "err", "Add meg mindkét gólszámot!");
+        return;
+      }
+      tip.scoreHome = Number(h);
+      tip.scoreAway = Number(a);
+      // A pontos eredmény implikálja a kimenetelt is, ha még nem volt kiválasztva
+      if(!tip.outcomeTip){
+        tip.outcomeTip = tip.scoreHome === tip.scoreAway ? "X" : (tip.scoreHome > tip.scoreAway ? "1" : "2");
+      }
       saveTip(matchId, tip);
     }
     if(e.target.closest(".advancer-pick") && e.target.tagName === "BUTTON"){
       tip.advancerTip = e.target.dataset.val;
-      row.querySelectorAll(".advancer-pick button").forEach(b=>
-        b.classList.toggle("selected", b.dataset.val === tip.advancerTip));
       saveTip(matchId, tip);
     }
     if(e.target.dataset.action === "delete-tip"){
       deleteTip(matchId);
     }
-  });
-  container.addEventListener("change", (e)=>{
-    const row = e.target.closest(".match-row");
-    if(!row) return;
-    const matchId = row.dataset.matchId;
-    const tip = LOCAL_TIPS[matchId] || (LOCAL_TIPS[matchId] = {});
-    if(e.target.dataset.role === "scoreHome") tip.scoreHome = Number(e.target.value);
-    if(e.target.dataset.role === "scoreAway") tip.scoreAway = Number(e.target.value);
-    saveTip(matchId, tip);
   });
 }
 
@@ -1438,6 +1587,7 @@ async function saveTip(matchId, tip){
     if(!ALL_TIPS[matchId]) ALL_TIPS[matchId] = {};
     ALL_TIPS[matchId][CURRENT_USER] = tip; // helyi állapot is frissül, hogy a ranglista azonnal lássa
     showTipSaveState(matchId, "ok", "✓ Tipp mentve");
+    renderAll(); // a gombok/csempe azonnal frissüljön (kiválasztott állapot, Mentve felirat)
   } catch(err){
     showTipSaveState(matchId, "err", "Hiba, próbáld újra");
     console.error(err);
@@ -1506,6 +1656,49 @@ function calcTipPoints(match, tip){
 // bejegyzések megkeresése és törlése. Csak a tips/ gyökér alatti,
 // ÉRVÉNYTELEN (nem valós meccs-ID) kulcsokat törli — a helyes szerkezetű,
 // valós tippeket nem érinti.
+// Admin: egy adott felhasználó jelszavának resetelése (nem kell hozzá az ő
+// jelenlegi jelszava, csak az admin jogosultság). A régi hash-t is töröljük,
+// hogy a következő belépéskor bármilyen jelszót elfogadjon és azt mentse el újként.
+async function adminResetPassword(){
+  const inp = document.getElementById("resetPwUser");
+  const msg = document.getElementById("resetPwMsg");
+  const name = inp ? inp.value.trim().toUpperCase() : "";
+  if(!name){ msg.textContent = "⚠️ Írd be a felhasználónevet!"; msg.style.color = "var(--bl-red)"; return; }
+  const safe = fbSafeName(name);
+  try{
+    await fbSet(`passwordReset/${safe}`, true);
+    await fbDel(`userAuth/${safe}`).catch(()=>{});
+    msg.textContent = `✅ ${name} jelszava resetelve. Legközelebb bármilyen jelszóval beléphet, azt fogja elmenteni.`;
+    msg.style.color = "var(--bl-green)";
+    if(inp) inp.value = "";
+  }catch(e){
+    msg.textContent = "❌ Hiba: " + e.message; msg.style.color = "var(--bl-red)";
+  }
+}
+
+// Admin: saját admin jelszó módosítása
+async function adminChangePassword(){
+  const oldPw = (document.getElementById("admPwOld")||{}).value || "";
+  const newPw = (document.getElementById("admPwNew")||{}).value || "";
+  const newPw2 = (document.getElementById("admPwNew2")||{}).value || "";
+  const msg = document.getElementById("admPwMsg");
+  if(!oldPw){ msg.textContent = "⚠️ Add meg a jelenlegi jelszót!"; msg.style.color = "var(--bl-red)"; return; }
+  if(simpleHash(oldPw) !== ADMIN_PW_HASH){ msg.textContent = "❌ Hibás jelenlegi jelszó!"; msg.style.color = "var(--bl-red)"; return; }
+  if(newPw.length < 4){ msg.textContent = "⚠️ Az új jelszó legalább 4 karakter legyen!"; msg.style.color = "var(--bl-red)"; return; }
+  if(newPw !== newPw2){ msg.textContent = "❌ A két új jelszó nem egyezik!"; msg.style.color = "var(--bl-red)"; return; }
+  try{
+    const newHash = simpleHash(newPw);
+    await fbSet("adminPwHash", newHash);
+    ADMIN_PW_HASH = newHash;
+    document.getElementById("admPwOld").value = "";
+    document.getElementById("admPwNew").value = "";
+    document.getElementById("admPwNew2").value = "";
+    msg.textContent = "✅ Jelszó sikeresen módosítva!"; msg.style.color = "var(--bl-green)";
+  }catch(e){
+    msg.textContent = "❌ Hiba a mentésnél!"; msg.style.color = "var(--bl-red)";
+  }
+}
+
 async function cleanupLegacyTips(){
   const msg = document.getElementById("cleanupMsg");
   msg.textContent = "⏳ Ellenőrzés…"; msg.style.color = "var(--bl-grey)";
