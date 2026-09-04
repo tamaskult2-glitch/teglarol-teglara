@@ -962,10 +962,12 @@ async function submitInviteRequest(){
     let emailSent = false, emailError = null;
     if(typeof emailjs !== "undefined"){
       try{
-        await emailjs.send("service_x5huqxn", "template_pfrf10g", {
-          to_email: "tamaskult2@icloud.com",
-          subject: "🔗 BL26/27 meghívó kérés: " + name,
-          message: `👤 Név: ${name}\n📧 Elérhetőség: ${contact}\n🤝 Kapcsolat: ${connection}\n📅 Dátum: ${today}`
+        // A notify.html-ben már bizonyítottan működő sablon újrahasznosítva
+        // (a korábbi template_pfrf10g nem létezik a fiókban — "template ID not found").
+        await emailjs.send("service_x5huqxn", "template_ooyqw26", {
+          email: "tamaskult2@icloud.com",
+          name: "Admin",
+          db: `🔗 BL26/27 meghívó kérés\n\n👤 Név: ${name}\n📧 Elérhetőség: ${contact}\n🤝 Kapcsolat: ${connection}\n📅 Dátum: ${today}`
         });
         emailSent = true;
       }catch(e2){
