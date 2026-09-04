@@ -959,17 +959,34 @@ async function submitInviteRequest(){
       msg.style.color = "var(--bl-red)";
       return;
     }
+    let emailSent = false, emailError = null;
     if(typeof emailjs !== "undefined"){
       try{
-        emailjs.send("service_x5huqxn", "template_pfrf10g", {
+        await emailjs.send("service_x5huqxn", "template_pfrf10g", {
           to_email: "tamaskult2@icloud.com",
           subject: "🔗 BL26/27 meghívó kérés: " + name,
           message: `👤 Név: ${name}\n📧 Elérhetőség: ${contact}\n🤝 Kapcsolat: ${connection}\n📅 Dátum: ${today}`
         });
-      }catch(e2){}
+        emailSent = true;
+      }catch(e2){
+        emailError = e2;
+        console.error("EmailJS hiba a meghívó-kérésnél:", e2);
+      }
+    } else {
+      emailError = new Error("EmailJS script nem töltődött be");
+      console.error(emailError);
     }
-    msg.textContent = "✅ Kérés elküldve! Az admin hamarosan küld egy meghívó linket.";
-    msg.style.color = "var(--bl-green)";
+
+    if(emailSent){
+      msg.textContent = "✅ Kérés elküldve, az admin emailt is kapott róla!";
+      msg.style.color = "var(--bl-green)";
+    } else {
+      // A Firebase-mentés (fenti fbPush) ekkor már megtörtént, tehát a kérés
+      // NEM veszett el — csak az email-értesítés nem ment ki. Ezt jelezzük,
+      // hogy ne higgye a user, hibátlanul eljutott az adminhoz emailben is.
+      msg.textContent = "⚠️ Kérés mentve, de az email-értesítés nem ment ki (admin app-ban azért látja). Hiba: " + (emailError ? emailError.text || emailError.message || String(emailError) : "ismeretlen");
+      msg.style.color = "var(--bl-gold)";
+    }
     document.getElementById("reqName").value = "";
     document.getElementById("reqContact").value = "";
     document.getElementById("reqConnection").value = "";
