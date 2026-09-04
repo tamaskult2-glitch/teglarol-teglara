@@ -194,6 +194,40 @@
   body.is-admin .admin-only{display:block;}
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;}
   .modal-box{background:var(--bl-navy2);border:1px solid rgba(0,200,255,.28);border-radius:18px;padding:32px 24px;max-width:340px;width:100%;text-align:center;}
+
+  /* ===== DESKTOP NÉZET — szélesebb kijelző, nagyobb szöveg ===== */
+  @media (min-width: 900px){
+    main{max-width:1400px;padding:20px 28px;}
+    header.bl-header h1{font-size:30px;}
+    header.bl-header .sub{font-size:14px;}
+    nav.bl-tabs button{font-size:15px;padding:16px 12px;}
+    .card{padding:20px 22px;}
+    .card h2{font-size:18px;}
+    table.bl-table{font-size:14.5px;}
+    .match-meta{font-size:12px;padding:9px 16px;}
+    .time-tag{font-size:15px;}
+    .grp-tag{font-size:10.5px;}
+    .match-body{padding:14px 16px 16px;}
+    .team-blk .tf{font-size:26px;}
+    .team-blk .tn{font-size:15px;}
+    .vs-block{font-size:13px;}
+    .result-score{font-size:24px;}
+    .tip-btn{font-size:18px;padding:13px 4px;}
+    .score-row-label{font-size:12px;}
+    .score-num-input{width:46px;height:46px;font-size:21px;}
+    .score-sep{font-size:20px;}
+    .score-save-btn{font-size:14px;height:46px;padding:0 18px;}
+    .del-tip-btn{width:46px;height:46px;font-size:17px;}
+    .advancer-pick .label{font-size:12.5px;}
+    .advancer-pick button{font-size:13.5px;padding:9px 4px;}
+    .placeholder-note{font-size:13.5px;padding:12px;}
+    .save-state{font-size:11.5px;}
+    .result-footer{font-size:12.5px;}
+    .pts-badge{font-size:12.5px;}
+  }
+  @media (min-width: 1300px){
+    main{max-width:1700px;}
+  }
 </style>
 </head>
 <body>
