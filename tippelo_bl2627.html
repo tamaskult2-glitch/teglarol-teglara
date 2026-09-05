@@ -172,6 +172,25 @@
     font-size:9px;font-weight:800;color:var(--bl-navy);background:var(--bl-cyan);
     border-radius:5px;padding:1px 3px;letter-spacing:.3px;
   }
+  .match-events{
+    margin-bottom:8px;padding:6px 4px;background:rgba(255,255,255,.02);border-radius:8px;
+  }
+  .event-row{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;
+    font-size:11.5px;color:var(--bl-white);padding:2px 0;
+  }
+  .event-row.home-ev{text-align:right;}
+  .event-row.away-ev{text-align:left;}
+  .event-row .ev-min{font-size:9.5px;color:var(--bl-grey);text-align:center;white-space:nowrap;}
+  .card-tips-row{
+    margin-bottom:8px;padding:6px 4px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;
+  }
+  .card-tips-label{font-size:10px;color:var(--bl-gold);font-weight:700;width:100%;margin-bottom:2px;}
+  .tip-chip{
+    font-size:10.5px;color:var(--bl-white);background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:3px 9px;
+  }
+  .tip-chip.me{background:rgba(0,200,255,.1);border-color:rgba(0,200,255,.3);color:var(--bl-cyan);}
   .advancer-pick{
     display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.1);flex-wrap:wrap;
   }
@@ -403,14 +422,14 @@
   <!-- LIGASZAKASZ TAB: 8 forduló, minden meccs tippelhető -->
   <section id="tab-liga" class="tab-panel active">
     <div class="card" style="border-color:rgba(201,160,56,.4);">
-      <h2>🧪 Teszt meccs (ESPN-ellenőrzéshez)</h2>
+      <h2>🧪 Teszt meccsek (ESPN-ellenőrzéshez)</h2>
       <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">
-        Ez NEM valós BL-meccs — csak arra való, hogy a mai (élő) Premier League-meccsel
+        Ezek NEM valós BL-meccsek — csak arra valók, hogy élő Premier League-meccsekkel
         leteszteljük az automata ESPN-lekérést, mielőtt szeptember 8-án éles BL-meccsen
-        élesben számítana. A ligaszakasz tabellát nem érinti.
+        élesben számítana. A ligaszakasz tabellát nem érintik.
       </div>
       <div id="testMatchContainer"></div>
-      <button onclick="fetchTestMatchFromESPN()" style="margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:13px;font-weight:700;cursor:pointer;">🤖 Teszt-eredmény lekérése (Premier League ESPN)</button>
+      <button onclick="fetchTestMatchFromESPN()" style="margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:13px;font-weight:700;cursor:pointer;">🤖 Teszt-eredmények lekérése (Premier League ESPN)</button>
       <div id="testFetchMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
     </div>
     <div class="card">
@@ -608,13 +627,14 @@
       <div id="espnFetchMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
     </div>
     <div class="card" style="border-color:rgba(201,160,56,.4);">
-      <h2>🧪 Teszt meccs törlése</h2>
+      <h2>🧪 Teszt meccsek törlése</h2>
       <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">
-        A Ligaszakasz fül tetején lévő Manchester City – Coventry teszt-meccs (ami az ESPN
-        auto-fetch kipróbálására szolgál) és az összes rá leadott tipp végleges eltávolítása.
-        Ez a ranglistából is kiveszi a hozzá tartozó pontokat, mintha meg sem történt volna.
+        A Ligaszakasz fül tetején lévő teszt-meccsek (Manchester City – Coventry City,
+        Everton – Manchester United — mindkettő az ESPN auto-fetch kipróbálására szolgál)
+        és az összes rájuk leadott tipp végleges eltávolítása. Ez a ranglistából is kiveszi
+        a hozzájuk tartozó pontokat, mintha meg sem történtek volna.
       </div>
-      <button onclick="deleteTestMatch()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--bl-red);background:rgba(224,51,63,.1);color:var(--bl-white);font-size:13px;font-weight:700;cursor:pointer;">🗑️ Teszt meccs és tippjei törlése</button>
+      <button onclick="deleteTestMatch()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--bl-red);background:rgba(224,51,63,.1);color:var(--bl-white);font-size:13px;font-weight:700;cursor:pointer;">🗑️ Teszt meccsek és tippjeik törlése</button>
       <div id="deleteTestMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
     </div>
     <div class="card">
@@ -1022,9 +1042,11 @@ function matchEspnEventToLocal(event){
   if(!homeId || !awayId) return null;
 
   const today = getBudapestToday();
-  return LEAGUE_MATCHES.find(m=>
+  const found = LEAGUE_MATCHES.find(m=>
     m.stage === "league" && m.huDate === today && m.homeId === homeId && m.awayId === awayId
   ) || null;
+  if(found) found.espnEventId = event.id; // kell a részletes összefoglaló (gólszerzők, lapok) lekéréséhez
+  return found;
 }
 
 // Admin-gomb hívja: lekéri a mai BL-scoreboardot ESPN-től, és minden
@@ -1083,9 +1105,9 @@ async function autoFetchTodayResults(){
 }
 
 /* =====================================================================
-   IDEIGLENES TESZT MECCS — kizárólag arra való, hogy a szeptember 8-i BL-
-   rajt előtt egy MA élő Premier League-meccsel leteszteljük az ESPN
-   auto-fetch mechanizmust (scoreboard lekérés → csapat-egyeztetés →
+   IDEIGLENES TESZT MECCSEK — kizárólag arra valók, hogy a szeptember 8-i
+   BL-rajt előtt MA/HOLNAP élő Premier League-meccsekkel leteszteljük az
+   ESPN auto-fetch mechanizmust (scoreboard lekérés → csapat-egyeztetés →
    FT-eredmény mentése). NEM valós BL-adat, a tabellát nem érinti
    (computeStandings csak stage==="league"-t számol, ez stage==="test").
    BIZTONSÁGGAL TÖRÖLHETŐ ez az egész blokk + a HTML kártya, ha a BL-
@@ -1093,94 +1115,115 @@ async function autoFetchTodayResults(){
    ===================================================================== */
 const ESPN_PL_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard";
 
-const TEST_MATCH = {
-  id: "TEST_PL_01",
-  stage: "test",
-  huDate: getBudapestToday(),
-  huTime: "16:00", // pontosítva: ma 16:00-kor kezdődik (magyar idő)
-  teamHome: "Manchester City",
-  teamAway: "Coventry City",
-  homeId: null, awayId: null,
-  ftHome: null, ftAway: null
-};
+const TEST_MATCHES = [
+  {
+    id: "TEST_PL_01",
+    stage: "test",
+    huDate: getBudapestToday(),
+    huTime: "16:00",
+    teamHome: "Manchester City",
+    teamAway: "Coventry City",
+    homeId: null, awayId: null,
+    ftHome: null, ftAway: null
+  },
+  {
+    id: "TEST_PL_02",
+    stage: "test",
+    huDate: "2026-09-06", // holnap (vasárnap), UK 14:00 -> magyar idő szerint 15:00
+    huTime: "15:00",
+    teamHome: "Everton",
+    teamAway: "Manchester United",
+    homeId: null, awayId: null,
+    ftHome: null, ftAway: null
+  }
+];
+
+function findTestMatch(id){ return TEST_MATCHES.find(m=>m.id===id) || null; }
 
 function renderTestMatch(){
   const container = document.getElementById("testMatchContainer");
   if(!container) return;
-  container.innerHTML = renderMatchRow(TEST_MATCH, false);
+  container.innerHTML = TEST_MATCHES.map(m=>renderMatchRow(m, false)).join("");
+}
+
+async function fetchOneTestMatchFromESPN(testMatch, msg){
+  const today = getBudapestToday().replace(/-/g,"");
+  const dayOf = testMatch.huDate.replace(/-/g,"");
+  const res = await fetch(`${ESPN_PL_SCOREBOARD}?dates=${dayOf}`);
+  if(!res.ok) throw new Error("ESPN válasz hiba: " + res.status);
+  const data = await res.json();
+  const events = data.events || [];
+
+  const target = events.find(ev=>{
+    const comp = ev.competitions && ev.competitions[0];
+    if(!comp) return false;
+    const names = comp.competitors.map(c=> normalizeTeamName(c.team.displayName || c.team.name));
+    return names.includes(normalizeTeamName(testMatch.teamHome)) && names.includes(normalizeTeamName(testMatch.teamAway));
+  });
+
+  if(!target){
+    return { ok:false, text: `❌ Nem található a ${testMatch.teamHome} – ${testMatch.teamAway} meccs a(z) ${testMatch.huDate} napi ESPN Premier League listában.` };
+  }
+
+  testMatch.espnEventId = target.id;
+  const comp = target.competitions[0];
+  const state = comp.status.type.state; // 'pre' | 'in' | 'post'
+  const home = comp.competitors.find(c=>c.homeAway==="home");
+  const away = comp.competitors.find(c=>c.homeAway==="away");
+  const homeIsTeamHome = normalizeTeamName(home.team.displayName) === normalizeTeamName(testMatch.teamHome);
+
+  if(state === "pre"){
+    return { ok:false, text: `ℹ️ ${testMatch.teamHome} – ${testMatch.teamAway}: még nem kezdődött el (ESPN szerint: ${comp.status.type.shortDetail || "pre"}).` };
+  }
+  if(state === "in"){
+    return { ok:false, text: `⏱️ ${testMatch.teamHome} – ${testMatch.teamAway}: élőben megy (${comp.status.type.shortDetail || "in progress"}) — állás: ${home.score}:${away.score}.` };
+  }
+
+  // state === 'post' -> vége a meccsnek, kinyerjük az eredményt a helyes hazai/vendég sorrendben
+  const ftHome = parseInt(homeIsTeamHome ? home.score : away.score, 10);
+  const ftAway = parseInt(homeIsTeamHome ? away.score : home.score, 10);
+  testMatch.ftHome = ftHome;
+  testMatch.ftAway = ftAway;
+  return { ok:true, text: `✅ ${testMatch.teamHome} ${ftHome}:${ftAway} ${testMatch.teamAway} — auto-fetch működik!` };
 }
 
 async function fetchTestMatchFromESPN(){
   const msg = document.getElementById("testFetchMsg");
   msg.textContent = "⏳ ESPN Premier League scoreboard lekérdezése…"; msg.style.color = "var(--bl-grey)";
-  try{
-    const today = getBudapestToday().replace(/-/g,"");
-    const res = await fetch(`${ESPN_PL_SCOREBOARD}?dates=${today}`);
-    if(!res.ok) throw new Error("ESPN válasz hiba: " + res.status);
-    const data = await res.json();
-    const events = data.events || [];
-
-    const target = events.find(ev=>{
-      const comp = ev.competitions && ev.competitions[0];
-      if(!comp) return false;
-      const names = comp.competitors.map(c=> normalizeTeamName(c.team.displayName || c.team.name));
-      return names.includes(normalizeTeamName(TEST_MATCH.teamHome)) && names.includes(normalizeTeamName(TEST_MATCH.teamAway));
-    });
-
-    if(!target){
-      msg.textContent = "❌ Nem található a Man City – Coventry meccs a mai ESPN Premier League listában.";
-      msg.style.color = "var(--bl-red)";
-      return;
+  const results = [];
+  let anyOk = false;
+  for(const tm of TEST_MATCHES){
+    try{
+      const r = await fetchOneTestMatchFromESPN(tm, msg);
+      results.push(r.text);
+      if(r.ok) anyOk = true;
+    }catch(e){
+      console.error("Teszt-meccs ESPN hiba:", e);
+      results.push(`❌ ${tm.teamHome} – ${tm.teamAway}: ${e.message}`);
     }
-
-    const comp = target.competitions[0];
-    const state = comp.status.type.state; // 'pre' | 'in' | 'post'
-    const home = comp.competitors.find(c=>c.homeAway==="home");
-    const away = comp.competitors.find(c=>c.homeAway==="away");
-    const homeIsCity = normalizeTeamName(home.team.displayName) === normalizeTeamName(TEST_MATCH.teamHome);
-
-    if(state === "pre"){
-      msg.textContent = `ℹ️ A meccs még nem kezdődött el (ESPN szerint: ${comp.status.type.shortDetail || "pre"}).`;
-      msg.style.color = "var(--bl-grey)";
-      return;
-    }
-    if(state === "in"){
-      msg.textContent = `⏱️ Élőben megy (${comp.status.type.shortDetail || "in progress"}) — állás: ${home.score}:${away.score}. Várj a végéig a teszthez.`;
-      msg.style.color = "var(--bl-gold)";
-      return;
-    }
-
-    // state === 'post' -> vége a meccsnek, kinyerjük az eredményt a helyes hazai/vendég sorrendben
-    const ftHome = parseInt(homeIsCity ? home.score : away.score, 10);
-    const ftAway = parseInt(homeIsCity ? away.score : home.score, 10);
-    TEST_MATCH.ftHome = ftHome;
-    TEST_MATCH.ftAway = ftAway;
-    renderAll(); // nem csak a teszt-kártyát, a ranglistát (és a Tippek táblát) is frissíteni kell
-    msg.textContent = `✅ Sikeres teszt! ESPN szerint a végeredmény: ${TEST_MATCH.teamHome} ${ftHome}:${ftAway} ${TEST_MATCH.teamAway}. Az auto-fetch mechanizmus működik.`;
-    msg.style.color = "var(--bl-green)";
-  }catch(e){
-    console.error("Teszt-meccs ESPN hiba:", e);
-    msg.textContent = "❌ Hiba: " + e.message;
-    msg.style.color = "var(--bl-red)";
   }
+  msg.innerHTML = results.join("<br>");
+  msg.style.color = anyOk ? "var(--bl-green)" : "var(--bl-grey)";
+  if(anyOk) renderAll(); // nem csak a teszt-kártyákat, a ranglistát (és a Tippek táblát) is frissíteni kell
 }
 
-// Automatikus lekérdezés kick-off + 2 óra után — a kézi gomb emellett
-// mindig elérhető marad (pl. ha korábban szeretnéd ellenőrizni, vagy ha az
-// automatikus kísérlet valamiért nem talált eredményt). Csak akkor fut le
-// automatikusan, ha még nincs rögzítve eredmény, és csak EGYSZER, amíg az
-// oldal nyitva van — utána a periodikus ellenőrzés kikapcsol.
-let _testAutoFetchDone = false;
+// Automatikus lekérdezés kick-off + 2 óra után, MECCSENKÉNT külön-külön —
+// a kézi gomb emellett mindig elérhető marad. Csak akkor fut le
+// automatikusan egy adott meccsre, ha még nincs rögzítve eredménye, és
+// csak EGYSZER, amíg az oldal nyitva van.
+const _testAutoFetchDone = new Set();
 function checkTestMatchAutoFetch(){
-  if(_testAutoFetchDone || TEST_MATCH.ftHome != null) return;
-  try{
-    const kickoff = new Date(`${TEST_MATCH.huDate}T${TEST_MATCH.huTime}:00+01:00`);
-    const threshold = kickoff.getTime() + 2*60*60*1000; // kezdés + 2 óra
-    if(Date.now() >= threshold){
-      _testAutoFetchDone = true;
-      fetchTestMatchFromESPN();
-    }
-  }catch(e){}
+  TEST_MATCHES.forEach(tm=>{
+    if(_testAutoFetchDone.has(tm.id) || tm.ftHome != null) return;
+    try{
+      const kickoff = new Date(`${tm.huDate}T${tm.huTime}:00+01:00`);
+      const threshold = kickoff.getTime() + 2*60*60*1000; // kezdés + 2 óra
+      if(Date.now() >= threshold){
+        _testAutoFetchDone.add(tm.id);
+        fetchTestMatchFromESPN();
+      }
+    }catch(e){}
+  });
 }
 // Induláskor egyszer, majd 2 percenként újra megnézzük — így ha az oldal
 // nyitva marad, magától elsül, amint eltelt a kick-off + 2 óra, de a
@@ -1196,6 +1239,53 @@ setInterval(checkTestMatchAutoFetch, 2*60*1000);
    (autoFetchTodayResults / adminSaveMatchResult) — ez a funkció csak
    megjeleníti a folyamatban lévő meccs állását, amíg nincs FT rögzítve.
    ===================================================================== */
+let MATCH_EVENTS = {}; // {matchId: [{kind:'goal'|'yellow'|'red', player, minute, isHome, ownGoal}]}
+const _finalEventsFetched = new Set(); // véglegesen lezárt meccsekhez már ne kérdezzünk újra
+
+// ESPN summary-válaszból kinyeri a gólokat/lapokat — a mezőnevek ESPN-en
+// belül is változnak sportáganként/verzióként, ezért több lehetséges
+// helyet is megnézünk (ugyanaz az óvatosság, mint amit a VB is alkalmazott,
+// csak itt egyetlen, letisztult próbálkozással, nem több párhuzamossal).
+function parseMatchEvents(summaryData, homeEspnId, awayEspnId){
+  const raw = summaryData.keyEvents || summaryData.scoringPlays || [];
+  return raw.map(ev=>{
+    const typeText = (ev.type && (ev.type.text || ev.type.id)) || ev.text || "";
+    const isOwnGoal = /own.?goal/i.test(typeText);
+    const isGoal = /goal/i.test(typeText);
+    const isYellow = /yellow/i.test(typeText);
+    const isRed = /red.?card/i.test(typeText);
+    let kind = null;
+    if(isGoal) kind = "goal";
+    else if(isYellow) kind = "yellow";
+    else if(isRed) kind = "red";
+    if(!kind) return null;
+
+    const player = (ev.athletesInvolved && ev.athletesInvolved[0] && ev.athletesInvolved[0].displayName)
+      || (ev.participants && ev.participants[0] && ev.participants[0].athlete && ev.participants[0].athlete.displayName)
+      || "?";
+    const minute = (ev.clock && ev.clock.displayValue) || "";
+    const teamId = ev.team && ev.team.id;
+    const isHome = String(teamId) === String(homeEspnId);
+    return { kind, player, minute, isHome, ownGoal: isOwnGoal };
+  }).filter(Boolean);
+}
+
+async function fetchMatchEvents(match, sportPath){
+  if(!match.espnEventId) return;
+  if(_finalEventsFetched.has(match.id)) return; // már lezárt meccsnél nem kérdezünk rá újra
+  try{
+    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${sportPath}/summary?event=${match.espnEventId}`);
+    if(!res.ok) return;
+    const data = await res.json();
+    const comp = data.header && data.header.competitions && data.header.competitions[0];
+    if(!comp) return;
+    const homeC = comp.competitors.find(c=>c.homeAway==="home");
+    const awayC = comp.competitors.find(c=>c.homeAway==="away");
+    MATCH_EVENTS[match.id] = parseMatchEvents(data, homeC && homeC.id, awayC && awayC.id);
+    if(match.ftHome != null) _finalEventsFetched.add(match.id); // a végeredmény már megvan -> nem változik többet
+  }catch(e){ /* csendben elnyeljük — a gólszerző-lista nem kritikus adat */ }
+}
+
 async function refreshLiveScores(){
   let changed = false;
 
@@ -1205,14 +1295,21 @@ async function refreshLiveScores(){
     const res = await fetch(`${ESPN_CL_SCOREBOARD}?dates=${today}`);
     if(res.ok){
       const data = await res.json();
-      (data.events||[]).forEach(ev=>{
+      for(const ev of data.events||[]){
         const comp = ev.competitions && ev.competitions[0];
         const state = comp && comp.status && comp.status.type && comp.status.type.state;
         const localMatch = matchEspnEventToLocal(ev);
-        if(!localMatch || localMatch.ftHome != null) return;
+        if(!localMatch) continue;
+
+        if(isKickoffPassed(localMatch.huDate, localMatch.huTime)){
+          await fetchMatchEvents(localMatch, "uefa.champions");
+          changed = true;
+        }
+
+        if(localMatch.ftHome != null) continue;
         if(state !== "in"){
           if(LIVE_SCORES[localMatch.id]){ delete LIVE_SCORES[localMatch.id]; changed = true; }
-          return;
+          continue;
         }
         const home = comp.competitors.find(c=>c.homeAway==="home");
         const away = comp.competitors.find(c=>c.homeAway==="away");
@@ -1222,38 +1319,50 @@ async function refreshLiveScores(){
           clock: (comp.status.type.shortDetail || "") 
         };
         changed = true;
-      });
+      }
     }
   }catch(e){ /* csendben elnyeljük — élő állásnál nem kritikus egy sikertelen kísérlet */ }
 
-  // Teszt meccs (Premier League) — csak amíg nincs FT rögzítve
-  if(TEST_MATCH.ftHome == null){
+  // Teszt meccsek (Premier League) — meccsenként a saját napjukra kérdezünk rá
+  const testDatesNeeded = Array.from(new Set(TEST_MATCHES.map(m=>m.huDate)));
+  for(const day of testDatesNeeded){
     try{
-      const today = getBudapestToday().replace(/-/g,"");
-      const res2 = await fetch(`${ESPN_PL_SCOREBOARD}?dates=${today}`);
-      if(res2.ok){
-        const data2 = await res2.json();
+      const dayCompact = day.replace(/-/g,"");
+      const res2 = await fetch(`${ESPN_PL_SCOREBOARD}?dates=${dayCompact}`);
+      if(!res2.ok) continue;
+      const data2 = await res2.json();
+
+      for(const tm of TEST_MATCHES.filter(m=>m.huDate===day)){
         const target = (data2.events||[]).find(ev=>{
           const comp = ev.competitions && ev.competitions[0];
           if(!comp) return false;
           const names = comp.competitors.map(c=>normalizeTeamName(c.team.displayName || c.team.name));
-          return names.includes(normalizeTeamName(TEST_MATCH.teamHome)) && names.includes(normalizeTeamName(TEST_MATCH.teamAway));
+          return names.includes(normalizeTeamName(tm.teamHome)) && names.includes(normalizeTeamName(tm.teamAway));
         });
-        if(target){
-          const comp = target.competitions[0];
-          const state = comp.status.type.state;
+        if(!target) continue;
+
+        tm.espnEventId = target.id;
+        const comp = target.competitions[0];
+        const state = comp.status.type.state;
+
+        if(isKickoffPassed(tm.huDate, tm.huTime)){
+          await fetchMatchEvents(tm, "eng.1");
+          changed = true;
+        }
+
+        if(tm.ftHome == null){
           if(state === "in"){
             const home = comp.competitors.find(c=>c.homeAway==="home");
             const away = comp.competitors.find(c=>c.homeAway==="away");
-            const homeIsCity = normalizeTeamName(home.team.displayName) === normalizeTeamName(TEST_MATCH.teamHome);
-            LIVE_SCORES[TEST_MATCH.id] = {
-              home: parseInt(homeIsCity ? home.score : away.score, 10) || 0,
-              away: parseInt(homeIsCity ? away.score : home.score, 10) || 0,
+            const homeIsTeamHome = normalizeTeamName(home.team.displayName) === normalizeTeamName(tm.teamHome);
+            LIVE_SCORES[tm.id] = {
+              home: parseInt(homeIsTeamHome ? home.score : away.score, 10) || 0,
+              away: parseInt(homeIsTeamHome ? away.score : home.score, 10) || 0,
               clock: comp.status.type.shortDetail || ""
             };
             changed = true;
-          } else if(LIVE_SCORES[TEST_MATCH.id]){
-            delete LIVE_SCORES[TEST_MATCH.id];
+          } else if(LIVE_SCORES[tm.id]){
+            delete LIVE_SCORES[tm.id];
             changed = true;
           }
         }
@@ -1277,14 +1386,16 @@ async function deleteTestMatch(){
   const msg = document.getElementById("deleteTestMsg");
   msg.textContent = "⏳ Törlés…"; msg.style.color = "var(--bl-grey)";
   try{
-    await fbSet(`tips/${TEST_MATCH.id}`, null);
-    if(ALL_TIPS[TEST_MATCH.id]) delete ALL_TIPS[TEST_MATCH.id];
-    delete LOCAL_TIPS[TEST_MATCH.id];
-    TEST_MATCH.ftHome = null;
-    TEST_MATCH.ftAway = null;
-    _testAutoFetchDone = true; // ne induljon újra magától a törlés után
+    for(const tm of TEST_MATCHES){
+      await fbSet(`tips/${tm.id}`, null);
+      if(ALL_TIPS[tm.id]) delete ALL_TIPS[tm.id];
+      delete LOCAL_TIPS[tm.id];
+      tm.ftHome = null;
+      tm.ftAway = null;
+      _testAutoFetchDone.add(tm.id); // ne induljon újra magától a törlés után
+    }
     renderAll();
-    msg.textContent = "🗑️ Teszt meccs és minden hozzá tartozó tipp törölve — a ranglistából is eltűnt.";
+    msg.textContent = "🗑️ A teszt meccsek és minden hozzájuk tartozó tipp törölve — a ranglistából is eltűntek.";
     msg.style.color = "var(--bl-green)";
   }catch(e){
     msg.textContent = "❌ Hiba a törlésnél: " + e.message;
@@ -1944,6 +2055,36 @@ function renderMatchRow(match, isKnockout){
   else if(live) scoreBlock = `<span class="result-score" style="color:var(--bl-red);">${live.home} : ${live.away}</span>`;
   else scoreBlock = `<span class="vs-block">VS</span>`;
 
+  // Gólszerzők/lapok + a tippelők tippjei — csak kick-off UTÁN látszik
+  let liveInfoBlock = "";
+  if(locked){
+    const events = MATCH_EVENTS[match.id];
+    if(events && events.length){
+      const rows = events.map(e=>{
+        const icon = e.kind === "goal" ? (e.ownGoal ? "⚽<span style='font-size:9px;'>(öngól)</span>" : "⚽") : (e.kind === "yellow" ? "🟨" : "🟥");
+        return `<div class="event-row ${e.isHome ? 'home-ev' : 'away-ev'}">
+          ${e.isHome ? `${icon} ${escapeHtml(e.player)}` : ""}
+          <span class="ev-min">${escapeHtml(e.minute)}</span>
+          ${!e.isHome ? `${escapeHtml(e.player)} ${icon}` : ""}
+        </div>`;
+      }).join("");
+      liveInfoBlock += `<div class="match-events">${rows}</div>`;
+    }
+
+    const matchTips = ALL_TIPS[match.id] || {};
+    const tipChips = Object.keys(matchTips).map(u=>{
+      const t = matchTips[u];
+      if(!t || !t.outcomeTip) return null;
+      const name = (ALL_USERS[u] && ALL_USERS[u].name) || u;
+      const scoreStr = (t.scoreHome != null && t.scoreAway != null) ? ` (${t.scoreHome}:${t.scoreAway})` : "";
+      const isMe = u === CURRENT_USER;
+      return `<span class="tip-chip${isMe ? ' me' : ''}">${escapeHtml(name)}: <b>${t.outcomeTip}</b>${scoreStr}</span>`;
+    }).filter(Boolean);
+    if(tipChips.length){
+      liveInfoBlock += `<div class="card-tips-row"><div class="card-tips-label">📋 Tippek</div>${tipChips.join("")}</div>`;
+    }
+  }
+
   return `
   <div class="match-card${hasResult?" has-result":""}${locked?" locked":""}" data-match-id="${match.id}">
     <div class="match-meta">
@@ -1964,6 +2105,8 @@ function renderMatchRow(match, isKnockout){
           <span class="tn">${match.teamAway}</span>
         </div>
       </div>
+
+      ${liveInfoBlock}
 
       <div class="tip-buttons" data-role="outcome">
         <button data-val="1" class="${tipBtnClass('1','hb',tip,match)}" ${dis}>1</button>
@@ -2237,7 +2380,7 @@ async function cleanupLegacyTips(){
     if(!data){ msg.textContent = "✓ Nincs tipp-adat, nincs mit tisztítani."; msg.style.color="var(--bl-green)"; return; }
 
     const validMatchIds = new Set(LEAGUE_MATCHES.map(m=>m.id));
-    validMatchIds.add(TEST_MATCH.id); // a teszt-meccs tippjei nem "hibás adat", nem törlendők itt
+    TEST_MATCHES.forEach(tm=>validMatchIds.add(tm.id)); // a teszt-meccsek tippjei nem "hibás adat", nem törlendők itt
     const badKeys = Object.keys(data).filter(k=>!validMatchIds.has(k));
 
     if(badKeys.length === 0){
@@ -2259,15 +2402,15 @@ async function cleanupLegacyTips(){
 
 function computeLeaderboard(){
   // Poka-yoke védelem: csak olyan ALL_TIPS-kulcsot dolgozunk fel, ami egy
-  // VALÓS meccs-ID (LEAGUE_MATCHES-ben szereplő) VAGY a TEST_MATCH ID-ja —
-  // utóbbi szándékosan beleszámít a ranglistába, amíg a teszt-meccs létezik
-  // (l. admin "Teszt meccs törlése" gomb, ami ezt is eltünteti). A korábbi
-  // (már javított) tips/{user}/{matchId} útvonal-sorrendből maradt
+  // VALÓS meccs-ID (LEAGUE_MATCHES-ben szereplő) VAGY egy TEST_MATCHES ID —
+  // utóbbiak szándékosan beleszámítanak a ranglistába, amíg a teszt-meccsek
+  // léteznek (l. admin "Teszt meccsek törlése" gomb, ami ezt is eltünteti).
+  // A korábbi (már javított) tips/{user}/{matchId} útvonal-sorrendből maradt
   // Firebase-ben pár régi teszt-bejegyzés tips/KULT/L1_01 formában — enélkül
   // a védelem nélkül a "KULT" alatti "L1_01" stb. meccs-kulcsokat tévesen
   // felhasználónak nézné a ranglista.
   const validMatchIds = new Set(LEAGUE_MATCHES.map(m=>m.id));
-  validMatchIds.add(TEST_MATCH.id);
+  TEST_MATCHES.forEach(tm=>validMatchIds.add(tm.id));
 
   const users = new Set();
   Object.keys(ALL_TIPS).forEach(matchId=>{
@@ -2275,7 +2418,7 @@ function computeLeaderboard(){
     Object.keys(ALL_TIPS[matchId] || {}).forEach(u=>users.add(u));
   });
 
-  const scoringMatches = LEAGUE_MATCHES.concat([TEST_MATCH]);
+  const scoringMatches = LEAGUE_MATCHES.concat(TEST_MATCHES);
 
   const rows = [];
   users.forEach(safe=>{
@@ -2309,7 +2452,7 @@ function renderTippekTab(){
   const container = document.getElementById("tippekContainer");
   if(!container) return;
 
-  const allMatches = LEAGUE_MATCHES.concat([TEST_MATCH]);
+  const allMatches = LEAGUE_MATCHES.concat(TEST_MATCHES);
   const matchesWithTips = allMatches.filter(m=>
     ALL_TIPS[m.id] && Object.values(ALL_TIPS[m.id]).some(t=> t && t.outcomeTip)
   );
