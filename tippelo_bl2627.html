@@ -228,6 +228,19 @@
   @media (min-width: 1300px){
     main{max-width:1700px;}
   }
+  /* A ranglista kártyát a TÉNYLEGES böngésző-ablak bal széléhez tolja ki,
+     nem csak a (középre igazított) main konténeren belül balra —
+     enélkül széles kijelzőn a main két oldalán lévő üres sáv miatt úgy
+     tűnt volna, mintha középen lenne. */
+  @media (min-width: 900px){
+    #tab-ranglista .card{
+      margin-left: calc(50% - 50vw);
+      margin-right: auto;
+      max-width: 480px;
+      padding-left: 28px;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+  }
 
   /* ===== LEBEGŐ FEL/LE UGRÁTÓ NYILAK — a VB Gólszagló mintája ===== */
   .nav-fab{
@@ -371,6 +384,7 @@
   <button data-tab="tab-tabla">📊 Tabella</button>
   <button data-tab="tab-playoff">🎯 Rájátszás</button>
   <button data-tab="tab-ko">🏆 Kieséses</button>
+  <button data-tab="tab-tippek">📋 Tippek</button>
   <button data-tab="tab-ranglista">🏅 Ranglista</button>
   <button data-tab="tab-szabalyok">ℹ️ Szabályok</button>
   <button data-tab="tab-admin" class="admin-only">🔧 Admin</button>
@@ -436,6 +450,18 @@
         vagy tizenegyespárbaj dönti el, és <u>ez</u> számít, nem a pontos hosszabbításos eredmény.
       </div>
       <div id="koMatchesContainer"></div>
+    </div>
+  </section>
+
+  <!-- TIPPEK TAB — ki mit tippelt, mások tippje csak kick-off után látszik -->
+  <section id="tab-tippek" class="tab-panel">
+    <div class="card">
+      <h2>📋 Tippek</h2>
+      <div class="placeholder-note" style="margin-bottom:10px;">
+        A saját tipped mindig látod. Másokét csak a meccs <b>kezdése (kick-off) után</b> — előtte
+        csak egy ✓ jelzi, hogy leadta a tippjét, hogy senki ne tudjon más tippjéhez igazodni.
+      </div>
+      <div id="tippekContainer"></div>
     </div>
   </section>
 
@@ -2172,6 +2198,88 @@ function computeLeaderboard(){
   return rows;
 }
 
+/* =====================================================================
+   TIPPEK TÁBLA — a VB Gólszagló buildTippTable()-jéből adaptálva, EGY
+   FONTOS ELTÉRÉSSEL: a VB-ben a mások tippje az admin-rögzített EREDMÉNY
+   meglétéhez volt kötve, itt a KEZDÉS (kick-off) IDŐPONTJÁHOZ — ez a
+   helyesebb szabály, mert a meccs kezdete után már nincs mit védeni
+   (nem lehet "igazodni" máséhoz), nem kell megvárni, míg admin beírja
+   az eredményt. A saját tipped mindig, mindenkor látod.
+   ===================================================================== */
+function renderTippekTab(){
+  const container = document.getElementById("tippekContainer");
+  if(!container) return;
+
+  const allMatches = LEAGUE_MATCHES.concat([TEST_MATCH]);
+  const matchesWithTips = allMatches.filter(m=>
+    ALL_TIPS[m.id] && Object.values(ALL_TIPS[m.id]).some(t=> t && t.outcomeTip)
+  );
+
+  if(matchesWithTips.length === 0){
+    container.innerHTML = `<div class="placeholder-note">Még senki nem adott le tippet.</div>`;
+    return;
+  }
+
+  const users = new Set();
+  matchesWithTips.forEach(m=> Object.keys(ALL_TIPS[m.id]).forEach(u=>users.add(u)));
+  const userList = Array.from(users).sort();
+
+  matchesWithTips.sort((a,b)=> (a.huDate+a.huTime).localeCompare(b.huDate+b.huTime));
+
+  let html = `<div style="overflow-x:auto;"><table class="bl-table" style="white-space:nowrap;">`;
+  html += `<thead><tr><th style="text-align:left;position:sticky;left:0;background:var(--bl-navy2);z-index:2;">Meccs</th>`;
+  userList.forEach(u=>{
+    const isMe = u === CURRENT_USER;
+    const displayName = (ALL_USERS[u] && ALL_USERS[u].name) || u;
+    html += `<th style="${isMe ? "color:var(--bl-gold);" : ""}">${escapeHtml(displayName)}${isMe ? " (te)" : ""}</th>`;
+  });
+  html += `</tr></thead><tbody>`;
+
+  matchesWithTips.forEach(m=>{
+    const revealed = isKickoffPassed(m.huDate, m.huTime);
+    const hasResult = m.ftHome != null && m.ftAway != null;
+    const realOutcome = hasResult ? (m.ftHome === m.ftAway ? "X" : (m.ftHome > m.ftAway ? "1" : "2")) : null;
+
+    html += `<tr>`;
+    html += `<td class="team-cell" style="position:sticky;left:0;background:var(--bl-navy2);">
+      ${m.teamHome} – ${m.teamAway}
+      <div style="font-size:9px;color:var(--bl-grey);">${m.huDate} ${m.huTime}${hasResult ? ` · ${m.ftHome}:${m.ftAway}` : (revealed ? " · folyamatban" : "")}</div>
+    </td>`;
+
+    userList.forEach(u=>{
+      const tip = ALL_TIPS[m.id] && ALL_TIPS[m.id][u];
+      const isMe = u === CURRENT_USER;
+
+      if(!tip || !tip.outcomeTip){
+        html += `<td style="color:var(--bl-grey);">–</td>`;
+        return;
+      }
+      if(!isMe && !revealed){
+        html += `<td><span style="display:inline-block;width:26px;height:26px;border-radius:6px;background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.25);color:var(--bl-cyan);font-size:13px;line-height:24px;" title="Leadta a tippjét, kick-offig rejtve">✓</span></td>`;
+        return;
+      }
+
+      let bg = "rgba(255,255,255,.05)", col = "var(--bl-white)";
+      if(hasResult){
+        const isExact = tip.scoreHome === m.ftHome && tip.scoreAway === m.ftAway;
+        if(isExact){ bg = "rgba(31,174,94,.25)"; col = "var(--bl-green)"; }
+        else if(tip.outcomeTip === realOutcome){ bg = "rgba(31,174,94,.12)"; col = "#86efac"; }
+        else { bg = "rgba(224,51,63,.12)"; col = "#fca5a5"; }
+      }
+      const scoreStr = (tip.scoreHome != null && tip.scoreAway != null) ? `${tip.scoreHome}:${tip.scoreAway}` : "";
+      html += `<td><div style="display:inline-flex;flex-direction:column;align-items:center;background:${bg};border-radius:6px;padding:3px 8px;min-width:28px;">
+        <span style="font-weight:800;font-size:13px;color:${col};">${tip.outcomeTip}</span>
+        ${scoreStr ? `<span style="font-size:10px;color:${col};opacity:.85;">${scoreStr}</span>` : ""}
+      </div></td>`;
+    });
+
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  container.innerHTML = html;
+}
+
 function renderLeaderboardTab(){
   const container = document.getElementById("leaderboardContainer");
   const rows = computeLeaderboard();
@@ -2528,6 +2636,7 @@ function renderAll(){
   renderPlayoffTab(standings);
   renderKnockoutTab(standings);
   renderAdminPanel();
+  renderTippekTab();
   renderLeaderboardTab();
 }
 
