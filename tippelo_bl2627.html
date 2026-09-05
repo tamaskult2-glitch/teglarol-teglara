@@ -1155,7 +1155,7 @@ async function fetchTestMatchFromESPN(){
     const ftAway = parseInt(homeIsCity ? away.score : home.score, 10);
     TEST_MATCH.ftHome = ftHome;
     TEST_MATCH.ftAway = ftAway;
-    renderTestMatch();
+    renderAll(); // nem csak a teszt-kártyát, a ranglistát (és a Tippek táblát) is frissíteni kell
     msg.textContent = `✅ Sikeres teszt! ESPN szerint a végeredmény: ${TEST_MATCH.teamHome} ${ftHome}:${ftAway} ${TEST_MATCH.teamAway}. Az auto-fetch mechanizmus működik.`;
     msg.style.color = "var(--bl-green)";
   }catch(e){
