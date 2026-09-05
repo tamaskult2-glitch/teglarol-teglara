@@ -228,17 +228,25 @@
   @media (min-width: 1300px){
     main{max-width:1700px;}
   }
-  /* A ranglista kártyát a TÉNYLEGES böngésző-ablak bal széléhez tolja ki,
-     nem csak a (középre igazított) main konténeren belül balra —
-     enélkül széles kijelzőn a main két oldalán lévő üres sáv miatt úgy
-     tűnt volna, mintha középen lenne. */
+  /* A ranglista kártyát a TÉNYLEGES képernyő/böngésző-ablak bal széléhez
+     tolja ki — mobilon a main 12px paddingjét ellensúlyozva, asztali
+     nézetben pedig a (középre igazított, széles) main konténer bal oldali
+     üres sávját "áttörve". Enélkül mobilon nem volt hova "balra tolódnia"
+     (a kártya max-width-je szélesebb, mint a telefon képernyője), asztalin
+     pedig a main két oldalán lévő üres sáv miatt középen tűnt maradni. */
+  #tab-ranglista .card{
+    margin-left: -12px;
+    width: calc(100% + 12px);
+    max-width: 480px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
   @media (min-width: 900px){
     #tab-ranglista .card{
       margin-left: calc(50% - 50vw);
       margin-right: auto;
+      width: auto;
       max-width: 480px;
       padding-left: 28px;
-      border-radius: 0 var(--radius) var(--radius) 0;
     }
   }
 
@@ -467,7 +475,7 @@
 
   <!-- RANGLISTA TAB -->
   <section id="tab-ranglista" class="tab-panel">
-    <div class="card" style="max-width:480px;margin-left:0;margin-right:auto;">
+    <div class="card">
       <h2>🏅 Ranglista</h2>
       <div id="leaderboardContainer"></div>
     </div>
@@ -1180,6 +1188,87 @@ function checkTestMatchAutoFetch(){
 checkTestMatchAutoFetch();
 setInterval(checkTestMatchAutoFetch, 2*60*1000);
 
+/* =====================================================================
+   ÉLŐ ÁLLÁS — csak olvasás, nincs Firebase-írás, ezért MINDENKI böngészője
+   futtathatja (nem csak admin). A LIVE_SCORES memóriában él, oldal-
+   újratöltéskor elvész — ez rendben van, mert a következő lekérdezés
+   úgyis frissen behozza. A végeredmény MENTÉSE továbbra is admin-jog
+   (autoFetchTodayResults / adminSaveMatchResult) — ez a funkció csak
+   megjeleníti a folyamatban lévő meccs állását, amíg nincs FT rögzítve.
+   ===================================================================== */
+async function refreshLiveScores(){
+  let changed = false;
+
+  // Valós BL-meccsek (csak akkor van értelme, ha már elindult a szezon)
+  try{
+    const today = getBudapestToday().replace(/-/g,"");
+    const res = await fetch(`${ESPN_CL_SCOREBOARD}?dates=${today}`);
+    if(res.ok){
+      const data = await res.json();
+      (data.events||[]).forEach(ev=>{
+        const comp = ev.competitions && ev.competitions[0];
+        const state = comp && comp.status && comp.status.type && comp.status.type.state;
+        const localMatch = matchEspnEventToLocal(ev);
+        if(!localMatch || localMatch.ftHome != null) return;
+        if(state !== "in"){
+          if(LIVE_SCORES[localMatch.id]){ delete LIVE_SCORES[localMatch.id]; changed = true; }
+          return;
+        }
+        const home = comp.competitors.find(c=>c.homeAway==="home");
+        const away = comp.competitors.find(c=>c.homeAway==="away");
+        LIVE_SCORES[localMatch.id] = {
+          home: parseInt(home.score,10) || 0,
+          away: parseInt(away.score,10) || 0,
+          clock: (comp.status.type.shortDetail || "") 
+        };
+        changed = true;
+      });
+    }
+  }catch(e){ /* csendben elnyeljük — élő állásnál nem kritikus egy sikertelen kísérlet */ }
+
+  // Teszt meccs (Premier League) — csak amíg nincs FT rögzítve
+  if(TEST_MATCH.ftHome == null){
+    try{
+      const today = getBudapestToday().replace(/-/g,"");
+      const res2 = await fetch(`${ESPN_PL_SCOREBOARD}?dates=${today}`);
+      if(res2.ok){
+        const data2 = await res2.json();
+        const target = (data2.events||[]).find(ev=>{
+          const comp = ev.competitions && ev.competitions[0];
+          if(!comp) return false;
+          const names = comp.competitors.map(c=>normalizeTeamName(c.team.displayName || c.team.name));
+          return names.includes(normalizeTeamName(TEST_MATCH.teamHome)) && names.includes(normalizeTeamName(TEST_MATCH.teamAway));
+        });
+        if(target){
+          const comp = target.competitions[0];
+          const state = comp.status.type.state;
+          if(state === "in"){
+            const home = comp.competitors.find(c=>c.homeAway==="home");
+            const away = comp.competitors.find(c=>c.homeAway==="away");
+            const homeIsCity = normalizeTeamName(home.team.displayName) === normalizeTeamName(TEST_MATCH.teamHome);
+            LIVE_SCORES[TEST_MATCH.id] = {
+              home: parseInt(homeIsCity ? home.score : away.score, 10) || 0,
+              away: parseInt(homeIsCity ? away.score : home.score, 10) || 0,
+              clock: comp.status.type.shortDetail || ""
+            };
+            changed = true;
+          } else if(LIVE_SCORES[TEST_MATCH.id]){
+            delete LIVE_SCORES[TEST_MATCH.id];
+            changed = true;
+          }
+        }
+      }
+    }catch(e){}
+  }
+
+  if(changed) renderAll();
+}
+
+// Induláskor egyszer, majd percenként — mindenkinél fut, nem csak adminnál,
+// mivel csak olvas (ESPN), nem ír Firebase-be.
+refreshLiveScores();
+setInterval(refreshLiveScores, 60*1000);
+
 // Admin: a teszt-meccs és a rá leadott ÖSSZES tipp végleges törlése —
 // Firebase-ből is (tips/TEST_PL_01 ág) és a helyi állapotból is (ALL_TIPS,
 // LOCAL_TIPS), így a ranglistából is azonnal eltűnik a hozzá tartozó pont,
@@ -1717,6 +1806,7 @@ let LOCAL_RESULTS = {};
 let LOCAL_TIPS = {};
 let ALL_TIPS = {};    // {matchId: {safeName: tip}} — MINDENKI tippje, ranglistához kell
 let ALL_USERS = {};   // {safeName: {name, joined}} — a users/ Firebase-ágból
+let LIVE_SCORES = {};  // {matchId: {home, away, clock}} — csak memóriában, nem Firebase (átmeneti, élő állás)
 
 // Mindenki tippjének + a rögzített eredményeknek betöltése Firebase-ből.
 // Enélkül csak a saját tipped és a saját munkameneted eredmény-mentései
@@ -1831,6 +1921,7 @@ function renderMatchRow(match, isKnockout){
   const dis = locked ? "disabled" : "";
   const hasTip = tip.outcomeTip || tip.scoreHome != null || tip.scoreAway != null || tip.advancerTip;
   const hasResult = match.ftHome != null && match.ftAway != null;
+  const live = !hasResult ? LIVE_SCORES[match.id] : null;
 
   const hVal = tip.scoreHome != null ? String(tip.scoreHome) : "";
   const aVal = tip.scoreAway != null ? String(tip.scoreAway) : "";
@@ -1843,13 +1934,23 @@ function renderMatchRow(match, isKnockout){
     resultFooter = `<div class="result-footer">Erre a tippre: <span class="pts-badge">${pts>0?"+"+pts:"0"} pt</span></div>`;
   }
 
+  let metaBadge = "";
+  if(hasResult) metaBadge = '<span class="done-badge">🔒 VÉGE</span>';
+  else if(live) metaBadge = `<span class="locked-badge" style="color:var(--bl-red);border-color:rgba(224,51,63,.4);background:rgba(224,51,63,.08);">🔴 ÉLŐ${live.clock ? " · "+escapeHtml(live.clock) : ""}</span>`;
+  else if(locked) metaBadge = '<span class="locked-badge">⏰ ZÁRVA</span>';
+
+  let scoreBlock;
+  if(hasResult) scoreBlock = `<span class="result-score">${match.ftHome} : ${match.ftAway}</span>`;
+  else if(live) scoreBlock = `<span class="result-score" style="color:var(--bl-red);">${live.home} : ${live.away}</span>`;
+  else scoreBlock = `<span class="vs-block">VS</span>`;
+
   return `
   <div class="match-card${hasResult?" has-result":""}${locked?" locked":""}" data-match-id="${match.id}">
     <div class="match-meta">
       <span class="time-tag">${match.huTime || "21:00"}</span>
       <span class="grp-tag">${match.matchday ? match.matchday+". forduló" : (match.stage||"")}</span>
       <span style="color:var(--bl-grey);">${match.huDate}</span>
-      ${hasResult ? '<span class="done-badge">🔒 VÉGE</span>' : (locked ? '<span class="locked-badge">⏰ ZÁRVA</span>' : '')}
+      ${metaBadge}
     </div>
     <div class="match-body">
       <div class="match-teams-row">
@@ -1857,9 +1958,7 @@ function renderMatchRow(match, isKnockout){
           <span class="tf">${homeBadge}</span>
           <span class="tn">${match.teamHome}</span>
         </div>
-        ${hasResult
-          ? `<span class="result-score">${match.ftHome} : ${match.ftAway}</span>`
-          : `<span class="vs-block">VS</span>`}
+        ${scoreBlock}
         <div class="team-blk away-blk">
           <span class="tf">${awayBadge}</span>
           <span class="tn">${match.teamAway}</span>
