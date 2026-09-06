@@ -161,19 +161,19 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 2 tégla frissítve (2026. aug. 28.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 1 új tégla (2026. szept. 6.)
 
 📊 Mai frissítések:
-• 🏢 Megválasztották az NVVH vezetőit: Unger Anna Róza az elnök (137 igen), Tasnády Katalin a nyomozati elnökhelyettes (139 igen) – megbízatásuk szept.1-jén kezdődik
-• 💰 Új feljelentések: Covid-lélegeztetőgép-beszerzések és a Kommentár Alapítvány állami támogatása ügyében; elindult az MNB egykori vezetése elleni vizsgálóbizottság is
-• ⛽ Üzemanyagár: benzin változatlan 592 Ft/l, a dízel 681-ről 677 Ft/l-re csökkent
+• 🆕 ÚJ TÉGLA: Rendvédelmi dolgozók bérrendezése – bejelentve, de 2026-ban mégsem lesz béremelés, azt 2027-re halasztották
+• ⛽ Üzemanyagár tovább drágul: benzin 617 Ft/l, dízel 697 Ft/l – a kormány célzott segítséget ígért az autósoknak
+• 📄 Kiszivárgott dokumentumok szerint Orbán Gáspár jóval nagyobb szerepet töltött be a csádi misszióban, mint amit korábban kommunikáltak
 
-📊 101 tégla | 10 megvalósult | 66 bejelentve | 25 ígéret
+📊 102 tégla | 10 megvalósult | 67 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
-    <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com</textarea>
+    <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com,zsolt.ruszin@fairconto.hu</textarea>
 
     <button id="sendBtn" onclick="sendAll()">
       <span id="btnText">📧 Értesítő küldése</span>
@@ -204,22 +204,22 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 2 tégla frissítve (2026. aug. 28.)
+    dbInput.value = `🧱 1 új tégla (2026. szept. 6.)
 
 📊 Mai frissítések:
-• 🏢 Megválasztották az NVVH vezetőit: Unger Anna Róza az elnök (137 igen), Tasnády Katalin a nyomozati elnökhelyettes (139 igen) – megbízatásuk szept.1-jén kezdődik
-• 💰 Új feljelentések: Covid-lélegeztetőgép-beszerzések és a Kommentár Alapítvány állami támogatása ügyében; elindult az MNB egykori vezetése elleni vizsgálóbizottság is
-• ⛽ Üzemanyagár: benzin változatlan 592 Ft/l, a dízel 681-ről 677 Ft/l-re csökkent
+• 🆕 ÚJ TÉGLA: Rendvédelmi dolgozók bérrendezése – bejelentve, de 2026-ban mégsem lesz béremelés, azt 2027-re halasztották
+• ⛽ Üzemanyagár tovább drágul: benzin 617 Ft/l, dízel 697 Ft/l – a kormány célzott segítséget ígért az autósoknak
+• 📄 Kiszivárgott dokumentumok szerint Orbán Gáspár jóval nagyobb szerepet töltött be a csádi misszióban, mint amit korábban kommunikáltak
 
-📊 101 tégla | 10 megvalósult | 66 bejelentve | 25 ígéret
+📊 102 tégla | 10 megvalósult | 67 bejelentve | 25 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. aug. 28.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 6.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 592 Ft/l (változatlan), dízel 677 Ft/l (enyhén csökkent)
+• Üzemanyag: benzin 617 Ft/l, dízel 697 Ft/l – mindkettő tovább drágult, kormányzati intézkedés kilátásban
 • Élelmiszer, rezsi összehasonlítás
 • TISZA ígéretek hatásvizsgálata
 
