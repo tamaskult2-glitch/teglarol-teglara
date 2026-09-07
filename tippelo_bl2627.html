@@ -663,6 +663,20 @@
       </div>
       <div id="resetPwMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
     </div>
+    <div class="card" style="border-color:rgba(224,51,63,.35);">
+      <h2>🗑️ Felhasználó törlése</h2>
+      <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">
+        Törli a fiókot (jelszó, regisztráció) és az összes tippjét minden meccsről —
+        a ranglistából is teljesen eltűnik, mintha soha nem regisztrált volna. Ez a
+        művelet nem visszavonható.
+      </div>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="delUserInput" placeholder="Felhasználónév (pl. BERCI)" maxlength="30"
+          style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;">
+        <button onclick="adminDeleteUser()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--bl-red);background:rgba(224,51,63,.1);color:var(--bl-white);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">🗑️ Törlés</button>
+      </div>
+      <div id="delUserMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
+    </div>
     <div class="card">
       <h2>🔑 Admin jelszó módosítása</h2>
       <input type="password" id="admPwOld" placeholder="Jelenlegi admin jelszó" maxlength="30"
@@ -2155,6 +2169,48 @@ async function adminResetPassword(){
     await fbSet(`passwordReset/${safe}`, true);
     await fbDel(`userAuth/${safe}`).catch(()=>{});
     msg.textContent = `✅ ${name} jelszava resetelve. Legközelebb bármilyen jelszóval beléphet, azt fogja elmenteni.`;
+    msg.style.color = "var(--bl-green)";
+    if(inp) inp.value = "";
+  }catch(e){
+    msg.textContent = "❌ Hiba: " + e.message; msg.style.color = "var(--bl-red)";
+  }
+}
+
+// Admin: felhasználó teljes törlése — fiók (jelszó, regisztráció) + minden
+// tippje minden meccsről. A VB Gólszagló deleteUser()-jéből adaptálva a BL
+// tips/{matchId}/{safeName} útvonal-sorrendjéhez (a VB-ben ugyanez volt).
+// A deletedUsers/{safe} bejegyzés csak nyomon követésre szolgál (mikor lett
+// törölve) — jövőbeli funkcióknak, most nincs rá más funkcionális hatás.
+async function adminDeleteUser(){
+  const inp = document.getElementById("delUserInput");
+  const msg = document.getElementById("delUserMsg");
+  const name = inp ? inp.value.trim().toUpperCase() : "";
+  if(!name){ msg.textContent = "⚠️ Írd be a felhasználónevet!"; msg.style.color = "var(--bl-red)"; return; }
+  if(!confirm(`Biztosan törlöd ${name} teljes fiókját és összes tippjét? Ez nem visszavonható!`)) return;
+
+  const safe = fbSafeName(name);
+  msg.textContent = "⏳ Törlés…"; msg.style.color = "var(--bl-grey)";
+  try{
+    const tips = await fbGet("tips").catch(()=>null);
+    let tipCount = 0;
+    if(tips){
+      for(const matchId of Object.keys(tips)){
+        if(tips[matchId] && tips[matchId][safe] !== undefined){
+          await fbSet(`tips/${matchId}/${safe}`, null);
+          if(ALL_TIPS[matchId]) delete ALL_TIPS[matchId][safe];
+          tipCount++;
+        }
+      }
+    }
+    await fbDel(`users/${safe}`).catch(()=>{});
+    await fbDel(`userAuth/${safe}`).catch(()=>{});
+    await fbDel(`passwordReset/${safe}`).catch(()=>{});
+    await fbSet(`deletedUsers/${safe}`, getBudapestToday()).catch(()=>{});
+    if(ALL_USERS[safe]) delete ALL_USERS[safe];
+    if(safe === CURRENT_USER){ CURRENT_USER = null; changeName(); } // saját magát törölte -> kijelentkeztetjük
+    else renderAll();
+
+    msg.textContent = `✅ ${name} teljesen törölve (${tipCount} tipp + a fiókja).`;
     msg.style.color = "var(--bl-green)";
     if(inp) inp.value = "";
   }catch(e){
