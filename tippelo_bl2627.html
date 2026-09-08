@@ -176,7 +176,10 @@
     border-radius:8px;width:40px;height:40px;font-size:15px;cursor:pointer;flex-shrink:0;
   }
   .result-footer{font-size:11px;color:var(--bl-grey);text-align:center;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.08);}
-  .pts-badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:8px;background:rgba(31,174,94,.12);color:var(--bl-green);font-size:11px;font-weight:700;}
+  .pts-badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;background:rgba(31,174,94,.12);color:var(--bl-green);font-size:10px;font-weight:700;border:1px solid rgba(31,174,94,.25);}
+  .pts-badge.pts3{background:rgba(31,174,94,.18);color:#4ade80;border-color:rgba(31,174,94,.4);}
+  .pts-badge.pts-gd{background:rgba(0,200,255,.12);color:var(--bl-cyan);border-color:rgba(0,200,255,.3);}
+  .pts-badge.pts-zero{background:rgba(255,255,255,.04);color:var(--bl-grey);border-color:rgba(255,255,255,.1);opacity:.6;}
 
   /* Admin eredmény-rögzítő táblázat sorai — külön koncepció a fenti meccs-csempétől */
   .match-row{
@@ -441,12 +444,12 @@
 </div>
 
 <nav class="bl-tabs">
+  <button data-tab="tab-ranglista">🏅 Ranglista</button>
   <button data-tab="tab-liga" class="active">⚽ Ligaszakasz</button>
   <button data-tab="tab-tabla">📊 Tabella</button>
   <button data-tab="tab-playoff">🎯 Rájátszás</button>
   <button data-tab="tab-ko">🏆 Kieséses</button>
   <button data-tab="tab-tippek">📋 Tippek</button>
-  <button data-tab="tab-ranglista">🏅 Ranglista</button>
   <button data-tab="tab-szabalyok">ℹ️ Szabályok</button>
   <button data-tab="tab-admin" class="admin-only">🔧 Admin</button>
 </nav>
@@ -1979,13 +1982,29 @@ function renderMatchRow(match, isKnockout){
     }
 
     const matchTips = ALL_TIPS[match.id] || {};
+    const realOutcome = hasResult ? (match.ftHome === match.ftAway ? "X" : (match.ftHome > match.ftAway ? "1" : "2")) : null;
     const tipChips = Object.keys(matchTips).map(u=>{
       const t = matchTips[u];
       if(!t || !t.outcomeTip) return null;
       const name = (ALL_USERS[u] && ALL_USERS[u].name) || u;
       const scoreStr = (t.scoreHome != null && t.scoreAway != null) ? ` (${t.scoreHome}:${t.scoreAway})` : "";
       const isMe = u === CURRENT_USER;
-      return `<span class="tip-chip${isMe ? ' me' : ''}">${escapeHtml(name)}: <b>${t.outcomeTip}</b>${scoreStr}</span>`;
+
+      // Pontszám-jelvény — a VB Gólszagló pts-badge mintáját követve: 🎯 zöld
+      // a pontos eredménynél, 📐 kék a gólkülönbség-bónusznál, egyszerű zöld
+      // a puszta kimenetel-találatnál, halványított "0 pt" mellétippnél.
+      let ptsBadge = "";
+      if(hasResult){
+        const pts = calcTipPoints(match, t);
+        const isExact = t.scoreHome === match.ftHome && t.scoreAway === match.ftAway;
+        const correctOutcome = t.outcomeTip === realOutcome;
+        if(isExact) ptsBadge = `<span class="pts-badge pts3">+${pts} 🎯</span>`;
+        else if(correctOutcome && pts > SCORING_DEFAULTS.ft.outcome) ptsBadge = `<span class="pts-badge pts-gd">+${pts} 📐</span>`;
+        else if(correctOutcome) ptsBadge = `<span class="pts-badge">+${pts}</span>`;
+        else ptsBadge = `<span class="pts-badge pts-zero">0 pt</span>`;
+      }
+
+      return `<span class="tip-chip${isMe ? ' me' : ''}">${escapeHtml(name)}: <b>${t.outcomeTip}</b>${scoreStr}${ptsBadge}</span>`;
     }).filter(Boolean);
     if(tipChips.length){
       liveInfoBlock += `<div class="card-tips-row"><div class="card-tips-label">📋 Tippek</div>${tipChips.join("")}</div>`;
@@ -2477,6 +2496,7 @@ function renderLeaderboardTab(){
   }
 
   const med = ["🥇","🥈","🥉"];
+  const prizes = ["40K", "24K", "16K"]; // 1., 2., 3. helyezett nyereménye
   container.innerHTML = rows.map((r,i)=>{
     const me = r.safe === CURRENT_USER;
     return `
@@ -2487,6 +2507,7 @@ function renderLeaderboardTab(){
         <div style="font-size:16px;font-weight:800;color:var(--bl-white);">${r.pts} <span style="font-size:11px;font-weight:400;color:var(--bl-grey);">pt</span></div>
         <div style="font-size:10.5px;color:var(--bl-grey);">${r.tipped} tipp${r.exact>0?` · 🎯 ${r.exact} pontos`:""}${r.pending>0?` · ${r.pending} várja`:""}</div>
       </div>
+      ${i<3 ? `<div style="margin-left:auto;flex-shrink:0;font-size:14px;font-weight:800;color:var(--bl-gold);">${prizes[i]}</div>` : ''}
     </div>`;
   }).join("");
 }
