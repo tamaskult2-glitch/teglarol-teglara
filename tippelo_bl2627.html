@@ -1161,12 +1161,20 @@ const _finalEventsFetched = new Set(); // véglegesen lezárt meccsekhez már ne
 // belül is változnak sportáganként/verzióként, ezért több lehetséges
 // helyet is megnézünk (ugyanaz az óvatosság, mint amit a VB is alkalmazott,
 // csak itt egyetlen, letisztult próbálkozással, nem több párhuzamossal).
+// FONTOS JAVÍTÁS: korábban csak EGYIK forrást néztük (keyEvents VAGY
+// scoringPlays, amelyik előbb létezett) — de az ESPN keyEvents mezője
+// nem mindig tartalmazza MINDEN gólt, míg a scoringPlays kifejezetten a
+// gólokra specializált, teljes lista. Emiatt egy 5 gólos meccsnél néha
+// csak 4 gólszerző jelent meg. Most mindkét forrást egyesítjük: a lapokat
+// a keyEvents-ből vesszük, a gólokat elsősorban a scoringPlays-ből (ha
+// van), és csak akkor a keyEvents-ből, ha a scoringPlays nem elérhető —
+// plusz kiszűrjük az esetleges átfedő duplikátumokat (ugyanaz a percben +
+// játékos egyszer, akár mindkét forrásban szerepel).
 function parseMatchEvents(summaryData, homeEspnId, awayEspnId){
-  const raw = summaryData.keyEvents || summaryData.scoringPlays || [];
-  return raw.map(ev=>{
+  function toEvent(ev){
     const typeText = (ev.type && (ev.type.text || ev.type.id)) || ev.text || "";
     const isOwnGoal = /own.?goal/i.test(typeText);
-    const isGoal = /goal/i.test(typeText);
+    const isGoal = /goal/i.test(typeText) || ev.scoringPlay === true;
     const isYellow = /yellow/i.test(typeText);
     const isRed = /red.?card/i.test(typeText);
     let kind = null;
@@ -1182,7 +1190,27 @@ function parseMatchEvents(summaryData, homeEspnId, awayEspnId){
     const teamId = ev.team && ev.team.id;
     const isHome = String(teamId) === String(homeEspnId);
     return { kind, player, minute, isHome, ownGoal: isOwnGoal };
-  }).filter(Boolean);
+  }
+
+  const fromKeyEvents = (summaryData.keyEvents || []).map(toEvent).filter(Boolean);
+  const fromScoringPlays = (summaryData.scoringPlays || []).map(toEvent).filter(Boolean);
+
+  // Lapok: keyEvents-ből (a scoringPlays csak gólokat tartalmaz).
+  const cards = fromKeyEvents.filter(e => e.kind === "yellow" || e.kind === "red");
+  // Gólok: elsősorban scoringPlays (teljesebb), ha üres, essünk vissza a keyEvents gólokra.
+  const goals = fromScoringPlays.length
+    ? fromScoringPlays.filter(e => e.kind === "goal")
+    : fromKeyEvents.filter(e => e.kind === "goal");
+
+  const merged = goals.concat(cards);
+  // Duplikátum-szűrés: azonos perc+játékos+típus csak egyszer szerepeljen.
+  const seen = new Set();
+  return merged.filter(e=>{
+    const key = `${e.kind}|${e.player}|${e.minute}`;
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 async function fetchMatchEvents(match, sportPath){
@@ -1934,6 +1962,20 @@ function renderMatchRow(match, isKnockout){
         </div>`;
       }).join("");
       liveInfoBlock += `<div class="match-events">${rows}</div>`;
+
+      // Poka-yoke: ha a gólesemények száma nem egyezik a ismert góllal
+      // (ESPN adathiány, pl. keyEvents/scoringPlays nem tartalmaz mindent),
+      // ezt jelezzük — inkább látszódjon a hiány, mint hogy hamisan
+      // teljesnek tűnjön a lista.
+      const knownHome = hasResult ? match.ftHome : (live ? live.home : null);
+      const knownAway = hasResult ? match.ftAway : (live ? live.away : null);
+      if(knownHome != null && knownAway != null){
+        const homeGoals = events.filter(e=>e.kind==="goal" && e.isHome).length;
+        const awayGoals = events.filter(e=>e.kind==="goal" && !e.isHome).length;
+        if(homeGoals !== knownHome || awayGoals !== knownAway){
+          liveInfoBlock += `<div style="font-size:9.5px;color:var(--bl-gold);text-align:center;padding:2px 0 6px;">⚠️ Nem biztos, hogy minden gólesemény megjelenik (ESPN-adathiány)</div>`;
+        }
+      }
     }
 
     const matchTips = ALL_TIPS[match.id] || {};
