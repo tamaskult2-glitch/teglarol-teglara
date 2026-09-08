@@ -216,6 +216,7 @@
     border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:3px 9px;
   }
   .tip-chip.me{background:rgba(0,200,255,.1);border-color:rgba(0,200,255,.3);color:var(--bl-cyan);}
+  .tip-chip.tip-chip-missing{background:rgba(224,51,63,.1);border-color:rgba(224,51,63,.3);color:var(--bl-red);}
   .advancer-pick{
     display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.1);flex-wrap:wrap;
   }
@@ -2006,6 +2007,18 @@ function renderMatchRow(match, isKnockout){
 
       return `<span class="tip-chip${isMe ? ' me' : ''}">${escapeHtml(name)}: <b>${t.outcomeTip}</b>${scoreStr}${ptsBadge}</span>`;
     }).filter(Boolean);
+
+    // Aki nem tippelt, és a meccsnek már VÉGE van, azt is megmutatjuk — pirossal,
+    // hogy egyértelmű legyen, ki maradt ki (nem csak nem jelenik meg semmi).
+    if(hasResult){
+      const tippedSafes = new Set(Object.keys(matchTips).filter(u => matchTips[u] && matchTips[u].outcomeTip));
+      Object.keys(ALL_USERS).forEach(safe=>{
+        if(tippedSafes.has(safe)) return;
+        const name = (ALL_USERS[safe] && ALL_USERS[safe].name) || safe;
+        tipChips.push(`<span class="tip-chip tip-chip-missing">${escapeHtml(name)}: <b>–</b></span>`);
+      });
+    }
+
     if(tipChips.length){
       liveInfoBlock += `<div class="card-tips-row"><div class="card-tips-label">📋 Tippek</div>${tipChips.join("")}</div>`;
     }
@@ -2496,7 +2509,7 @@ function renderLeaderboardTab(){
   }
 
   const med = ["🥇","🥈","🥉"];
-  const prizes = ["40K", "24K", "16K"]; // 1., 2., 3. helyezett nyereménye
+  const prizes = ["45K", "27K", "18K"]; // 1., 2., 3. helyezett nyereménye
   container.innerHTML = rows.map((r,i)=>{
     const me = r.safe === CURRENT_USER;
     return `
