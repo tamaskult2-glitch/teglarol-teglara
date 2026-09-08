@@ -1777,10 +1777,32 @@ function getBudapestToday(){
   return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Budapest" }).format(new Date());
 }
 
+// "Most" Budapest szerinti óra:perc, ugyanígy időzóna-offszet nélkül —
+// az isKickoffPassed()-hez kell, hogy a kick-off idejét ne kelljen UTC-
+// offszettel (+01:00/+02:00) kiszámolni, ami a nyári/téli időszámítás
+// váltásakor pontosan azt a hibát okozná, amit korábban javítottunk.
+function getBudapestNowKey(){
+  const parts = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Budapest", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false
+  }).formatToParts(new Date());
+  const m = {};
+  parts.forEach(p => { m[p.type] = p.value; });
+  return `${m.year}-${m.month}-${m.day}T${m.hour}:${m.minute}`;
+}
+
+// JAVÍTVA: korábban egy fix "+01:00" (téli, CET) UTC-offszettel számoltuk ki
+// a kick-off pillanatát — ez szeptembertől október végéig (amíg CEST, +02:00
+// van érvényben) 1 órás csúszást okozott: a rendszer 1 órával KÉSŐBB zárta
+// volna le a tippelést, mint a valós magyar kezdési idő. Most mindkét oldalt
+// (a "most"-ot és a kick-offot is) Budapest wall-clock idő szerinti
+// szövegként hasonlítjuk össze — így nincs szükség UTC-offszetre, tehát a
+// CET/CEST-váltás sem tud hibát okozni.
 function isKickoffPassed(huDate, huTime){
   try{
-    const kickoff = new Date(`${huDate}T${huTime}:00+01:00`); // közelítő CET; a nyári/téli idő eltérés max 1 óra, ez itt elhanyagolható biztonsági ráhagyás
-    return Date.now() >= kickoff.getTime();
+    const nowKey = getBudapestNowKey();      // pl. "2026-09-08T17:03"
+    const kickoffKey = `${huDate}T${huTime}`; // pl. "2026-09-08T18:00"
+    return nowKey >= kickoffKey;
   }catch(e){ return false; }
 }
 
