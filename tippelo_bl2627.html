@@ -1013,32 +1013,48 @@ const ESPN_CL_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer
 // ez a lista áthidalja a leggyakoribb eltéréseket. Bal oldal: ESPN forma
 // (kisbetűs, normalizált), jobb oldal: a mi TEAMS_REAL id-nk.
 const ESPN_TEAM_ALIASES = {
-  "inter milan":"INT", "internazionale":"INT",
-  "atletico madrid":"ATM", "atlético madrid":"ATM",
-  "paris saint germain":"PSG", "psg":"PSG",
+  "inter milan":"INT", "internazionale":"INT", "inter":"INT",
+  "atletico madrid":"ATM", "atlético madrid":"ATM", "atletico":"ATM",
+  "paris saint germain":"PSG", "psg":"PSG", "paris sg":"PSG",
   "manchester city":"MCI", "man city":"MCI",
   "manchester united":"MUN", "man united":"MUN", "man utd":"MUN",
-  "bayern munich":"BAY", "fc bayern munchen":"BAY", "bayern munchen":"BAY",
+  "bayern munich":"BAY", "fc bayern munchen":"BAY", "bayern munchen":"BAY", "bayern":"BAY",
   "real madrid":"RMA",
-  "borussia dortmund":"DOR", "dortmund":"DOR",
+  "borussia dortmund":"DOR", "dortmund":"DOR", "bvb":"DOR",
   "vfb stuttgart":"STU", "stuttgart":"STU",
   "fc porto":"POR", "porto":"POR",
-  "sporting cp":"SPO", "sporting lisbon":"SPO", "sporting clube de portugal":"SPO",
-  "shakhtar donetsk":"SHA",
-  "aek athens":"AEK", "aek fc":"AEK",
+  "sporting cp":"SPO", "sporting lisbon":"SPO", "sporting clube de portugal":"SPO", "sporting":"SPO",
+  "shakhtar donetsk":"SHA", "shakhtar":"SHA",
+  "aek athens":"AEK", "aek fc":"AEK", "aek":"AEK",
   "psv eindhoven":"PSV", "psv":"PSV",
-  "club brugge":"CLB", "club brugge kv":"CLB",
-  "aston villa":"AVL",
-  "real betis":"BET", "betis":"BET",
+  "club brugge":"CLB", "club brugge kv":"CLB", "brugge":"CLB", "club bruges":"CLB",
+  "aston villa":"AVL", "villa":"AVL",
+  "real betis":"BET", "betis":"BET", "betis sevilla":"BET",
   "galatasaray":"GAL", "galatasaray sk":"GAL",
   "villarreal":"VIL", "villarreal cf":"VIL",
-  "slovan bratislava":"SLB", "sk slovan bratislava":"SLB",
-  "fc barcelona":"BAR", "barcelona":"BAR"
+  "slovan bratislava":"SLB", "sk slovan bratislava":"SLB", "slovan":"SLB",
+  "fc barcelona":"BAR", "barcelona":"BAR",
+  "lask":"LASK", "lask linz":"LASK",
+  "lille":"LIL", "losc lille":"LIL", "losc":"LIL",
+  "feyenoord":"FEY", "feyenoord rotterdam":"FEY",
+  "viking":"VIK", "viking fk":"VIK", "viking stavanger":"VIK",
+  "liverpool":"LIV",
+  "napoli":"NAP", "ssc napoli":"NAP",
+  "arsenal":"ARS",
+  "fenerbahce":"FEN", "fenerbahçe":"FEN",
+  "roma":"ROM", "as roma":"ROM",
+  "como":"COM", "como 1907":"COM",
+  "leipzig":"LEI", "rb leipzig":"LEI",
+  "bodo glimt":"BOD", "bodo/glimt":"BOD", "fk bodo glimt":"BOD",
+  "sabah":"SAB", "sabah fk":"SAB", "sabah baku":"SAB",
+  "slavia praha":"SLA", "slavia prague":"SLA", "slavia":"SLA",
+  "lens":"LEN", "rc lens":"LEN"
 };
 
 function normalizeTeamName(name){
   return String(name||"")
     .toLowerCase()
+    .replace(/ø/g,"o").replace(/æ/g,"ae") // ezek NEM ékezetes (kombináló) karakterek, az NFD nem bontja fel őket
     .normalize("NFD").replace(/[\u0300-\u036f]/g,"") // ékezetek eltávolítása
     .replace(/\b(fc|cf|sk|kv|afc|cd)\b/g,"")
     .replace(/[^a-z0-9 ]/g,"")
