@@ -180,6 +180,7 @@
   .pts-badge.pts3{background:rgba(31,174,94,.18);color:#4ade80;border-color:rgba(31,174,94,.4);}
   .pts-badge.pts-gd{background:rgba(0,200,255,.12);color:var(--bl-cyan);border-color:rgba(0,200,255,.3);}
   .pts-badge.pts-zero{background:rgba(255,255,255,.04);color:var(--bl-grey);border-color:rgba(255,255,255,.1);opacity:.6;}
+  .pts-badge.live{border-style:dashed;}
 
   /* Admin eredmény-rögzítő táblázat sorai — külön koncepció a fenti meccs-csempétől */
   .match-row{
@@ -1997,7 +1998,13 @@ function renderMatchRow(match, isKnockout){
     }
 
     const matchTips = ALL_TIPS[match.id] || {};
-    const realOutcome = hasResult ? (match.ftHome === match.ftAway ? "X" : (match.ftHome > match.ftAway ? "1" : "2")) : null;
+    // Élő meccsnél a JELENLEGI állást használjuk "ideiglenes eredményként" a
+    // pontok/jelek kiszámításához — nyilván ez még változhat a meccs végéig,
+    // ezért külön (⏱️, szaggatott keret) jelöljük, nem véglegesként.
+    const effHome = hasResult ? match.ftHome : (live ? live.home : null);
+    const effAway = hasResult ? match.ftAway : (live ? live.away : null);
+    const hasScore = effHome != null && effAway != null;
+    const realOutcome = hasScore ? (effHome === effAway ? "X" : (effHome > effAway ? "1" : "2")) : null;
     const tipChips = Object.keys(matchTips).map(u=>{
       const t = matchTips[u];
       if(!t || !t.outcomeTip) return null;
@@ -2008,15 +2015,20 @@ function renderMatchRow(match, isKnockout){
       // Pontszám-jelvény — a VB Gólszagló pts-badge mintáját követve: 🎯 zöld
       // a pontos eredménynél, 📐 kék a gólkülönbség-bónusznál, egyszerű zöld
       // a puszta kimenetel-találatnál, halványított "0 pt" mellétippnél.
+      // Ha még csak élő (nem hasResult), ⏱️ előtag + "live" osztály jelzi,
+      // hogy ez a jelenlegi állás alapján van, nem végleges.
       let ptsBadge = "";
-      if(hasResult){
-        const pts = calcTipPoints(match, t);
-        const isExact = t.scoreHome === match.ftHome && t.scoreAway === match.ftAway;
+      if(hasScore){
+        const pseudoMatch = { ...match, ftHome: effHome, ftAway: effAway };
+        const pts = calcTipPoints(pseudoMatch, t);
+        const isExact = t.scoreHome === effHome && t.scoreAway === effAway;
         const correctOutcome = t.outcomeTip === realOutcome;
-        if(isExact) ptsBadge = `<span class="pts-badge pts3">+${pts} 🎯</span>`;
-        else if(correctOutcome && pts > SCORING_DEFAULTS.ft.outcome) ptsBadge = `<span class="pts-badge pts-gd">+${pts} 📐</span>`;
-        else if(correctOutcome) ptsBadge = `<span class="pts-badge">+${pts}</span>`;
-        else ptsBadge = `<span class="pts-badge pts-zero">0 pt</span>`;
+        const liveCls = hasResult ? "" : " live";
+        const prefix = hasResult ? "" : "⏱️";
+        if(isExact) ptsBadge = `<span class="pts-badge pts3${liveCls}">${prefix}+${pts} 🎯</span>`;
+        else if(correctOutcome && pts > SCORING_DEFAULTS.ft.outcome) ptsBadge = `<span class="pts-badge pts-gd${liveCls}">${prefix}+${pts} 📐</span>`;
+        else if(correctOutcome) ptsBadge = `<span class="pts-badge${liveCls}">${prefix}+${pts}</span>`;
+        else ptsBadge = `<span class="pts-badge pts-zero${liveCls}">${prefix}0 pt</span>`;
       }
 
       return `<span class="tip-chip${isMe ? ' me' : ''}">${escapeHtml(name)}: <b>${t.outcomeTip}</b>${scoreStr}${ptsBadge}</span>`;
