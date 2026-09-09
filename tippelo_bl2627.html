@@ -2112,6 +2112,17 @@ function bindTipHandlers(containerId){
     // 1/X/2 gomb — a VB mintájára AZONNAL menti a kimenetelt (nem kell külön Mentés)
     if(e.target.closest("[data-role='outcome']") && e.target.tagName === "BUTTON"){
       tip.outcomeTip = e.target.dataset.val;
+      // Ha volt korábban mentett pontos eredmény, ami MOST már ellentmond az
+      // újonnan választott kimenetelnek (pl. 2:2 volt mentve X-ként, majd
+      // rákattint az "1"-re), azt törölni kell — máskülönben ellentmondó
+      // állapot (outcome=1 + score=2:2) menne el Firebase-be.
+      if(tip.scoreHome != null && tip.scoreAway != null){
+        const impliedByScore = tip.scoreHome === tip.scoreAway ? "X" : (tip.scoreHome > tip.scoreAway ? "1" : "2");
+        if(impliedByScore !== tip.outcomeTip){
+          tip.scoreHome = null;
+          tip.scoreAway = null;
+        }
+      }
       saveTip(matchId, tip);
     }
     // Pontos eredmény mentése — külön gomb, csak akkor ment, ha rákattintanak
@@ -2125,10 +2136,11 @@ function bindTipHandlers(containerId){
       }
       tip.scoreHome = Number(h);
       tip.scoreAway = Number(a);
-      // A pontos eredmény implikálja a kimenetelt is, ha még nem volt kiválasztva
-      if(!tip.outcomeTip){
-        tip.outcomeTip = tip.scoreHome === tip.scoreAway ? "X" : (tip.scoreHome > tip.scoreAway ? "1" : "2");
-      }
+      // A pontos eredmény MINDIG felülírja/kikényszeríti a hozzá tartozó
+      // kimenetelt — korábban csak akkor állítottuk be, ha még nem volt
+      // kiválasztva, ami ellentmondó állapotot engedett meg (pl. "1" kimenetel
+      // + 2:2 pontos eredmény mentve egyszerre, ami valójában X-et jelentene).
+      tip.outcomeTip = tip.scoreHome === tip.scoreAway ? "X" : (tip.scoreHome > tip.scoreAway ? "1" : "2");
       saveTip(matchId, tip);
     }
     if(e.target.closest(".advancer-pick") && e.target.tagName === "BUTTON"){
