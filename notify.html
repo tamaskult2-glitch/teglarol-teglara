@@ -161,14 +161,14 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 1 új tégla (2026. szept. 6.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 5 új tégla + 6 frissítve (2026. szept. 13.)
 
 📊 Mai frissítések:
-• 🆕 ÚJ TÉGLA: Rendvédelmi dolgozók bérrendezése – bejelentve, de 2026-ban mégsem lesz béremelés, azt 2027-re halasztották
-• ⛽ Üzemanyagár tovább drágul: benzin 617 Ft/l, dízel 697 Ft/l – a kormány célzott segítséget ígért az autósoknak
-• 📄 Kiszivárgott dokumentumok szerint Orbán Gáspár jóval nagyobb szerepet töltött be a csádi misszióban, mint amit korábban kommunikáltak
+• 🆕 5 ÚJ TÉGLA: Szociális/NOKS-dolgozók kétlépcsős béremelése, Szent István Vidékfejlesztési Program, Hulladékgazdálkodás (MOHU) felülvizsgálata, Megváltozott munkaképességűek ellátása, Orosz diplomaták kiutasítása (✅ megvalósult)
+• ⛽ Célzott dízeltámogatás: havi 5000 Ft, ~1 millió embernek
+• 🏛️ Megyei közgyűlések megszüntetése bejelentve; 5 új AB-jelölt megnevezve
 
-📊 102 tégla | 10 megvalósult | 67 bejelentve | 25 ígéret
+📊 107 tégla | 26 megvalósult | 68 bejelentve | 13 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -204,22 +204,22 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 1 új tégla (2026. szept. 6.)
+    dbInput.value = `🧱 5 új tégla + 6 frissítve (2026. szept. 13.)
 
 📊 Mai frissítések:
-• 🆕 ÚJ TÉGLA: Rendvédelmi dolgozók bérrendezése – bejelentve, de 2026-ban mégsem lesz béremelés, azt 2027-re halasztották
-• ⛽ Üzemanyagár tovább drágul: benzin 617 Ft/l, dízel 697 Ft/l – a kormány célzott segítséget ígért az autósoknak
-• 📄 Kiszivárgott dokumentumok szerint Orbán Gáspár jóval nagyobb szerepet töltött be a csádi misszióban, mint amit korábban kommunikáltak
+• 🆕 5 ÚJ TÉGLA: Szociális/NOKS-dolgozók kétlépcsős béremelése, Szent István Vidékfejlesztési Program, Hulladékgazdálkodás (MOHU) felülvizsgálata, Megváltozott munkaképességűek ellátása, Orosz diplomaták kiutasítása (✅ megvalósult)
+• ⛽ Célzott dízeltámogatás: havi 5000 Ft, ~1 millió embernek
+• 🏛️ Megyei közgyűlések megszüntetése bejelentve; 5 új AB-jelölt megnevezve
 
-📊 102 tégla | 10 megvalósult | 67 bejelentve | 25 ígéret
+📊 107 tégla | 26 megvalósult | 68 bejelentve | 13 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 6.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 13.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 617 Ft/l, dízel 697 Ft/l – mindkettő tovább drágult, kormányzati intézkedés kilátásban
+• Üzemanyag: a dízelárak tartósan magasak – a kormány szept.11-én célzott dízeltámogatást hirdetett (havi 5000 Ft, ~1 millió dízelautósnak)
 • Élelmiszer, rezsi összehasonlítás
 • TISZA ígéretek hatásvizsgálata
 
