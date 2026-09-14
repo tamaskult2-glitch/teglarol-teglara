@@ -1250,6 +1250,50 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   margin-top: 5px;
   text-align: right;
 }
+.progress-ring-legend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.prl-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 999px;
+  transition: transform 0.15s, background 0.15s;
+}
+.prl-item:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.06);
+}
+.prl-dot {
+  width: 11px;
+  height: 11px;
+  min-width: 11px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
+}
+.prl-count {
+  font-weight: 800;
+  font-size: 17px;
+}
+.prl-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.prl-total {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
 </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -1647,7 +1691,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-09-14</strong> · Ver. 4.41</p>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-09-14</strong> · Ver. 4.42</p>
 
  <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
@@ -1670,17 +1714,17 @@ window.addEventListener('unhandledrejection', function(e) {
   <div class="progress-ring-legend">
    <div class="prl-item" onclick="filterByStatus('done')" title="Megvalósult téglák">
     <div class="prl-dot" style="background:#2ecc71"></div>
-    <span class="prl-count" id="ringCountDone">–</span>
+    <span class="prl-count" id="ringCountDone" style="color:#2ecc71">–</span>
     <span class="prl-label">megvalósult</span>
    </div>
    <div class="prl-item" onclick="filterByStatus('announced')" title="Bejelentett téglák">
     <div class="prl-dot" style="background:#FF9933"></div>
-    <span class="prl-count" id="ringCountAnn">–</span>
+    <span class="prl-count" id="ringCountAnn" style="color:#FF9933">–</span>
     <span class="prl-label">bejelentve</span>
    </div>
    <div class="prl-item" onclick="filterByStatus('promise')" title="Csak ígéret téglák">
     <div class="prl-dot" style="background:#e8405a"></div>
-    <span class="prl-count" id="ringCountProm">–</span>
+    <span class="prl-count" id="ringCountProm" style="color:#e8405a">–</span>
     <span class="prl-label">csak ígéret</span>
    </div>
    <div class="prl-total" id="ringTotalLabel">103 ígéret összesen</div>
