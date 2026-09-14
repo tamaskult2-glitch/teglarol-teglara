@@ -920,13 +920,13 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
   .kt-hide-mobile { display:none !important; }
     .calc-result-grid { grid-template-columns:1fr; }
 
-  /* Mobilon kompaktabb elrendezés, logo érintetlen */
-  .modern-header { padding:52px 16px 44px; }
+  /* Mobilon kompaktabb elrendezés, logó lekicsinyítve */
+  .modern-header { padding:44px 16px 32px; }
   .river-bg { border-radius:24px; opacity:0.3; top:-260px; height:200px; left:-16px; right:-16px; width:calc(100% + 32px); }
   .river-bg svg { width:100%; height:100%; }
   .version-badge { font-size:13px; position:absolute; top:12px; left:50%; transform:translateX(-50%); }
   .header-inner { gap:8px; }
-  .logo-future { width:200px !important; height:200px !important; border-radius:40px !important; }
+  .logo-future { width:130px !important; height:130px !important; border-radius:28px !important; }
   .story-btn { padding:7px 18px; font-size:12px; margin-top:4px; }
   .header-text h1 { font-size:28px; margin-bottom:4px; }
   .header-text #daysSince { font-size:13px; }
@@ -1294,6 +1294,24 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   color: var(--text-secondary);
   opacity: 0.85;
 }
+.header-action-btn {
+  flex: 1 1 0;
+  min-width: 64px;
+  max-width: 92px;
+  padding: 10px 8px !important;
+  font-size: 11px !important;
+  line-height: 1.15;
+  gap: 5px !important;
+  justify-content: center;
+}
+.header-action-btn span:last-child {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+@media (max-width:380px) {
+  .header-action-btn { min-width:0; padding:9px 6px !important; }
+}
 </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -1491,8 +1509,8 @@ window.addEventListener('unhandledrejection', function(e) {
  </div><!-- /logo-future -->
 
  <!-- Névjegy + Szavazó + Dark toggle egy sorban -->
- <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
-  <button class="story-btn" id="storyBtn" aria-label="Névjegy és verziótörténet megnyitása" aria-label="Az oldal története">
+ <div style="display:flex;align-items:stretch;gap:8px;margin-top:4px;">
+  <button class="story-btn header-action-btn" id="storyBtn" aria-label="Névjegy és verziótörténet megnyitása">
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <rect x="3" y="3" width="7" height="7" rx="1"/>
     <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -1503,20 +1521,21 @@ window.addEventListener('unhandledrejection', function(e) {
   </button>
   
   <!-- SZAVAZÓ GOMB - ÚJ FUNKCIÓ! -->
-  <button id="votingBtn" class="story-btn voting-pulse" style="padding:10px 12px; flex-direction:row; gap:6px; background:linear-gradient(135deg,#FF9933,#FF6B35); color:white; border:none; position:relative;" aria-label="Szavazás" title="Új! Szavazz a legfontosabb ígéretekre!">
-   <span style="font-size:18px;">🗳️</span>
-   <span style="font-size:12px; font-weight:700;">Szavazz!</span>
+  <button id="votingBtn" class="story-btn header-action-btn voting-pulse" style="background:linear-gradient(135deg,#FF9933,#FF6B35); color:white; border:none;" aria-label="Szavazás" title="Új! Szavazz a legfontosabb ígéretekre!">
+   <span style="font-size:20px;line-height:1;">🗳️</span>
+   <span>Szavazz!</span>
   </button>
   
   <!-- Támogató gomb -->
-  <button id="supportHeaderBtn" class="story-btn" style="padding:8px 10px; flex-direction:column; gap:2px; background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!" onclick="var m=document.getElementById('supportModalMain');if(m){m.style.display='flex';}if(typeof loadSupportAmountMain==='function')loadSupportAmountMain();if(typeof initSupportQRMain==='function')initSupportQRMain();">
-   <span style="font-size:14px;">❤️</span>
-   <span style="font-size:10px; font-weight:700; line-height:1.1;" class="support-btn-label">Támogass!</span>
+  <button id="supportHeaderBtn" class="story-btn header-action-btn" style="background:linear-gradient(135deg,#CE2939,#a01020); color:white; border:none;" aria-label="Támogatás" title="Támogasd az oldalt!" onclick="var m=document.getElementById('supportModalMain');if(m){m.style.display='flex';}if(typeof loadSupportAmountMain==='function')loadSupportAmountMain();if(typeof initSupportQRMain==='function')initSupportQRMain();">
+   <span style="font-size:20px;line-height:1;">❤️</span>
+   <span class="support-btn-label">Támogass!</span>
   </button>
 
   <!-- Dark mode toggle -->
-  <button id="darkToggleHeader" class="story-btn" style="padding:10px 12px; flex-direction:row; gap:0;" aria-label="Sötét/világos mód váltása" title="Téma váltás">
-   <span id="darkToggleIconHeader" style="font-size:20px;">🌙</span>
+  <button id="darkToggleHeader" class="story-btn header-action-btn" aria-label="Sötét/világos mód váltása" title="Téma váltás">
+   <span id="darkToggleIconHeader" style="font-size:20px;line-height:1;">🌙</span>
+   <span>Téma</span>
   </button>
  </div><!-- /Névjegy + Szavazó + Dark toggle -->
 
@@ -1691,7 +1710,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-09-14</strong> · Ver. 4.42</p>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-09-14</strong> · Ver. 4.44</p>
 
  <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
