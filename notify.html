@@ -161,14 +161,16 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 5 új tégla + 6 frissítve (2026. szept. 13.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 1 új tégla + 7 frissítve (2026. szept. 15.)
 
 📊 Mai frissítések:
-• 🆕 5 ÚJ TÉGLA: Szociális/NOKS-dolgozók kétlépcsős béremelése, Szent István Vidékfejlesztési Program, Hulladékgazdálkodás (MOHU) felülvizsgálata, Megváltozott munkaképességűek ellátása, Orosz diplomaták kiutasítása (✅ megvalósult)
-• ⛽ Célzott dízeltámogatás: havi 5000 Ft, ~1 millió embernek
-• 🏛️ Megyei közgyűlések megszüntetése bejelentve; 5 új AB-jelölt megnevezve
+• ✅ Ügynökakták teljes megnyitása – megvalósult (végrehajtási törvény elfogadva)
+• 🆕 ÚJ TÉGLA: Új alkotmány és választójogi törvény 2030-ig
+• 🚨 Feljelentés Szijjártó Péter ellen (magánrepülők + ~300 Mrd Ft-os Covid-lélegeztetőgép ügy)
+• 🏛️ Schmidt Mária leváltva, Terror Háza bezár; új NAV-elnök
+• ⛽ Dízeltámogatás parlamenti előterjesztése + dohányadó-emelés nov.1-től
 
-📊 107 tégla | 26 megvalósult | 68 bejelentve | 13 ígéret
+📊 108 tégla | 27 megvalósult | 67 bejelentve | 14 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -204,22 +206,24 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 5 új tégla + 6 frissítve (2026. szept. 13.)
+    dbInput.value = `🧱 1 új tégla + 7 frissítve (2026. szept. 15.)
 
 📊 Mai frissítések:
-• 🆕 5 ÚJ TÉGLA: Szociális/NOKS-dolgozók kétlépcsős béremelése, Szent István Vidékfejlesztési Program, Hulladékgazdálkodás (MOHU) felülvizsgálata, Megváltozott munkaképességűek ellátása, Orosz diplomaták kiutasítása (✅ megvalósult)
-• ⛽ Célzott dízeltámogatás: havi 5000 Ft, ~1 millió embernek
-• 🏛️ Megyei közgyűlések megszüntetése bejelentve; 5 új AB-jelölt megnevezve
+• ✅ Ügynökakták teljes megnyitása – megvalósult (végrehajtási törvény elfogadva)
+• 🆕 ÚJ TÉGLA: Új alkotmány és választójogi törvény 2030-ig
+• 🚨 Feljelentés Szijjártó Péter ellen (magánrepülők + ~300 Mrd Ft-os Covid-lélegeztetőgép ügy)
+• 🏛️ Schmidt Mária leváltva, Terror Háza bezár; új NAV-elnök
+• ⛽ Dízeltámogatás parlamenti előterjesztése + dohányadó-emelés nov.1-től
 
-📊 107 tégla | 26 megvalósult | 68 bejelentve | 13 ígéret
+📊 108 tégla | 27 megvalósult | 67 bejelentve | 14 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 13.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 15.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: a dízelárak tartósan magasak – a kormány szept.11-én célzott dízeltámogatást hirdetett (havi 5000 Ft, ~1 millió dízelautósnak)
+• Üzemanyag: a dízelárak tartósan magasak – a kormány célzott dízeltámogatást terjesztett a parlament elé (havi 5000 Ft, ~1 millió dízelautósnak)
 • Élelmiszer, rezsi összehasonlítás
 • TISZA ígéretek hatásvizsgálata
 
