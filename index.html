@@ -135,7 +135,7 @@ body.dark .sidebar .cat-item:hover { filter:brightness(1.15); }
 .content { margin-left:var(--sidebar-width); padding:40px; }
 
 /* ---- HEADER ---- */
-.modern-header { background:linear-gradient(135deg,#E8DDD2 0%,#C9B8A8 60%,#B5A498 100%); padding:60px 20px 56px; border-radius:24px; box-shadow:var(--shadow-soft); margin-bottom:40px; position:relative; overflow:visible; min-height:120px; }
+.modern-header { background:linear-gradient(135deg,#E8DDD2 0%,#C9B8A8 60%,#B5A498 100%); padding:60px 20px 28px; border-radius:24px; box-shadow:var(--shadow-soft); margin-bottom:40px; position:relative; overflow:visible; min-height:120px; }
 body.dark .modern-header { background:linear-gradient(135deg,#24283B 0%,#2A2E42 60%,#1F2235 100%); }
 .header-inner { display:flex; align-items:center; gap:40px; flex-wrap:wrap; justify-content:center; }
 .logo-future { width:200px; height:200px; border-radius:40px; overflow:visible; position:relative; box-shadow:0 8px 24px rgba(30,25,20,0.18),inset 0 1px 0 rgba(255,255,255,0.2); flex-shrink:0; }
@@ -1006,7 +1006,7 @@ body.dark .search-result-title mark { background:#7B6000; color:#F0D060; }
   .calc-tab { font-size:15px; }
 
   /* ── HERO: kétoszlopos desktop elrendezés ── */
-  .modern-header { padding:52px 48px 52px; }
+  .modern-header { padding:52px 48px 32px; }
   .header-inner { flex-wrap:nowrap; justify-content:flex-start; align-items:center; gap:52px; }
 
   /* Bal: nagy logo + névjegy */
@@ -1710,7 +1710,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-09-15</strong> · Ver. 4.45</p>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-09-16</strong> · Ver. 4.49</p>
 
  <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
@@ -1758,8 +1758,8 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <!-- MAI FRISSÍTÉSEK FELHÍVÓ -->
  <p id="todayUpdateWrap" style="text-align:center;margin-top:8px;display:none;">
-  <button onclick="activateNewestSort()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#e8405a,#c0183a);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,64,90,0.4);transition:transform 0.15s;">
-   <span style="font-size:16px;">🔴</span>
+  <button onclick="activateNewestSort()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(59,130,246,0.4);transition:transform 0.15s;">
+   <span style="font-size:16px;">🔵</span>
    <span id="todayUpdateMsg">Ma X tégla frissült – nézd meg!</span>
    <span style="font-size:13px;opacity:0.85;">→</span>
   </button>
@@ -1981,8 +1981,8 @@ body.dark .wallet-nav-btn .label {
  </div>
  </div>
 
- <!-- Készítette + Felelősségkizáró – jobb alsó sarok, egy sorban -->
- <div style="position:absolute;bottom:14px;right:18px;display:flex;align-items:center;gap:8px;">
+ <!-- Készítette + Felelősségkizáró – normál flow-ban, a share-gombok alatt -->
+ <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin:14px 0 0;">
   <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.35);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.4);border-radius:999px;padding:5px 12px;font-size:11px;color:#555;">
    <span style="font-weight:500;color:#555;">Készítette</span>
    <span style="width:1px;height:12px;background:rgba(0,0,0,0.25);display:inline-block;"></span>
@@ -2740,17 +2740,18 @@ var safeStorage = (function() {
      </div>
      
      <div style="font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
-      Több kategória is kijelölhető egyszerre (pl. 25 év alatti + 2 gyermekes + Anya vagyok)
+      Több kategória is kijelölhető egyszerre (pl. 25 év alatti + 2 jogosult gyermek + Anya vagyok)
      </div>
      
      <!-- ALAP KATEGÓRIÁK -->
      <div style="margin-bottom:24px;">
-      <div style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Gyerekszám</div>
+      <div style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Kedvezményre jogosult gyermekek száma</div>
+      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:10px; line-height:1.4;">A családi pótlék/kedvezmény nem szűnik meg automatikusan 18 évesen: nappali tagozatos tanulónál addig a tanévig jár, amíg a gyermek betölti a 20. évét (SNI esetén 23-at). Csak az ez alapján még jogosult gyermekeket számold ide.</div>
       <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;">
-       <button class="cat-modal-btn" data-type="gyermektelen">🙋 Gyermektelen</button>
-       <button class="cat-modal-btn" data-type="1gyerek">👶 1 gyermekes</button>
-       <button class="cat-modal-btn" data-type="2gyerek">👶👶 2 gyermekes</button>
-       <button class="cat-modal-btn" data-type="3gyerek">👨‍👩‍👧 3+ gyermekes</button>
+       <button class="cat-modal-btn" data-type="gyermektelen">🙋 Nincs jogosult gyermekem</button>
+       <button class="cat-modal-btn" data-type="1gyerek">👶 1 jogosult gyermek</button>
+       <button class="cat-modal-btn" data-type="2gyerek">👶👶 2 jogosult gyermek</button>
+       <button class="cat-modal-btn" data-type="3gyerek">👨‍👩‍👧 3+ jogosult gyermek</button>
       </div>
      </div>
      
@@ -3068,6 +3069,13 @@ var safeStorage = (function() {
    <div class="story-section-title">📋 Verziótörténet</div>
 
    <div class="story-timeline">
+    <div class="story-tl-item">
+     <div class="story-tl-dot" style="background:#7ED957;border:2px solid #5ab040;"></div>
+     <div class="story-tl-content">
+      <div class="story-tl-ver">Ver. 4.47 <span class="story-tl-date">2026-09-16</span></div>
+      <div class="story-tl-desc">🔍 Hitelesség-ellenőrzés + hírfrissítés: ⬆️ Új alkotmánytervezet pontosítva – szept.15-én az Országgyűlés TÉNYLEGESEN megválasztotta mind az 5 új alkotmánybírót (korábban csak jelöltként szerepeltek). 🔄 Fidesz-korszak szerződések frissítve és tömörítve: szept.15-16-án őrizetbe vették Jellinek Dánielt (Tiborcz üzlettársa, a 7. leggazdagabb magyar) és Szivek Norbert volt MNV-vezért az 5+ éve húzódó, 10+ Mrd Ft-os Volánbusz-korrupciós ügyben – ez az eddigi legkonkrétabb elszámoltatási eredmény. ✅ Spot-check: a Vagyonadó tégla tartalma megerősítve pontos és aktuális (okt. végi parlamenti beterjesztés, 1 Mrd Ft-os küszöb, 300-600 Mrd Ft várt bevétel), nem igényelt módosítást. 📊 108 tégla | 27 megvalósult | 67 bejelentve | 14 ígéret (nincs új tégla vagy státuszváltás e körben).</div>
+     </div>
+    </div>
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#7ED957;border:2px solid #5ab040;"></div>
      <div class="story-tl-content">
@@ -4600,9 +4608,9 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Új alkotmánytervezet kidolgozása",
   "FiDeSZ állapot": "Alaptörvény XII. módosítása 2024",
-  "Volt előrelépést jelentő bejelentés?": "igen – az Országgyűlés júl.13-án 139 igen, 6 nem szavazattal elfogadta az Alaptörvény 17. módosítását (Sulyok Tamás elnöki megbízatásának megszüntetése, 70 év feletti AB-tagok leváltása, 12 éves képviselői mandátumkorlát, NVVH alkotmányos alapja); Sulyok júl.18-án aláírta, hatályba lépett; az Országgyűlés aug.11-én megválasztotta dr. Baka Andrást köztársasági elnöknek, aki aug.19-én hivatalba lépett; szept.12-én Magyar Péter megnevezte a TISZA 5 új alkotmánybíró-jelöltjét (köztük Ligeti Miklós); szept.15-i hírek szerint az Alkotmánybíróságban emiatt szinte teljes sorcsere várható a testület összetételében; szept.14-én Magyar Péter a Kossuth rádióban bejelentette, hogy 2030-ig új alkotmányt és új választójogi törvényt is ígér – ez egy önálló, hosszabb távú vállalás (l. külön tégla)",
+  "Volt előrelépést jelentő bejelentés?": "igen – az Országgyűlés júl.13-án 139 igen, 6 nem szavazattal elfogadta az Alaptörvény 17. módosítását (Sulyok Tamás elnöki megbízatásának megszüntetése, 70 év feletti AB-tagok leváltása, 12 éves képviselői mandátumkorlát, NVVH alkotmányos alapja); Sulyok júl.18-án aláírta, hatályba lépett; az Országgyűlés aug.11-én megválasztotta dr. Baka Andrást köztársasági elnöknek, aki aug.19-én hivatalba lépett; szept.12-én Magyar Péter megnevezte a TISZA 5 alkotmánybíró-jelöltjét (köztük Ligeti Miklós); szept.15-én (kedd) az Országgyűlés meg is választotta mind az 5 új alkotmánybírót – ezzel a testületben gyakorlatilag teljes összetételcsere történt; szept.14-én Magyar Péter a Kossuth rádióban bejelentette, hogy 2030-ig új alkotmányt és új választójogi törvényt is ígér – ez egy önálló, hosszabb távú vállalás (l. külön tégla)",
   "Változás": "megvalósult",
-  "Frissítés": "2026-09-15",
+  "Frissítés": "2026-09-16",
   "Forrás link": "https://telex.hu/belfold/2026/08/19/baka-andras-koztarsasagi-elnok-sandor-palota-atvette-hivatalat",
   "Prioritás": "azonnali"
  },
@@ -5590,9 +5598,9 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Fidesz-korszak gyanús szerződéseinek felülvizsgálata és felmondása",
   "FiDeSZ állapot": "Az Orbán-kormány utolsó hónapjaiban számos nagy összegű, átláthatóság nélküli szerződést kötött alapítványokkal és állami cégekkel (KEKVA-rendszer); összesen ezermilliárdokra rúgó állami vagyon átcsoportosítás",
-  "Volt előrelépést jelentő bejelentés?": "igen – dohány- és kaszinókoncessziók, valamint a Covid-lélegeztetőgép-beszerzések teljes körű felülvizsgálata elrendelve; jún.24: felmondták a Balásy Gyula-féle Lounge-csoporttal kötött szerződéseket; aug.25: Orbán Anita feljelentést tett a Külügyminisztérium 2020-as, Szijjártó Péter minisztersége alatti Covid-lélegeztetőgép-beszerzései miatt (kb. 300 Mrd Ft értékben, közbeszerzés alóli kivételként kezelve); aug.26: a Fidesz jogosulatlanul fért hozzá a Gondosóra-program felhasználóinak adataihoz – ezt a szerződést is felmondták; szept.15-én (kedd) tovább gyorsult az elszámoltatás: Orbán Anita újabb feljelentést tett Szijjártó Péter ellen a delegációk \"rutinszerű\" magánrepülőgép-használata miatt (hűtlen kezelés gyanúja); előállítottak két NER-közeli üzletembert (Tiborcz István egyik üzlettársa és az állami vagyonkezelő egy volt vezetője); Lázár János büntetést kapott; eddig 70 nem nyilvános határozatot tártak fel, kb. 4000 Mrd Ft állami forrás sorsa kérdéses; emellett aug.25-én kiderült: a MÁV-csoport és a Magyar Közút közös gépjármű-beszerzési eljárása a becsült 89,1 Mrd Ft helyett végül 47,7 Mrd Ft-os ajánlattal zárult (41+ Mrd Ft megtakarítás)",
+  "Volt előrelépést jelentő bejelentés?": "igen – dohány-/kaszinókoncessziók és Covid-lélegeztetőgép-beszerzések felülvizsgálata elrendelve; jún.24: felmondták a Balásy Gyula-féle szerződéseket; aug.25: Orbán Anita feljelentést tett a 2020-as, Szijjártó minisztersége alatti lélegeztetőgép-beszerzések miatt (~300 Mrd Ft); szept.15-én további feljelentés Szijjártó ellen (magánrepülők); szept.15-16: őrizetbe vették Jellinek Dánielt (Tiborcz üzlettársa) és Szivek Norbert volt MNV-vezért az 5+ éve húzódó, 10+ Mrd Ft-os Volánbusz-korrupciós ügyben – ez az eddigi legkomolyabb konkrét eredmény; a MÁV-Közút közös beszerzés 41+ Mrd Ft megtakarítást hozott; eddig 70 nem nyilvános határozatot tártak fel, kb. 4000 Mrd Ft állami forrás sorsa kérdéses",
   "Változás": "bejelentve",
-  "Frissítés": "2026-09-15",
+  "Frissítés": "2026-09-16",
   "Forrás link": "https://piacesprofit.hu/cikkek/gazdasag/hatalmas-pofon-keszul-a-fidesz-uzleti-hatorszaganak.html",
   "Prioritás": "magas"
  },
@@ -6730,11 +6738,11 @@ Számold ki te is: ${url}`;
   // Chip-ek frissítése
   function updateChips() {
     const categoryNames = {
-      'gyermektelen': { icon: '🙋', name: 'Gyermektelen', color: 'rgba(123,147,219,0.15)', textColor: '#7B93DB' },
+      'gyermektelen': { icon: '🙋', name: 'Nincs jogosult gyermek', color: 'rgba(123,147,219,0.15)', textColor: '#7B93DB' },
       '25alatt': { icon: '👤', name: '25 év alatti', color: 'rgba(123,147,219,0.15)', textColor: '#7B93DB' },
-      '1gyerek': { icon: '👶', name: '1 gyermekes', color: 'rgba(76,175,80,0.15)', textColor: '#4CAF50' },
-      '2gyerek': { icon: '👶👶', name: '2 gyermekes', color: 'rgba(76,175,80,0.15)', textColor: '#4CAF50' },
-      '3gyerek': { icon: '👨‍👩‍👧', name: '3+ gyermekes', color: 'rgba(76,175,80,0.15)', textColor: '#4CAF50' },
+      '1gyerek': { icon: '👶', name: '1 jogosult gyermek', color: 'rgba(76,175,80,0.15)', textColor: '#4CAF50' },
+      '2gyerek': { icon: '👶👶', name: '2 jogosult gyermek', color: 'rgba(76,175,80,0.15)', textColor: '#4CAF50' },
+      '3gyerek': { icon: '👨‍👩‍👧', name: '3+ jogosult gyermek', color: 'rgba(76,175,80,0.15)', textColor: '#4CAF50' },
       'anya': { icon: '👩', name: 'Anya vagyok', color: 'rgba(233,30,99,0.15)', textColor: '#E91E63' },
       'elsohazas': { icon: '💍', name: 'Első házasok', color: 'rgba(156,39,176,0.15)', textColor: '#9C27B0' },
       'fogyatekos': { icon: '♿', name: 'Fogyatékossággal élő', color: 'rgba(156,39,176,0.15)', textColor: '#9C27B0' },

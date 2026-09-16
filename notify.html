@@ -161,14 +161,12 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 1 új tégla + 7 frissítve (2026. szept. 15.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 2 tégla frissült (2026. szept. 16.)
 
 📊 Mai frissítések:
-• ✅ Ügynökakták teljes megnyitása – megvalósult (végrehajtási törvény elfogadva)
-• 🆕 ÚJ TÉGLA: Új alkotmány és választójogi törvény 2030-ig
-• 🚨 Feljelentés Szijjártó Péter ellen (magánrepülők + ~300 Mrd Ft-os Covid-lélegeztetőgép ügy)
-• 🏛️ Schmidt Mária leváltva, Terror Háza bezár; új NAV-elnök
-• ⛽ Dízeltámogatás parlamenti előterjesztése + dohányadó-emelés nov.1-től
+• ⬆️ Új alkotmánytervezet – pontosítva: az 5 alkotmánybírót TÉNYLEGESEN megválasztották (nem csak jelöltek)
+• 🚨 Volánbusz-ügy: őrizetbe vették Jellinek Dánielt (Tiborcz üzlettársa) és Szivek Norbert volt MNV-vezért egy 10+ Mrd Ft-os korrupciós ügyben
+• ✅ Hitelesség-ellenőrzés: a fájl épsége és több korábbi tégla pontossága is megerősítve
 
 📊 108 tégla | 27 megvalósult | 67 bejelentve | 14 ígéret
 
@@ -206,21 +204,19 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 1 új tégla + 7 frissítve (2026. szept. 15.)
+    dbInput.value = `🧱 2 tégla frissült (2026. szept. 16.)
 
 📊 Mai frissítések:
-• ✅ Ügynökakták teljes megnyitása – megvalósult (végrehajtási törvény elfogadva)
-• 🆕 ÚJ TÉGLA: Új alkotmány és választójogi törvény 2030-ig
-• 🚨 Feljelentés Szijjártó Péter ellen (magánrepülők + ~300 Mrd Ft-os Covid-lélegeztetőgép ügy)
-• 🏛️ Schmidt Mária leváltva, Terror Háza bezár; új NAV-elnök
-• ⛽ Dízeltámogatás parlamenti előterjesztése + dohányadó-emelés nov.1-től
+• ⬆️ Új alkotmánytervezet – pontosítva: az 5 alkotmánybírót TÉNYLEGESEN megválasztották (nem csak jelöltek)
+• 🚨 Volánbusz-ügy: őrizetbe vették Jellinek Dánielt (Tiborcz üzlettársa) és Szivek Norbert volt MNV-vezért egy 10+ Mrd Ft-os korrupciós ügyben
+• ✅ Hitelesség-ellenőrzés: a fájl épsége és több korábbi tégla pontossága is megerősítve
 
 📊 108 tégla | 27 megvalósult | 67 bejelentve | 14 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 15.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 16.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
 • Üzemanyag: a dízelárak tartósan magasak – a kormány célzott dízeltámogatást terjesztett a parlament elé (havi 5000 Ft, ~1 millió dízelautósnak)
