@@ -161,14 +161,14 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 2 tégla frissült (2026. szept. 16.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 1 új tégla + 2 frissítve (2026. szept. 17.)
 
 📊 Mai frissítések:
-• ⬆️ Új alkotmánytervezet – pontosítva: az 5 alkotmánybírót TÉNYLEGESEN megválasztották (nem csak jelöltek)
-• 🚨 Volánbusz-ügy: őrizetbe vették Jellinek Dánielt (Tiborcz üzlettársa) és Szivek Norbert volt MNV-vezért egy 10+ Mrd Ft-os korrupciós ügyben
-• ✅ Hitelesség-ellenőrzés: a fájl épsége és több korábbi tégla pontossága is megerősítve
+• 🆕 ÚJ TÉGLA: Kötelező orvosi kamarai tagság visszaállítása
+• 🏥 Egészségügyi pluszforrás – Hegedűs Zsolt 10 éves, 10 000+ Mrd Ft-os forrástervet vázolt fel
+• 🚨 Az MNB is feljelentést tett öt ingatlan miatt a Fidesz-korszak elszámoltatásában
 
-📊 108 tégla | 27 megvalósult | 67 bejelentve | 14 ígéret
+📊 109 tégla | 27 megvalósult | 68 bejelentve | 14 ígéret
 
 🔗 teglarol-teglara.hu</textarea>
 
@@ -204,19 +204,19 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 2 tégla frissült (2026. szept. 16.)
+    dbInput.value = `🧱 1 új tégla + 2 frissítve (2026. szept. 17.)
 
 📊 Mai frissítések:
-• ⬆️ Új alkotmánytervezet – pontosítva: az 5 alkotmánybírót TÉNYLEGESEN megválasztották (nem csak jelöltek)
-• 🚨 Volánbusz-ügy: őrizetbe vették Jellinek Dánielt (Tiborcz üzlettársa) és Szivek Norbert volt MNV-vezért egy 10+ Mrd Ft-os korrupciós ügyben
-• ✅ Hitelesség-ellenőrzés: a fájl épsége és több korábbi tégla pontossága is megerősítve
+• 🆕 ÚJ TÉGLA: Kötelező orvosi kamarai tagság visszaállítása
+• 🏥 Egészségügyi pluszforrás – Hegedűs Zsolt 10 éves, 10 000+ Mrd Ft-os forrástervet vázolt fel
+• 🚨 Az MNB is feljelentést tett öt ingatlan miatt a Fidesz-korszak elszámoltatásában
 
-📊 108 tégla | 27 megvalósult | 67 bejelentve | 14 ígéret
+📊 109 tégla | 27 megvalósult | 68 bejelentve | 14 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 16.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 17.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
 • Üzemanyag: a dízelárak tartósan magasak – a kormány célzott dízeltámogatást terjesztett a parlament elé (havi 5000 Ft, ~1 millió dízelautósnak)
