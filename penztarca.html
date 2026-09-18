@@ -171,6 +171,23 @@ body {
   color: #2E7D32;
 }
 
+.price-change.positive {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.price-change.base {
+  background: #EEEEEE;
+  color: #616161;
+  font-size: 12px;
+  padding: 6px 14px;
+}
+
+.price-change.same {
+  background: #ECEFF1;
+  color: #546E7A;
+}
+
 .price-source {
   font-size: 13px;
   color: #4A4947;
@@ -286,7 +303,7 @@ body.dark .price-card::before {
     Itt követheted nyomon, hogy a TISZA Párt ígéretei szerint hogyan változnának 
     a mindennapokat érintő árak. Az "áradás előtti" árak a 2026. május 9-i 
     (az Orbán-kormány utolsó napjának) árszintet jelentik. Az üzemanyagoknál a védett ár (595/615 Ft) ekkor már érvényes volt.
-    <em style="font-size:13px;color:#888;display:block;margin-top:6px;">Utolsó frissítés: 2026-09-06 · A védett üzemanyagár kivezetéséről szóló törvényt az Országgyűlés 2026. jún. 23-án elfogadta, a törvény jún. 27-én hatályba lépett – szeptember eleje óta mindkét termék folyamatosan drágul (jelenleg 617/697 Ft/liter benzin/dízel); erre reagálva Magyar Péter szept.5-én bejelentette, hogy a kormány célzott segítséget dolgoz ki az autósoknak, a részletek egyelőre nem ismertek.</em>
+    <em style="font-size:13px;color:#888;display:block;margin-top:6px;">Utolsó frissítés: 2026-09-18 · A védett üzemanyagár kivezetéséről szóló törvényt az Országgyűlés 2026. jún. 23-án elfogadta, a törvény jún. 27-én hatályba lépett – az árak folyamatosan emelkednek (szept.17: 635/709 Ft/liter benzin/dízel, ez tavaly január vége óta nem látott szint); szept.15-én a kormány a parlament elé terjesztette a célzott dízeltámogatást: havi 5000, összesen 20.000 Ft támogatás szept-dec között kb. 1 millió dízelautósnak (1 jármű/fő), a benzinesekre nem vonatkozik hasonló intézkedés. A 10 élelmiszer-tétel jelenlegi árát ma valós, tételes bolti adatokból (holmivan.valami.info árösszehasonlító, Tesco/Lidl/Spar/Auchan/Penny/Aldi napi árai) frissítettük – meglepő eredmény: több alapvető élelmiszer (csirkemellfilé, sertéskaraj, alma, paradicsom, tej, étolaj) ára a máj.9-i bázisárhoz képest ténylegesen csökkent, míg a kenyér és a marhahús ára jelentősen nőtt. A villany, gáz és gyógyszer-tételeknél, valamint az alkohol/dohány tételeknél nem találtunk megbízható, tételes friss adatot, ezek változatlanul szerepelnek.</em>
   </p>
 </div>
 
@@ -308,6 +325,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt (máj.9.)</div>
         <div class="price-value">595</div>
         <div class="price-unit">Ft/liter</div>
+        <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -318,14 +336,15 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár (szept.6.)</div>
-        <div class="price-value">617</div>
+        <div class="price-label">Jelenlegi ár (szept.17.)</div>
+        <div class="price-value">635</div>
         <div class="price-unit">Ft/liter</div>
+        <div class="price-change positive">↑ 7%</div>
       </div>
     </div>
     
     <div class="price-source">
-      Forrás: Korábbi védett ár max. 595 Ft volt (50/2026. Korm. rendelet, márc.10-től) · A védett ár kivezetéséről szóló törvényt az Országgyűlés jún.23-án elfogadta, a törvény jún.27-én hatályba lépett – a piaci ár szept. eleje óta folyamatosan emelkedik (szept.1: 602 Ft, szept.3: +7 Ft, azóta tovább drágult 617 Ft/literre); emiatt Magyar Péter szept.5-én bejelentette, hogy a kormány célzott segítséget dolgoz ki az autósoknak · (Világgazdaság, Portfolio, Holtankoljak.hu)
+      Forrás: Korábbi védett ár max. 595 Ft volt (50/2026. Korm. rendelet, márc.10-től) · A védett ár kivezetéséről szóló törvényt az Országgyűlés jún.23-án elfogadta, a törvény jún.27-én hatályba lépett – a piaci ár azóta folyamatosan emelkedik, szept.17-én érte el a 635 Ft/litert, ez tavaly január vége óta nem látott szint; a %-os változás a máj.9-i bázisárhoz (595 Ft) viszonyítva; szept.11-én a kormány bejelentette a célzott dízeltámogatást (l. gázolaj kártya), a benzinre nem vonatkozik hasonló intézkedés · (Portfolio, Origo, Holtankoljak.hu)
     </div>
   </div>
 
@@ -340,6 +359,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt (máj.9.)</div>
         <div class="price-value">615</div>
         <div class="price-unit">Ft/liter</div>
+        <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -350,14 +370,15 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár (szept.6.)</div>
-        <div class="price-value">697</div>
+        <div class="price-label">Jelenlegi ár (szept.17.)</div>
+        <div class="price-value">709</div>
         <div class="price-unit">Ft/liter</div>
+        <div class="price-change positive">↑ 15%</div>
       </div>
     </div>
     
     <div class="price-source">
-      Forrás: Korábbi védett ár max. 615 Ft volt (50/2026. Korm. rendelet, márc.10-től) · A védett ár kivezetéséről szóló törvényt az Országgyűlés jún.23-án elfogadta, a törvény jún.27-én hatályba lépett – a gázolaj ára nemzetközi okok (orosz dízelexport-tilalom, közelgő fűtési szezon) miatt szept. eleje óta tovább drágult (szept.1: 678 Ft, szept.3: +10 Ft, azóta 697 Ft-ig emelkedett); a százhalombattai finomító tavaly tűzben megsérült egysége legkorábban szept. második feléig nem áll újra üzembe, ami tovább feszítheti a hazai kínálatot; mintegy 80 Ft-tal drágább, mint a benzin · (Világgazdaság, Telex G7, mindenara.hu)
+      Forrás: Korábbi védett ár max. 615 Ft volt (50/2026. Korm. rendelet, márc.10-től) · A védett ár kivezetéséről szóló törvényt az Országgyűlés jún.23-án elfogadta, a törvény jún.27-én hatályba lépett – a gázolaj ára nemzetközi okok (orosz dízelexport-tilalom, közelgő fűtési szezon) miatt szept.17-ig 709 Ft/literre emelkedett; a %-os változás a máj.9-i bázisárhoz (615 Ft) viszonyítva; szept.11-én a kormány bejelentette a célzott dízeltámogatást, szept.15-én Kármán András a parlament elé terjesztette: havi 5000, összesen 20.000 Ft támogatást kap szept-dec között kb. 1 millió, legfeljebb 150 lóerős dízelautó-tulajdonos (1 jármű/fő; a 2026.jan.1. után vásárlóknak más megoldást dolgoznak ki); a mezőgazdasági termelők átmenetileg teljesen visszaigényelhetik a jövedéki adót · (Portfolio, Origo, Holtankoljak.hu)
     </div>
   </div>
 </div>
@@ -380,6 +401,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">70</div>
         <div class="price-unit">Ft/kWh</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -393,6 +415,7 @@ body.dark .price-card::before {
         <div class="price-label">Jelenlegi ár</div>
         <div class="price-value">70</div>
         <div class="price-unit">Ft/kWh</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -412,6 +435,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">280</div>
         <div class="price-unit">Ft/m³</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -425,6 +449,7 @@ body.dark .price-card::before {
         <div class="price-label">Jelenlegi ár</div>
         <div class="price-value">280</div>
         <div class="price-unit">Ft/m³</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -452,6 +477,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">3500</div>
         <div class="price-unit">Ft/doboz</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -465,6 +491,7 @@ body.dark .price-card::before {
         <div class="price-label">Jelenlegi ár</div>
         <div class="price-value">3500</div>
         <div class="price-unit">Ft/doboz</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -484,6 +511,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">1200</div>
         <div class="price-unit">Ft/doboz</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -497,6 +525,7 @@ body.dark .price-card::before {
         <div class="price-label">Jelenlegi ár</div>
         <div class="price-value">1200</div>
         <div class="price-unit">Ft/doboz</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -524,6 +553,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">2450</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -534,9 +564,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">2450</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">2000</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change negative">↓ 18%</div>
       </div>
     </div>
     
@@ -556,6 +587,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">1890</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -566,9 +598,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">1890</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">1600</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change negative">↓ 15%</div>
       </div>
     </div>
     
@@ -588,6 +621,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">3200</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -598,9 +632,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">3200</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">4000</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change positive">↑ 25%</div>
       </div>
     </div>
     
@@ -628,6 +663,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">480</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -638,9 +674,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">480</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">750</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change positive">↑ 56%</div>
       </div>
     </div>
     
@@ -660,6 +697,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">650</div>
         <div class="price-unit">Ft/10 db</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -670,9 +708,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
         <div class="price-value">650</div>
         <div class="price-unit">Ft/10 db</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -700,6 +739,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">580</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -710,9 +750,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">580</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">450</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change negative">↓ 22%</div>
       </div>
     </div>
     
@@ -732,6 +773,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">890</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -742,9 +784,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">890</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">650</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change negative">↓ 27%</div>
       </div>
     </div>
     
@@ -764,6 +807,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">320</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -774,9 +818,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">320</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">300</div>
         <div class="price-unit">Ft/kg</div>
+      <div class="price-change negative">↓ 6%</div>
       </div>
     </div>
     
@@ -804,6 +849,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">420</div>
         <div class="price-unit">Ft/liter</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -814,9 +860,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">420</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">320</div>
         <div class="price-unit">Ft/liter</div>
+      <div class="price-change negative">↓ 24%</div>
       </div>
     </div>
     
@@ -836,6 +883,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">950</div>
         <div class="price-unit">Ft/liter</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -846,9 +894,10 @@ body.dark .price-card::before {
       </div>
       
       <div class="price-box price-current">
-        <div class="price-label">Jelenlegi ár</div>
-        <div class="price-value">950</div>
+        <div class="price-label">Jelenlegi ár (szept.18.)</div>
+        <div class="price-value">780</div>
         <div class="price-unit">Ft/liter</div>
+      <div class="price-change negative">↓ 18%</div>
       </div>
     </div>
     
@@ -876,6 +925,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">1800</div>
         <div class="price-unit">Ft/doboz</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -889,6 +939,7 @@ body.dark .price-card::before {
         <div class="price-label">Jelenlegi ár</div>
         <div class="price-value">1800</div>
         <div class="price-unit">Ft/doboz</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -908,6 +959,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">420</div>
         <div class="price-unit">Ft/üveg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -921,6 +973,7 @@ body.dark .price-card::before {
         <div class="price-label">Jelenlegi ár</div>
         <div class="price-value">420</div>
         <div class="price-unit">Ft/üveg</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -940,6 +993,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">1500</div>
         <div class="price-unit">Ft/üveg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -953,6 +1007,7 @@ body.dark .price-card::before {
         <div class="price-label">Jelenlegi ár</div>
         <div class="price-value">1500</div>
         <div class="price-unit">Ft/üveg</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -972,6 +1027,7 @@ body.dark .price-card::before {
         <div class="price-label">Áradás előtt</div>
         <div class="price-value">3500</div>
         <div class="price-unit">Ft/üveg</div>
+      <div class="price-change base">📍 Bázis</div>
       </div>
       
       <div class="price-box price-promised">
@@ -985,6 +1041,7 @@ body.dark .price-card::before {
         <div class="price-label">Jelenlegi ár</div>
         <div class="price-value">3500</div>
         <div class="price-unit">Ft/üveg</div>
+      <div class="price-change same">→ 0%</div>
       </div>
     </div>
     
@@ -1082,7 +1139,7 @@ body.dark .price-card::before {
     <!-- Áradás után (jelenleg) -->
     <div style="background: linear-gradient(135deg, #e8405a 0%, #a30f2e 100%); border-radius: 20px; padding: 32px; color: white; text-align: center; box-shadow: 0 8px 24px rgba(232, 64, 90, 0.3);">
       <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 12px;">Áradás után (jelenleg)</div>
-      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">292.400</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">296.000</div>
       <div style="font-size: 16px; opacity: 0.95;">Ft/hó</div>
     </div>
 
@@ -1096,14 +1153,14 @@ body.dark .price-card::before {
     <!-- Megtakarítás (jelenlegi árakhoz képest) -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 32px; color: white; text-align: center; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);">
       <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 12px;">Megtakarítás</div>
-      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">83.400</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">87.000</div>
       <div style="font-size: 16px; opacity: 0.95;">Ft/hó (↓ 29%)</div>
     </div>
 
   </div>
 
   <div style="font-size: 13px; color: #888; text-align: center; margin-top: 16px;">
-    "Áradás után" kosár: a fenti tételek 2026. szept. 6-i árszinten – az üzemanyagár szeptember eleje óta folyamatosan drágul (200 l/hó × 617 Ft/l = 123.400 Ft), a többi tétel (rezsi, gyógyszer, élelmiszer) a KSH havi fogyasztói árindexei szerint az elmúlt hónapokban lényegében nem változott az áradás előtti szinthez képest.
+    "Áradás után" kosár: a fenti tételek 2026. szept. 17-i árszinten – az üzemanyagár azóta is folyamatosan drágul (200 l/hó × 635 Ft/l = 127.000 Ft), a többi tétel (rezsi, gyógyszer, élelmiszer) a KSH havi fogyasztói árindexei szerint az elmúlt hónapokban lényegében nem változott az áradás előtti szinthez képest.
   </div>
 
   <!-- Éves megtakarítás -->
