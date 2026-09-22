@@ -161,13 +161,13 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 6 tégla frissült (2026. szept. 19.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 5 tégla frissült (2026. szept. 22.)
 
 📊 Mai frissítések:
-• 💰 Vagyonosodási vizsgálat: konkrét törvényjavaslat – NAV 20 évre visszamenőleg vizsgálhatja a politikusokat
-• 🚨 Autópálya-koncesszió ügy: bizonyítékok egy ~23 000 Mrd Ft-os szerződésről (Mészáros Lőrinc, Szíjj László)
-• 🎓 Erasmus-program teljes újraindítása október elejére várható
-• 🏢 Kötelező kamarai hozzájárulás eltörölve
+• 🚨 M6-os autópálya-koncesszió LEÁLLÍTVA – "a magyar történelem legsúlyosabb korrupciós ügye"
+• ⚖️ Legfőbb ügyész-ügy: a TISZA elutasította Baka András jelöltjét
+• 🏛️ Az AB megsemmisítette az önkormányzati szolidaritási hozzájárulás szabályait
+• 📺 Médiatanács elnöke megválasztva – a Független Közmédia Testület felállt
 
 📊 109 tégla | 27 megvalósult | 68 bejelentve | 14 ígéret
 
@@ -205,24 +205,24 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 6 tégla frissült (2026. szept. 19.)
+    dbInput.value = `🧱 5 tégla frissült (2026. szept. 22.)
 
 📊 Mai frissítések:
-• 💰 Vagyonosodási vizsgálat: konkrét törvényjavaslat – NAV 20 évre visszamenőleg vizsgálhatja a politikusokat
-• 🚨 Autópálya-koncesszió ügy: bizonyítékok egy ~23 000 Mrd Ft-os szerződésről (Mészáros Lőrinc, Szíjj László)
-• 🎓 Erasmus-program teljes újraindítása október elejére várható
-• 🏢 Kötelező kamarai hozzájárulás eltörölve
+• 🚨 M6-os autópálya-koncesszió LEÁLLÍTVA – "a magyar történelem legsúlyosabb korrupciós ügye"
+• ⚖️ Legfőbb ügyész-ügy: a TISZA elutasította Baka András jelöltjét
+• 🏛️ Az AB megsemmisítette az önkormányzati szolidaritási hozzájárulás szabályait
+• 📺 Médiatanács elnöke megválasztva – a Független Közmédia Testület felállt
 
 📊 109 tégla | 27 megvalósult | 68 bejelentve | 14 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 19.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 22.)
 
-📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak – 10 élelmiszer-tétel valós, mai bolti árral frissítve
-• Meglepő eredmény: csirkemellfilé, sertéskaraj, tej, alma, paradicsom ára csökkent, de a kenyér (+56%) és marhahús (+25%) jelentősen drágult
-• Üzemanyag: dízeltámogatás a parlament előtt
+📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
+• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – a drágulás megállt, de a dízeltámogatás még a parlament előtt van
+• Élelmiszer-tételek: csirkemellfilé, sertéskaraj, tej, alma, paradicsom olcsóbb lett, de a kenyér (+56%) és marhahús (+25%) jelentősen drágult
 
 🔗 teglarol-teglara.hu/penztarca.html`;
     dbInput.placeholder = 'Pénztárcaindex launch üzenet';
