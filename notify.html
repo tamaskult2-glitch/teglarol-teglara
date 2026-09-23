@@ -161,13 +161,13 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 5 tégla frissült (2026. szept. 22.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. szept. 23.)
 
 📊 Mai frissítések:
-• 🚨 M6-os autópálya-koncesszió LEÁLLÍTVA – "a magyar történelem legsúlyosabb korrupciós ügye"
-• ⚖️ Legfőbb ügyész-ügy: a TISZA elutasította Baka András jelöltjét
-• 🏛️ Az AB megsemmisítette az önkormányzati szolidaritási hozzájárulás szabályait
-• 📺 Médiatanács elnöke megválasztva – a Független Közmédia Testület felállt
+• 🗺️ A mérföldkő-lista is pótolva a szept.15-22-i eseményekkel (Volánbusz, ügynökakták-törvény, M6-koncesszió, AB-döntés, Matolcsy-kihallgatás)
+• ⚖️ Legfőbb ügyész-ügy: Baka András szept.23-án is kitart Szathmáry Zoltán mellett
+• ⚖️ Mérlegen: Magyar Péter maga kérte mentelmi joga felfüggesztését; Medián-mérés csökkő TISZA-támogatottságot mutat
+• ⛽ Üzemanyagár stagnál (636/709 Ft/l), de a Brent olajár csökken – árcsökkenés jöhet
 
 📊 109 tégla | 27 megvalósult | 68 bejelentve | 14 ígéret
 
@@ -205,23 +205,23 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 5 tégla frissült (2026. szept. 22.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. szept. 23.)
 
 📊 Mai frissítések:
-• 🚨 M6-os autópálya-koncesszió LEÁLLÍTVA – "a magyar történelem legsúlyosabb korrupciós ügye"
-• ⚖️ Legfőbb ügyész-ügy: a TISZA elutasította Baka András jelöltjét
-• 🏛️ Az AB megsemmisítette az önkormányzati szolidaritási hozzájárulás szabályait
-• 📺 Médiatanács elnöke megválasztva – a Független Közmédia Testület felállt
+• 🗺️ A mérföldkő-lista is pótolva a szept.15-22-i eseményekkel (Volánbusz, ügynökakták-törvény, M6-koncesszió, AB-döntés, Matolcsy-kihallgatás)
+• ⚖️ Legfőbb ügyész-ügy: Baka András szept.23-án is kitart Szathmáry Zoltán mellett
+• ⚖️ Mérlegen: Magyar Péter maga kérte mentelmi joga felfüggesztését; Medián-mérés csökkő TISZA-támogatottságot mutat
+• ⛽ Üzemanyagár stagnál (636/709 Ft/l), de a Brent olajár csökken – árcsökkenés jöhet
 
 📊 109 tégla | 27 megvalósult | 68 bejelentve | 14 ígéret
 
 🔗 teglarol-teglara.hu`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 22.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 23.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – a drágulás megállt, de a dízeltámogatás még a parlament előtt van
+• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – szept.19. óta stagnál, de a Brent olajár csökken, árcsökkenés jöhet
 • Élelmiszer-tételek: csirkemellfilé, sertéskaraj, tej, alma, paradicsom olcsóbb lett, de a kenyér (+56%) és marhahús (+25%) jelentősen drágult
 
 🔗 teglarol-teglara.hu/penztarca.html`;
