@@ -155,6 +155,57 @@ body {
   font-weight: 600;
 }
 
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+}
+@media (max-width: 600px) {
+  .stat-grid { grid-template-columns: 1fr; }
+}
+.stat-card {
+  background: #fff;
+  border: 1px solid #ECE9E4;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.stat-metric {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4A4947;
+  margin-bottom: 10px;
+}
+.stat-values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.stat-val-block { text-align: center; flex: 1; }
+.stat-val-num { font-size: 22px; font-weight: 800; color: #2A2826; }
+.stat-val-label { font-size: 11px; color: #888; margin-top: 2px; }
+.stat-arrow { font-size: 18px; color: #ccc; }
+.stat-delta {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.stat-delta.up-bad { background: #FCE8EA; color: #c0183a; }
+.stat-delta.up-good { background: #E8F5E9; color: #1e7e34; }
+.stat-delta.down-bad { background: #FCE8EA; color: #c0183a; }
+.stat-delta.down-good { background: #E8F5E9; color: #1e7e34; }
+.stat-source { font-size: 11px; color: #999; margin-top: 8px; }
+body.dark .stat-card { background: #1E1D1B; border-color: #2E2C29; }
+body.dark .stat-metric { color: #C4C0BB; }
+body.dark .stat-val-num { color: #E8E4DD; }
+body.dark .stat-source { color: #777; }
+body.dark .stat-delta.up-bad, body.dark .stat-delta.down-bad { background: #2a1a1c; color: #ef5350; }
+body.dark .stat-delta.up-good, body.dark .stat-delta.down-good { background: #1a2a1a; color: #4caf50; }
+
 .dev-source a:hover {
   text-decoration: underline;
 }
@@ -253,6 +304,85 @@ body.dark .dev-card::before {
     azt, hogy ez alapján "mikor volt jobb", mindenki maga döntse el.
   </p>
 </div>
+
+<!-- NÉGY ELLENŐRZÖTT MUTATÓ, KORMÁNYVÁLTÁS ÓTA -->
+<div class="stat-grid">
+
+  <div class="stat-card">
+    <div class="stat-metric">⛽ 95-ös benzin átlagára</div>
+    <div class="stat-values">
+      <div class="stat-val-block">
+        <div class="stat-val-num">595</div>
+        <div class="stat-val-label">máj.9. Ft/l</div>
+      </div>
+      <div class="stat-arrow">→</div>
+      <div class="stat-val-block">
+        <div class="stat-val-num">636</div>
+        <div class="stat-val-label">szept.26. Ft/l</div>
+      </div>
+    </div>
+    <div class="stat-delta up-bad">↑ 6,9%</div>
+    <div class="stat-source">Forrás: Holtankoljak.hu</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-metric">⛽ Gázolaj átlagára</div>
+    <div class="stat-values">
+      <div class="stat-val-block">
+        <div class="stat-val-num">615</div>
+        <div class="stat-val-label">máj.9. Ft/l</div>
+      </div>
+      <div class="stat-arrow">→</div>
+      <div class="stat-val-block">
+        <div class="stat-val-num">709</div>
+        <div class="stat-val-label">szept.26. Ft/l</div>
+      </div>
+    </div>
+    <div class="stat-delta up-bad">↑ 15,3%</div>
+    <div class="stat-source">Forrás: Holtankoljak.hu</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-metric">👤 Munkanélküliségi ráta</div>
+    <div class="stat-values">
+      <div class="stat-val-block">
+        <div class="stat-val-num">4,3%</div>
+        <div class="stat-val-label">2026. máj.</div>
+      </div>
+      <div class="stat-arrow">→</div>
+      <div class="stat-val-block">
+        <div class="stat-val-num">4,7%</div>
+        <div class="stat-val-label">2026. aug.</div>
+      </div>
+    </div>
+    <div class="stat-delta up-bad">↑ 0,4 pp</div>
+    <div class="stat-source">Forrás: KSH (a legfrissebb elérhető havi adat)</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-metric">💰 2026-os költségvetési hiánycél</div>
+    <div class="stat-values">
+      <div class="stat-val-block">
+        <div class="stat-val-num">3,7%</div>
+        <div class="stat-val-label">eredeti terv</div>
+      </div>
+      <div class="stat-arrow">→</div>
+      <div class="stat-val-block">
+        <div class="stat-val-num">7,5%</div>
+        <div class="stat-val-label">felülvizsgált</div>
+      </div>
+    </div>
+    <div class="stat-delta up-bad">↑ 3,8 pp</div>
+    <div class="stat-source">Forrás: Fitch Ratings / Portfolio, szept.1-jei felülvizsgálat</div>
+  </div>
+
+</div>
+<p style="font-size:12px;color:#999;margin:-16px 0 32px;text-align:center;">
+  Ez a négy mutató azért került ide, mert ezekhez volt megbízható, tételes forrásunk mind a kormányváltás (2026.
+  máj.9.) körüli, mind a mai időpontra – nem szelektáltunk aszerint, hogy kedvező vagy kedvezőtlen irányba
+  mutatnak. A lenti kártyás lista más, nem számszerűsíthető fejleményeket gyűjt, kedvező és kedvezőtlen irányban
+  egyaránt.
+</p>
 
 <!-- KEDVEZŐ FEJLEMÉNYEK -->
 <div class="category-section">
