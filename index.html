@@ -1710,7 +1710,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-09-23</strong> · Ver. 4.54</p>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-09-26</strong> · Ver. 4.55</p>
 
  <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
@@ -2051,11 +2051,19 @@ body.dark .wallet-nav-btn .label {
    <div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,#CE2939,var(--border-subtle));border-radius:2px;"></div>
 
    <!-- Mérföldkövek -->
-   <div class="milestone" data-date="2026-09-22" style="border-left:2px dashed var(--border-subtle);padding-left:8px;margin-left:-8px;">
+   <div class="milestone" data-date="2026-09-26" style="border-left:2px dashed var(--border-subtle);padding-left:8px;margin-left:-8px;">
     <div class="milestone-dot" style="background:transparent;border:2px dashed #FF9933;"></div>
     <div class="milestone-content">
      <div class="milestone-date" style="color:#FF9933;">⏳ Várható — szeptember-október folyamán</div>
-     <div class="milestone-desc">🇪🇺 Szept.30: az uniós helyreállítási forrásokra vonatkozó végső kifizetési kérelem benyújtási határideje · 🎓 Okt. eleje: az Erasmus-program teljes újraindítása · 💰 Okt. közepe: a szociális/NOKS-dolgozók béremelésének első lépcsője</div>
+     <div class="milestone-desc">⚖️ Hétfői rendkívüli ülés: legfőbb ügyész megválasztása + mentelmi ügyek · 🇪🇺 Szept.30: a végső kifizetési kérelem benyújtási határideje, EU-Tanács döntése a 4,2 Mrd EUR kohéziós forrásról · 🎓 Okt. eleje: az Erasmus-program teljes újraindítása</div>
+    </div>
+   </div>
+
+   <div class="milestone" data-date="2026-09-24">
+    <div class="milestone-dot" style="background:#FF9933;"></div>
+    <div class="milestone-content">
+     <div class="milestone-date">📅 2026. szept. 23–24. — EU-áttörés + Környezetvédelmi Főhatóság</div>
+     <div class="milestone-desc">🇪🇺 Az Európai Bizottság javasolta a még befagyasztott 4,2 Mrd EUR kohéziós forrás felszabadítását – az első hivatalos EU-oldali lépés, nem csak magyar kormányzati állítás · 🌳 A kormány formálisan elfogadta a Környezetvédelmi Főhatóság létrehozásáról szóló előterjesztést (indul 2027.jan.1-től) · ⚖️ Az aranykonvoj-ügy ukrán pénzszállítóit képviselő ügyvédi iroda feljelentést tett hatóság félrevezetése miatt, miután Magyar Péter éjjel kommentekben üzent a Legfőbb Ügyészségnek</div>
     </div>
    </div>
 
@@ -3101,6 +3109,13 @@ var safeStorage = (function() {
    <div class="story-section-title">📋 Verziótörténet</div>
 
    <div class="story-timeline">
+    <div class="story-tl-item">
+     <div class="story-tl-dot" style="background:#7ED957;border:2px solid #5ab040;"></div>
+     <div class="story-tl-content">
+      <div class="story-tl-ver">Ver. 4.55 <span class="story-tl-date">2026-09-26</span></div>
+      <div class="story-tl-desc">🔍 Teljes oldal frissítés (szept.24-26.): ⬆️ Rezsicsökkentés/dízeltámogatás "megvalósult"-ra emelve – a célzott dízeltámogatási törvényt elfogadták, az első, 5000 Ft-os részlet szept.30-án (szerdán) érkezik kb. 1 millió dízelautósnak. 🇪🇺 Nagy előrelépés az EU-források ügyében – szept.23-án az Európai Bizottság hivatalosan javasolta a még befagyasztva tartott 4,2 Mrd EUR kohéziós forrás felszabadítását, ezzel a KEKVA-fenntartású egyetemek is visszatérhetnek az Erasmus+/Horizont Európa programokba (ez az első EU-oldali, nem csak magyar kormányzati megerősítés). 🌳 Szept.24: formálisan is elfogadták a Környezetvédelmi Főhatóság létrehozásáról szóló előterjesztést. ⚖️ Tovább éleződött a legfőbb ügyész-konfliktus: aranykonvoj-feljelentés hatóság félrevezetése miatt, Magyar Péter átírná a mentelmi jogi szabályokat, hétfőn rendkívüli ülés várható. 👨‍👩‍👧 Magyar Péter szept.24-én ismét megerősítette a családi pótlék 2027-es emelését. 📊 109 tégla | 28 megvalósult | 67 bejelentve | 14 ígéret. 🔜 Várható: hétfői rendkívüli ülés (legfőbb ügyész + mentelmi ügyek), EU-Tanács végleges döntése a kohéziós forrásról.</div>
+     </div>
+    </div>
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#7ED957;border:2px solid #5ab040;"></div>
      <div class="story-tl-content">
@@ -4990,9 +5005,9 @@ const excelData = [
   "Kategória": "Családpolitika",
   "TiSZa ígéret": "Családtámogatások bővítése",
   "FiDeSZ állapot": "meglévő rendszer",
-  "Volt előrelépést jelentő bejelentés?": "igen – jún.11-én meghosszabbították a babaváró hitel gyermekvállalási haladékát és a Diákhitel1 kamatstopot; a családi pótlék duplázása NEM került bele a szept.1-jei felülvizsgált 2026-os költségvetésbe; szept.14-én Magyar Péter a Kossuth rádióban megerősítette: a családi pótlék \"nagyarányú\" emelése garantáltan meg fog történni (2008 óta nem emelték), de ennek mértékét és időpontját már a 2027-es költségvetésben határozzák meg – így 2026-ban továbbra sem várható; a GYES/GYET és anyasági támogatás duplázásáról sincs konkrét információ; az iskolakezdési támogatás szűkebb körben már megvalósult (l. külön tégla)",
+  "Volt előrelépést jelentő bejelentés?": "igen – jún.11-én meghosszabbították a babaváró hitel gyermekvállalási haladékát; a családi pótlék duplázása NEM került bele a szept.1-jei felülvizsgált 2026-os költségvetésbe; szept.14. és szept.24. is (Kossuth rádió) Magyar Péter megerősítette: a családi pótlék \"nagyarányú\" emelése garantáltan meg fog történni, de mértékét/időpontját a 2027-es költségvetésben határozzák meg – 2026-ban továbbra sem várható; szept.24-én hozzátette: az örökölt 8,3%-os hiányt 3 hónap alatt 1000 Mrd Ft-tal csökkentették, ez indokolja a családtámogatások halasztását; az iskolakezdési támogatás szűkebb körben már megvalósult (l. külön tégla)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-09-14",
+  "Frissítés": "2026-09-26",
   "Forrás link": "https://telex.hu/g7/kozelet/2026/09/07/tisza-valasztasi-igeret-koltsegvetes-euro-tuzifa-gyogyszer-szja-nyugdij",
   "Prioritás": "rovid"
  },
@@ -5050,9 +5065,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Uniós források felszabadítása",
   "FiDeSZ állapot": "8000 Mrd Ft befagyasztva",
-  "Volt előrelépést jelentő bejelentés?": "igen – máj.29-30: Magyar Péter és von der Leyen politikai megállapodást kötött 16,4 Mrd EUR befagyasztott forrás (10 Mrd RRF + 4,2 Mrd kohéziós + 2,2 Mrd akadémiai) felszabadításáról; júl.10: az Ecofin jóváhagyta a módosított helyreállítási tervet; aug.2: hatályba lépett az EPPO-csatlakozás; aug.31 (a végső határidőn) Vitézy Dávid bejelentette, hogy a kormány saját értékelése szerint mind a 127 mérföldkövet teljesítette – ez egyoldalú kormányzati nyilatkozat, az EU hivatalos elfogadása még nem történt meg; szept.18-i hírek szerint október elejére minden akadály elhárulhat az Erasmus-program teljes újraindítása elől, így magyar egyetemisták már az őszi félévben kiutazhatnak; a végső kifizetési kérelmet szept.30-ig kell benyújtani, a folyósítás határideje dec.31. (tételes mérföldkő-lista a téglára kattintva)",
+  "Volt előrelépést jelentő bejelentés?": "igen – máj.29-30: Magyar Péter és von der Leyen politikai megállapodást kötött 16,4 Mrd EUR befagyasztott forrás felszabadításáról; júl.10: az Ecofin jóváhagyta a módosított helyreállítási tervet; aug.31: Vitézy Dávid bejelentette a 127 mérföldkő teljesítését (egyoldalú kormányzati nyilatkozat); szept.23-án (szerda) az Európai Bizottság végre az EU-oldalról is konkrétan lépett: Ursula von der Leyen bejelentette, hogy a Bizottság javasolja a még befagyasztva tartott 4,2 Mrd EUR kohéziós forrás felszabadítását, és ezzel a KEKVA-fenntartású (alapítványi) egyetemek is visszatérhetnek az Erasmus+ és a Horizont Európa programokba – ez az első hivatalos EU-s javaslat, nem csak magyar kormányzati állítás, de még nem végleges tagállami/tanácsi döntés; a végső kifizetési kérelmet szept.30-ig kell benyújtani, a folyósítás határideje dec.31. (tételes mérföldkő-lista a téglára kattintva)",
   "Változás": "bejelentve",
-  "Frissítés": "2026-09-19",
+  "Frissítés": "2026-09-26",
   "Forrás link": "https://www.economx.hu/belfold/2026/08/31/magyar-peter-rrf-unios-forrasok-helyreallitasi-hatarido/",
   "Prioritás": "azonnali",
   "Forrás": "https://telex.hu/kulfold/2026/05/29/magyar-peter-ursula-von-der-leyen-unios-penzek-targyalas-helyreallitasi-alap-kohezios-penzek"
@@ -5300,9 +5315,9 @@ const excelData = [
   "Kategória": "Energia és környezet",
   "TiSZa ígéret": "Környezetvédelmi szabályok szigorítása",
   "FiDeSZ állapot": "akkugyárak kontroll nélkül",
-  "Volt előrelépést jelentő bejelentés?": "igen – szept.3-5-én Magyar Péter bejelentette: 2027.jan.1-től létrejön a Környezetvédelmi Főhatóság; bevezetik a \"három csapás\" elvét (5 éven belüli harmadik szabálysértésnél minimumbírság), a legsúlyosabb esetekben a bírság felső határa 5 Mrd Ft-ra emelkedik; kritikusok szerint az akkugyárak esetében ez nem elég szigorú (\"nem ezt ígérték\")",
+  "Volt előrelépést jelentő bejelentés?": "igen – szept.3-5-én Magyar Péter bejelentette: 2027.jan.1-től létrejön a Környezetvédelmi Főhatóság; bevezetik a \"három csapás\" elvét, a legsúlyosabb esetekben a bírság felső határa 5 Mrd Ft-ra emelkedik; szept.24-én (csütörtök) a kormány formálisan is elfogadta az országos élő környezet felügyeleti hatóság létrehozásáról szóló előterjesztést, amely környezet-, természet-, állat- és klímavédelmi feladatokat is ellát majd; kritikusok szerint az akkugyárak esetében ez nem elég szigorú (\"nem ezt ígérték\")",
   "Változás": "bejelentve",
-  "Frissítés": "2026-09-13",
+  "Frissítés": "2026-09-26",
   "Forrás link": "https://www.economx.hu/belfold/2026/09/04/magyar-peter-kornyezetvedelmi-fohatosag-birsag-akkugyarak/",
   "Prioritás": "hosszu"
  },
@@ -5390,9 +5405,9 @@ const excelData = [
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Rezsicsökkentés megtartása és kiterjesztése vállalkozásokra",
   "FiDeSZ állapot": "csak lakossági rezsivédelem",
-  "Volt előrelépést jelentő bejelentés?": "igen – FONTOS ELLENTMONDÁS: a kampányígéret a rezsicsökkentés kiterjesztését ígérte, de Kármán András már máj.13-án bejelentette, hogy a jelenlegi rendszert rászorultsági alapon szűkítenék; a védett üzemanyagárat az Országgyűlés jún.23-án kivezette; szept.15-én (kedd) Kármán András az Országgyűlés elé terjesztette a törvényjavaslatot: havi 5000, összesen 20 000 Ft támogatást kap szept-dec között kb. 1 millió, legfeljebb 150 lóerős dízelautó-tulajdonos (egy jármű után jár csak, a 2026.jan.1. után vásárlóknak más megoldást dolgoznak ki); a mezőgazdasági termelők átmenetileg teljesen visszaigényelhetik a gázolaj jövedéki adóját; a törvényjavaslat egy másik eleme a dohánytermékek jövedéki adójának emelése nov.1-től (a kormány kb. 90 Mrd Ft többletbevételt vár, amit egészségügyre fordítanak); Zsiday Viktor elemző szerint a dízeltámogatást valójában a benzinesek, gyalogosok és tömegközlekedők fizetik meg közvetve; ez explicit módon NEM a korábbi, mindenkire vonatkozó hatósági ár visszaállítása, hanem szűkebb, célzott intézkedés",
-  "Változás": "bejelentve",
-  "Frissítés": "2026-09-15",
+  "Volt előrelépést jelentő bejelentés?": "igen – FONTOS ELLENTMONDÁS: a kampányígéret a rezsicsökkentés kiterjesztését ígérte, de a jelenlegi rendszert rászorultsági alapon szűkítenék; a védett üzemanyagárat az Országgyűlés jún.23-án kivezette, azóta 636/709 Ft/l-re (benzin/dízel) drágult; szept.15-én benyújtott célzott dízeltámogatási törvényjavaslatot elfogadták: havi 5000, összesen 20 000 Ft támogatást kap szept-dec között kb. 1 millió, legfeljebb 150 lóerős dízelautó-tulajdonos – az első, 5000 Ft-os részlet szept.30-án (szerdán) érkezik; a mezőgazdasági termelők visszaigényelhetik a gázolaj jövedéki adóját; Zsiday Viktor elemző szerint a dízeltámogatást valójában a benzinesek és tömegközlekedők fizetik meg közvetve; ez NEM a korábbi, mindenkire vonatkozó hatósági ár visszaállítása, hanem szűkebb, célzott intézkedés, amely most ténylegesen folyósításra kerül",
+  "Változás": "megvalósult",
+  "Frissítés": "2026-09-26",
   "Forrás link": "https://www.feol.hu/orszag-vilag/2026/05/a-tisza-part-maris-kozolte-a-rezsicsokkentest-nem-tartanak-fenn-a-jelenlegi-formajaban",
   "Prioritás": "azonnali"
  },
@@ -5440,9 +5455,9 @@ const excelData = [
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Alapítványi egyetemek visszaállamosítása",
   "FiDeSZ állapot": "11 egyetem alapítványi formában 2021-től",
-  "Volt előrelépést jelentő bejelentés?": "igen – jún.29-én hatályba lépett a törvényi rendelkezés: a felsőoktatási KEKVA-alapítványokat 2027.aug.1-ig meg kell szüntetni, jogutód a Magyar Állam; a nem felsőoktatási kekvák (pl. MCC) aug.31-ig valóban megszűntek; aug.28: a felsőoktatási kekváknál 98%-ban lecserélték a kuratóriumokat (1200+ pályázóból 660 érvényes); az Erasmus-hozzáférés helyreállítása is megtörtént; a tényleges egyetemi átalakítás 2027.aug.1-ig még folyamatban van",
+  "Volt előrelépést jelentő bejelentés?": "igen – jún.29-én hatályba lépett a törvényi rendelkezés: a felsőoktatási KEKVA-alapítványokat 2027.aug.1-ig meg kell szüntetni, jogutód a Magyar Állam; a nem felsőoktatási kekvák (pl. MCC) aug.31-ig valóban megszűntek – szept.25-i megerősítés szerint pontosan 14 kekva szűnt meg jogutód nélkül; aug.28: a felsőoktatási kekváknál 98%-ban lecserélték a kuratóriumokat; FONTOS PONTOSÍTÁS: a KEKVA-fenntartású egyetemek Erasmus+/Horizont Európa-hozzáférése valójában csak szept.23-án vált (feltételesen) lehetségessé, az EU Bizottság 4,2 Mrd EUR-s kohéziós forrás-javaslatával együtt – korábban ez még nem volt megvalósult tény; a tényleges egyetemi átalakítás 2027.aug.1-ig még folyamatban van",
   "Változás": "megvalósult",
-  "Frissítés": "2026-09-11",
+  "Frissítés": "2026-09-26",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260828/meglepi-a-tarca-szinte-a-teljes-vezetest-lecserelik-a-vitatott-alapitvanyoknal-magyarorszagon-859054",
   "Prioritás": "rovid"
  },
@@ -5668,9 +5683,9 @@ const excelData = [
   "Kategória": "Államszerkezet és jogállam",
   "TiSZa ígéret": "Közjogi méltóságok felelősségre vonása / lemondásra szólítása",
   "FiDeSZ állapot": "Közjogi intézmények politikailag elfoglalva – bíróságok, AB, ÁSZ Fidesz-szimpatizánsokkal töltve fel",
-  "Volt előrelépést jelentő bejelentés?": "igen – az Alaptörvény 17. módosítása megszüntette Sulyok Tamás megbízatását, és 2 hónappal később a 70 év feletti alkotmánybírókét (köztük Polt Péter) is; júl.22-én Nagy Gábor Bálint legfőbb ügyész is lemondott; aug.19-én Baka András átvette az elnöki jogköröket; szept.22-én a TISZA-frakció egyhangúlag elutasította Baka András legfőbb ügyészi jelöltjét, Szathmáry Zoltánt (testvére gyanúsított az aranykonvoj-ügyben) – Baka András délután megerősítette, hogy ragaszkodik a jelöléshez, ez politikai elemzők szerint az államfő első \"szuverenitási tesztje\" a Tisza-kormánnyal szemben; az utódlás így továbbra sem oldódott meg",
+  "Volt előrelépést jelentő bejelentés?": "igen – az Alaptörvény 17. módosítása megszüntette Sulyok Tamás megbízatását, és a 70 év feletti alkotmánybírókét is; júl.22-én Nagy Gábor Bálint legfőbb ügyész is lemondott; aug.19-én Baka András átvette az elnöki jogköröket; szept.22-én a TISZA-frakció elutasította Baka András legfőbb ügyészi jelöltjét, Szathmáry Zoltánt (testvére gyanúsított az aranykonvoj-ügyben), az államfő mégis ragaszkodik hozzá; a konfliktus tovább éleződött: éjjel Magyar Péter kommentekben üzent a Legfőbb Ügyészségnek, mire az aranykonvoj-ügy ukrán pénzszállítóit képviselő ügyvédi iroda feljelentést tett hatóság félrevezetése és hamis vád miatt; emellett Magyar Péter jelezte, átírná a mentelmi jogi szabályokat is; hétfőn (szept.28 körül) rendkívüli ülésen tárgyalhatja az Országgyűlés a legfőbb ügyész megválasztását és több politikus mentelmi ügyét",
   "Változás": "megvalósult",
-  "Frissítés": "2026-09-23",
+  "Frissítés": "2026-09-26",
   "Forrás link": "https://telex.hu/belfold/2026/08/19/baka-andras-koztarsasagi-elnok-sandor-palota-atvette-hivatalat",
   "Prioritás": "Azonnali"
  },

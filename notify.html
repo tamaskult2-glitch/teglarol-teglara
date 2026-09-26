@@ -161,15 +161,15 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. szept. 23.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. szept. 26.)
 
 📊 Mai frissítések:
-• 🗺️ A mérföldkő-lista is pótolva a szept.15-22-i eseményekkel (Volánbusz, ügynökakták-törvény, M6-koncesszió, AB-döntés, Matolcsy-kihallgatás)
-• ⚖️ Legfőbb ügyész-ügy: Baka András szept.23-án is kitart Szathmáry Zoltán mellett
-• ⚖️ Mérlegen: Magyar Péter maga kérte mentelmi joga felfüggesztését; Medián-mérés csökkő TISZA-támogatottságot mutat
-• ⛽ Üzemanyagár stagnál (636/709 Ft/l), de a Brent olajár csökken – árcsökkenés jöhet
+• ⬆️ Dízeltámogatás megvalósult – az első, 5000 Ft-os részlet szept.30-án érkezik ~1 millió dízelautósnak
+• 🇪🇺 Az EU Bizottság javasolja a 4,2 Mrd EUR kohéziós forrás felszabadítását
+• 🌳 Elfogadták a Környezetvédelmi Főhatóság létrehozásáról szóló előterjesztést
+• ⚖️ Aranykonvoj-ügy: feljelentés a legfőbb ügyészi konfliktus közepette, hétfőn rendkívüli ülés várható
 
-📊 109 tégla | 27 megvalósult | 68 bejelentve | 14 ígéret</textarea>
+📊 109 tégla | 28 megvalósult | 67 bejelentve | 14 ígéret</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com,zsolt.ruszin@fairconto.hu</textarea>
@@ -203,21 +203,21 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 Teljes oldal frissítve (2026. szept. 23.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. szept. 26.)
 
 📊 Mai frissítések:
-• 🗺️ A mérföldkő-lista is pótolva a szept.15-22-i eseményekkel (Volánbusz, ügynökakták-törvény, M6-koncesszió, AB-döntés, Matolcsy-kihallgatás)
-• ⚖️ Legfőbb ügyész-ügy: Baka András szept.23-án is kitart Szathmáry Zoltán mellett
-• ⚖️ Mérlegen: Magyar Péter maga kérte mentelmi joga felfüggesztését; Medián-mérés csökkő TISZA-támogatottságot mutat
-• ⛽ Üzemanyagár stagnál (636/709 Ft/l), de a Brent olajár csökken – árcsökkenés jöhet
+• ⬆️ Dízeltámogatás megvalósult – az első, 5000 Ft-os részlet szept.30-án érkezik ~1 millió dízelautósnak
+• 🇪🇺 Az EU Bizottság javasolja a 4,2 Mrd EUR kohéziós forrás felszabadítását
+• 🌳 Elfogadták a Környezetvédelmi Főhatóság létrehozásáról szóló előterjesztést
+• ⚖️ Aranykonvoj-ügy: feljelentés a legfőbb ügyészi konfliktus közepette, hétfőn rendkívüli ülés várható
 
-📊 109 tégla | 27 megvalósult | 68 bejelentve | 14 ígéret`;
+📊 109 tégla | 28 megvalósult | 67 bejelentve | 14 ígéret`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 23.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 26.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – szept.19. óta stagnál, de a Brent olajár csökken, árcsökkenés jöhet
+• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – szept.19. óta stagnál; a dízeltámogatás első részlete szept.30-án érkezik
 • Élelmiszer-tételek: csirkemellfilé, sertéskaraj, tej, alma, paradicsom olcsóbb lett, de a kenyér (+56%) és marhahús (+25%) jelentősen drágult
 
 🔗 teglarol-teglara.hu/penztarca.html`;
