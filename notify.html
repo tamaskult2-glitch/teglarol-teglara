@@ -161,14 +161,13 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. szept. 28.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. szept. 30.)
 
-📊 Mai frissítések:
-• 💰 Vagyonadó: 2027.jan.1-től jön, de az eredetileg vállaltnál szigorúbb feltételekkel (500 Mrd Ft felett az 1%-nál magasabb kulcs is lehet)
-• 🧾 KATA: széles körű kiterjesztés készül – a katások cégeknek is számlázhatnának
-• 🏛️ Budapest: megszavazták az ingatlan-vagyonkezelési törvényt (Vörösmarty tér, Erzsébet tér stb. a fővároshoz kerül)
-• ⚖️ Ma rendkívüli ülés: legfőbb ügyész-jelölt és négy képviselő mentelmi ügye – a kimenetel még nem ismert
-• 📊 Mérleg: új mutatók (üzemanyagár, munkanélküliség, hiánycél) a kormányváltás óta
+📊 A legmozgalmasabb parlamenti nap eddig:
+• ⚖️ Szathmáry Zoltánt NEM választották meg legfőbb ügyésznek (0 igen, 138 nem)
+• 🚨 Hankó Balázst és Seszták Miklóst ŐRIZETBE vették mentelmi joguk felfüggesztése után
+• 📜 Ügyészségi feljegyzés szerint Orbán Viktor adhatott utasítást az aranykonvoj-vagyon lefoglalására
+• ⛽ MA indult a dízeltámogatás automatikus kifizetése kb. 1 millió jogosultnak
 
 📊 109 tégla | 28 megvalósult | 67 bejelentve | 14 ígéret</textarea>
 
@@ -204,22 +203,21 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 Teljes oldal frissítve (2026. szept. 28.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. szept. 30.)
 
-📊 Mai frissítések:
-• 💰 Vagyonadó: 2027.jan.1-től jön, de az eredetileg vállaltnál szigorúbb feltételekkel (500 Mrd Ft felett az 1%-nál magasabb kulcs is lehet)
-• 🧾 KATA: széles körű kiterjesztés készül – a katások cégeknek is számlázhatnának
-• 🏛️ Budapest: megszavazták az ingatlan-vagyonkezelési törvényt (Vörösmarty tér, Erzsébet tér stb. a fővároshoz kerül)
-• ⚖️ Ma rendkívüli ülés: legfőbb ügyész-jelölt és négy képviselő mentelmi ügye – a kimenetel még nem ismert
-• 📊 Mérleg: új mutatók (üzemanyagár, munkanélküliség, hiánycél) a kormányváltás óta
+📊 A legmozgalmasabb parlamenti nap eddig:
+• ⚖️ Szathmáry Zoltánt NEM választották meg legfőbb ügyésznek (0 igen, 138 nem)
+• 🚨 Hankó Balázst és Seszták Miklóst ŐRIZETBE vették mentelmi joguk felfüggesztése után
+• 📜 Ügyészségi feljegyzés szerint Orbán Viktor adhatott utasítást az aranykonvoj-vagyon lefoglalására
+• ⛽ MA indult a dízeltámogatás automatikus kifizetése kb. 1 millió jogosultnak
 
 📊 109 tégla | 28 megvalósult | 67 bejelentve | 14 ígéret`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 28.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 30.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – szept.19. óta stagnál, a Brent olaj 105 USD felett van, csökkenés egyelőre nem várható; a dízeltámogatás első részlete szept.30-án érkezik
+• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – már több mint egy hete stagnál, miközben a nemzetközi árak alapján akár 700/800 Ft is indokolt lenne; a dízeltámogatás MA megkezdődött
 • Élelmiszer-tételek: csirkemellfilé, sertéskaraj, tej, alma, paradicsom olcsóbb lett, de a kenyér (+56%) és marhahús (+25%) jelentősen drágult
 
 🔗 teglarol-teglara.hu/penztarca.html`;
