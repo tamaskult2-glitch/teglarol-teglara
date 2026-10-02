@@ -161,15 +161,15 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. szept. 30.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 2.)
 
-📊 A legmozgalmasabb parlamenti nap eddig:
-• ⚖️ Szathmáry Zoltánt NEM választották meg legfőbb ügyésznek (0 igen, 138 nem)
-• 🚨 Hankó Balázst és Seszták Miklóst ŐRIZETBE vették mentelmi joguk felfüggesztése után
-• 📜 Ügyészségi feljegyzés szerint Orbán Viktor adhatott utasítást az aranykonvoj-vagyon lefoglalására
-• ⛽ MA indult a dízeltámogatás automatikus kifizetése kb. 1 millió jogosultnak
+📊 1990 óta először: letartóztattak egy volt minisztert:
+• 🚨 Seszták Miklóst 30 napra LETARTÓZTATTA a bíróság (12 Mrd Ft-os vesztegetés gyanúja)
+• 🚨 Hankó Balázs és volt államtitkára letartóztatását is elrendelték (NKA-ügy, 17+ Mrd Ft)
+• 🏛️ Újraült a Fővárosi Közfejlesztések Tanácsa 5+ év szünet után
+• 🗺️ A MÁV is "megyebérletre" nevezte át a "vármegyebérletet"
 
-📊 109 tégla | 28 megvalósult | 67 bejelentve | 14 ígéret</textarea>
+📊 109 tégla | 29 megvalósult | 66 bejelentve | 14 ígéret</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com,zsolt.ruszin@fairconto.hu</textarea>
@@ -203,21 +203,21 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
   
   if (type === 'tegla') {
-    dbInput.value = `🧱 Teljes oldal frissítve (2026. szept. 30.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 2.)
 
-📊 A legmozgalmasabb parlamenti nap eddig:
-• ⚖️ Szathmáry Zoltánt NEM választották meg legfőbb ügyésznek (0 igen, 138 nem)
-• 🚨 Hankó Balázst és Seszták Miklóst ŐRIZETBE vették mentelmi joguk felfüggesztése után
-• 📜 Ügyészségi feljegyzés szerint Orbán Viktor adhatott utasítást az aranykonvoj-vagyon lefoglalására
-• ⛽ MA indult a dízeltámogatás automatikus kifizetése kb. 1 millió jogosultnak
+📊 1990 óta először: letartóztattak egy volt minisztert:
+• 🚨 Seszták Miklóst 30 napra LETARTÓZTATTA a bíróság (12 Mrd Ft-os vesztegetés gyanúja)
+• 🚨 Hankó Balázs és volt államtitkára letartóztatását is elrendelték (NKA-ügy, 17+ Mrd Ft)
+• 🏛️ Újraült a Fővárosi Közfejlesztések Tanácsa 5+ év szünet után
+• 🗺️ A MÁV is "megyebérletre" nevezte át a "vármegyebérletet"
 
-📊 109 tégla | 28 megvalósult | 67 bejelentve | 14 ígéret`;
+📊 109 tégla | 29 megvalósult | 66 bejelentve | 14 ígéret`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. szept. 30.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 2.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – már több mint egy hete stagnál, miközben a nemzetközi árak alapján akár 700/800 Ft is indokolt lenne; a dízeltámogatás MA megkezdődött
+• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – már két hete stagnál ("láthatatlan védett ár"), miközben a nemzetközi árak alapján akár 700/800 Ft is indokolt lenne
 • Élelmiszer-tételek: csirkemellfilé, sertéskaraj, tej, alma, paradicsom olcsóbb lett, de a kenyér (+56%) és marhahús (+25%) jelentősen drágult
 
 🔗 teglarol-teglara.hu/penztarca.html`;
