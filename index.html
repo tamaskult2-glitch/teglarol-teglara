@@ -6137,13 +6137,13 @@ function activateNewestSort() {
 // ── Frissítések felhívó (ma vagy tegnap) ──
 (function() {
   const today = getBudapestDate();
-  // Tegnap: getBudapestDate() - 1 nap
+  // Tegnap: getBudapestDate() - 1 nap (Budapest időzónában)
   const todayParts = today.split('-');
-  const d = new Date(Date.UTC(+todayParts[0], +todayParts[1]-1, +todayParts[2]));
-  d.setUTCDate(d.getUTCDate() - 1);
-  const yesterday = d.getUTCFullYear() + '-' +
-    String(d.getUTCMonth()+1).padStart(2,'0') + '-' +
-    String(d.getUTCDate()).padStart(2,'0');
+  const d = new Date(todayParts[0] + '-' + todayParts[1] + '-' + todayParts[2] + 'T00:00:00');
+  d.setDate(d.getDate() - 1);
+  const yesterday = d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
   const wrap = document.getElementById('todayUpdateWrap');
   const msg  = document.getElementById('todayUpdateMsg');
   if (!wrap || !msg) return;
