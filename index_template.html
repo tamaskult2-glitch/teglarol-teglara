@@ -1710,7 +1710,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-07</strong> · Ver. 4.59</p>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-09</strong> · Ver. 4.61</p>
 
  <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
@@ -2051,7 +2051,7 @@ body.dark .wallet-nav-btn .label {
    <div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,#CE2939,var(--border-subtle));border-radius:2px;"></div>
 
    <!-- Mérföldkövek -->
-   <div class="milestone" data-date="2026-10-07" style="border-left:2px dashed var(--border-subtle);padding-left:8px;margin-left:-8px;">
+   <div class="milestone" data-date="2026-10-08" style="border-left:2px dashed var(--border-subtle);padding-left:8px;margin-left:-8px;">
     <div class="milestone-dot" style="background:transparent;border:2px dashed #FF9933;"></div>
     <div class="milestone-content">
      <div class="milestone-date" style="color:#FF9933;">⏳ Várható — október folyamán</div>
@@ -2059,7 +2059,7 @@ body.dark .wallet-nav-btn .label {
     </div>
    </div>
 
-   <div class="milestone" data-date="2026-10-01">
+   <div class="milestone" data-date="2026-10-08">
     <div class="milestone-dot" style="background:#CE2939;"></div>
     <div class="milestone-content">
      <div class="milestone-date" style="font-weight:700;color:#CE2939;">🔥 2026. szept. 30. – okt. 1. — 1990 óta először: letartóztatott volt miniszter</div>
@@ -3136,7 +3136,14 @@ var safeStorage = (function() {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 4.59 <span class="story-tl-date">2026-10-07</span></div>
+      <div class="story-tl-ver">Ver. 4.61 <span class="story-tl-date">2026-10-09</span></div>
+      <div class="story-tl-desc">🔥 Kormányzati tájékoztató (magyar péter + vitézy): 💰 Vagyonadó – a kormány bejelentette: 15-25 ezer adóalanyt érint, ~7 milliárdos bevétel várható. 🚂 71-es vasútvonal fejlesztése – Vitézy Dávid bejelentette: uniós forrásokból elindul (Baross Gábor Terv keretében). 🏥 Egészségügy – 2027-es költségvetésben 500 milliárd Ft pluszforrás; azonban csípő- és térdprotézis-műtétre még 30 ezren várnak. 🏅 Sport – Magyar Péter: \"Megszabadítjuk a sportot a pártpolitikától\"; konkrét intézkedések még nincsenek bejelentve. 🆕 1 ÚJ TÉGLA: Sport felszabadítása a pártpolitikától. 📊 110 tégla | 29 megvalósult | 67 bejelentve | 14 ígéret (ma 4 tégla frissítve).</div>
+     </div>
+    </div>
+    <div class="story-tl-item">
+     <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
+     <div class="story-tl-content">
+      <div class="story-tl-ver">Ver. 4.60 <span class="story-tl-date">2026-10-08</span></div>
       <div class="story-tl-desc">🔥 1990 óta először tartóztattak le volt minisztert: szept.30-án a bíróság 30 napra LETARTÓZTATTA Seszták Miklós volt fejlesztési minisztert (12 Mrd Ft-os vesztegetés gyanúja, Nagy Ignác utcai bv-intézetbe szállítva); okt.1-jén Hankó Balázs volt kultuszminiszter és volt államtitkára, Varga-Bajusz Veronika letartóztatását is elrendelték (NKA-ügy, 17+ Mrd Ft) – mindkét döntés ellen fellebbeztek. ⬆️ Budapest-törvény "megvalósult"-ra emelve: okt.1-jén több mint 5 év szünet után újraült a Fővárosi Közfejlesztések Tanácsa, kibővített jogkörökkel, Magyar Péter és Karácsony Gergely fontos megállapodásairól beszélt. 🏛️ Megye-névváltás a gyakorlatban: okt.1-től a MÁV is "megyebérletre" nevezte át a "vármegyebérletet". 📜 Nyilvánossá teszik az Orbán-kormányok üléseinek jegyzőkönyveit is (elsőként a 2010-es kormányalakítás utáni hónapokét). 📊 109 tégla | 29 megvalósult | 66 bejelentve | 14 ígéret. 🔜 Várható: Baka András új legfőbbügyész-jelöltje, az erdőbényei kihelyezett kormányülés (okt.3-4.) eredményei.</div>
      </div>
     </div>
@@ -5046,13 +5053,13 @@ function activateNewestSort() {
 // ── Frissítések felhívó (ma vagy tegnap) ──
 (function() {
   const today = getBudapestDate();
-  // Tegnap: getBudapestDate() - 1 nap
+  // Tegnap: getBudapestDate() - 1 nap (Budapest időzónában)
   const todayParts = today.split('-');
-  const d = new Date(Date.UTC(+todayParts[0], +todayParts[1]-1, +todayParts[2]));
-  d.setUTCDate(d.getUTCDate() - 1);
-  const yesterday = d.getUTCFullYear() + '-' +
-    String(d.getUTCMonth()+1).padStart(2,'0') + '-' +
-    String(d.getUTCDate()).padStart(2,'0');
+  const d = new Date(todayParts[0] + '-' + todayParts[1] + '-' + todayParts[2] + 'T00:00:00');
+  d.setDate(d.getDate() - 1);
+  const yesterday = d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
   const wrap = document.getElementById('todayUpdateWrap');
   const msg  = document.getElementById('todayUpdateMsg');
   if (!wrap || !msg) return;
