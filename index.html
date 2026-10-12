@@ -1710,7 +1710,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-11</strong> · Ver. 4.63</p>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-12</strong> · Ver. 4.64</p>
 
  <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
@@ -3138,6 +3138,13 @@ var safeStorage = (function() {
      <div class="story-tl-content">
       <div class="story-tl-ver">Ver. 4.62 <span class="story-tl-date">2026-10-09</span></div>
       <div class="story-tl-desc">🔥 Kormányzati tájékoztató (magyar péter + vitézy): 💰 Vagyonadó – 15-25 ezer adóalanyt érint, ~7 milliárdos bevétel. 🚂 71-es vasútvonal fejlesztése – uniós forrásokból (Baross Gábor Terv). 🏥 Egészségügy – 500 milliárd Ft pluszforrás a 2027-es költségvetésben. 🏅 Sport – Felszabadítás a pártpolitikától. 📰 Állampapír adómentessége – Magyar Péter megerősítette: megtartják az adómentességet, de EU-s nyomás alatt van. 🆕 2 ÚJ TÉGLA: Sport felszabadítása + Állampapírok adómentességének megtartása. 📊 111 tégla | 30 megvalósult | 67 bejelentve | 14 ígéret (ma 5 tégla frissítve).</div>
+     </div>
+    </div>
+    <div class="story-tl-item">
+     <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
+     <div class="story-tl-content">
+      <div class="story-tl-ver">Ver. 4.64 <span class="story-tl-date">2026-10-12</span></div>
+      <div class="story-tl-desc">🔥 Teljes oldal frissítés (október 9-12-i kormányzati fejlemények alapján): 🚂 **ÚJ TÉGLA: Déli Körvasút (Southern Ring Railway) fejlesztése** – okt.9-én Vitézy Dávid bejelentette, hogy a projektet LEÁLLÍTHATJÁK a közbeszerzési szabálytalanságok miatt (V-Híd és Kontúr Csoport kartell-gyanúja), 367 Mrd Ft EU-s forrás veszélyben, Konkurencia Hatóság nyomozik. 👷 **Szociális dolgozók béremelés frissítve** – okt.9-én megerősítve: 25% béremelés ~90 ezer szociális/egészségügyi dolgozónak, kétlépcsős (mid-október + 2027. jan.1), konkrét dátum még tisztázásra vár. ⛽ **Üzemanyag-jövedéki csökkentés** – 25 Ft/liter kedvezmény dec.31-ig. 📊 112 tégla | 30 megvalósult | 68 bejelentve | 14 ígéret (1 új tégla + 2 frissítés). 🔜 Várható: 2027-es költségvetés végleges bemutatása (október közepén), szociális béremelés pontos végrehajtási ütemezése.</div>
      </div>
     </div>
     <div class="story-tl-item">
@@ -5401,6 +5408,16 @@ const excelData = [
   "Prioritás": "hosszu"
  },
  {
+  "Kategória": "Közlekedés",
+  "TiSZa ígéret": "Déli Körvasút (Southern Ring Railway) fejlesztése",
+  "FiDeSZ állapot": "Orbán-kormány szüneteltetett/késleltetett projektje, közbeszerzési irányított eljárás",
+  "Volt előrelépést jelentő bejelentés?": "igen, de veszélyeztetett – okt.9-én Vitézy Dávid bejelentette, hogy a Déli Körvasút építése LEÁLLHAT a közbeszerzési szabálytalanságok miatt; gyanú: V-Híd és Kontúr Csoport közötti kartell (előhívás); **367 Mrd Ft EU-s forrás veszélyben**, Konkurencia Hatóság nyomozása elindult, feljelentés benyújtva; konstrukciós hiba az eredeti Fidesz-korszak szerződésben, TISZA-kormány ezt nem tudta azonnal helyre tenni, de 2027-es költségvetésben megoldás keresés alatt; projekt vitás, mivel az eredeti ütemezés a járvánnyal és szakember-hiánnyal már jóval a terv mögé szorult",
+  "Változás": "bejelentve",
+  "Frissítés": "2026-10-09",
+  "Forrás link": "https://index.hu/belfold/2026/10/09/kormanyzati-tajekoztato-magyar-peter-vitezy-david-tisza-part-bejelentes/vitezy-david-teljesen-leallhat-a-deli-korvasut-epitese-a-kozbeszerzes-szabalytalansagai-miatt/",
+  "Prioritás": "magas"
+ },
+ {
   "Kategória": "Lakhatás",
   "TiSZa ígéret": "Bérlakásprogram előkészítése",
   "FiDeSZ állapot": "az önkormányzati bérlakásállomány 90%-ot csökkent 1990 óta; CSOK lakástámogatás létezik, de bérlakásprogram nincs",
@@ -5762,9 +5779,9 @@ const excelData = [
   "Kategória": "Családpolitika",
   "TiSZa ígéret": "Szociális és gyermekvédelmi (NOKS) dolgozók kétlépcsős béremelése",
   "FiDeSZ állapot": "évek óta elmaradó, valódi béremelés nélküli szektor",
-  "Volt előrelépést jelentő bejelentés?": "igen – szept.3-i kormányzati sajtótájékoztatón Magyar Péter bejelentette, hogy a szociális szférában és a nevelést-oktatást közvetlenül segítő (NOKS) dolgozóknál kétlépcsős béremelés jön: az első lépés okt. közepén, a második 2027. jan.1-jén léphet életbe; a konkrét összegekről és végrehajtási részletekről a kormánynak még döntenie kell; a szakszervezetek (SZÁÉF, MKKSZ) meglepetésként élték meg a bejelentést, mivel a kampányban ígért azonnali 25%-os emelést nem tartják elfogadhatónak a kétlépcsős megoldás helyett, és szept.18-ra demonstrációt terveznek; szept.14-én Magyar Péter a Kossuth rádióban pontosított: a gyermekvédelemben dolgozó szakemberek 20-25%-os béremelést kapnak, az első felét novemberben, a másik felét januárban – ez kissé eltér a szept.3-i \"október közepén\" időponttól, a pontos, egységes ütemezés még tisztázásra vár",
+  "Volt előrelépést jelentő bejelentés?": "igen – szept.3-i kormányzati sajtótájékoztatón Magyar Péter bejelentette, hogy szociális szférában és nevelést-oktatást segítő (NOKS) dolgozóknál kétlépcsős béremelés jön; szept.14-én pontosított: 20-25%-os béremelés, első felét november, másodika január. Okt.9-i kormányinfó: **25% béremelés szociális/egészségügyi dolgozók számára**, ~90 ezer fő érintett, kétlépcsős (mid-október + 2027. jan.1); konkrét dátum még tisztázásra vár, tárgyalások folynak; szakszervezetek (SZÁÉF, MKKSZ) a kampányban ígért azonnali megvalósítást szorgalmazzák",
   "Változás": "bejelentve",
-  "Frissítés": "2026-09-14",
+  "Frissítés": "2026-10-09",
   "Forrás link": "https://www.vg.hu/kozelet/2026/09/beremeles-ket-lepcso-noks-dolgozok-magyar-peter-lannert",
   "Prioritás": "rovid"
  },

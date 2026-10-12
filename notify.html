@@ -161,15 +161,15 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 8.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 12.)
 
-📊 1990 óta először: letartóztattak egy volt minisztert:
-• 🚨 Seszták Miklóst 30 napra LETARTÓZTATTA a bíróság (12 Mrd Ft-os vesztegetés gyanúja)
-• 🚨 Hankó Balázs és volt államtitkára letartóztatását is elrendelték (NKA-ügy, 17+ Mrd Ft)
-• 🏛️ Újraült a Fővárosi Közfejlesztések Tanácsa 5+ év szünet után
-• 🗺️ A MÁV is "megyebérletre" nevezte át a "vármegyebérletet"
+🔥 Október 9-12-i kormányzati fejlemények:
+• 🚂 ÚJ TÉGLA: Déli Körvasút LEÁLLÍTHATÓ – 367 Mrd Ft EU-s forrás veszélyben (közbeszerzési szabálytalanság)
+• 👷 Szociális dolgozók **25% béremelése** – ~90 ezer fő, kétlépcsős (mid-október + jan.2027)
+• ⛽ Üzemanyag-jövedéki csökkentés – 25 Ft/liter dec.31-ig
+• 💰 Vagyonadó, KATA-módosítás, egészségügy +500 Mrd Ft (okt.9-én bejelentve)
 
-📊 109 tégla | 29 megvalósult | 66 bejelentve | 14 ígéret</textarea>
+📊 112 tégla | 30 megvalósult | 68 bejelentve | 14 ígéret</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com,zsolt.ruszin@fairconto.hu</textarea>
@@ -201,17 +201,17 @@ emailjs.init(CONFIG.publicKey);
 function updateTemplate() {
   const type = document.getElementById('typeSelect').value;
   const dbInput = document.getElementById('dbInput');
-  
+
   if (type === 'tegla') {
-    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 8.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 12.)
 
-📊 1990 óta először: letartóztattak egy volt minisztert:
-• 🚨 Seszták Miklóst 30 napra LETARTÓZTATTA a bíróság (12 Mrd Ft-os vesztegetés gyanúja)
-• 🚨 Hankó Balázs és volt államtitkára letartóztatását is elrendelték (NKA-ügy, 17+ Mrd Ft)
-• 🏛️ Újraült a Fővárosi Közfejlesztések Tanácsa 5+ év szünet után
-• 🗺️ A MÁV is "megyebérletre" nevezte át a "vármegyebérletet"
+🔥 Október 9-12-i kormányzati fejlemények:
+• 🚂 ÚJ TÉGLA: Déli Körvasút LEÁLLÍTHATÓ – 367 Mrd Ft EU-s forrás veszélyben (közbeszerzési szabálytalanság)
+• 👷 Szociális dolgozók **25% béremelése** – ~90 ezer fő, kétlépcsős (mid-október + jan.2027)
+• ⛽ Üzemanyag-jövedéki csökkentés – 25 Ft/liter dec.31-ig
+• 💰 Vagyonadó, KATA-módosítás, egészségügy +500 Mrd Ft (okt.9-én bejelentve)
 
-📊 109 tégla | 29 megvalósult | 66 bejelentve | 14 ígéret`;
+📊 112 tégla | 30 megvalósult | 68 bejelentve | 14 ígéret`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
     dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 8.)
