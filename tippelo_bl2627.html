@@ -789,33 +789,69 @@ function fbSafeName(name){
   return String(name || "").trim().replace(/[.#$\[\]\/]/g, "_");
 }
 
+const corsProxy = "https://api.allorigins.win/get?url=";
+
 async function fbGet(path){
-  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`);
-  if(!res.ok) throw new Error(`Firebase GET hiba: ${path}`);
-  return res.json();
+  const url = `${FB_BASE}/${FB_ROOT}/${path}.json`;
+  try{
+    const res = await fetch(url);
+    if(res.ok) return res.json();
+  }catch(e){}
+  // Fallback: CORS proxy
+  const proxyRes = await fetch(corsProxy + encodeURIComponent(url));
+  if(!proxyRes.ok) throw new Error(`Firebase GET hiba: ${path}`);
+  const proxyData = await proxyRes.json();
+  return JSON.parse(proxyData.contents);
 }
 async function fbSet(path, value){
-  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+  const url = `${FB_BASE}/${FB_ROOT}/${path}.json`;
+  try{
+    const res = await fetch(url, {
+      method:"PUT", body: JSON.stringify(value)
+    });
+    if(res.ok) return res.json();
+  }catch(e){}
+  // Fallback: CORS proxy
+  const proxyRes = await fetch(corsProxy + encodeURIComponent(url), {
     method:"PUT", body: JSON.stringify(value)
   });
-  if(!res.ok) throw new Error(`Firebase SET hiba: ${path}`);
-  return res.json();
+  if(!proxyRes.ok) throw new Error(`Firebase SET hiba: ${path}`);
+  const proxyData = await proxyRes.json();
+  return JSON.parse(proxyData.contents);
 }
 async function fbPatch(path, value){
-  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+  const url = `${FB_BASE}/${FB_ROOT}/${path}.json`;
+  try{
+    const res = await fetch(url, {
+      method:"PATCH", body: JSON.stringify(value)
+    });
+    if(res.ok) return res.json();
+  }catch(e){}
+  // Fallback: CORS proxy
+  const proxyRes = await fetch(corsProxy + encodeURIComponent(url), {
     method:"PATCH", body: JSON.stringify(value)
   });
-  if(!res.ok) throw new Error(`Firebase PATCH hiba: ${path}`);
-  return res.json();
+  if(!proxyRes.ok) throw new Error(`Firebase PATCH hiba: ${path}`);
+  const proxyData = await proxyRes.json();
+  return JSON.parse(proxyData.contents);
 }
 // POST — Firebase automatikusan generál egy egyedi kulcsot (pl. lista jellegű
 // bejegyzésekhez, mint az inviteRequests). A válasz {name: "-Nxyz..."} alakú.
 async function fbPush(path, value){
-  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+  const url = `${FB_BASE}/${FB_ROOT}/${path}.json`;
+  try{
+    const res = await fetch(url, {
+      method:"POST", body: JSON.stringify(value)
+    });
+    if(res.ok) return res.json();
+  }catch(e){}
+  // Fallback: CORS proxy
+  const proxyRes = await fetch(corsProxy + encodeURIComponent(url), {
     method:"POST", body: JSON.stringify(value)
   });
-  if(!res.ok) throw new Error(`Firebase PUSH hiba: ${path}`);
-  return res.json();
+  if(!proxyRes.ok) throw new Error(`Firebase PUSH hiba: ${path}`);
+  const proxyData = await proxyRes.json();
+  return JSON.parse(proxyData.contents);
 }
 
 /* =====================================================================
