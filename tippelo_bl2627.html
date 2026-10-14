@@ -1137,7 +1137,12 @@ async function autoFetchTodayResults(){
   if(msg){ msg.textContent = "⏳ ESPN lekérdezése…"; msg.style.color = "var(--bl-grey)"; }
   try{
     const today = getBudapestToday().replace(/-/g,"");
-    const res = await fetch(`${ESPN_CL_SCOREBOARD}?dates=${today}`);
+    const res = await fetch(`${ESPN_CL_SCOREBOARD}?dates=${today}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json'
+      }
+    });
     if(!res.ok) throw new Error("ESPN válasz hiba: " + res.status);
     const data = await res.json();
     const events = data.events || [];
@@ -1315,7 +1320,12 @@ async function refreshLiveScores(){
   // Valós BL-meccsek (csak akkor van értelme, ha már elindult a szezon)
   try{
     const today = getBudapestToday().replace(/-/g,"");
-    const res = await fetch(`${ESPN_CL_SCOREBOARD}?dates=${today}`);
+    const res = await fetch(`${ESPN_CL_SCOREBOARD}?dates=${today}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json'
+      }
+    });
     if(res.ok){
       const data = await res.json();
       for(const ev of data.events||[]){
