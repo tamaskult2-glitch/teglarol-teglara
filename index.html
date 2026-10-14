@@ -1710,7 +1710,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-12</strong> · Ver. 4.65</p>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-14</strong> · Ver. 4.66</p>
 
  <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
@@ -3136,6 +3136,13 @@ var safeStorage = (function() {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
      <div class="story-tl-content">
+      <div class="story-tl-ver">Ver. 4.66 <span class="story-tl-date">2026-10-14</span></div>
+      <div class="story-tl-desc">🔄 Teljes oldal frissítés (október 14.): Verziók és dátumok szinkronizálása az összes korábbi bejelentés alapján. 📊 **Aktuális státusz**: 113 tégla | 30 megvalósult | 69 bejelentve | 14 ígéret. 🟣🔵 Teglák kategóriája már jelölve: 🟣 102 kampány + 🔵 11 kormányzat. 📝 Összes bejelentés feldolgozva az október 9-i kormányzati tájékoztatóból: vagyonadó, KATA, egészségügy (500 Mrd Ft), közlekedés, sport, szociális dolgozók béremelése. 🔜 Nyomon követés: 2027-es költségvetés pontos paraméterezése, szociális béremelés tényleges ütemezése, szerződésfelülvizsgálatok lezárása.</div>
+     </div>
+    </div>
+    <div class="story-tl-item">
+     <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
+     <div class="story-tl-content">
       <div class="story-tl-ver">Ver. 4.62 <span class="story-tl-date">2026-10-09</span></div>
       <div class="story-tl-desc">🔥 Kormányzati tájékoztató (magyar péter + vitézy): 💰 Vagyonadó – 15-25 ezer adóalanyt érint, ~7 milliárdos bevétel. 🚂 71-es vasútvonal fejlesztése – uniós forrásokból (Baross Gábor Terv). 🏥 Egészségügy – 500 milliárd Ft pluszforrás a 2027-es költségvetésben. 🏅 Sport – Felszabadítás a pártpolitikától. 📰 Állampapír adómentessége – Magyar Péter megerősítette: megtartják az adómentességet, de EU-s nyomás alatt van. 🆕 2 ÚJ TÉGLA: Sport felszabadítása + Állampapírok adómentességének megtartása. 📊 111 tégla | 30 megvalósult | 67 bejelentve | 14 ígéret (ma 5 tégla frissítve).</div>
      </div>
@@ -3766,6 +3773,7 @@ function buildCard(item) {
  const today = getBudapestDate();
  const freshBadge = item["Frissítés"] === today ? '<span class="fresh-badge">● Ma</span>' : '';
  const fidesszHtml = item["FiDeSZ állapot"] ? `<div style="font-size:13px;color:var(--text-secondary);padding:6px 10px;background:var(--bg-main);border-radius:8px;line-height:1.4;"><span style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;">Előtte:</span> ${item["FiDeSZ állapot"]}</div>` : "";
+ const tipusEmoji = item["Típus"] === "kormányzat" ? "🔵" : "🟣";
 
  const bodyHTML = `
  <div class="card-body" style="display:flex;flex-direction:column;height:100%;">
@@ -3774,7 +3782,7 @@ function buildCard(item) {
    <span class="badge ${st.cls}">${st.label}</span>
    ${freshBadge}
   </div>
-  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
+  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${tipusEmoji} ${title}</h3>
   <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
    ${fidesszHtml}
    <div style="font-size:14px;color:var(--text-main);line-height:1.5;"><span style="font-weight:700;">Előrelépés:</span> ${item["Volt előrelépést jelentő bejelentés?"] || "–"}</div>
@@ -3981,6 +3989,7 @@ function renderDashboard(data) {
  const priLabel = pri === "azonnali" ? "🔴 Azonnali" : pri === "hosszu" ? "🟢 Hosszú táv" : "🟡 Rövid táv";
  const priCls = `priority-${pri}`;
  card.dataset.priority = pri;
+ const tipusEmoji = item["Típus"] === "kormányzat" ? "🔵" : "🟣";
 
  const bodyHTML = `
  <div class="card-body" style="display:flex;flex-direction:column;height:100%;">
@@ -3989,7 +3998,7 @@ function renderDashboard(data) {
    <span class="badge ${st.cls}">${st.label}</span>
    ${item["Frissítés"] === new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Budapest'}).format(new Date()) ? '<span class="fresh-badge">● Ma</span>' : ''}
   </div>
-  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${title}</h3>
+  <h3 style="margin:0 0 10px;font-size:17px;line-height:1.4;font-weight:700;">${tipusEmoji} ${title}</h3>
   <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
    ${item["FiDeSZ állapot"] ? `<div style="font-size:13px;color:var(--text-secondary);padding:6px 10px;background:var(--bg-main);border-radius:8px;line-height:1.4;"><span style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;">Előtte:</span> ${item["FiDeSZ állapot"]}</div>` : ""}
    <div style="font-size:14px;color:var(--text-main);line-height:1.5;"><span style="font-weight:700;">Előrelépés:</span> ${item["Volt előrelépést jelentő bejelentés?"] || "–"}</div>
@@ -4523,8 +4532,9 @@ function openModal(item) {
  const cat = item["Kategória"];
  const desc = descriptions[title] || "A részletes leírás a teljes programdokumentumban olvasható.";
  const st = getStatus(item["Változás"]);
+ const tipusEmoji = item["Típus"] === "kormányzat" ? "🔵" : "🟣";
 
- document.getElementById("modalTitle").textContent = title;
+ document.getElementById("modalTitle").textContent = tipusEmoji + " " + title;
  document.getElementById("modalDesc").textContent = desc;
 
  const tag = document.getElementById("modalCategoryTag");
@@ -4743,7 +4753,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/09/beremeles-nem-lesz-forrnak-az-indulatok",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4753,7 +4764,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-16",
   "Forrás link": "https://telex.hu/belfold/2026/08/19/baka-andras-koztarsasagi-elnok-sandor-palota-atvette-hivatalat",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4763,7 +4775,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-06",
   "Forrás link": "https://telex.hu/belfold/2026/05/14/haborus-veszelyhelyzet-magyarorszag",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4773,7 +4786,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://hirado.hu/belfold/cikk/2026/06/19/sulyok-tamas-dontott-alairta-a-miniszterelnoki-ciklusok-korlatozasarol-szolo-alaptorveny-modositast",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4783,7 +4797,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/09/vegrehajtok-a-kormany-sebesseget-valt",
-  "Prioritás": "magas"
+  "Prioritás": "magas",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4793,7 +4808,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://telex.hu/belfold/2026/07/17/kuria-obh-elnoke-birosagok-elmozditas-alaptorveny-magyar-peter-varga-zs",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4803,7 +4819,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-22",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260727/megszunt-az-mtva-folytatodik-a-kozmedia-megujitasa-852398",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4813,7 +4830,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://magyarnemzet.hu/belfold/2026/06/partfinanszirozas-frakciopenzek-partok-kepviselok-fizetesek",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4824,7 +4842,8 @@ const excelData = [
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.portfolio.hu/unios-forrasok/20260710/hivatalos-magyarorszag-csatlakozik-az-europai-ugyeszseghez-848818",
   "Prioritás": "azonnali",
-  "Forrás": "https://www.portfolio.hu/gazdasag/20260528/tisza-kormany-megjott-magyar-peter-elso-bejelentese-brusszelbol-839520"
+  "Forrás": "https://www.portfolio.hu/gazdasag/20260528/tisza-kormany-megjott-magyar-peter-elso-bejelentese-brusszelbol-839520",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4834,7 +4853,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://infostart.hu/belfold/2026/05/27/az-orszaggyules-visszavonta-magyarorszag-kilepeset-a-nemzetkozi-buntetobirosagbol",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4844,7 +4864,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://444.hu/2026/06/30/az-orszaggyules-megszavazta-a-szuverenitasvedelmi-hivatal-megszunteteset",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -4854,7 +4875,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://telex.hu/belfold/2026/08/28/parlament-percrol-percre-augusztus-28-nvvh",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Biztonságpolitika",
@@ -4864,7 +4886,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://www.penzcentrum.hu/gazdasag/20260514/fu-alatt-uj-torveny-lepett-eletbe-az-uzemanyagarakrol-megszunt-a-rendkivuli-helyzet-errol-mindenkinek-tudnia-kell-1198634",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Biztonságpolitika",
@@ -4874,7 +4897,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Biztonságpolitika",
@@ -4884,7 +4908,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://index.hu/gazdasag/2026/08/26/nato-fegyverkezes-kormany-magyar-peter-vedelmi-kiadasok/",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Biztonságpolitika",
@@ -4894,7 +4919,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://www.haon.hu/orszag-vilag/2026/09/migracios-valsaghelyzet-a-kormany-brusszelre-is-uzent",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Biztonságpolitika",
@@ -4905,7 +4931,8 @@ const excelData = [
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.agrarszektor.hu/szabalyozas/20260605/dontott-a-tisza-kormany-a-vendegmunkasokrol-azonnali-valtozas-jon-itthon-62582",
   "Prioritás": "rovid",
-  "Forrás": "https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/07/vendegmunkas-kormany-munkavallalok-harmadik-orszagbeli"
+  "Forrás": "https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/07/vendegmunkas-kormany-munkavallalok-harmadik-orszagbeli",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Biztonságpolitika",
@@ -4915,7 +4942,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://www.haon.hu/orszag-vilag/2026/09/migracios-valsaghelyzet-a-kormany-brusszelre-is-uzent",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Biztonságpolitika",
@@ -4925,7 +4953,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://index.hu/belfold/2026/09/04/tisza-kormany-gorog-marta-salatatorveny-buntetojog-vagyonelkobzas-embercsempeszet/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Külpolitika",
@@ -4935,7 +4964,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://index.hu/belfold/2026/06/12/magyar-peter-megallapodas-magyarorszag-ukrajna-karpataljai-magyarsag/",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Külpolitika",
@@ -4945,7 +4975,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://kormany.hu/hirek/v4-csucs-godollon-orszagainkat-sokkal-tobb-koti-ossze-mint-ami-elvalasztja",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Külpolitika",
@@ -4955,7 +4986,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://portfolio.hu/gazdasag/20260504/valasztas-2026-megalakul-a-tisza-kormany-834348",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Külpolitika",
@@ -4965,7 +4997,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://index.hu/belfold/2026/04/12/magyar-peter-tisza-part-valasztas-2026-portre-miniszterelnok-szavazas/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Külpolitika",
@@ -4975,7 +5008,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://gondola.hu/cikkek/kivandorlas-erosodes-tisza-kormany-157220",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egészségügy",
@@ -4985,7 +5019,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/08/egeszsegugy-atalakitas-korhazak-bezaras",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egészségügy",
@@ -4995,7 +5030,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://www.vg.hu/kozelet/2026/05/hegedus-zsolt-egeszsegugyi-miniszterjelolt-bizottsagi-meghallgatas",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egészségügy",
@@ -5005,7 +5041,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-10-09",
   "Forrás link": "https://index.hu/belfold/2026/10/09/kormanyzati-tajekoztato-magyar-peter-vitezy-david-tisza-part-bejelentes/reszleteket-arult-el-a-2027-es-koltsegvetesrol-a-miniszterelnok",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egészségügy",
@@ -5015,7 +5052,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://index.hu/belfold/2026/08/25/hegedus-zsolt-varolista-egeszsegugy-csokkentes-program-orszagos-mentoszolgalat/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egészségügy",
@@ -5025,7 +5063,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egészségügy",
@@ -5035,7 +5074,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5045,7 +5085,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://www.origo.hu/belpol/2026/08/nyugdij-karman-andras-raszorultsag-alapjan",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5055,7 +5096,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-19",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260827/magyar-peter-bejelentette-megemelik-a-nyugdijminimumot-erre-keszulhetnek-a-nyugdijasok-858602",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5065,7 +5107,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5075,7 +5118,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-26",
   "Forrás link": "https://telex.hu/g7/kozelet/2026/09/07/tisza-valasztasi-igeret-koltsegvetes-euro-tuzifa-gyogyszer-szja-nyugdij",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5085,7 +5129,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://www.boon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5095,7 +5140,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5105,7 +5151,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5115,7 +5162,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5125,7 +5173,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://hirlevel.egov.hu/2026/06/21/a-kormany-2026-evi-oszi-torvenyalkotasi-programja-muvelodes-oktataspolitika/",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5136,7 +5185,8 @@ const excelData = [
   "Frissítés": "2026-09-26",
   "Forrás link": "https://www.economx.hu/belfold/2026/08/31/magyar-peter-rrf-unios-forrasok-helyreallitasi-hatarido/",
   "Prioritás": "azonnali",
-  "Forrás": "https://telex.hu/kulfold/2026/05/29/magyar-peter-ursula-von-der-leyen-unios-penzek-targyalas-helyreallitasi-alap-kohezios-penzek"
+  "Forrás": "https://telex.hu/kulfold/2026/05/29/magyar-peter-ursula-von-der-leyen-unios-penzek-targyalas-helyreallitasi-alap-kohezios-penzek",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5147,7 +5197,8 @@ const excelData = [
   "Frissítés": "2026-09-28",
   "Forrás link": "https://telex.hu/g7/kozelet/2026/09/07/tisza-valasztasi-igeret-koltsegvetes-euro-tuzifa-gyogyszer-szja-nyugdij",
   "Prioritás": "magas",
-  "Forrás": "https://piacesprofit.hu/cikkek/gazdasag/a-tisza-kormany-csokkenti-az-alacsonyabb-berekhez-tartozo-szemely-jovedelemadot.html"
+  "Forrás": "https://piacesprofit.hu/cikkek/gazdasag/a-tisza-kormany-csokkenti-az-alacsonyabb-berekhez-tartozo-szemely-jovedelemadot.html",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5157,7 +5208,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5167,7 +5219,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://uzletem.hu/jogadokonyveles/karman-andras-ujra-szelesebb-korben-valaszthato-lesz-a-kata-modosul-a-vallalati-adokedvezmenyek-szovevenyes-rendszere",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5177,7 +5230,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://telex.hu/g7/kozelet/2026/09/07/tisza-valasztasi-igeret-koltsegvetes-euro-tuzifa-gyogyszer-szja-nyugdij",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5187,7 +5241,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://telex.hu/g7/kozelet/2026/09/07/tisza-valasztasi-igeret-koltsegvetes-euro-tuzifa-gyogyszer-szja-nyugdij",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5197,8 +5252,10 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/08/termofold-arverseny-allami-foldek-tiltakozo-gazdak",
-  "Prioritás": "hosszu"
- }, {
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
+ },
+ {
   "Kategória": "Gazdaság",
   "TiSZa ígéret": "Magyar gazdák védelme – ukrán agrártermékek import-szabályozása",
   "FiDeSZ állapot": "A Fidesz-kormány veszélyhelyzeti rendelettel tiltotta az ukrán agrártermékek behózatalát; 20+ termék (gabona, baromfi stb.) importáját blokkolták; az intézkedés az Eu-s szabályokkal is feszültségben volt",
@@ -5206,7 +5263,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-08",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260522/hivatalos-a-magyar-kormany-maris-ujratiltotta-az-ukran-szallitmanyokat-838722",
-  "Prioritás": "magas"
+  "Prioritás": "magas",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5216,7 +5274,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://telex.hu/belfold/2026/02/07/tisza-part-program-orszaggyulesi-valasztas-2026-aprilis-magyar-peter",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5226,7 +5285,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-19",
   "Forrás link": "https://piacesprofit.hu/cikkek/kkv_cegblog/burokraciacsokkentes_lepapirozva.html",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egyéb",
@@ -5236,7 +5296,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://index.hu/belfold/2026/04/12/magyar-peter-tisza-part-valasztas-2026-portre-miniszterelnok-szavazas/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egyéb",
@@ -5246,7 +5307,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egyéb",
@@ -5256,7 +5318,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egyéb",
@@ -5266,7 +5329,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-15",
   "Forrás link": "https://telex.hu/belfold/2026/05/19/kegyelmi-ugy-nyilvanossag-bicskei-gyermekotthon-novak-katalin-varga-judit",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egyéb",
@@ -5276,7 +5340,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260413/mar-majus-elejen-kormanyt-alakitana-a-tisza-part-eloben-beszel-magyar-peter-830276",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Oktatás",
@@ -5286,7 +5351,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://iskolaszolga.hu/palyazat/pedagogusber-emeles-kormanyrendelet-modositas",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Oktatás",
@@ -5296,8 +5362,10 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.penzcentrum.hu/oktatas/20260826/elkepeszto-trukkel-palastoljak-a-tanarhianyt-az-iskolakban-kiderult-kik-tanithatjak-valojaban-a-gyerekeket-2026-oszen-1204419",
-  "Prioritás": "rovid"
- }, {
+  "Prioritás": "rovid",
+  "Típus": "kampány"
+ },
+ {
   "Kategória": "Oktatás",
   "TiSZa ígéret": "Modern tananyagfejlesztés",
   "FiDeSZ állapot": "elavult tananyag",
@@ -5305,7 +5373,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-08",
   "Forrás link": "https://www.penzcentrum.hu/oktatas/20260815/nagyon-fontos-bejelentest-tett-lannert-judit-a-tankonyvekrol-szazezernyi-iskolast-es-pedagogust-erint-1203979",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Oktatás",
@@ -5315,7 +5384,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.alon.hu/orszagos-hirek/2026/08/tanevkezdes-tobb-jogkort-kapnak-az-iskolaigazgatok-es-a-tantestuletek",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Korrupcióellenes intézkedések",
@@ -5325,7 +5395,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://jogaszvilag.hu/szakma/mit-hoz-a-kbt-friss-modositasa/",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Korrupcióellenes intézkedések",
@@ -5335,7 +5406,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://njt.jog.gov.hu/jogszabaly/2026-18-00-00",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közigazgatás",
@@ -5345,7 +5417,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://njt.jog.gov.hu/jogszabaly/2026-13-00-00",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közigazgatás",
@@ -5355,7 +5428,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://cdn.tisza.work/A%20m%C5%B1k%C3%B6d%C5%91%20%C3%A9s%20embers%C3%A9ges%20Magyarorsz%C3%A1g%20alapjai.pdf",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Energia és környezet",
@@ -5365,7 +5439,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/08/orosz-energia-parlamenti-vita-hortay-kapitany",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Energia és környezet",
@@ -5375,7 +5450,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://www.tudasfaja.com/rezsicsokkentes-a-tisza-part-kormanya-alatt-erre-szamits-a-villany-es-gazszamlakon",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Energia és környezet",
@@ -5385,7 +5461,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-26",
   "Forrás link": "https://www.economx.hu/belfold/2026/09/04/magyar-peter-kornyezetvedelmi-fohatosag-birsag-akkugyarak/",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közlekedés",
@@ -5395,7 +5472,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-10-09",
   "Forrás link": "https://index.hu/belfold/2026/10/09/kormanyzati-tajekoztato-magyar-peter-vitezy-david-tisza-part-bejelentes/elinditjak-a-71-es-vasutvonal-fejleszteset",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közlekedés",
@@ -5405,7 +5483,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://telex.hu/belfold/2026/07/22/baross-gabor-vasutfejlesztesi-terv-magyar-peter-vitezy-david",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közlekedés",
@@ -5415,7 +5494,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-10-09",
   "Forrás link": "https://index.hu/belfold/2026/10/09/kormanyzati-tajekoztato-magyar-peter-vitezy-david-tisza-part-bejelentes/vitezy-david-teljesen-leallhat-a-deli-korvasut-epitese-a-kozbeszerzes-szabalytalansagai-miatt/",
-  "Prioritás": "magas"
+  "Prioritás": "magas",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Lakhatás",
@@ -5425,7 +5505,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.portfolio.hu/ingatlan/20260902/itt-a-torvenyjavaslat-nagy-valtozasok-jonnek-az-epitkezeseknel-az-otthon-startot-is-erinti-a-beavatkozas-859826",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közigazgatás",
@@ -5435,7 +5516,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-10-08",
   "Forrás link": "https://telex.hu/belfold/2026/07/18/kihirdetes-magyar-kozlony-sulyok-tamas-alairas-koztarsasagi-elnok",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közigazgatás",
@@ -5445,7 +5527,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-22",
   "Forrás link": "https://hang.hu/belfold/rendszerszintu-valtoztatas-meg-nem-varhato-de-a-bajba-jutott-onkormanyzatoknak-segithet-a-penzugyminiszterium-191942",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közigazgatás",
@@ -5455,8 +5538,10 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-10-08",
   "Forrás link": "https://www.economx.hu/belfold/2026/08/31/kivereztetes-partnerseg-kormany-budapest-karacsony-gergely-vitezy-david/",
-  "Prioritás": "rovid"
- }, {
+  "Prioritás": "rovid",
+  "Típus": "kampány"
+ },
+ {
   "Kategória": "Közigazgatás",
   "TiSZa ígéret": "Miniszterelnöki fizetés csökkentése 2,5 millió forintra",
   "FiDeSZ állapot": "miniszterelnöki fizetés magasabb (pontos adat nem publikus)",
@@ -5465,7 +5550,8 @@ const excelData = [
   "Frissítés": "2026-09-08",
   "Forrás link": "https://magyarkozlony.hu/hivatalos-lapok/syfNfCj1brCvPwPVvRue6a299004cdce9/dokumentumok/3b50fb5c7d7a1ae31735677a23eb299eb5ed79b4/letoltes",
   "Prioritás": "rovid",
-  "Forrás": "https://www.portfolio.hu/gazdasag/20260527/tisza-kormany-visszavonjak-a-diplomatautleveleket-nyilvanosak-lesznek-a-korhazi-fertozesek-839176"
+  "Forrás": "https://www.portfolio.hu/gazdasag/20260527/tisza-kormany-visszavonjak-a-diplomatautleveleket-nyilvanosak-lesznek-a-korhazi-fertozesek-839176",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5475,7 +5561,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-10-09",
   "Forrás link": "https://index.hu/belfold/2026/10/09/kormanyzati-tajekoztato-magyar-peter-vitezy-david-tisza-part-bejelentes/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5485,7 +5572,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-30",
   "Forrás link": "https://www.feol.hu/orszag-vilag/2026/05/a-tisza-part-maris-kozolte-a-rezsicsokkentest-nem-tartanak-fenn-a-jelenlegi-formajaban",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5495,7 +5583,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://telex.hu/gazdasag/2026/09/03/paks-atomeromu-paks-ii-nuklearis-roszatom-kapitany-istvan-magyar-peter",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5505,7 +5594,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://telex.hu/g7/kozelet/2026/09/07/tisza-valasztasi-igeret-koltsegvetes-euro-tuzifa-gyogyszer-szja-nyugdij",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Oktatás",
@@ -5515,7 +5605,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://eduline.hu/kozoktatas/20260815_tankonyvrendeles-iskolak-uj-kiadvanyok-potrendeles-reform",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Oktatás",
@@ -5525,7 +5616,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-08",
   "Forrás link": "https://www.hodpress.hu/a-kormany-felemelne-a-tankotelezettseg-korhatarat/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Oktatás",
@@ -5535,7 +5627,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-26",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260828/meglepi-a-tarca-szinte-a-teljes-vezetest-lecserelik-a-vitatott-alapitvanyoknal-magyarorszagon-859054",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Energia és környezet",
@@ -5545,7 +5638,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://magyartisza.hu/hirek/ujsag/bemutatta-mukodo-es-emberseges-magyarorszag-programjat-a-tisza",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Energia és környezet",
@@ -5555,7 +5649,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-08",
   "Forrás link": "https://vtest.debreceninap.hu/helyi/2026/09/03/otmilliard-forintra-emelik-a-kornyezetvedelmi-birsag-maximumat-tarkanyi-zsolt-szerint-ez-mar-fajhat-a-szennyezo-gyaraknak/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közlekedés",
@@ -5565,8 +5660,10 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://hvg.hu/gazdasag/20260522_ferihegyi-repuloter-fejlesztes-vitezy-david",
-  "Prioritás": "hosszu"
- }, {
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
+ },
+ {
   "Kategória": "Közlekedés",
   "TiSZa ígéret": "HÉV-infrastruktúra fejlesztése",
   "FiDeSZ állapot": "elavult HÉV-vonalak",
@@ -5574,7 +5671,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-08",
   "Forrás link": "https://index.hu/belfold/2026/08/05/vitezy-david-hev-kocsik-kozlekedes-baross-gabor-vasutfejlesztesi-terv/",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Lakhatás",
@@ -5584,8 +5682,10 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.portfolio.hu/ingatlan/20260901/megjelent-a-hatarozat-jon-a-kormany-lakasepitesi-es-berlakasprogramja-859532",
-  "Prioritás": "rovid"
- }, {
+  "Prioritás": "rovid",
+  "Típus": "kampány"
+ },
+ {
   "Kategória": "Korrupcióellenes intézkedések",
   "TiSZa ígéret": "20 évre visszamenőleg vagyonosodási vizsgálat politikusokon",
   "FiDeSZ állapot": "nincs átfogó vagyonosodási vizsgálat",
@@ -5593,7 +5693,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-19",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260826/tisza-kormany-jonnek-a-friss-dontesek-jo-hirek-paksrol-858308",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közigazgatás",
@@ -5603,7 +5704,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://index.hu/belfold/2026/02/07/magyar-peter-tisza-part-program-valasztasok-2026/",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Közigazgatás",
@@ -5613,7 +5715,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-08",
   "Forrás link": "https://index.hu/belfold/2026/04/28/miniszter-bejelentes-magyar-peter-tisza-part-kormany-tarr-zoltan-tanacs-zoltan-bodis-kriszta/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5623,7 +5726,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://telex.hu/g7/penz/2026/09/02/magyar-euro-bevezetes-celdatum-koltsegvetes-hiany",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -5633,7 +5737,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-10-08",
   "Forrás link": "https://index.hu/belfold/2026/08/09/ugynokaktak-oktober-23-feloldas-titkosszolgalat/",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5643,7 +5748,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://index.hu/belfold/2026/04/13/magyar-peter-elso-100-nap-ugynokaktak-ugyeszseg-kozmedia-kormany-tisza-part/",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5653,7 +5759,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://www.szon.hu/orszag-vilag/2026/04/ime-magyar-peter-kampanyigeretei-amiket-szamon-kerhetnek-a-valasztok",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5663,7 +5770,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://ellenpont.hu/magyar-peter-igeretei-nyugdijasoknak",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5673,7 +5781,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://ellenpont.hu/magyar-peter-igeretei-nyugdijasoknak",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5683,7 +5792,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://www.vg.hu/vilaggazdasag-magyar-gazdasag/2026/09/kapitany-istvan-ganz-abraham-program-vendeglatohelyek",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Egészségügy",
@@ -5693,7 +5803,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.economx.hu/belfold/2026/08/12/orszaggyules-dontes-gyogyszerek-afacsokkentes-egyhangu-szavazas/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5703,7 +5814,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://www.forbes.hu/penz/oriasi-lyukat-talalt-a-tisza-kormany-az-allamkasszaban/",
-  "Prioritás": "Azonnali"
+  "Prioritás": "Azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Gazdaság",
@@ -5713,7 +5825,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-10-09",
   "Forrás link": "https://index.hu/belfold/2026/10/09/kormanyzati-tajekoztato-magyar-peter-vitezy-david-tisza-part-bejelentes/magyar-peter-nem-tervezunk-valtoztatni-a-lakossagi-allampapirok-adoelonyen/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -5723,7 +5836,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://telex.hu/belfold/2026/05/12/gorog-marta-igazsagugyi-miniszter-parlament-bizottsagi-meghallgatas",
-  "Prioritás": "Azonnali"
+  "Prioritás": "Azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -5733,7 +5847,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-10",
   "Forrás link": "https://telex.hu/belfold/2026/05/11/posfai-gabor-bizottsagi-meghallgatas-nemzetbiztonsagi-bizottsag",
-  "Prioritás": "Azonnali"
+  "Prioritás": "Azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -5743,7 +5858,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-15",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260715/tisza-kormany-uj-part-alakulhat-a-fidesz-romjain-lemondott-szijjarto-peter-849670",
-  "Prioritás": "magas"
+  "Prioritás": "magas",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -5753,7 +5869,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-11",
   "Forrás link": "https://nepszava.hu/3328112_tavozo-allamtitkarok-miniszterek-hathavi-juttatas-vegkielegites-tisza",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -5763,7 +5880,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-10-10",
   "Forrás link": "https://piacesprofit.hu/cikkek/gazdasag/hatalmas-pofon-keszul-a-fidesz-uzleti-hatorszaganak.html",
-  "Prioritás": "magas"
+  "Prioritás": "magas",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -5773,7 +5891,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-30",
   "Forrás link": "https://telex.hu/belfold/2026/08/19/baka-andras-koztarsasagi-elnok-sandor-palota-atvette-hivatalat",
-  "Prioritás": "Azonnali"
+  "Prioritás": "Azonnali",
+  "Típus": "kampány"
  },
  {
   "Kategória": "Családpolitika",
@@ -5783,7 +5902,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-10-09",
   "Forrás link": "https://www.vg.hu/kozelet/2026/09/beremeles-ket-lepcso-noks-dolgozok-magyar-peter-lannert",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Közigazgatás",
@@ -5793,7 +5913,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260908/magyar-peter-bejelentette-indul-a-szent-istvan-videkfejlesztesi-program-861074",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Egyéb",
@@ -5803,7 +5924,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-19",
   "Forrás link": "https://telex.hu/gazdasag/2026/09/03/teljes-hulladekgazdalkodasi-rendszert-felulvizsgalja-a-kormany-magyar-peter-mohu-koncesszio",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Egyéb",
@@ -5813,7 +5935,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-10-09",
   "Forrás link": "https://index.hu/belfold/2026/10/09/kormanyzati-tajekoztato-magyar-peter-vitezy-david-tisza-part-bejelentes/magyar-peter-megszabaditjuk-a-sportot-a-partpolitikatol/",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Gazdaság",
@@ -5823,7 +5946,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-10-06",
   "Forrás link": "https://index.hu/sport/futball/2026/10/06/magyar-peter-bejelentes-adozasi-forma-ekho-500-millio-forintos-hatar-60-millio-denes-ferenc-sportkozgazdasz/",
-  "Prioritás": "kozepterm"
+  "Prioritás": "kozepterm",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Családpolitika",
@@ -5833,7 +5957,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://telex.hu/belfold/2026/09/03/kormanyzati-tajekoztato-kormanyinfo-magyar-peter",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Külpolitika",
@@ -5843,7 +5968,8 @@ const excelData = [
   "Változás": "megvalósult",
   "Frissítés": "2026-09-13",
   "Forrás link": "https://index.hu/belfold/2026/09/08/orban-anita-oroszorszag-diplomata-diplomacia-kiutasitas/",
-  "Prioritás": "azonnali"
+  "Prioritás": "azonnali",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Államszerkezet és jogállam",
@@ -5853,7 +5979,8 @@ const excelData = [
   "Változás": "ígéret",
   "Frissítés": "2026-09-15",
   "Forrás link": "https://privatbankar.hu/cikkek/makro/ujabb-emeleseket-jelentett-be-magyar-peter-jon-az-uj-valasztasi-torveny-is.html",
-  "Prioritás": "hosszu"
+  "Prioritás": "hosszu",
+  "Típus": "kormányzat"
  },
  {
   "Kategória": "Egészségügy",
@@ -5863,7 +5990,8 @@ const excelData = [
   "Változás": "bejelentve",
   "Frissítés": "2026-09-17",
   "Forrás link": "https://www.portfolio.hu/gazdasag/20260903/meglepi-a-kormany-komoly-jogokat-kapnak-vissza-a-magyar-orvosok-860354",
-  "Prioritás": "rovid"
+  "Prioritás": "rovid",
+  "Típus": "kormányzat"
  }
 ];
 
