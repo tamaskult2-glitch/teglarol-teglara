@@ -790,32 +790,64 @@ function fbSafeName(name){
 }
 
 async function fbGet(path){
-  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`);
-  if(!res.ok) throw new Error(`Firebase GET hiba: ${path}`);
-  return res.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 másodperc timeout
+  try{
+    const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if(!res.ok) throw new Error(`Firebase GET hiba: ${path}`);
+    return res.json();
+  }catch(e){
+    clearTimeout(timeoutId);
+    throw e;
+  }
 }
 async function fbSet(path, value){
-  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
-    method:"PUT", body: JSON.stringify(value)
-  });
-  if(!res.ok) throw new Error(`Firebase SET hiba: ${path}`);
-  return res.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  try{
+    const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+      method:"PUT", body: JSON.stringify(value), signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if(!res.ok) throw new Error(`Firebase SET hiba: ${path}`);
+    return res.json();
+  }catch(e){
+    clearTimeout(timeoutId);
+    throw e;
+  }
 }
 async function fbPatch(path, value){
-  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
-    method:"PATCH", body: JSON.stringify(value)
-  });
-  if(!res.ok) throw new Error(`Firebase PATCH hiba: ${path}`);
-  return res.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  try{
+    const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+      method:"PATCH", body: JSON.stringify(value), signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if(!res.ok) throw new Error(`Firebase PATCH hiba: ${path}`);
+    return res.json();
+  }catch(e){
+    clearTimeout(timeoutId);
+    throw e;
+  }
 }
 // POST — Firebase automatikusan generál egy egyedi kulcsot (pl. lista jellegű
 // bejegyzésekhez, mint az inviteRequests). A válasz {name: "-Nxyz..."} alakú.
 async function fbPush(path, value){
-  const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
-    method:"POST", body: JSON.stringify(value)
-  });
-  if(!res.ok) throw new Error(`Firebase PUSH hiba: ${path}`);
-  return res.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  try{
+    const res = await fetch(`${FB_BASE}/${FB_ROOT}/${path}.json`, {
+      method:"POST", body: JSON.stringify(value), signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if(!res.ok) throw new Error(`Firebase PUSH hiba: ${path}`);
+    return res.json();
+  }catch(e){
+    clearTimeout(timeoutId);
+    throw e;
+  }
 }
 
 /* =====================================================================
