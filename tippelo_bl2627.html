@@ -669,6 +669,24 @@
       <div id="espnFetchMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
     </div>
     <div class="card">
+      <h2>📝 Manuális eredmény rögzítés</h2>
+      <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">
+        Ha az ESPN nem működik, vagy gyorsan be kell vinni egy eredményt, ide írj a match ID-t (pl. "LEN_SPO_2026-10-13") és az eredményt.
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input type="text" id="manualMatchId" placeholder="Match ID (pl. LEN_SPO_2026-10-13)"
+          style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;">
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input type="number" id="manualScoreHome" placeholder="Hazai gólok" min="0" max="20"
+          style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;">
+        <input type="number" id="manualScoreAway" placeholder="Vendég gólok" min="0" max="20"
+          style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--bl-white);font-size:13px;">
+        <button onclick="adminManualSaveResult()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--bl-green);background:rgba(31,174,94,.1);color:var(--bl-green);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">✓ Mentés</button>
+      </div>
+      <div id="manualResultMsg" style="font-size:11px;color:var(--bl-grey);min-height:15px;"></div>
+    </div>
+    <div class="card">
       <h2>🔑 Jelszó reset (felhasználónak)</h2>
       <div style="font-size:11.5px;color:var(--bl-grey);margin-bottom:10px;">
         Ha valaki elfelejtette a jelszavát, itt is resetelheted (ugyanaz, mint a bejelentkezési
@@ -1162,6 +1180,49 @@ async function autoFetchTodayResults(){
   }catch(e){
     console.error("ESPN auto-fetch hiba:", e);
     if(msg){ msg.textContent = "❌ Hiba az ESPN-lekérdezésnél: " + e.message; msg.style.color = "var(--bl-red)"; }
+  }
+}
+
+// Manuális eredmény rögzítés (amikor ESPN nem működik)
+async function adminManualSaveResult(){
+  const msg = document.getElementById("manualResultMsg");
+  const matchIdInput = document.getElementById("manualMatchId").value.trim();
+  const homeScoreInput = document.getElementById("manualScoreHome").value;
+  const awayScoreInput = document.getElementById("manualScoreAway").value;
+
+  if(!matchIdInput || homeScoreInput === "" || awayScoreInput === ""){
+    if(msg) msg.textContent = "⚠️ Töltsd ki az összes mezőt!";
+    if(msg) msg.style.color = "var(--bl-red)";
+    return;
+  }
+
+  const ftHome = parseInt(homeScoreInput, 10);
+  const ftAway = parseInt(awayScoreInput, 10);
+
+  if(isNaN(ftHome) || isNaN(ftAway)){
+    if(msg) msg.textContent = "⚠️ A gólok számának egésznek kell lennie!";
+    if(msg) msg.style.color = "var(--bl-red)";
+    return;
+  }
+
+  try{
+    if(msg) msg.textContent = "⏳ Mentés folyamatban…";
+    const ok = await adminSaveMatchResult(matchIdInput, { ftHome, ftAway });
+    if(ok){
+      if(msg) msg.textContent = `✅ ${matchIdInput} → ${ftHome}:${ftAway} sikeresen mentve!`;
+      if(msg) msg.style.color = "var(--bl-green)";
+      document.getElementById("manualMatchId").value = "";
+      document.getElementById("manualScoreHome").value = "";
+      document.getElementById("manualScoreAway").value = "";
+      renderAll();
+    } else {
+      if(msg) msg.textContent = "❌ Mentés sikertelen — ellenőrizd a match ID-t!";
+      if(msg) msg.style.color = "var(--bl-red)";
+    }
+  }catch(e){
+    console.error("Manuális mentés hiba:", e);
+    if(msg) msg.textContent = "❌ Hiba: " + e.message;
+    if(msg) msg.style.color = "var(--bl-red)";
   }
 }
 
