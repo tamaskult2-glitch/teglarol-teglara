@@ -1679,6 +1679,16 @@ async function initAuth(){
   }
 
   renderAll();
+
+  // Automatikus ESPN eredmény-lekérés oldal betöltéskor
+  setTimeout(() => {
+    const today = getBudapestToday();
+    const roundDates = Object.values(ROUND_DATES);
+    if(roundDates.includes(today)){
+      console.log("🤖 Automatikus ESPN fetch indítása mai nap miatt:", today);
+      autoFetchTodayResults();
+    }
+  }, 500);
 }
 
 document.getElementById("nameInput").addEventListener("keydown", (e)=>{
