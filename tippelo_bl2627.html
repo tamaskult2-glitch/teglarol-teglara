@@ -1153,9 +1153,9 @@ function espnNameToTeamId(espnName){
 }
 
 // Az adott ESPN esemény párosítása egy helyi (LEAGUE_MATCHES) meccshez —
-// csak a MAI napra és csak a ligaszakaszra keres, hogy ne találjon rosszul
-// egy playoff/KO meccshez (azokat a valós ágrajz még nem is tartalmazza).
-function matchEspnEventToLocal(event){
+// ha nincs dátum megadva, csak a MAI napra keres; ha van, akkor arra a dátumra.
+// Csak a ligaszakaszra keres, hogy ne találjon rosszul egy playoff/KO meccshez.
+function matchEspnEventToLocal(event, searchDate){
   const comp = event.competitions && event.competitions[0];
   if(!comp) return null;
   const home = comp.competitors.find(c=>c.homeAway==="home");
@@ -1165,9 +1165,9 @@ function matchEspnEventToLocal(event){
   const awayId = espnNameToTeamId(away.team.displayName || away.team.name);
   if(!homeId || !awayId) return null;
 
-  const today = getBudapestToday();
+  const date = searchDate || getBudapestToday();
   const found = LEAGUE_MATCHES.find(m=>
-    m.stage === "league" && m.huDate === today && m.homeId === homeId && m.awayId === awayId
+    m.stage === "league" && m.huDate === date && m.homeId === homeId && m.awayId === awayId
   ) || null;
   if(found) found.espnEventId = event.id; // kell a részletes összefoglaló (gólszerzők, lapok) lekéréséhez
   return found;
@@ -1253,7 +1253,7 @@ async function autoSyncAllResults(){
           const state = comp && comp.status && comp.status.type && comp.status.type.state;
           if(state !== "post") continue; // csak lezárt meccsek
 
-          const localMatch = matchEspnEventToLocal(ev);
+          const localMatch = matchEspnEventToLocal(ev, dateStr);
           if(!localMatch){ totalSkipped++; continue; }
 
           // Ha már van végeredmény, kihagyjuk
