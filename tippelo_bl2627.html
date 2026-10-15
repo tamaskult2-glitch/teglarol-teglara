@@ -665,7 +665,10 @@
         automatikusan elmenti azokat, amiket még nem rögzítettél kézzel. A kieséses szakasz
         (ET/11-es) továbbra is kézi rögzítést igényel.
       </div>
-      <button onclick="autoFetchTodayResults()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--bl-cyan);background:rgba(0,200,255,.12);color:var(--bl-cyan);font-size:13px;font-weight:700;cursor:pointer;">🤖 Mai eredmények lekérése</button>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <button onclick="autoFetchTodayResults()" style="flex:1;padding:8px 16px;border-radius:8px;border:1px solid var(--bl-cyan);background:rgba(0,200,255,.12);color:var(--bl-cyan);font-size:13px;font-weight:700;cursor:pointer;">🤖 Mai eredmények</button>
+        <button onclick="autoSyncAllResults()" style="flex:1;padding:8px 16px;border-radius:8px;border:1px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:13px;font-weight:700;cursor:pointer;">🔄 Auto-szinkronizálás</button>
+      </div>
       <div id="espnFetchMsg" style="font-size:11px;color:var(--bl-grey);margin-top:8px;min-height:15px;"></div>
     </div>
     <div class="card">
@@ -1222,6 +1225,67 @@ async function autoFetchTodayResults(){
   }catch(e){
     console.error("ESPN auto-fetch hiba:", e);
     if(msg){ msg.textContent = "❌ Hiba az ESPN-lekérdezésnél: " + e.message; msg.style.color = "var(--bl-red)"; }
+  }
+}
+
+// Auto-szinkronizálás: összes meccs eredményét ellenőrzi és ESPN-ből letölti a hiányzóakat
+async function autoSyncAllResults(){
+  const msg = document.getElementById("espnFetchMsg");
+  if(msg){ msg.textContent = "⏳ Összes meccs szinkronizálása…"; msg.style.color = "var(--bl-grey)"; }
+
+  let totalSaved = 0;
+  let totalSkipped = 0;
+
+  try{
+    // Végigmegyünk az összes forduló-dátumon
+    for(const roundNum in ROUND_DATES){
+      const dateStr = ROUND_DATES[roundNum];
+      const dateFormatted = dateStr.replace(/-/g, ""); // 2026-10-13 → 20261013
+
+      try{
+        const res = await fetch(`${ESPN_CL_SCOREBOARD}?dates=${dateFormatted}`);
+        if(!res.ok) continue;
+        const data = await res.json();
+        const events = data.events || [];
+
+        for(const ev of events){
+          const comp = ev.competitions && ev.competitions[0];
+          const state = comp && comp.status && comp.status.type && comp.status.type.state;
+          if(state !== "post") continue; // csak lezárt meccsek
+
+          const localMatch = matchEspnEventToLocal(ev);
+          if(!localMatch){ totalSkipped++; continue; }
+
+          // Ha már van végeredmény, kihagyjuk
+          if(localMatch.ftHome != null && localMatch.ftAway != null) continue;
+
+          const home = comp.competitors.find(c=>c.homeAway==="home");
+          const away = comp.competitors.find(c=>c.homeAway==="away");
+          const ftHome = parseInt(home.score, 10);
+          const ftAway = parseInt(away.score, 10);
+          if(isNaN(ftHome) || isNaN(ftAway)) continue;
+
+          const ok = await adminSaveMatchResult(localMatch.id, { ftHome, ftAway });
+          if(ok){
+            Object.assign(localMatch, { ftHome, ftAway });
+            totalSaved++;
+          }
+        }
+      }catch(e){
+        console.warn(`Hiba a ${dateStr} lekérdezésénél:`, e);
+      }
+    }
+
+    if(msg){
+      msg.textContent = totalSaved > 0
+        ? `✅ ${totalSaved} eredmény szinkronizálva az összes fordulóból!${totalSkipped ? ` (${totalSkipped} meccset nem sikerült beazonosítani)` : ""}`
+        : `ℹ️ Nincs új szinkronizálandó eredmény.${totalSkipped ? ` (${totalSkipped} ESPN-meccset nem sikerült beazonosítani)` : ""}`;
+      msg.style.color = totalSaved > 0 ? "var(--bl-green)" : "var(--bl-grey)";
+    }
+    if(totalSaved > 0) renderAll();
+  }catch(e){
+    console.error("Auto-szinkronizálás hiba:", e);
+    if(msg){ msg.textContent = "❌ Hiba az auto-szinkronizálásban: " + e.message; msg.style.color = "var(--bl-red)"; }
   }
 }
 
