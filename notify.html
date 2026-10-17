@@ -161,16 +161,15 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 12.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 17.)
 
-🔥 Október 6-12-i kormányzati fejlemények:
-• 🚂 ÚJ TÉGLA: Déli Körvasút LEÁLLÍTHATÓ – 367 Mrd Ft EU-s forrás veszélyben (közbeszerzési szabálytalanság)
-• ⚖️ ÚJ TÉGLA: Sportolók EKHO adózása – plafon: 500 → 60 Mrd Ft (2027. jan.1-től), magas jövedelmű sportolók adókedvezménye szűkül
-• 👷 Szociális dolgozók **25% béremelése** – ~90 ezer fő, kétlépcsős (mid-október + jan.2027)
-• ⛽ Üzemanyag-jövedéki csökkentés – 25 Ft/liter dec.31-ig
-• 💰 Vagyonadó, KATA-módosítás, egészségügy +500 Mrd Ft
+🔥 Október 16-17-i kormányzati fejlemények:
+• 🏥 Egészségügy: BCG-terv bejelentés – átfogó reformok, várólisták csökkentése, gyógyszerfelírás modernizálása (végleges bemutatás: okt.30-nov.1.)
+• ⚛️ Paks II: Roszatom-tárgyalások félbeszakadtak – technikai viták, szerződésmódosítás igényes, 12,5 Mrd EUR hitel helyzetén bizonytalan
+• 🇪🇺 EU-költségvetés: Magyar Péter nyíltan elutasította az EU javaslatát az október 17-i csúcskonferencián
+• ⛽ Üzemanyagárak: benzin 642 Ft/l, dízel 709 Ft/l (2026.okt.17.)
 
-📊 113 tégla | 30 megvalósult | 69 bejelentve | 14 ígéret</textarea>
+📊 Pénztárcaindex & Mérleg frissítve – 4 fő tégla, mérleg-fejlemények hozzáadva</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com,zsolt.ruszin@fairconto.hu</textarea>
@@ -204,22 +203,22 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
 
   if (type === 'tegla') {
-    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 12.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 17.)
 
-🔥 Október 6-12-i kormányzati fejlemények:
-• 🚂 ÚJ TÉGLA: Déli Körvasút LEÁLLÍTHATÓ – 367 Mrd Ft EU-s forrás veszélyben (közbeszerzési szabálytalanság)
-• ⚖️ ÚJ TÉGLA: Sportolók EKHO adózása – plafon: 500 → 60 Mrd Ft (2027. jan.1-től), magas jövedelmű sportolók adókedvezménye szűkül
-• 👷 Szociális dolgozók **25% béremelése** – ~90 ezer fő, kétlépcsős (mid-október + jan.2027)
-• ⛽ Üzemanyag-jövedéki csökkentés – 25 Ft/liter dec.31-ig
-• 💰 Vagyonadó, KATA-módosítás, egészségügy +500 Mrd Ft
+🔥 Október 16-17-i kormányzati fejlemények:
+• 🏥 Egészségügy: BCG-terv bejelentés – átfogó reformok, várólisták csökkentése, gyógyszerfelírás modernizálása (végleges bemutatás: okt.30-nov.1.)
+• ⚛️ Paks II: Roszatom-tárgyalások félbeszakadtak – technikai viták, szerződésmódosítás igényes, 12,5 Mrd EUR hitel helyzetén bizonytalan
+• 🇪🇺 EU-költségvetés: Magyar Péter nyíltan elutasította az EU javaslatát az október 17-i csúcskonferencián
+• ⛽ Üzemanyagárak: benzin 642 Ft/l, dízel 709 Ft/l (2026.okt.17.)
 
-📊 113 tégla | 30 megvalósult | 69 bejelentve | 14 ígéret`;
+📊 Pénztárcaindex & Mérleg frissítve – 4 fő tégla, mérleg-fejlemények hozzáadva`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 8.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 17.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 636 Ft/l, dízel 709 Ft/l – már két hete stagnál ("láthatatlan védett ár"), miközben a nemzetközi árak alapján akár 700/800 Ft is indokolt lenne
+• Üzemanyag: benzin 642 Ft/l (+7,9% az áradáshoz képest), dízel 709 Ft/l (+15,3%) – az elmúlt másfél hónapban csak fokozatos drágulás
+• Üzemanyag-költség: 200 l/hó kalkuláció = 128.400 Ft/hó (benzin: 200×642)
 • Élelmiszer-tételek: csirkemellfilé, sertéskaraj, tej, alma, paradicsom olcsóbb lett, de a kenyér (+56%) és marhahús (+25%) jelentősen drágult
 
 🔗 teglarol-teglara.hu/penztarca.html`;
