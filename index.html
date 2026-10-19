@@ -3983,9 +3983,13 @@ function voteComment(cardId, commentId, direction, isReply = false) {
   let comment;
 
   if (isReply) {
-    const parent = comments.find(c => c.id === commentId.split('_reply_')[0]);
-    if (!parent) return;
-    comment = parent.replies.find(r => r.id === commentId.split('_reply_')[1]);
+    for (let c of comments) {
+      const found = c.replies && c.replies.find(r => r.id === commentId);
+      if (found) {
+        comment = found;
+        break;
+      }
+    }
   } else {
     comment = comments.find(c => c.id === commentId);
   }
