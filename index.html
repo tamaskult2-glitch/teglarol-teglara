@@ -4323,7 +4323,10 @@ document.querySelectorAll(".cat-item").forEach(item => {
  const cat = item.getAttribute("data-cat");
  const pri = item.getAttribute("data-priority");
  const isCalc = item.getAttribute("data-calc") === "true";
- 
+
+ // Ha specális elem (Search, Dark Toggle, Bug Report), ne futtasd a szűrőt
+ if (!cat && !pri && !isCalc) return;
+
  // KALKULÁTOR MEGNYITÁSA
  if (isCalc) {
   // Töröljük a kategória szűrőket
