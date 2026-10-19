@@ -3815,19 +3815,304 @@ function buildCard(item) {
  </div>
  `;
 
+ const cardId = _getCardId(title);
+ const commentCount = _getComments(cardId).length;
+
+ const commentsHTML = `
+ <div class="card-comments" style="border-top:1px solid var(--border-subtle);padding-top:12px;margin-top:12px;" data-card-id="${cardId}">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+   <span style="font-size:13px;font-weight:600;color:var(--text-main);">💬 Hozzászólások (${commentCount})</span>
+   <button class="comment-toggle-btn" onclick="toggleCommentForm(event, '${cardId}')" style="background:none;border:none;color:#c0183a;cursor:pointer;font-size:12px;font-weight:600;padding:0;">+ Hozzászólás</button>
+  </div>
+  <div class="comment-form-wrap" style="display:none;margin-bottom:12px;" id="form-${cardId}">
+   <input type="text" class="comment-name-input" placeholder="Név (opcionális)" style="width:100%;padding:8px;margin-bottom:8px;border:1px solid var(--border-subtle);border-radius:6px;font-size:13px;">
+   <textarea class="comment-text-input" placeholder="Írd meg a hozzászólásodat..." style="width:100%;padding:8px;margin-bottom:8px;border:1px solid var(--border-subtle);border-radius:6px;font-size:13px;min-height:80px;font-family:inherit;resize:vertical;"></textarea>
+   <div style="display:flex;gap:8px;">
+    <button class="comment-submit-btn" onclick="submitComment('${cardId}')" style="flex:1;padding:8px;background:#c0183a;color:white;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Küldés</button>
+    <button onclick="toggleCommentForm(event, '${cardId}')" style="flex:1;padding:8px;background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-subtle);border-radius:6px;font-size:13px;cursor:pointer;">Mégse</button>
+   </div>
+  </div>
+  <div class="comments-list" id="comments-${cardId}" style="max-height:400px;overflow-y:auto;"></div>
+ </div>
+ `;
+
  if (vizHTML) {
   card.classList.add('card-split');
-  card.innerHTML = bodyHTML + `<div class="card-viz">${vizHTML}</div>`;
+  card.innerHTML = bodyHTML + `<div class="card-viz">${vizHTML}</div>` + commentsHTML;
  } else {
-  card.innerHTML = bodyHTML;
+  card.innerHTML = bodyHTML + commentsHTML;
  }
 
  card.addEventListener('click', (e) => {
   if (e.target.tagName === 'A') return;
   if (e.target.closest('button')) return;
+  if (e.target.closest('.card-comments')) return;
+  if (e.target.closest('textarea')) return;
+  if (e.target.closest('input')) return;
   openModal(item);
  });
+
+ setTimeout(() => renderCommentsInCard(cardId), 100);
  return card;
+}
+
+// ──── COMMENT SYSTEM (localStorage MVP) ────
+
+function _getCardId(title) {
+  return 'card_' + title.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 50);
+}
+
+function _getComments(cardId) {
+  try {
+    const data = localStorage.getItem(`comments_${cardId}`);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function _saveComments(cardId, comments) {
+  try {
+    localStorage.setItem(`comments_${cardId}`, JSON.stringify(comments));
+  } catch (e) {
+    console.error('localStorage save failed:', e);
+  }
+}
+
+function toggleCommentForm(e, cardId) {
+  e.stopPropagation();
+  const form = document.getElementById(`form-${cardId}`);
+  if (form) {
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    if (form.style.display === 'block') {
+      form.querySelector('.comment-text-input').focus();
+    }
+  }
+}
+
+function submitComment(cardId) {
+  const form = document.getElementById(`form-${cardId}`);
+  if (!form) return;
+
+  const nameInput = form.querySelector('.comment-name-input');
+  const textInput = form.querySelector('.comment-text-input');
+  const text = textInput.value.trim();
+
+  if (!text) {
+    alert('⚠️ Írj valami szöveget!');
+    return;
+  }
+
+  if (text.length > 1000) {
+    alert('⚠️ Maximum 1000 karakter!');
+    return;
+  }
+
+  const name = (nameInput.value.trim() || 'Névtelen').substring(0, 50);
+  const comments = _getComments(cardId);
+
+  const newComment = {
+    id: Date.now().toString(),
+    name: name,
+    text: text,
+    timestamp: new Date().toISOString(),
+    upvotes: 0,
+    downvotes: 0,
+    replies: [],
+    voted: null
+  };
+
+  comments.push(newComment);
+  _saveComments(cardId, comments);
+
+  nameInput.value = '';
+  textInput.value = '';
+  form.style.display = 'none';
+
+  renderCommentsInCard(cardId);
+}
+
+function toggleReply(e, cardId, commentId) {
+  e.stopPropagation();
+  const replyForm = document.getElementById(`reply-form-${commentId}`);
+  if (replyForm) {
+    replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+    if (replyForm.style.display === 'block') {
+      replyForm.querySelector('.reply-text-input').focus();
+    }
+  }
+}
+
+function submitReply(cardId, commentId) {
+  const replyForm = document.getElementById(`reply-form-${commentId}`);
+  if (!replyForm) return;
+
+  const nameInput = replyForm.querySelector('.reply-name-input');
+  const textInput = replyForm.querySelector('.reply-text-input');
+  const text = textInput.value.trim();
+
+  if (!text) {
+    alert('⚠️ Írj valami szöveget!');
+    return;
+  }
+
+  if (text.length > 1000) {
+    alert('⚠️ Maximum 1000 karakter!');
+    return;
+  }
+
+  const name = (nameInput.value.trim() || 'Névtelen').substring(0, 50);
+  const comments = _getComments(cardId);
+  const comment = comments.find(c => c.id === commentId);
+
+  if (!comment) return;
+
+  const newReply = {
+    id: Date.now().toString(),
+    name: name,
+    text: text,
+    timestamp: new Date().toISOString(),
+    upvotes: 0,
+    downvotes: 0,
+    voted: null
+  };
+
+  if (!comment.replies) comment.replies = [];
+  comment.replies.push(newReply);
+  _saveComments(cardId, comments);
+
+  nameInput.value = '';
+  textInput.value = '';
+  replyForm.style.display = 'none';
+
+  renderCommentsInCard(cardId);
+}
+
+function voteComment(cardId, commentId, direction, isReply = false) {
+  const comments = _getComments(cardId);
+  let comment;
+
+  if (isReply) {
+    for (let c of comments) {
+      const found = c.replies && c.replies.find(r => r.id === commentId);
+      if (found) {
+        comment = found;
+        break;
+      }
+    }
+  } else {
+    comment = comments.find(c => c.id === commentId);
+  }
+
+  if (!comment) return;
+
+  if (comment.voted === direction) {
+    comment.voted = null;
+    if (direction === 'up') comment.upvotes--;
+    else comment.downvotes--;
+  } else {
+    if (comment.voted === 'up') comment.upvotes--;
+    if (comment.voted === 'down') comment.downvotes--;
+    comment.voted = direction;
+    if (direction === 'up') comment.upvotes++;
+    else comment.downvotes++;
+  }
+
+  _saveComments(cardId, comments);
+  renderCommentsInCard(cardId);
+}
+
+function _timeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = now - date;
+
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 1) return 'most';
+  if (minutes < 60) return minutes + ' perce';
+  if (hours < 24) return hours + ' órája';
+  if (days < 30) return days + ' napja';
+  return date.toLocaleDateString('hu-HU');
+}
+
+function renderCommentHTML(cardId, comment, level = 0, parentId = '') {
+  const hasVoted = comment.voted !== null;
+  const html = `
+    <div class="comment" style="margin-left:${level * 20}px;padding:10px;background:var(--bg-main);border-radius:8px;margin-bottom:8px;border-left:3px solid ${level === 0 ? '#c0183a' : '#ddd'};">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px;">
+        <div style="font-weight:600;font-size:13px;color:var(--text-main);">${comment.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary);">${_timeAgo(comment.timestamp)}</div>
+      </div>
+      <div style="font-size:13px;color:var(--text-main);line-height:1.4;margin-bottom:8px;word-break:break-word;">${comment.text}</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:4px;background:rgba(192,24,58,0.05);padding:4px 8px;border-radius:6px;">
+          <button onclick="voteComment('${cardId}', '${comment.id}', 'up', ${level > 0})" style="background:none;border:none;cursor:pointer;font-size:12px;${comment.voted === 'up' ? 'color:#c0183a;font-weight:700;' : 'color:#999;'}">👍</button>
+          <span style="font-size:11px;color:var(--text-secondary);">${comment.upvotes}</span>
+          <button onclick="voteComment('${cardId}', '${comment.id}', 'down', ${level > 0})" style="background:none;border:none;cursor:pointer;font-size:12px;${comment.voted === 'down' ? 'color:#c0183a;font-weight:700;' : 'color:#999;'}">👎</button>
+          <span style="font-size:11px;color:var(--text-secondary);">${comment.downvotes}</span>
+        </div>
+        ${level === 0 ? `<button onclick="toggleReply(event, '${cardId}', '${comment.id}')" style="background:none;border:none;color:#c0183a;cursor:pointer;font-size:12px;font-weight:600;padding:0;">💬 Válasz</button>` : ''}
+      </div>
+      ${level === 0 && comment.replies && comment.replies.length > 0 ? `
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border-subtle);">
+          ${comment.replies.map(reply => renderCommentHTML(cardId, reply, 1, comment.id)).join('')}
+        </div>
+      ` : ''}
+      ${level === 0 ? `
+        <div class="reply-form-wrap" style="display:none;margin-top:8px;" id="reply-form-${comment.id}">
+          <input type="text" class="reply-name-input" placeholder="Név (opcionális)" style="width:100%;padding:6px;margin-bottom:6px;border:1px solid var(--border-subtle);border-radius:6px;font-size:12px;box-sizing:border-box;">
+          <textarea class="reply-text-input" placeholder="Írj választ..." style="width:100%;padding:6px;margin-bottom:6px;border:1px solid var(--border-subtle);border-radius:6px;font-size:12px;min-height:60px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+          <div style="display:flex;gap:6px;">
+            <button onclick="submitReply('${cardId}', '${comment.id}')" style="flex:1;padding:6px;background:#c0183a;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Küldés</button>
+            <button onclick="toggleReply(event, '${cardId}', '${comment.id}')" style="flex:1;padding:6px;background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-subtle);border-radius:6px;font-size:12px;cursor:pointer;">Mégse</button>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+  return html;
+}
+
+function renderCommentsInCard(cardId) {
+  const container = document.getElementById(`comments-${cardId}`);
+  if (!container) return;
+
+  const comments = _getComments(cardId);
+  const sortMode = localStorage.getItem(`sort_${cardId}`) || 'newest';
+
+  let sorted = [...comments];
+  if (sortMode === 'best') {
+    sorted.sort((a, b) => (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes));
+  } else if (sortMode === 'oldest') {
+    sorted.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  } else {
+    sorted.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  }
+
+  const counterSpan = document.querySelector(`[data-card-id="${cardId}"] > div:first-child > span:first-child`);
+  if (counterSpan) counterSpan.textContent = `💬 Hozzászólások (${comments.length})`;
+
+  const sortHTML = comments.length > 0 ? `
+    <div style="display:flex;gap:4px;margin-bottom:8px;font-size:12px;">
+      <button onclick="setSortMode('${cardId}', 'newest')" style="background:${sortMode === 'newest' ? '#c0183a' : 'var(--bg-main)'};color:${sortMode === 'newest' ? 'white' : 'var(--text-main)'};border:1px solid var(--border-subtle);padding:4px 12px;border-radius:6px;cursor:pointer;">Legújabb</button>
+      <button onclick="setSortMode('${cardId}', 'best')" style="background:${sortMode === 'best' ? '#c0183a' : 'var(--bg-main)'};color:${sortMode === 'best' ? 'white' : 'var(--text-main)'};border:1px solid var(--border-subtle);padding:4px 12px;border-radius:6px;cursor:pointer;">Legjobb</button>
+      <button onclick="setSortMode('${cardId}', 'oldest')" style="background:${sortMode === 'oldest' ? '#c0183a' : 'var(--bg-main)'};color:${sortMode === 'oldest' ? 'white' : 'var(--text-main)'};border:1px solid var(--border-subtle);padding:4px 12px;border-radius:6px;cursor:pointer;">Legrégebbi</button>
+    </div>
+  ` : '';
+
+  if (sorted.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">Még nincs hozzászólás. Légy az első!</div>';
+  } else {
+    container.innerHTML = sortHTML + sorted.map(c => renderCommentHTML(cardId, c, 0)).join('');
+  }
+}
+
+function setSortMode(cardId, mode) {
+  localStorage.setItem(`sort_${cardId}`, mode);
+  renderCommentsInCard(cardId);
 }
 
 function renderDashboard(data) {
