@@ -3732,8 +3732,7 @@ if (sidebarDarkToggle) {
 // Sidebar search
 const sidebarSearch = document.getElementById("sidebarSearch");
 if (sidebarSearch) {
-  sidebarSearch.addEventListener("click", (e) => {
-    e.stopPropagation();
+  sidebarSearch.addEventListener("click", () => {
     document.getElementById("searchBox").focus();
     closeSidebar();
   });
@@ -3742,18 +3741,9 @@ if (sidebarSearch) {
 // Sidebar bug report
 const sidebarBugReport = document.getElementById("sidebarBugReport");
 if (sidebarBugReport) {
-  sidebarBugReport.addEventListener("click", (e) => {
-    e.stopPropagation();
+  sidebarBugReport.addEventListener("click", () => {
     document.getElementById("bugOverlay").classList.add("active");
     closeSidebar();
-  });
-}
-
-// Sidebar dark toggle
-const sidebarDarkToggle = document.getElementById("sidebarDarkToggle");
-if (sidebarDarkToggle) {
-  sidebarDarkToggle.addEventListener("click", (e) => {
-    e.stopPropagation();
   });
 }
 
