@@ -1312,6 +1312,14 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 @media (max-width:380px) {
   .header-action-btn { min-width:0; padding:9px 6px !important; }
 }
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideOutDown {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(20px); }
+}
 </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -3858,6 +3866,62 @@ function buildCard(item) {
 
 // ──── COMMENT SYSTEM (localStorage MVP) ────
 
+// Toast notification
+function showToast(message, duration = 3000) {
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #c0183a;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(192, 24, 58, 0.3);
+    z-index: 10000;
+    animation: slideInUp 0.3s ease-out;
+  `;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = 'slideOutDown 0.3s ease-in';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+// Email notification admin-nek
+function sendCommentNotificationEmail(tileTitle, authorName, text, type = 'comment', replyTo = null) {
+  try {
+    if (typeof emailjs === 'undefined') return;
+
+    const subject = type === 'reply' ? `Válasz: ${tileTitle}` : `Új hozzászólás: ${tileTitle}`;
+    const replyInfo = type === 'reply' && replyTo ? ` (válasz ${replyTo}-nak)` : '';
+    const message = `
+Új ${type === 'reply' ? 'válasz' : 'hozzászólás'} a teglarol-teglara.hu-n
+
+📌 Tégla: ${tileTitle}
+👤 Szerző: ${authorName}${replyInfo}
+📝 Szöveg: ${text}
+🕐 Idő: ${new Date().toLocaleString('hu-HU')}
+
+🔗 Link: https://teglarol-teglara.hu#${tileTitle.toLowerCase().replace(/[^a-z0-9]/g, '_')}
+    `.trim();
+
+    emailjs.send(
+      'service_x5huqxn',
+      'template_ooyqw26',
+      {
+        email: 'tamaskult2@gmail.com',
+        name: 'Tegláról-Téglára Admin',
+        db: message
+      }
+    ).catch(() => {});
+  } catch (e) {}
+}
+
 function _getCardId(title) {
   return 'card_' + title.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 50);
 }
@@ -3911,6 +3975,9 @@ function submitComment(cardId) {
   const name = (nameInput.value.trim() || 'Névtelen').substring(0, 50);
   const comments = _getComments(cardId);
 
+  const titleEl = document.querySelector(`[data-card-id="${cardId}"]`).closest('.card').querySelector('h3');
+  const tileTitle = titleEl ? titleEl.textContent.trim() : 'Ismeretlen tégla';
+
   const newComment = {
     id: Date.now().toString(),
     name: name,
@@ -3930,6 +3997,12 @@ function submitComment(cardId) {
   form.style.display = 'none';
 
   renderCommentsInCard(cardId);
+
+  // Toast notification
+  showToast(`✅ Hozzászólás beküldve!`);
+
+  // Email admin-nek
+  sendCommentNotificationEmail(tileTitle, name, text, 'comment');
 }
 
 function toggleReply(e, cardId, commentId) {
@@ -3967,6 +4040,9 @@ function submitReply(cardId, commentId) {
 
   if (!comment) return;
 
+  const titleEl = document.querySelector(`[data-card-id="${cardId}"]`).closest('.card').querySelector('h3');
+  const tileTitle = titleEl ? titleEl.textContent.trim() : 'Ismeretlen tégla';
+
   const newReply = {
     id: Date.now().toString(),
     name: name,
@@ -3986,6 +4062,12 @@ function submitReply(cardId, commentId) {
   replyForm.style.display = 'none';
 
   renderCommentsInCard(cardId);
+
+  // Toast notification
+  showToast(`✅ Válasz beküldve!`);
+
+  // Email admin-nek
+  sendCommentNotificationEmail(tileTitle, name, text, 'reply', comment.name);
 }
 
 function voteComment(cardId, commentId, direction, isReply = false) {
