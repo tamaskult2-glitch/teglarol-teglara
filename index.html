@@ -3903,6 +3903,11 @@ function submitComment(cardId) {
     return;
   }
 
+  if (text.length > 1000) {
+    alert('⚠️ Maximum 1000 karakter!');
+    return;
+  }
+
   const name = (nameInput.value.trim() || 'Névtelen').substring(0, 50);
   const comments = _getComments(cardId);
 
@@ -3948,6 +3953,11 @@ function submitReply(cardId, commentId) {
 
   if (!text) {
     alert('⚠️ Írj valami szöveget!');
+    return;
+  }
+
+  if (text.length > 1000) {
+    alert('⚠️ Maximum 1000 karakter!');
     return;
   }
 
@@ -4071,16 +4081,38 @@ function renderCommentsInCard(cardId) {
   if (!container) return;
 
   const comments = _getComments(cardId);
-  const sorted = comments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const sortMode = localStorage.getItem(`sort_${cardId}`) || 'newest';
+
+  let sorted = [...comments];
+  if (sortMode === 'best') {
+    sorted.sort((a, b) => (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes));
+  } else if (sortMode === 'oldest') {
+    sorted.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  } else {
+    sorted.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  }
 
   const counterSpan = document.querySelector(`[data-card-id="${cardId}"] > div:first-child > span:first-child`);
   if (counterSpan) counterSpan.textContent = `💬 Hozzászólások (${comments.length})`;
 
+  const sortHTML = comments.length > 0 ? `
+    <div style="display:flex;gap:4px;margin-bottom:8px;font-size:12px;">
+      <button onclick="setSortMode('${cardId}', 'newest')" style="background:${sortMode === 'newest' ? '#c0183a' : 'var(--bg-main)'};color:${sortMode === 'newest' ? 'white' : 'var(--text-main)'};border:1px solid var(--border-subtle);padding:4px 12px;border-radius:6px;cursor:pointer;">Legújabb</button>
+      <button onclick="setSortMode('${cardId}', 'best')" style="background:${sortMode === 'best' ? '#c0183a' : 'var(--bg-main)'};color:${sortMode === 'best' ? 'white' : 'var(--text-main)'};border:1px solid var(--border-subtle);padding:4px 12px;border-radius:6px;cursor:pointer;">Legjobb</button>
+      <button onclick="setSortMode('${cardId}', 'oldest')" style="background:${sortMode === 'oldest' ? '#c0183a' : 'var(--bg-main)'};color:${sortMode === 'oldest' ? 'white' : 'var(--text-main)'};border:1px solid var(--border-subtle);padding:4px 12px;border-radius:6px;cursor:pointer;">Legrégebbi</button>
+    </div>
+  ` : '';
+
   if (sorted.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">🦗 Még nincs hozzászólás. Légy az első!</div>';
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">Még nincs hozzászólás. Légy az első!</div>';
   } else {
-    container.innerHTML = sorted.map(c => renderCommentHTML(cardId, c, 0)).join('');
+    container.innerHTML = sortHTML + sorted.map(c => renderCommentHTML(cardId, c, 0)).join('');
   }
+}
+
+function setSortMode(cardId, mode) {
+  localStorage.setItem(`sort_${cardId}`, mode);
+  renderCommentsInCard(cardId);
 }
 
 function renderDashboard(data) {
