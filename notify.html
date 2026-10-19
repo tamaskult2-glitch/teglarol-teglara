@@ -161,15 +161,18 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 17.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 19.)
 
-🔥 Október 16-17-i kormányzati fejlemények:
-• 🏥 Egészségügy: BCG-terv bejelentés – átfogó reformok, várólisták csökkentése, gyógyszerfelírás modernizálása (végleges bemutatás: okt.30-nov.1.)
-• ⚛️ Paks II: Roszatom-tárgyalások félbeszakadtak – technikai viták, szerződésmódosítás igényes, 12,5 Mrd EUR hitel helyzetén bizonytalan
-• 🇪🇺 EU-költségvetés: Magyar Péter nyíltan elutasította az EU javaslatát az október 17-i csúcskonferencián
-• ⛽ Üzemanyagárak: benzin 642 Ft/l, dízel 709 Ft/l (2026.okt.17.)
+🔥 Október 19-i költségvetési bejelentés:
+• 💰 SZJA-csökkentés: 15% → 9% (minimálbérig terjedő jövedelem) | Nettó: +19.368 Ft/hó (2027)
+• 👨‍👩‍👧 Családi pótlék: duplázódik (300 Mrd Ft) | Babaváró, CSOK, falusi CSOK: változatlan
+• 👴 Minimumnyugdíj: 28k Ft → 120k Ft | 13. havi nyugdíj: megtartva
+• 🏥 Egészségügy: 928 Mrd Ft EU-s fejlesztési pénz, prioritás az egészségügyre
+• 🏗️ Infrastruktúra: 100 Mrd Ft kátyúmentesítés
+• 💸 Költségvetési hiány: 8,3% → 4,9% | Új vagyonadó: 200 Mrd Ft/év
+• ⛽ Üzemanyagárak: benzin 642 Ft/l, dízel 709 Ft/l (2026.okt.19.)
 
-📊 Pénztárcaindex & Mérleg frissítve – 4 fő tégla, mérleg-fejlemények hozzáadva</textarea>
+📊 Pénztárcaindex, Mérleg, Index frissítve</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com,zsolt.ruszin@fairconto.hu</textarea>
@@ -203,15 +206,18 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
 
   if (type === 'tegla') {
-    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 17.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 19.)
 
-🔥 Október 16-17-i kormányzati fejlemények:
-• 🏥 Egészségügy: BCG-terv bejelentés – átfogó reformok, várólisták csökkentése, gyógyszerfelírás modernizálása (végleges bemutatás: okt.30-nov.1.)
-• ⚛️ Paks II: Roszatom-tárgyalások félbeszakadtak – technikai viták, szerződésmódosítás igényes, 12,5 Mrd EUR hitel helyzetén bizonytalan
-• 🇪🇺 EU-költségvetés: Magyar Péter nyíltan elutasította az EU javaslatát az október 17-i csúcskonferencián
-• ⛽ Üzemanyagárak: benzin 642 Ft/l, dízel 709 Ft/l (2026.okt.17.)
+🔥 Október 19-i költségvetési bejelentés:
+• 💰 SZJA-csökkentés: 15% → 9% (minimálbérig) | Nettó: +19.368 Ft/hó (2027)
+• 👨‍👩‍👧 Családi pótlék: duplázódik (300 Mrd Ft) | Babaváró, CSOK: változatlan
+• 👴 Minimumnyugdíj: 28k → 120k Ft | 13. havi: megtartva
+• 🏥 Egészségügy: 928 Mrd Ft EU-s fejlesztési pénz
+• 🏗️ Infrastruktúra: 100 Mrd Ft kátyúmentesítés
+• 💸 Költségvetési hiány: 8,3% → 4,9% | Új vagyonadó: 200 Mrd Ft/év
+• ⛽ Üzemanyagárak: benzin 642 Ft/l, dízel 709 Ft/l
 
-📊 Pénztárcaindex & Mérleg frissítve – 4 fő tégla, mérleg-fejlemények hozzáadva`;
+📊 Index, Pénztárcaindex, Mérleg frissítve`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
     dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 17.)
