@@ -3139,8 +3139,9 @@ var safeStorage = (function() {
    </div>
 
    <div class="story-section-title">📋 Verziótörténet</div>
+   <button id="timelineToggleBtn" onclick="toggleTimeline()" style="background:#c0183a;color:white;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;">▼ Teljes timeline megtekintése</button>
 
-   <div class="story-timeline">
+   <div class="story-timeline" id="timelineContainer" style="display:none;">
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
      <div class="story-tl-content">
@@ -3778,6 +3779,18 @@ sidebarOverlay.addEventListener("click", closeSidebar);
   if (tesztMsg) tesztMsg.textContent = "🧱 A kormány " + diff + " napja épít — figyeld velünk, hogy valóban tégláról-téglára haladnak-e!";
 })();
 
+// ── Timeline Toggle ──
+function toggleTimeline() {
+  const container = document.getElementById('timelineContainer');
+  const btn = document.getElementById('timelineToggleBtn');
+  if (container.style.display === 'none') {
+    container.style.display = 'flex';
+    btn.textContent = '▲ Timeline összecsukása';
+  } else {
+    container.style.display = 'none';
+    btn.textContent = '▼ Teljes timeline megtekintése';
+  }
+}
 
 // ── Kártyaépítő segédfüggvény ──
 
