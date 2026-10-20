@@ -2053,7 +2053,8 @@ body.dark .wallet-nav-btn .label {
   </div>
 
   <!-- Mérföldkő idővonal -->
-  <div style="position:relative;padding-left:24px;">
+  <button id="milestoneToggleBtn" onclick="toggleMilestones()" style="background:#c0183a;color:white;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;width:100%;">▼ Teljes mérföldkő-idővonal megtekintése</button>
+  <div style="position:relative;padding-left:24px;display:none;" id="milestoneContainer">
 
    <!-- Függőleges vonal -->
    <div style="position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,#CE2939,var(--border-subtle));border-radius:2px;"></div>
@@ -3789,6 +3790,19 @@ function toggleTimeline() {
   } else {
     container.style.display = 'none';
     btn.textContent = '▼ Teljes timeline megtekintése';
+  }
+}
+
+// ── Milestone Toggle ──
+function toggleMilestones() {
+  const container = document.getElementById('milestoneContainer');
+  const btn = document.getElementById('milestoneToggleBtn');
+  if (container.style.display === 'none') {
+    container.style.display = 'block';
+    btn.textContent = '▲ Mérföldkő-idővonal összecsukása';
+  } else {
+    container.style.display = 'none';
+    btn.textContent = '▼ Teljes mérföldkő-idővonal megtekintése';
   }
 }
 
