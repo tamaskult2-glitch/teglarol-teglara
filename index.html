@@ -4037,12 +4037,9 @@ function showRecentComments() {
       }
     }
 
-    // Clear 24h-old comments from the list
-    const filteredRecent = recent.filter(c => {
-      const commentTime = new Date(c.timestamp).getTime();
-      return commentTime < last24h;
-    });
-    localStorage.setItem('recent_comments', JSON.stringify(filteredRecent));
+    // Clear all recent comments from tracking (user has viewed them)
+    // But keep the full comment history in each tile's data
+    localStorage.setItem('recent_comments', JSON.stringify([]));
     _updateRecentCommentsDisplay();
   } catch (e) {
     console.error('Failed to show recent comments:', e);
