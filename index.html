@@ -3965,25 +3965,30 @@ function _saveComments(cardId, comments) {
 
 function _trackRecentComment(cardId, tileTitle, name, text) {
   try {
+    console.log('💾 Tracking new comment for card:', cardId);
     let recent = JSON.parse(localStorage.getItem('recent_comments') || '[]');
-    recent.unshift({
+    const newComment = {
       cardId: cardId,
       tileTitle: tileTitle.replace(/^[🔵🟣]\s*/, ''),
       name: name,
       text: text.substring(0, 80) + (text.length > 80 ? '...' : ''),
       timestamp: new Date().toISOString()
-    });
+    };
+    recent.unshift(newComment);
+    console.log('✅ Comment added. Now we have', recent.length, 'total comments');
     recent = recent.slice(0, 10);
     localStorage.setItem('recent_comments', JSON.stringify(recent));
+    console.log('💾 Saved to localStorage. Updating display...');
     _updateRecentCommentsDisplay();
   } catch (e) {
-    console.error('Failed to track comment:', e);
+    console.error('❌ Failed to track comment:', e);
   }
 }
 
 function _updateRecentCommentsDisplay() {
   try {
     const recent = JSON.parse(localStorage.getItem('recent_comments') || '[]');
+    console.log('📋 Recent comments in localStorage:', recent);
     const now = new Date();
     const last24h = now.getTime() - (24 * 60 * 60 * 1000);
 
@@ -3992,17 +3997,23 @@ function _updateRecentCommentsDisplay() {
       return commentTime >= last24h;
     });
 
+    console.log(`🔔 Found ${recent24.length} comments in last 24h (out of ${recent.length} total)`);
+
     const wrap = document.getElementById('newCommentsWrap');
     if (wrap) {
       if (recent24.length > 0) {
         wrap.style.display = 'block';
         document.getElementById('newCommentsMsg').textContent = `${recent24.length} új hozzászólás az utolsó 24 órában – nézd meg!`;
+        console.log(`✅ Showing recent comments section with ${recent24.length} comments`);
       } else {
         wrap.style.display = 'none';
+        console.log('⏸️ Hiding recent comments section (no comments in last 24h)');
       }
+    } else {
+      console.error('❌ Element newCommentsWrap not found in DOM');
     }
   } catch (e) {
-    console.error('Failed to update display:', e);
+    console.error('❌ Failed to update display:', e);
   }
 }
 
@@ -8735,18 +8746,27 @@ async function addSupportAmountMain(ft) {
 
 <script>
 // Initialize recent comments display on page load
+console.log('🚀 Recent comments initialization script loaded. readyState:', document.readyState);
+
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('📄 DOMContentLoaded fired');
   setTimeout(() => {
+    console.log('⏱️ DOMContentLoaded timeout - calling _updateRecentCommentsDisplay()');
     _updateRecentCommentsDisplay();
   }, 100);
 });
 
 // Also try immediate load if DOM is already ready
 if (document.readyState === 'loading') {
+  console.log('📋 DOM still loading, waiting for DOMContentLoaded...');
   document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => _updateRecentCommentsDisplay(), 50);
+    setTimeout(() => {
+      console.log('⏱️ DOMContentLoaded (2nd listener) timeout');
+      _updateRecentCommentsDisplay();
+    }, 50);
   });
 } else {
+  console.log('✅ DOM already loaded, calling _updateRecentCommentsDisplay() immediately');
   _updateRecentCommentsDisplay();
 }
 </script>
