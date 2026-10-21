@@ -1773,6 +1773,15 @@ window.addEventListener('unhandledrejection', function(e) {
   </button>
  </p>
 
+<!-- ÚJ HOZZÁSZÓLÁSOK SZEKCIÓ -->
+ <p id="newCommentsWrap" style="text-align:center;margin-top:8px;display:none;">
+  <button onclick="showRecentComments()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7ED957,#5BC236);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(126,217,87,0.4);transition:transform 0.15s;">
+   <span style="font-size:16px;">💬</span>
+   <span id="newCommentsMsg">X új hozzászólás – nézd meg!</span>
+   <span style="font-size:13px;opacity:0.85;">→</span>
+  </button>
+ </p>
+
 <!-- FELIRATKOZÓ SZEKCIÓ -->
  <!-- KALKULÁTOR CTA -->
  <div style="text-align:center; margin:12px 0 4px;">
@@ -3954,6 +3963,68 @@ function _saveComments(cardId, comments) {
   }
 }
 
+function _trackRecentComment(cardId, tileTitle, name, text) {
+  try {
+    let recent = JSON.parse(localStorage.getItem('recent_comments') || '[]');
+    recent.unshift({
+      cardId: cardId,
+      tileTitle: tileTitle.replace(/^[🔵🟣]\s*/, ''),
+      name: name,
+      text: text.substring(0, 80) + (text.length > 80 ? '...' : ''),
+      timestamp: new Date().toISOString()
+    });
+    recent = recent.slice(0, 10);
+    localStorage.setItem('recent_comments', JSON.stringify(recent));
+    _updateRecentCommentsDisplay();
+  } catch (e) {
+    console.error('Failed to track comment:', e);
+  }
+}
+
+function _updateRecentCommentsDisplay() {
+  try {
+    const recent = JSON.parse(localStorage.getItem('recent_comments') || '[]');
+    const wrap = document.getElementById('newCommentsWrap');
+    if (wrap) {
+      if (recent.length > 0) {
+        wrap.style.display = 'block';
+        document.getElementById('newCommentsMsg').textContent = `${recent.length} új hozzászólás – nézd meg!`;
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+  } catch (e) {
+    console.error('Failed to update display:', e);
+  }
+}
+
+function showRecentComments() {
+  try {
+    const recent = JSON.parse(localStorage.getItem('recent_comments') || '[]');
+    if (recent.length === 0) {
+      alert('Nincs új hozzászólás');
+      return;
+    }
+    const first = recent[0];
+    const cardId = first.cardId;
+    const card = document.querySelector(`[data-card-id="${cardId}"]`);
+    if (card) {
+      const commentsSection = card.closest('.card').querySelector('.card-comments');
+      if (commentsSection) {
+        commentsSection.scrollIntoView({behavior: 'smooth', block: 'center'});
+        setTimeout(() => {
+          const commentsList = commentsSection.querySelector('.comments-list');
+          if (commentsList) commentsList.style.display = 'block';
+        }, 300);
+      }
+    }
+    localStorage.setItem('recent_comments', JSON.stringify([]));
+    _updateRecentCommentsDisplay();
+  } catch (e) {
+    console.error('Failed to show recent comments:', e);
+  }
+}
+
 function toggleCommentForm(e, cardId) {
   e.stopPropagation();
   const commentsSection = document.getElementById(`card-comments-${cardId}`);
@@ -4010,6 +4081,9 @@ function submitComment(cardId) {
   form.style.display = 'none';
 
   renderCommentsInCard(cardId);
+
+  // Track recent comment
+  _trackRecentComment(cardId, tileTitle, name, text);
 
   // Toast notification
   showToast(`✅ Hozzászólás beküldve!`);
@@ -4075,6 +4149,9 @@ function submitReply(cardId, commentId) {
   replyForm.style.display = 'none';
 
   renderCommentsInCard(cardId);
+
+  // Track recent comment
+  _trackRecentComment(cardId, tileTitle, name, text);
 
   // Toast notification
   showToast(`✅ Válasz beküldve!`);
@@ -8605,5 +8682,13 @@ async function addSupportAmountMain(ft) {
     <div style="font-size:11px;color:#aaa;margin-top:16px;line-height:1.5;">Köszönjük! 🙏 Minden forint segít.</div>
   </div>
 </div>
+
+<script>
+// Initialize recent comments display on page load
+setTimeout(() => {
+  _updateRecentCommentsDisplay();
+}, 500);
+</script>
+
 </body>
 </html>
