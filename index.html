@@ -4008,6 +4008,7 @@ function _updateRecentCommentsDisplay() {
 
 function showRecentComments() {
   try {
+    console.log('🔍 showRecentComments() called');
     const recent = JSON.parse(localStorage.getItem('recent_comments') || '[]');
     const now = new Date();
     const last24h = now.getTime() - (24 * 60 * 60 * 1000);
@@ -4017,6 +4018,8 @@ function showRecentComments() {
       return commentTime >= last24h;
     });
 
+    console.log(`📊 Found ${recent24.length} comments in last 24h`);
+
     if (recent24.length === 0) {
       alert('Nincs új hozzászólás az utolsó 24 órában');
       return;
@@ -4024,25 +4027,51 @@ function showRecentComments() {
 
     // Jump to the FIRST (oldest) comment from last 24h
     const firstOld = recent24[recent24.length - 1];
+    console.log('🎯 First comment to show:', firstOld);
     const cardId = firstOld.cardId;
-    const card = document.querySelector(`[data-card-id="${cardId}"]`);
-    if (card) {
-      const commentsSection = card.closest('.card').querySelector('.card-comments');
-      if (commentsSection) {
-        commentsSection.scrollIntoView({behavior: 'smooth', block: 'center'});
-        setTimeout(() => {
-          const commentsList = commentsSection.querySelector('.comments-list');
-          if (commentsList) commentsList.style.display = 'block';
-        }, 300);
+    const tileTitle = firstOld.tileTitle;
+
+    let cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+
+    // Fallback: if card not found by ID, search by title
+    if (!cardElement) {
+      console.log(`⚠️ Card not found by ID: ${cardId}. Searching by title: ${tileTitle}`);
+      const allCards = document.querySelectorAll('.card');
+      for (let c of allCards) {
+        const titleEl = c.querySelector('.card-title');
+        if (titleEl && titleEl.textContent.includes(tileTitle)) {
+          cardElement = c.querySelector('[data-card-id]');
+          console.log(`✅ Found card by title match`);
+          break;
+        }
       }
+    } else {
+      console.log(`✅ Found card by ID: ${cardId}`);
+    }
+
+    if (cardElement) {
+      const card = cardElement.closest('.card');
+      const commentsSection = card.querySelector('.card-comments');
+      if (commentsSection) {
+        console.log(`✅ Found comments section, scrolling...`);
+        commentsSection.style.display = 'block';
+        const commentsList = commentsSection.querySelector('.comments-list');
+        if (commentsList) commentsList.style.display = 'block';
+        commentsSection.scrollIntoView({behavior: 'smooth', block: 'center'});
+      } else {
+        console.log(`❌ Comments section not found in card`);
+      }
+    } else {
+      console.log(`❌ Card element not found (ID: ${cardId}, Title: ${tileTitle})`);
     }
 
     // Clear all recent comments from tracking (user has viewed them)
     // But keep the full comment history in each tile's data
     localStorage.setItem('recent_comments', JSON.stringify([]));
     _updateRecentCommentsDisplay();
+    console.log('✅ Recent comments cleared from tracking');
   } catch (e) {
-    console.error('Failed to show recent comments:', e);
+    console.error('❌ Failed to show recent comments:', e);
   }
 }
 
