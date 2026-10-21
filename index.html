@@ -3984,11 +3984,19 @@ function _trackRecentComment(cardId, tileTitle, name, text) {
 function _updateRecentCommentsDisplay() {
   try {
     const recent = JSON.parse(localStorage.getItem('recent_comments') || '[]');
+    const now = new Date();
+    const last24h = now.getTime() - (24 * 60 * 60 * 1000);
+
+    const recent24 = recent.filter(c => {
+      const commentTime = new Date(c.timestamp).getTime();
+      return commentTime >= last24h;
+    });
+
     const wrap = document.getElementById('newCommentsWrap');
     if (wrap) {
-      if (recent.length > 0) {
+      if (recent24.length > 0) {
         wrap.style.display = 'block';
-        document.getElementById('newCommentsMsg').textContent = `${recent.length} új hozzászólás – nézd meg!`;
+        document.getElementById('newCommentsMsg').textContent = `${recent24.length} új hozzászólás az utolsó 24 órában – nézd meg!`;
       } else {
         wrap.style.display = 'none';
       }
@@ -4001,12 +4009,22 @@ function _updateRecentCommentsDisplay() {
 function showRecentComments() {
   try {
     const recent = JSON.parse(localStorage.getItem('recent_comments') || '[]');
-    if (recent.length === 0) {
-      alert('Nincs új hozzászólás');
+    const now = new Date();
+    const last24h = now.getTime() - (24 * 60 * 60 * 1000);
+
+    const recent24 = recent.filter(c => {
+      const commentTime = new Date(c.timestamp).getTime();
+      return commentTime >= last24h;
+    });
+
+    if (recent24.length === 0) {
+      alert('Nincs új hozzászólás az utolsó 24 órában');
       return;
     }
-    const first = recent[0];
-    const cardId = first.cardId;
+
+    // Jump to the FIRST (oldest) comment from last 24h
+    const firstOld = recent24[recent24.length - 1];
+    const cardId = firstOld.cardId;
     const card = document.querySelector(`[data-card-id="${cardId}"]`);
     if (card) {
       const commentsSection = card.closest('.card').querySelector('.card-comments');
@@ -4018,7 +4036,13 @@ function showRecentComments() {
         }, 300);
       }
     }
-    localStorage.setItem('recent_comments', JSON.stringify([]));
+
+    // Clear 24h-old comments from the list
+    const filteredRecent = recent.filter(c => {
+      const commentTime = new Date(c.timestamp).getTime();
+      return commentTime < last24h;
+    });
+    localStorage.setItem('recent_comments', JSON.stringify(filteredRecent));
     _updateRecentCommentsDisplay();
   } catch (e) {
     console.error('Failed to show recent comments:', e);
