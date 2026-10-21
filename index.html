@@ -8709,9 +8709,20 @@ async function addSupportAmountMain(ft) {
 
 <script>
 // Initialize recent comments display on page load
-setTimeout(() => {
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    _updateRecentCommentsDisplay();
+  }, 100);
+});
+
+// Also try immediate load if DOM is already ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => _updateRecentCommentsDisplay(), 50);
+  });
+} else {
   _updateRecentCommentsDisplay();
-}, 500);
+}
 </script>
 
 </body>
