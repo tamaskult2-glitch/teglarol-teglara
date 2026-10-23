@@ -8870,27 +8870,42 @@ document.addEventListener('keydown', (e) => {
 
 // Mobile long press on header: open admin panel
 let longPressTimer = null;
-const header = document.querySelector('.modern-header');
-if (header) {
-  header.addEventListener('touchstart', () => {
-    longPressTimer = setTimeout(() => {
-      openAdminPanel();
-    }, 2000); // 2 másodperc hosszú nyomás
-  });
 
-  header.addEventListener('touchend', () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      longPressTimer = null;
-    }
-  });
+function setupLongPress() {
+  const header = document.querySelector('.modern-header');
+  console.log('🔍 Admin long press: keresem a fejlécet...', header ? '✅ OK' : '❌ HIBA');
 
-  header.addEventListener('touchmove', () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      longPressTimer = null;
-    }
-  });
+  if (header) {
+    header.addEventListener('touchstart', (e) => {
+      console.log('📱 Touchstart - hosszú nyomás kezdete');
+      longPressTimer = setTimeout(() => {
+        console.log('✅ Hosszú nyomás detektálva!');
+        openAdminPanel();
+      }, 2000);
+    });
+
+    header.addEventListener('touchend', () => {
+      console.log('📱 Touchend');
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    });
+
+    header.addEventListener('touchmove', () => {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    });
+  }
+}
+
+// Állítsd be a long press-t DOM betöltés után
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupLongPress);
+} else {
+  setupLongPress();
 }
 
 // Close panel on Escape key
