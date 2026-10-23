@@ -8772,6 +8772,7 @@ async function addSupportAmountMain(ft) {
         <button onclick="switchAdminTab('browsers')" id="tabBrowsers" style="padding:8px 16px;background:#eee;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">🌐 Böngészők</button>
         <button onclick="switchAdminTab('devices')" id="tabDevices" style="padding:8px 16px;background:#eee;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">📱 Eszközök</button>
         <button onclick="switchAdminTab('hours')" id="tabHours" style="padding:8px 16px;background:#eee;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">⏰ Órák</button>
+        <button onclick="switchAdminTab('ai')" id="tabAI" style="padding:8px 16px;background:#eee;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">🤖 AI Elemzés</button>
       </div>
 
       <!-- Overview Tab -->
@@ -8817,6 +8818,45 @@ async function addSupportAmountMain(ft) {
         <h3 style="margin:0 0 12px;color:#333;">⏰ Megtekintések óránként</h3>
         <div style="background:#f5f5f5;padding:16px;border-radius:8px;font-family:monospace;font-size:13px;line-height:1.8;margin-bottom:20px;" id="hoursList">
           <div style="color:#999;">Nincs adat</div>
+        </div>
+      </div>
+
+      <!-- AI Analysis Tab -->
+      <div id="tabContentAI" style="display:none;">
+        <h3 style="margin:0 0 12px;color:#333;">🤖 ChatGPT Ígéret Elemzés</h3>
+        <div style="background:#f5f5f5;padding:16px;border-radius:8px;margin-bottom:16px;">
+          <div style="margin-bottom:12px;">
+            <label style="font-size:12px;color:#666;font-weight:600;">Tégla szövege:</label>
+            <textarea id="aiPromptText" placeholder="Pl: SZJA-csökkentés: 15% → 9%" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:13px;resize:vertical;min-height:80px;margin-top:6px;font-family:inherit;"></textarea>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:12px;color:#666;font-weight:600;">Kategória:</label>
+            <input type="text" id="aiPromptCategory" placeholder="Pl: Adópolitika" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:13px;margin-top:6px;">
+          </div>
+          <button onclick="analyzePromise()" style="width:100%;padding:10px;background:#667eea;color:white;border:none;border-radius:6px;font-weight:600;cursor:pointer;">🤖 Elemzés indítása</button>
+        </div>
+        <div id="aiResultContainer" style="display:none;margin-bottom:16px;">
+          <div style="background:#f0f4ff;padding:16px;border-radius:8px;border-left:4px solid #667eea;margin-bottom:12px;">
+            <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:6px;">SZENTIMENT ANALÍZIS</div>
+            <div id="aiResultSentiment" style="font-size:16px;font-weight:700;color:#333;">-</div>
+            <div id="aiResultConfidence" style="font-size:12px;color:#666;margin-top:4px;">-</div>
+          </div>
+          <div style="background:#fff5f5;padding:16px;border-radius:8px;border-left:4px solid #e8405a;margin-bottom:12px;">
+            <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:6px;">ÍGÉRET STATUS</div>
+            <div id="aiResultStatus" style="font-size:16px;font-weight:700;color:#333;">-</div>
+            <div id="aiResultReasoning" style="font-size:12px;color:#666;margin-top:4px;line-height:1.5;">-</div>
+          </div>
+          <div style="background:#f0fff4;padding:16px;border-radius:8px;border-left:4px solid #28a745;">
+            <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:6px;">ÖSSZEFOGLALÁS</div>
+            <div id="aiResultSummary" style="font-size:13px;color:#333;line-height:1.6;">-</div>
+          </div>
+        </div>
+        <div id="aiLoadingContainer" style="display:none;text-align:center;color:#667eea;padding:20px;">
+          <div style="font-size:18px;margin-bottom:8px;">⏳</div>
+          <div>Elemzés folyamatban...</div>
+        </div>
+        <div id="aiErrorContainer" style="display:none;background:#fff5f5;padding:16px;border-radius:8px;border-left:4px solid #e8405a;color:#e8405a;">
+          <div id="aiErrorText">-</div>
         </div>
       </div>
 
@@ -9000,6 +9040,7 @@ function switchAdminTab(tab) {
   document.getElementById('tabContentBrowsers').style.display = 'none';
   document.getElementById('tabContentDevices').style.display = 'none';
   document.getElementById('tabContentHours').style.display = 'none';
+  document.getElementById('tabContentAI').style.display = 'none';
 
   // Reset all tab buttons
   document.getElementById('tabOverview').style.background = '#eee';
@@ -9012,6 +9053,8 @@ function switchAdminTab(tab) {
   document.getElementById('tabDevices').style.color = '#333';
   document.getElementById('tabHours').style.background = '#eee';
   document.getElementById('tabHours').style.color = '#333';
+  document.getElementById('tabAI').style.background = '#eee';
+  document.getElementById('tabAI').style.color = '#333';
 
   // Show selected tab
   if (tab === 'overview') {
@@ -9034,6 +9077,65 @@ function switchAdminTab(tab) {
     document.getElementById('tabContentHours').style.display = 'block';
     document.getElementById('tabHours').style.background = '#c0183a';
     document.getElementById('tabHours').style.color = 'white';
+  } else if (tab === 'ai') {
+    document.getElementById('tabContentAI').style.display = 'block';
+    document.getElementById('tabAI').style.background = '#667eea';
+    document.getElementById('tabAI').style.color = 'white';
+  }
+}
+
+async function analyzePromise() {
+  const text = document.getElementById('aiPromptText').value.trim();
+  const category = document.getElementById('aiPromptCategory').value.trim();
+
+  if (!text || !category) {
+    alert('⚠️ Kérlek add meg a tégla szövegét és kategóriáját!');
+    return;
+  }
+
+  document.getElementById('aiResultContainer').style.display = 'none';
+  document.getElementById('aiErrorContainer').style.display = 'none';
+  document.getElementById('aiLoadingContainer').style.display = 'block';
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, category })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Elemzés sikertelen');
+    }
+
+    document.getElementById('aiLoadingContainer').style.display = 'none';
+    document.getElementById('aiResultContainer').style.display = 'block';
+
+    const sentimentEmoji = {
+      'pozitív': '😊 Pozitív',
+      'negatív': '😞 Negatív',
+      'semleges': '😐 Semleges'
+    };
+
+    const statusEmoji = {
+      'teljesült': '✅ Teljesült',
+      'teljesülés alatt': '⏳ Teljesülés alatt',
+      'nem teljesült': '❌ Nem teljesült',
+      'feltételhez kötött': '⚠️ Feltételhez kötött'
+    };
+
+    document.getElementById('aiResultSentiment').textContent = sentimentEmoji[data.sentiment] || data.sentiment;
+    document.getElementById('aiResultConfidence').textContent = `Biztonság: ${data.confidence}%`;
+    document.getElementById('aiResultStatus').textContent = statusEmoji[data.status] || data.status;
+    document.getElementById('aiResultReasoning').textContent = data.reasoning;
+    document.getElementById('aiResultSummary').textContent = data.summary;
+
+  } catch (error) {
+    document.getElementById('aiLoadingContainer').style.display = 'none';
+    document.getElementById('aiErrorContainer').style.display = 'block';
+    document.getElementById('aiErrorText').textContent = `❌ Hiba: ${error.message}`;
   }
 }
 
