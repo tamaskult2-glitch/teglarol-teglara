@@ -8868,6 +8868,31 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Mobile long press on header: open admin panel
+let longPressTimer = null;
+const header = document.querySelector('.modern-header');
+if (header) {
+  header.addEventListener('touchstart', () => {
+    longPressTimer = setTimeout(() => {
+      openAdminPanel();
+    }, 2000); // 2 másodperc hosszú nyomás
+  });
+
+  header.addEventListener('touchend', () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  });
+
+  header.addEventListener('touchmove', () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  });
+}
+
 // Close panel on Escape key
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
