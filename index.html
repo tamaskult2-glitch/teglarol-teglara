@@ -8755,7 +8755,131 @@ async function addSupportAmountMain(ft) {
   </div>
 </div>
 
+<!-- Admin Panel (hidden, Ctrl+Shift+A to open) -->
+<div id="adminPanel" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:16px;padding:40px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <h2 style="margin:0 0 20px;color:#c0183a;font-size:24px;">🔐 Admin Bejelentkezés</h2>
+    <div id="adminLoginForm" style="display:block;">
+      <input type="password" id="adminPassword" placeholder="Jelszó" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;margin-bottom:16px;font-family:monospace;">
+      <button onclick="checkAdminPassword()" style="width:100%;padding:12px;background:#c0183a;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:16px;">Bejelentkezés</button>
+    </div>
+    <div id="adminStatsPanel" style="display:none;">
+      <div style="margin-bottom:20px;">
+        <h3 style="margin:0 0 12px;color:#333;">📊 Megtekintési Statisztika</h3>
+        <div style="background:#f5f5f5;padding:16px;border-radius:8px;font-family:monospace;font-size:14px;line-height:1.8;">
+          <div>📅 <strong>Mai nap:</strong> <span id="statToday">0</span> megtekintés</div>
+          <div>📆 <strong>Ez a hét:</strong> <span id="statWeek">0</span> megtekintés</div>
+          <div>📊 <strong>Ez a hónap:</strong> <span id="statMonth">0</span> megtekintés</div>
+          <div>🔢 <strong>Összesen:</strong> <span id="statTotal">0</span> megtekintés</div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid #ddd;color:#666;">
+            ⏰ Utolsó megtekintés: <span id="lastView">-</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="clearAdminStats()" style="width:100%;padding:10px;background:#f5f5f5;color:#333;border:2px solid #ddd;border-radius:8px;font-weight:600;cursor:pointer;margin-bottom:12px;">🗑️ Statisztika törlése</button>
+      <button onclick="closeAdminPanel()" style="width:100%;padding:10px;background:#c0183a;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Bezárás</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// Admin Panel functionality
+const ADMIN_PASSWORD = 'tt2026@kt';
+
+function trackPageView() {
+  const now = new Date();
+  const dateKey = now.toISOString().split('T')[0];
+  let stats = JSON.parse(localStorage.getItem('adminStats') || '{"views":[],"lastView":null}');
+
+  stats.views.push({
+    date: dateKey,
+    time: now.toISOString(),
+    timestamp: now.getTime()
+  });
+
+  stats.lastView = now.toISOString();
+  localStorage.setItem('adminStats', JSON.stringify(stats));
+}
+
+function getAdminStats() {
+  const stats = JSON.parse(localStorage.getItem('adminStats') || '{"views":[],"lastView":null}');
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+
+  // Count views by period
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const todayViews = stats.views.filter(v => v.date === today).length;
+  const weekViews = stats.views.filter(v => new Date(v.time) >= weekAgo).length;
+  const monthViews = stats.views.filter(v => new Date(v.time) >= monthAgo).length;
+  const totalViews = stats.views.length;
+
+  return { todayViews, weekViews, monthViews, totalViews, lastView: stats.lastView };
+}
+
+function checkAdminPassword() {
+  const password = document.getElementById('adminPassword').value;
+  if (password === ADMIN_PASSWORD) {
+    document.getElementById('adminLoginForm').style.display = 'none';
+    document.getElementById('adminStatsPanel').style.display = 'block';
+    updateAdminStats();
+  } else {
+    alert('❌ Hibás jelszó!');
+    document.getElementById('adminPassword').value = '';
+  }
+}
+
+function updateAdminStats() {
+  const stats = getAdminStats();
+  document.getElementById('statToday').textContent = stats.todayViews;
+  document.getElementById('statWeek').textContent = stats.weekViews;
+  document.getElementById('statMonth').textContent = stats.monthViews;
+  document.getElementById('statTotal').textContent = stats.totalViews;
+  document.getElementById('lastView').textContent = stats.lastView ? new Date(stats.lastView).toLocaleString('hu-HU') : '-';
+}
+
+function openAdminPanel() {
+  document.getElementById('adminPanel').style.display = 'flex';
+  document.getElementById('adminLoginForm').style.display = 'block';
+  document.getElementById('adminStatsPanel').style.display = 'none';
+  document.getElementById('adminPassword').value = '';
+}
+
+function closeAdminPanel() {
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('adminPassword').value = '';
+}
+
+function clearAdminStats() {
+  if (confirm('⚠️ Biztosan törlöd az összes statisztikát?')) {
+    localStorage.removeItem('adminStats');
+    document.getElementById('adminStatsPanel').style.display = 'none';
+    document.getElementById('adminLoginForm').style.display = 'block';
+    alert('✅ Statisztika törölve!');
+  }
+}
+
+// Keyboard shortcut: Ctrl+Shift+A to open admin panel
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+    e.preventDefault();
+    openAdminPanel();
+  }
+});
+
+// Close panel on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAdminPanel();
+  }
+});
+
+// Track page view on load
+document.addEventListener('DOMContentLoaded', () => {
+  trackPageView();
+});
+
 // Initialize recent comments display on page load
 console.log('🚀 Recent comments initialization script loaded. readyState:', document.readyState);
 
