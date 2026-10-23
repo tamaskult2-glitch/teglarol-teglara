@@ -8757,16 +8757,26 @@ async function addSupportAmountMain(ft) {
 
 <!-- Admin Panel (hidden, Ctrl+Shift+A to open) -->
 <div id="adminPanel" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;align-items:center;justify-content:center;">
-  <div style="background:white;border-radius:16px;padding:40px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+  <div style="background:white;border-radius:16px;padding:40px;max-width:700px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
     <h2 style="margin:0 0 20px;color:#c0183a;font-size:24px;">🔐 Admin Bejelentkezés</h2>
     <div id="adminLoginForm" style="display:block;">
       <input type="password" id="adminPassword" placeholder="Jelszó" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;margin-bottom:16px;font-family:monospace;">
       <button onclick="checkAdminPassword()" style="width:100%;padding:12px;background:#c0183a;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:16px;">Bejelentkezés</button>
     </div>
     <div id="adminStatsPanel" style="display:none;">
-      <div style="margin-bottom:20px;">
+      <!-- Tab buttons -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;border-bottom:2px solid #eee;padding-bottom:12px;">
+        <button onclick="switchAdminTab('overview')" id="tabOverview" style="padding:8px 16px;background:#c0183a;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;">📊 Áttekintés</button>
+        <button onclick="switchAdminTab('tiles')" id="tabTiles" style="padding:8px 16px;background:#eee;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">🧱 Téglákon</button>
+        <button onclick="switchAdminTab('browsers')" id="tabBrowsers" style="padding:8px 16px;background:#eee;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">🌐 Böngészők</button>
+        <button onclick="switchAdminTab('devices')" id="tabDevices" style="padding:8px 16px;background:#eee;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">📱 Eszközök</button>
+        <button onclick="switchAdminTab('hours')" id="tabHours" style="padding:8px 16px;background:#eee;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">⏰ Órák</button>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="tabContentOverview" style="display:block;">
         <h3 style="margin:0 0 12px;color:#333;">📊 Megtekintési Statisztika</h3>
-        <div style="background:#f5f5f5;padding:16px;border-radius:8px;font-family:monospace;font-size:14px;line-height:1.8;">
+        <div style="background:#f5f5f5;padding:16px;border-radius:8px;font-family:monospace;font-size:14px;line-height:1.8;margin-bottom:20px;">
           <div>📅 <strong>Mai nap:</strong> <span id="statToday">0</span> megtekintés</div>
           <div>📆 <strong>Ez a hét:</strong> <span id="statWeek">0</span> megtekintés</div>
           <div>📊 <strong>Ez a hónap:</strong> <span id="statMonth">0</span> megtekintés</div>
@@ -8776,6 +8786,39 @@ async function addSupportAmountMain(ft) {
           </div>
         </div>
       </div>
+
+      <!-- Tiles Tab -->
+      <div id="tabContentTiles" style="display:none;">
+        <h3 style="margin:0 0 12px;color:#333;">🧱 Legtöbb megtekintett téglákon</h3>
+        <div style="background:#f5f5f5;padding:16px;border-radius:8px;font-family:monospace;font-size:13px;line-height:2;margin-bottom:20px;" id="tilesList">
+          <div style="color:#999;">Nincs adat</div>
+        </div>
+      </div>
+
+      <!-- Browsers Tab -->
+      <div id="tabContentBrowsers" style="display:none;">
+        <h3 style="margin:0 0 12px;color:#333;">🌐 Böngésző megoszlás</h3>
+        <div style="background:#f5f5f5;padding:16px;border-radius:8px;font-family:monospace;font-size:13px;line-height:2;margin-bottom:20px;" id="browsersList">
+          <div style="color:#999;">Nincs adat</div>
+        </div>
+      </div>
+
+      <!-- Devices Tab -->
+      <div id="tabContentDevices" style="display:none;">
+        <h3 style="margin:0 0 12px;color:#333;">📱 Eszköz megoszlás</h3>
+        <div style="background:#f5f5f5;padding:16px;border-radius:8px;font-family:monospace;font-size:13px;line-height:2;margin-bottom:20px;" id="devicesList">
+          <div style="color:#999;">Nincs adat</div>
+        </div>
+      </div>
+
+      <!-- Hours Tab -->
+      <div id="tabContentHours" style="display:none;">
+        <h3 style="margin:0 0 12px;color:#333;">⏰ Megtekintések óránként</h3>
+        <div style="background:#f5f5f5;padding:16px;border-radius:8px;font-family:monospace;font-size:13px;line-height:1.8;margin-bottom:20px;" id="hoursList">
+          <div style="color:#999;">Nincs adat</div>
+        </div>
+      </div>
+
       <button onclick="clearAdminStats()" style="width:100%;padding:10px;background:#f5f5f5;color:#333;border:2px solid #ddd;border-radius:8px;font-weight:600;cursor:pointer;margin-bottom:12px;">🗑️ Statisztika törlése</button>
       <button onclick="closeAdminPanel()" style="width:100%;padding:10px;background:#c0183a;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Bezárás</button>
     </div>
@@ -8786,16 +8829,44 @@ async function addSupportAmountMain(ft) {
 // Admin Panel functionality
 const ADMIN_PASSWORD = 'tt2026@kt';
 
+function getBrowserInfo() {
+  const ua = navigator.userAgent;
+  if (ua.includes('Chrome') && !ua.includes('Chromium')) return 'Chrome';
+  if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+  if (ua.includes('Firefox')) return 'Firefox';
+  if (ua.includes('Edge')) return 'Edge';
+  return 'Egyéb';
+}
+
+function getDeviceType() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'Mobil' : 'Desktop';
+}
+
 function trackPageView() {
   const now = new Date();
   const dateKey = now.toISOString().split('T')[0];
-  let stats = JSON.parse(localStorage.getItem('adminStats') || '{"views":[],"lastView":null}');
+  const hour = now.getHours();
+  let stats = JSON.parse(localStorage.getItem('adminStats') || '{"views":[],"tiles":{},"categories":{},"browsers":{},"devices":{},"hours":{},"comments":0,"lastView":null}');
 
   stats.views.push({
     date: dateKey,
     time: now.toISOString(),
-    timestamp: now.getTime()
+    timestamp: now.getTime(),
+    browser: getBrowserInfo(),
+    device: getDeviceType(),
+    hour: hour
   });
+
+  // Eszköz nyomon követés
+  const device = getDeviceType();
+  stats.devices[device] = (stats.devices[device] || 0) + 1;
+
+  // Böngésző nyomon követés
+  const browser = getBrowserInfo();
+  stats.browsers[browser] = (stats.browsers[browser] || 0) + 1;
+
+  // Óra nyomon követés
+  stats.hours[hour] = (stats.hours[hour] || 0) + 1;
 
   stats.lastView = now.toISOString();
   localStorage.setItem('adminStats', JSON.stringify(stats));
@@ -8830,6 +8901,51 @@ function checkAdminPassword() {
   }
 }
 
+function trackTileClick(tileTitle, category = 'egyéb') {
+  let stats = JSON.parse(localStorage.getItem('adminStats') || '{"views":[],"tiles":{},"categories":{},"browsers":{},"devices":{},"hours":{},"comments":0,"lastView":null}');
+
+  // Track tile
+  stats.tiles[tileTitle] = (stats.tiles[tileTitle] || 0) + 1;
+
+  // Track category
+  stats.categories[category] = (stats.categories[category] || 0) + 1;
+
+  localStorage.setItem('adminStats', JSON.stringify(stats));
+}
+
+function getTopTiles(limit = 10) {
+  const stats = JSON.parse(localStorage.getItem('adminStats') || '{"tiles":{}}');
+  return Object.entries(stats.tiles || {})
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([tile, count]) => ({ tile, count }));
+}
+
+function getBrowserStats() {
+  const stats = JSON.parse(localStorage.getItem('adminStats') || '{"browsers":{}}');
+  const total = Object.values(stats.browsers || {}).reduce((a, b) => a + b, 0) || 1;
+  return Object.entries(stats.browsers || {})
+    .sort((a, b) => b[1] - a[1])
+    .map(([browser, count]) => ({ browser, count, percent: ((count / total) * 100).toFixed(1) }));
+}
+
+function getDeviceStats() {
+  const stats = JSON.parse(localStorage.getItem('adminStats') || '{"devices":{}}');
+  const total = Object.values(stats.devices || {}).reduce((a, b) => a + b, 0) || 1;
+  return Object.entries(stats.devices || {})
+    .sort((a, b) => b[1] - a[1])
+    .map(([device, count]) => ({ device, count, percent: ((count / total) * 100).toFixed(1) }));
+}
+
+function getHourStats() {
+  const stats = JSON.parse(localStorage.getItem('adminStats') || '{"hours":{}}');
+  const hours = [];
+  for (let i = 0; i < 24; i++) {
+    hours.push({ hour: i.toString().padStart(2, '0') + ':00', count: stats.hours?.[i] || 0 });
+  }
+  return hours;
+}
+
 function updateAdminStats() {
   const stats = getAdminStats();
   document.getElementById('statToday').textContent = stats.todayViews;
@@ -8837,6 +8953,87 @@ function updateAdminStats() {
   document.getElementById('statMonth').textContent = stats.monthViews;
   document.getElementById('statTotal').textContent = stats.totalViews;
   document.getElementById('lastView').textContent = stats.lastView ? new Date(stats.lastView).toLocaleString('hu-HU') : '-';
+
+  // Update tile list
+  const topTiles = getTopTiles();
+  const tilesList = document.getElementById('tilesList');
+  if (topTiles.length === 0) {
+    tilesList.innerHTML = '<div style="color:#999;">Nincs adat</div>';
+  } else {
+    tilesList.innerHTML = topTiles.map(t => `<div>🧱 <strong>${t.tile}:</strong> ${t.count} kattintás</div>`).join('');
+  }
+
+  // Update browser list
+  const browserStats = getBrowserStats();
+  const browsersList = document.getElementById('browsersList');
+  if (browserStats.length === 0) {
+    browsersList.innerHTML = '<div style="color:#999;">Nincs adat</div>';
+  } else {
+    browsersList.innerHTML = browserStats.map(b => `<div>🌐 <strong>${b.browser}:</strong> ${b.count} (${b.percent}%)</div>`).join('');
+  }
+
+  // Update device list
+  const deviceStats = getDeviceStats();
+  const devicesList = document.getElementById('devicesList');
+  if (deviceStats.length === 0) {
+    devicesList.innerHTML = '<div style="color:#999;">Nincs adat</div>';
+  } else {
+    devicesList.innerHTML = deviceStats.map(d => `<div>📱 <strong>${d.device}:</strong> ${d.count} (${d.percent}%)</div>`).join('');
+  }
+
+  // Update hours list
+  const hourStats = getHourStats();
+  const hoursList = document.getElementById('hoursList');
+  const nonZeroHours = hourStats.filter(h => h.count > 0);
+  if (nonZeroHours.length === 0) {
+    hoursList.innerHTML = '<div style="color:#999;">Nincs adat</div>';
+  } else {
+    hoursList.innerHTML = nonZeroHours.map(h => `<div>⏰ <strong>${h.hour}:</strong> ${h.count} megtekintés</div>`).join('');
+  }
+}
+
+function switchAdminTab(tab) {
+  // Hide all tabs
+  document.getElementById('tabContentOverview').style.display = 'none';
+  document.getElementById('tabContentTiles').style.display = 'none';
+  document.getElementById('tabContentBrowsers').style.display = 'none';
+  document.getElementById('tabContentDevices').style.display = 'none';
+  document.getElementById('tabContentHours').style.display = 'none';
+
+  // Reset all tab buttons
+  document.getElementById('tabOverview').style.background = '#eee';
+  document.getElementById('tabOverview').style.color = '#333';
+  document.getElementById('tabTiles').style.background = '#eee';
+  document.getElementById('tabTiles').style.color = '#333';
+  document.getElementById('tabBrowsers').style.background = '#eee';
+  document.getElementById('tabBrowsers').style.color = '#333';
+  document.getElementById('tabDevices').style.background = '#eee';
+  document.getElementById('tabDevices').style.color = '#333';
+  document.getElementById('tabHours').style.background = '#eee';
+  document.getElementById('tabHours').style.color = '#333';
+
+  // Show selected tab
+  if (tab === 'overview') {
+    document.getElementById('tabContentOverview').style.display = 'block';
+    document.getElementById('tabOverview').style.background = '#c0183a';
+    document.getElementById('tabOverview').style.color = 'white';
+  } else if (tab === 'tiles') {
+    document.getElementById('tabContentTiles').style.display = 'block';
+    document.getElementById('tabTiles').style.background = '#c0183a';
+    document.getElementById('tabTiles').style.color = 'white';
+  } else if (tab === 'browsers') {
+    document.getElementById('tabContentBrowsers').style.display = 'block';
+    document.getElementById('tabBrowsers').style.background = '#c0183a';
+    document.getElementById('tabBrowsers').style.color = 'white';
+  } else if (tab === 'devices') {
+    document.getElementById('tabContentDevices').style.display = 'block';
+    document.getElementById('tabDevices').style.background = '#c0183a';
+    document.getElementById('tabDevices').style.color = 'white';
+  } else if (tab === 'hours') {
+    document.getElementById('tabContentHours').style.display = 'block';
+    document.getElementById('tabHours').style.background = '#c0183a';
+    document.getElementById('tabHours').style.color = 'white';
+  }
 }
 
 function openAdminPanel() {
