@@ -161,18 +161,18 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 19.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 23.)
 
-🔥 Október 19-i költségvetési bejelentés:
-• 💰 SZJA-csökkentés: 15% → 9% (minimálbérig terjedő jövedelem) | Nettó: +19.368 Ft/hó (2027)
-• 👨‍👩‍👧 Családi pótlék: duplázódik (300 Mrd Ft) | Babaváró, CSOK, falusi CSOK: változatlan
-• 👴 Minimumnyugdíj: 28k Ft → 120k Ft | 13. havi nyugdíj: megtartva
-• 🏥 Egészségügy: 928 Mrd Ft EU-s fejlesztési pénz, prioritás az egészségügyre
-• 🏗️ Infrastruktúra: 100 Mrd Ft kátyúmentesítés
+🔥 Október 19–23-i költségvetési bejelentés és frissítések:
+• 💰 SZJA-csökkentés: 15% → 9% (minimálbérig terjedő jövedelem) | 2027-es költségvetés tervezet
+• 👨‍👩‍👧 Családi pótlék: duplázódik | 2027-es költségvetés tervezet
+• 👴 Minimumnyugdíj: 28k Ft → 120k Ft (inflációhoz kötve) | 13. havi, 14. havi nyugdíj megtartva
+• 🏥 Egészségügy: 500 Mrd Ft pluszforrás, várólisták csökkentésre 18,9 Mrd Ft (BCG-terv)
+• 💶 Euró bevezetés: 2030-as cél még nem törvény, reális időpont 2032+
+• 🇪🇺 Uniós pénzek: 16,4 Mrd EUR felszabadítása folyamatban
 • 💸 Költségvetési hiány: 8,3% → 4,9% | Új vagyonadó: 200 Mrd Ft/év
-• ⛽ Üzemanyagárak: benzin 642 Ft/l, dízel 709 Ft/l (2026.okt.19.)
 
-📊 Pénztárcaindex, Mérleg, Index frissítve</textarea>
+📊 Pénztárcaindex, Mérleg frissítve</textarea>
 
     <label for="emailsInput">📧 Feliratkozók (vesszővel elválasztva):</label>
     <textarea id="emailsInput" placeholder="email1@example.com, email2@example.com">tothnemerika@gmail.com,akos.fendrik22@gmail.com,tamaskult2@icloud.com,v.szabi520@gmail.com,kasza.szabolcs@gmail.com,zsolt.ruszin@fairconto.hu</textarea>
@@ -206,26 +206,27 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
 
   if (type === 'tegla') {
-    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 19.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 23.)
 
-🔥 Október 19-i költségvetési bejelentés:
-• 💰 SZJA-csökkentés: 15% → 9% (minimálbérig) | Nettó: +19.368 Ft/hó (2027)
-• 👨‍👩‍👧 Családi pótlék: duplázódik (300 Mrd Ft) | Babaváró, CSOK: változatlan
-• 👴 Minimumnyugdíj: 28k → 120k Ft | 13. havi: megtartva
-• 🏥 Egészségügy: 928 Mrd Ft EU-s fejlesztési pénz
-• 🏗️ Infrastruktúra: 100 Mrd Ft kátyúmentesítés
-• 💸 Költségvetési hiány: 8,3% → 4,9% | Új vagyonadó: 200 Mrd Ft/év
-• ⛽ Üzemanyagárak: benzin 642 Ft/l, dízel 709 Ft/l
+🔥 Október 19–23-i költségvetési bejelentés és frissítések:
+• 💰 SZJA-csökkentés: 15% → 9% (minimálbérig) | 2027-es költségvetés tervezet
+• 👨‍👩‍👧 Családi pótlék: duplázódik | 2027-es költségvetés tervezet
+• 👴 Minimumnyugdíj: 28k → 120k Ft | 13. havi, 14. havi megtartva (2027)
+• 🏥 Egészségügy: 500 Mrd Ft pluszforrás, várólisták csökkentésre 18,9 Mrd Ft
+• 💶 Euró: 2030-as cél még nem törvény, reális időpont 2032+
+• 🇪🇺 Uniós pénzek: 16,4 Mrd EUR felszabadítása folyamatban
+• 💸 Költségvetési hiány: 8,3% → 4,9%
 
 📊 Index, Pénztárcaindex, Mérleg frissítve`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 17.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 23.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 642 Ft/l (+7,9% az áradáshoz képest), dízel 709 Ft/l (+15,3%) – az elmúlt másfél hónapban csak fokozatos drágulás
+• Üzemanyag: benzin 642 Ft/l (+7,9% az áradáshoz képest), dízel 709 Ft/l (+15,3%)
 • Üzemanyag-költség: 200 l/hó kalkuláció = 128.400 Ft/hó (benzin: 200×642)
-• Élelmiszer-tételek: csirkemellfilé, sertéskaraj, tej, alma, paradicsom olcsóbb lett, de a kenyér (+56%) és marhahús (+25%) jelentősen drágult
+• Élelmiszer-tételek: változó áras csoportokként
+• 2027-es ígéretek: SZJA 9%, családi pótlék 2×, minimumnyugdíj 120k Ft
 
 🔗 teglarol-teglara.hu/penztarca.html`;
     dbInput.placeholder = 'Pénztárcaindex launch üzenet';
