@@ -9115,7 +9115,23 @@ document.addEventListener('keydown', (e) => {
 // Track page view on load
 document.addEventListener('DOMContentLoaded', () => {
   trackPageView();
+
+  // Set up tile click tracking
+  setupTileTracking();
 });
+
+// Global tile click tracking
+function setupTileTracking() {
+  // Track clicks on elements with data-tile attribute
+  document.addEventListener('click', (e) => {
+    const tileElement = e.target.closest('[data-tile]');
+    if (tileElement) {
+      const tileName = tileElement.getAttribute('data-tile');
+      const category = tileElement.getAttribute('data-category') || 'egyéb';
+      trackTileClick(tileName, category);
+    }
+  }, true);
+}
 
 // Initialize recent comments display on page load
 console.log('🚀 Recent comments initialization script loaded. readyState:', document.readyState);
