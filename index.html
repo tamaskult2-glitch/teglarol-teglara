@@ -3922,6 +3922,34 @@ function buildCard(item) {
  return card;
 }
 
+// Ensure all cards have comment sections
+function ensureAllCardsHaveComments() {
+  document.querySelectorAll('.card').forEach(card => {
+    if (!card.querySelector('.card-comments')) {
+      const title = card.querySelector('h3')?.textContent?.replace(/^[🔵🟣] /, '') || 'Unknown';
+      const cardId = _getCardId(title);
+      const commentCount = _getComments(cardId).length;
+
+      const commentsHTML = `<div class="card-comments" style="border-top:1px solid var(--border-subtle);padding-top:12px;margin-top:12px;" data-card-id="${cardId}" id="card-comments-${cardId}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;"><span style="font-size:13px;font-weight:600;color:var(--text-main);">💬 Hozzászólások (${commentCount})</span><button class="comment-toggle-btn" onclick="toggleCommentForm(event, '${cardId}')" style="background:none;border:none;color:#c0183a;cursor:pointer;font-size:12px;font-weight:600;padding:0;">+ Hozzászólás</button></div><div class="comment-form-wrap" style="display:none;margin-bottom:12px;position:relative;z-index:50;" id="form-${cardId}" onclick="event.stopPropagation()"><input type="text" class="comment-name-input" placeholder="Név (opcionális)" style="width:100%;padding:8px;margin-bottom:8px;border:1px solid var(--border-subtle);border-radius:6px;font-size:13px;box-sizing:border-box;"><textarea class="comment-text-input" placeholder="Írd meg a hozzászólásodat..." style="width:100%;padding:8px;margin-bottom:8px;border:1px solid var(--border-subtle);border-radius:6px;font-size:13px;min-height:80px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea><div style="display:flex;gap:8px;"><button class="comment-submit-btn" onclick="submitComment('${cardId}')" style="flex:1;padding:8px;background:#c0183a;color:white;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Küldés</button><button onclick="toggleCommentForm(event, '${cardId}')" style="flex:1;padding:8px;background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-subtle);border-radius:6px;font-size:13px;cursor:pointer;">Mégse</button></div></div><div class="comments-list" id="comments-${cardId}" style="max-height:400px;overflow-y:auto;display:${commentCount > 0 ? 'block' : 'none'};"></div></div>`;
+
+      card.appendChild(document.createRange().createContextualFragment(commentsHTML));
+      renderCommentsInCard(cardId);
+    }
+  });
+}
+
+// Run on initial load and when content changes
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(ensureAllCardsHaveComments, 500);
+  });
+} else {
+  setTimeout(ensureAllCardsHaveComments, 500);
+}
+
+// Also check periodically for newly added cards
+setInterval(ensureAllCardsHaveComments, 2000);
+
 // ──── COMMENT SYSTEM (localStorage MVP) ────
 
 // Toast notification
