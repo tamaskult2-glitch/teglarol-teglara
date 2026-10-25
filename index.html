@@ -26,7 +26,7 @@ window.addEventListener('unhandledrejection', function(e) {
  </script>
  
  <title>Tégláról-téglára | teglarol-teglara.hu</title>
-<meta name="version" content="4.71">
+<meta name="version" content="4.72">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="Független nyomonkövetés: Magyar Péter és a TISZA Párt ígéreteinek teljesülése tégláról-téglára.">
 <meta property="og:title" content="Tégláról-téglára | TISZA ígéretkövető">
@@ -5240,40 +5240,72 @@ function getMiniCharts() {
  },
 
  "Családtámogatások bővítése": () => {
- // Alapvető családtámogatások alakulása – havi/éves összegek egy egygyerekes családra
- const data = [
- { label: "Családi pótlék (1 gyerek)", values: [{y:"2010", v:12200}, {y:"2015", v:12200}, {y:"2020", v:12200}, {y:"2025", v:12200}, {y:"TISZA", v:24400}] },
- { label: "CSED (maximum)", values: [{y:"2010", v:160}, {y:"2015", v:180}, {y:"2020", v:210}, {y:"2025", v:280}, {y:"TISZA", v:280}] },
- { label: "SZJA-jóváírás (3 gyerek)", values: [{y:"2010", v:0}, {y:"2015", v:33000}, {y:"2020", v:66000}, {y:"2025", v:99000}, {y:"TISZA", v:99000}] }
- ];
- const max = 24400;
- return `<div class="viz-title">Családi pótlék (Ft/hó)</div> ${[{y:"2010",v:12200},{y:"2015",v:12200},{y:"2020",v:12200},{y:"2025",v:12200},{y:"TISZA",v:24400,hi:true}].map(d =>`
- <div class="mini-row">
- <span class="mini-label">${d.y}</span>
- <span class="mini-bar"><span class="mini-bar-fill" style="width:${(d.v/max)*100}%;background:${d.hi?'#7ED957':'#B5A498'};"></span></span>
- <span class="mini-value">${d.v.toLocaleString('hu')} Ft</span>
+ return `
+ <div class="viz-title">Családi pótlék módosítása</div>
+ <div style="display:flex;gap:16px;align-items:center;margin:12px 0;flex-wrap:wrap;">
+  <div style="flex:1;min-width:120px;text-align:center;padding:12px;background:var(--bg-main);border-radius:8px;">
+   <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:6px;">Mostani</div>
+   <div style="font-size:18px;font-weight:900;color:#B5A498;">12 200 Ft</div>
+   <div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">/hó (1 gyerek)</div>
+  </div>
+  <div style="font-size:24px;color:#999;">→</div>
+  <div style="flex:1;min-width:120px;text-align:center;padding:12px;background:#f0fff4;border-radius:8px;border:2px solid #7ED957;">
+   <div style="font-size:11px;font-weight:700;color:#4a9d6f;text-transform:uppercase;margin-bottom:6px;">TISZA ígéret</div>
+   <div style="font-size:18px;font-weight:900;color:#2da44e;">24 400 Ft</div>
+   <div style="font-size:10px;color:#4a9d6f;margin-top:4px;"><strong>+100%</strong> duplázás</div>
+  </div>
  </div>
- `).join('')} <div style="font-size:10px;color:var(--text-secondary);margin-top:6px;font-style:italic;">TISZA: duplázás vállalása</div>`;
+ <div style="font-size:10px;color:var(--text-secondary);margin-top:8px;line-height:1.6;">
+  <div><strong>➕</strong> SZJA-jóváírás (3 gyerek): 99 000 Ft/év</div>
+  <div><strong>➕</strong> 100% Család Program – azonos támogatás minden családszervezetre</div>
+ </div>
+ `;
  },
 
  "13. havi nyugdíj megtartása": () => {
- return `<div class="viz-title">Havi nyugdíjak/év</div> <div class="mini-row"><span class="mini-label">2010–11</span><span class="mini-bar"><span class="mini-bar-fill" style="width:100%;background:#B5A498;"></span></span><span class="mini-value">13 hó</span></div> <div class="mini-row"><span class="mini-label">2012–21</span><span class="mini-bar"><span class="mini-bar-fill" style="width:92%;background:#d4856a;"></span></span><span class="mini-value">12 hó</span></div> <div class="mini-row"><span class="mini-label">2022–25</span><span class="mini-bar"><span class="mini-bar-fill" style="width:100%;background:#7ED957;"></span></span><span class="mini-value">13 hó</span></div> <div class="mini-row"><span class="mini-label">TISZA</span><span class="mini-bar"><span class="mini-bar-fill" style="width:108%;background:#7ED957;"></span></span><span class="mini-value">14 hó</span></div> <div style="font-size:10px;color:var(--text-secondary);margin-top:6px;font-style:italic;">TISZA: +14. havi + SZÉP-kártya</div>`;
+ return `
+ <div class="viz-title">Éves nyugdíjkifizetés</div>
+ <div style="display:flex;gap:16px;align-items:center;margin:12px 0;flex-wrap:wrap;">
+  <div style="flex:1;min-width:110px;text-align:center;padding:12px;background:var(--bg-main);border-radius:8px;">
+   <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:6px;">2012–2021</div>
+   <div style="font-size:32px;font-weight:900;color:#d4856a;">12</div>
+   <div style="font-size:10px;color:var(--text-secondary);">hónap</div>
+  </div>
+  <div style="font-size:24px;color:#999;">→</div>
+  <div style="flex:1;min-width:110px;text-align:center;padding:12px;background:#f0fff4;border-radius:8px;border:2px solid #7ED957;">
+   <div style="font-size:11px;font-weight:700;color:#4a9d6f;text-transform:uppercase;margin-bottom:6px;">TISZA</div>
+   <div style="font-size:32px;font-weight:900;color:#2da44e;">14</div>
+   <div style="font-size:10px;color:#4a9d6f;">hónap + SZÉP-kártya</div>
+  </div>
+ </div>
+ <div style="font-size:10px;color:var(--text-secondary);margin-top:8px;line-height:1.6;">
+  <div><strong>✓ 2022-ben</strong> már 13 hó введено (visszajelzés a társadalom nyomására)</div>
+  <div><strong>+ Infláció-indexálás</strong> 100%-os reálérték-megőrzés</div>
+ </div>
+ `;
  },
 
  "Évi 500 milliárd Ft pluszforrás az egészségügynek": () => {
- // Egészségügyi kiadás, GDP% becslés
- const data = [
- { y: "2010", v: 4.5 }, { y: "2015", v: 4.8 }, { y: "2020", v: 4.7 },
- { y: "2023", v: 4.5 }, { y: "2026", v: 4.5 }, { y: "TISZA cél", v: 7.0 }
- ];
- const max = 7;
- return `<div class="viz-title">Egészségügyi kiadás (GDP %)</div> ${data.map(d =>`
- <div class="mini-row">
- <span class="mini-label">${d.y}</span>
- <span class="mini-bar"><span class="mini-bar-fill" style="width:${(d.v/max)*100}%;background:${d.y.includes('TISZA')?'#7ED957':'#d4856a'};"></span></span>
- <span class="mini-value">${d.v}%</span>
+ return `
+ <div class="viz-title">Egészségügyi finanszírozás</div>
+ <div style="display:flex;gap:16px;align-items:center;margin:12px 0;flex-wrap:wrap;">
+  <div style="flex:1;min-width:120px;text-align:center;padding:12px;background:var(--bg-main);border-radius:8px;">
+   <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:6px;">Mostani (2026)</div>
+   <div style="font-size:18px;font-weight:900;color:#d4856a;">4,5%</div>
+   <div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">GDP-ből</div>
+  </div>
+  <div style="font-size:24px;color:#999;">→</div>
+  <div style="flex:1;min-width:120px;text-align:center;padding:12px;background:#f0fff4;border-radius:8px;border:2px solid #7ED957;">
+   <div style="font-size:11px;font-weight:700;color:#4a9d6f;text-transform:uppercase;margin-bottom:6px;">TISZA cél</div>
+   <div style="font-size:18px;font-weight:900;color:#2da44e;">7,0%</div>
+   <div style="font-size:10px;color:#4a9d6f;margin-top:4px;"><strong>+500 Mrd Ft/év</strong></div>
+  </div>
  </div>
- `).join('')} <div style="font-size:10px;color:var(--text-secondary);margin-top:6px;font-style:italic;">+500 Mrd Ft/év bejelentve</div>`;
+ <div style="font-size:10px;color:var(--text-secondary);margin-top:8px;line-height:1.6;">
+  <div><strong>📊 EU átlag</strong> ~ 6,5% GDP</div>
+  <div><strong>🏆 Cél</strong> Európai szintre (várólisták csökkentés)</div>
+ </div>
+ `;
  },
 
  "Védelmi kiadások GDP 5%-ára növelése 2035-ig": () => {
@@ -5341,6 +5373,30 @@ function getMiniCharts() {
 
  "Bérlakásprogram előkészítése": () => {
  return `<div class="viz-title">Lakásárak (2010=100%)</div> <div class="mini-row"><span class="mini-label">2010</span><span class="mini-bar"><span class="mini-bar-fill" style="width:33%;background:#7ED957;"></span></span><span class="mini-value">100%</span></div> <div class="mini-row"><span class="mini-label">2015</span><span class="mini-bar"><span class="mini-bar-fill" style="width:40%;background:#d4856a;"></span></span><span class="mini-value">120%</span></div> <div class="mini-row"><span class="mini-label">2020</span><span class="mini-bar"><span class="mini-bar-fill" style="width:67%;background:#FF9933;"></span></span><span class="mini-value">200%</span></div> <div class="mini-row"><span class="mini-label">2025</span><span class="mini-bar"><span class="mini-bar-fill" style="width:100%;background:#FF6B6B;"></span></span><span class="mini-value">300%</span></div> <div style="font-size:10px;color:var(--text-secondary);margin-top:6px;font-style:italic;">3× drágulás 15 év alatt</div>`;
+ },
+
+ "SZJA csökkentése 9%-ra a mediánbér alatt + KATA visszaállítása": () => {
+ return `
+ <div class="viz-title">SZJA terhe mediánbér alatt</div>
+ <div style="display:flex;gap:16px;align-items:center;margin:12px 0;flex-wrap:wrap;">
+  <div style="flex:1;min-width:130px;text-align:center;padding:12px;background:var(--bg-main);border-radius:8px;">
+   <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:6px;">Mostani (flat 15%)</div>
+   <div style="font-size:20px;font-weight:900;color:#d4856a;">15%</div>
+   <div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">effektív teher</div>
+  </div>
+  <div style="font-size:24px;color:#999;">→</div>
+  <div style="flex:1;min-width:130px;text-align:center;padding:12px;background:#f0fff4;border-radius:8px;border:2px solid #7ED957;">
+   <div style="font-size:11px;font-weight:700;color:#4a9d6f;text-transform:uppercase;margin-bottom:6px;">TISZA 2027</div>
+   <div style="font-size:20px;font-weight:900;color:#2da44e;">9%</div>
+   <div style="font-size:10px;color:#4a9d6f;">mediánbér alatt</div>
+  </div>
+ </div>
+ <div style="font-size:10px;color:var(--text-secondary);margin-top:8px;line-height:1.6;">
+  <div><strong>🏢 KATA visszaállítás</strong> – kiterjesztett forma (cégek ↔ katások)</div>
+  <div><strong>💰 Finanszírozás</strong> ~ 300 Mrd Ft vagyonadó-kompenzáció</div>
+  <div><strong>📅 Bevezetés</strong> 2027. január 1-től (2027-es költségvetésbe tervezve)</div>
+ </div>
+ `;
  }
 };
   return _miniChartsCache;
