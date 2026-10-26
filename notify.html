@@ -161,9 +161,9 @@ button:disabled {
     </select>
 
     <label for="dbInput">📊 Üzenet:</label>
-    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 23.)
+    <textarea id="dbInput" placeholder="Pl: 2 tégla frissült ma" rows="6">🧱 Teljes oldal frissítve (2026. okt. 26.)
 
-🔥 Október 19–23-i költségvetési bejelentés és frissítések:
+🔥 Október 19–26-i költségvetési bejelentés és frissítések:
 • 💰 SZJA-csökkentés: 15% → 9% (minimálbérig terjedő jövedelem) | 2027-es költségvetés tervezet
 • 👨‍👩‍👧 Családi pótlék: duplázódik | 2027-es költségvetés tervezet
 • 👴 Minimumnyugdíj: 28k Ft → 120k Ft (inflációhoz kötve) | 13. havi, 14. havi nyugdíj megtartva
@@ -206,27 +206,29 @@ function updateTemplate() {
   const dbInput = document.getElementById('dbInput');
 
   if (type === 'tegla') {
-    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 23.)
+    dbInput.value = `🧱 Teljes oldal frissítve (2026. okt. 26.)
 
-🔥 Október 19–23-i költségvetési bejelentés és frissítések:
-• 💰 SZJA-csökkentés: 15% → 9% (minimálbérig) | 2027-es költségvetés tervezet
-• 👨‍👩‍👧 Családi pótlék: duplázódik | 2027-es költségvetés tervezet
+🔥 Október 19–26-i költségvetési bejelentés és frissítések:
+• 💰 SZJA-csökkentés: 15% → 9% (minimálbérig) | 2027-es költségvetés
+• 👨‍👩‍👧 Családi pótlék: duplázódik | 2027-es költségvetés
 • 👴 Minimumnyugdíj: 28k → 120k Ft | 13. havi, 14. havi megtartva (2027)
-• 🏥 Egészségügy: 500 Mrd Ft pluszforrás, várólisták csökkentésre 18,9 Mrd Ft
-• 💶 Euró: 2030-as cél még nem törvény, reális időpont 2032+
+• 🏥 Egészségügy: 500 Mrd Ft pluszforrás, várólisták csökkentésre
+• ⛽ Üzemanyagárak: benzin 647 Ft/l (+8,7%), dízel 716 Ft/l (+16,4%)
+• 📈 Munkanélküliség: 4,3% → 4,7% (augusztus 2026)
 • 🇪🇺 Uniós pénzek: 16,4 Mrd EUR felszabadítása folyamatban
 • 💸 Költségvetési hiány: 8,3% → 4,9%
 
 📊 Index, Pénztárcaindex, Mérleg frissítve`;
     dbInput.placeholder = 'Pl: 2 tégla frissült ma';
   } else if (type === 'penztarca') {
-    dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 23.)
+    dbInput.value = `💰 Pénztárcaindex frissítve (2026. okt. 26.)
 
 📊 Árösszehasonlítás: áradás előtti (2026.05.09) vs jelenlegi árak
-• Üzemanyag: benzin 642 Ft/l (+7,9% az áradáshoz képest), dízel 709 Ft/l (+15,3%)
-• Üzemanyag-költség: 200 l/hó kalkuláció = 128.400 Ft/hó (benzin: 200×642)
-• Élelmiszer-tételek: változó áras csoportokként
+• Üzemanyag: benzin 647 Ft/l (+8,7% az áradáshoz képest), dízel 716 Ft/l (+16,4%)
+• Üzemanyag-költség: 200 l/hó kalkuláció = 129.400 Ft/hó (benzin: 200×647)
+• Élelmiszer-tételek: szept.18-i bolti árakon
 • 2027-es ígéretek: SZJA 9%, családi pótlék 2×, minimumnyugdíj 120k Ft
+• Munkanélküliség: 4,3% (máj.) → 4,7% (aug. 2026)
 
 🔗 teglarol-teglara.hu/penztarca.html`;
     dbInput.placeholder = 'Pénztárcaindex launch üzenet';
