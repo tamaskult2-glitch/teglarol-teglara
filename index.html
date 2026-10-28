@@ -5161,32 +5161,40 @@ function openModal(item) {
  const meta = document.getElementById("modalMeta");
  meta.innerHTML = '\n <div class="modal-meta-item">\n <strong>St\u00e1tusz</strong>\n <span class="badge ' + st.cls + '">' + st.label + '</span>\n </div>\n' + (item["FiDeSZ \u00e1llapot"] ? '<div class="modal-meta-item"><strong>\u201e\u00e1rad\u00e1s\u201d el\u0151tt</strong>' + item["FiDeSZ \u00e1llapot"] + '</div>' : '') + '\n <div class="modal-meta-item"><strong>Friss\u00edtve</strong>' + (item["Friss\u00edt\u00e9s"] || '-') + '</div>\n <div class="modal-meta-item"><strong>El\u0151rel\u00e9p\u00e9s</strong>' + (item["Volt el\u0151rel\u00e9p\u00e9st jelent\u0151 bejelent\u00e9s?"] || '-') + '</div>\n';
 
- // T\u00e1bl\u00e1zatos r\u00e9szletek
+ // T\u00e1bl\u00e1zatos r\u00e9szletek - alapverzi\u00f3
+ const basicTable = `
+ <table style="width:100%;border-collapse:collapse;font-size:13px;">
+  <tr style="border-bottom:1px solid var(--border-subtle);">
+   <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);width:35%;">Kateg\u00f3ria</td>
+   <td style="padding:8px 0;color:var(--text-main);">${cat}</td>
+  </tr>
+  <tr style="border-bottom:1px solid var(--border-subtle);">
+   <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);">T\u00edpus</td>
+   <td style="padding:8px 0;color:var(--text-main);">${item["T\u00edpus"] === "korm\u00e1nyzat" ? "\ud83d\udd35 Korm\u00e1nyzati" : "\ud83d\udfe3 Kamp\u00e1ny"}</td>
+  </tr>
+  <tr style="border-bottom:1px solid var(--border-subtle);">
+   <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);">Prior\u00edt\u00e1s</td>
+   <td style="padding:8px 0;color:var(--text-main);">${item["Prior\u00edt\u00e1s"] === "azonnali" ? "\ud83d\udd34 Azonnali" : item["Prior\u00edt\u00e1s"] === "hosszu" ? "\ud83d\udfe2 Hossz\u00fa t\u00e1v" : "\ud83d\udfe1 R\u00f6vid t\u00e1v"}</td>
+  </tr>
+  <tr style="border-bottom:1px solid var(--border-subtle);">
+   <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);">Utols\u00f3 friss\u00edt\u00e9s</td>
+   <td style="padding:8px 0;color:var(--text-main);">${item["Friss\u00edt\u00e9s"] || "-"}</td>
+  </tr>
+  <tr>
+   <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);">St\u00e1tusz</td>
+   <td style="padding:8px 0;"><span class="badge ${st.cls}">${st.label}</span></td>
+  </tr>
+ </table>
+ `;
+
+ // Specifikus adatok az egyes \u00edg\u00e9retekhez
+ const specificTable = getDetailedTableData(title);
+ const tableContent = specificTable || basicTable;
+
  const detailsTable = `
  <div style="margin-top:16px;padding:12px;background:var(--bg-main);border-radius:8px;font-size:13px;">
-  <div style="font-weight:700;margin-bottom:10px;color:var(--text-main);">\ud83d\udccb R\u00e9szletek t\u00e1bl\u00e1zata</div>
-  <table style="width:100%;border-collapse:collapse;font-size:13px;">
-   <tr style="border-bottom:1px solid var(--border-subtle);">
-    <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);width:35%;">Kateg\u00f3ria</td>
-    <td style="padding:8px 0;color:var(--text-main);">${cat}</td>
-   </tr>
-   <tr style="border-bottom:1px solid var(--border-subtle);">
-    <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);">T\u00edpus</td>
-    <td style="padding:8px 0;color:var(--text-main);">${item["T\u00edpus"] === "korm\u00e1nyzat" ? "\ud83d\udd35 Korm\u00e1nyzati" : "\ud83d\udfe3 Kamp\u00e1ny"}</td>
-   </tr>
-   <tr style="border-bottom:1px solid var(--border-subtle);">
-    <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);">Prior\u00edt\u00e1s</td>
-    <td style="padding:8px 0;color:var(--text-main);">${item["Prior\u00edt\u00e1s"] === "azonnali" ? "\ud83d\udd34 Azonnali" : item["Prior\u00edt\u00e1s"] === "hosszu" ? "\ud83d\udfe2 Hossz\u00fa t\u00e1v" : "\ud83d\udfe1 R\u00f6vid t\u00e1v"}</td>
-   </tr>
-   <tr style="border-bottom:1px solid var(--border-subtle);">
-    <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);">Utols\u00f3 friss\u00edt\u00e9s</td>
-    <td style="padding:8px 0;color:var(--text-main);">${item["Friss\u00edt\u00e9s"] || "-"}</td>
-   </tr>
-   <tr>
-    <td style="padding:8px 0;font-weight:600;color:var(--text-secondary);">St\u00e1tusz</td>
-    <td style="padding:8px 0;"><span class="badge ${st.cls}">${st.label}</span></td>
-   </tr>
-  </table>
+  <div style="font-weight:700;margin-bottom:10px;color:var(--text-main);">\ud83d\udccb R\u00e9szletek</div>
+  ${tableContent}
  </div>
  `;
 
@@ -5231,6 +5239,109 @@ function closeModal() {
 modalClose.addEventListener("click", closeModal);
 overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+// Táblázatos adatok specifikus ígéretekhez
+function getDetailedTableData(title) {
+  const tables = {
+    "Széchenyi Card Programme": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Teljes költségvetés:</td>
+          <td style="padding:8px 0;">250 Mrd Ft</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Támogatott területek:</td>
+          <td style="padding:8px 0;">Felsőoktatás, szakképzés</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Projekt típusok:</td>
+          <td style="padding:8px 0;">Egyetemi és hallgatói kollégiumi épületek</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Indítás:</td>
+          <td style="padding:8px 0;">2026. október 27.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Megvalósítás:</td>
+          <td style="padding:8px 0;">2027-2030</td>
+        </tr>
+      </table>
+    `,
+    "Wekerle Sándor Lakásépítési Program": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">EU-s forrás:</td>
+          <td style="padding:8px 0;">550 M € (max. 2 Mrd €)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Projekt típusa:</td>
+          <td style="padding:8px 0;">Hallgatói kollégiumi épületek</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Előkészítési határidő:</td>
+          <td style="padding:8px 0;">2026. szeptember 30.</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Indítás:</td>
+          <td style="padding:8px 0;">2026. szeptember 1.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Célcsoportja:</td>
+          <td style="padding:8px 0;">Fiatal tanulók, hallgatók</td>
+        </tr>
+      </table>
+    `,
+    "KATA kiterjesztése (B2B, 300 Mrd Ft kompenzáció)": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Költségvetési kompenzáció:</td>
+          <td style="padding:8px 0;">300 Mrd Ft</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">B2B engedélyezés:</td>
+          <td style="padding:8px 0;">Igen - cégeknek és szervezeteknek</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Hatálybalépés:</td>
+          <td style="padding:8px 0;">2027. január 1.</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Kedvezmény:</td>
+          <td style="padding:8px 0;">Csökkentett adminisztráció, kedvezményes adó</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Célcsoportja:</td>
+          <td style="padding:8px 0;">Kisvállalkozások, mikrovállalkozások</td>
+        </tr>
+      </table>
+    `,
+    "Vagyonadó – évi 1% az 1 milliárd Ft feletti vagyonokra": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Adóalanyok:</td>
+          <td style="padding:8px 0;">15-25 ezer</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Adósávok:</td>
+          <td style="padding:8px 0;">1% - 2% (sávozott)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Alsó küszöb:</td>
+          <td style="padding:8px 0;">1 milliárd Ft</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Magasabb sáv küszöbe:</td>
+          <td style="padding:8px 0;">~500 Mrd Ft felett</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Bevétel (becsült):</td>
+          <td style="padding:8px 0;">~7 Mrd Ft éves</td>
+        </tr>
+      </table>
+    `
+  };
+  return tables[title] || null;
+}
 
 // miniCharts: lazily evaluated on first modal open
 let _miniChartsCache = null;
