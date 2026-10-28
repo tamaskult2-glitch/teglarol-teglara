@@ -5240,102 +5240,130 @@ modalClose.addEventListener("click", closeModal);
 overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
-// Táblázatos adatok specifikus ígéretekhez
+// Táblázatos adatok specifikus ígéretekhez - Hitel és pénzügyi adatok
 function getDetailedTableData(title) {
   const tables = {
-    "Széchenyi Card Programme": `
+    "Babaváró hitel": `
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;width:40%;">Teljes költségvetés:</td>
-          <td style="padding:8px 0;">250 Mrd Ft</td>
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">💰 Hitel paraméterei</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Támogatott területek:</td>
-          <td style="padding:8px 0;">Felsőoktatás, szakképzés</td>
+          <td style="padding:8px 0;font-weight:600;width:40%;">Ki veheti fel:</td>
+          <td style="padding:8px 0;">Házaspárok, közös háztartásban élők (első gyermek)</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Projekt típusok:</td>
-          <td style="padding:8px 0;">Egyetemi és hallgatói kollégiumi épületek</td>
+          <td style="padding:8px 0;font-weight:600;">Hitelösszeg:</td>
+          <td style="padding:8px 0;">10 Mft - 50 Mft</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Indítás:</td>
-          <td style="padding:8px 0;">2026. október 27.</td>
+          <td style="padding:8px 0;font-weight:600;">Kamatmérték:</td>
+          <td style="padding:8px 0;">0% (kamatmentes)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Futamidő:</td>
+          <td style="padding:8px 0;">Akár 25 év</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Mire használható:</td>
+          <td style="padding:8px 0;">Lakásvásárlás, építés, felújítás</td>
         </tr>
         <tr>
-          <td style="padding:8px 0;font-weight:600;">Megvalósítás:</td>
-          <td style="padding:8px 0;">2027-2030</td>
+          <td style="padding:8px 0;font-weight:600;">Haladék:</td>
+          <td style="padding:8px 0;">10 év - törlesztés halasztható</td>
         </tr>
       </table>
     `,
-    "Wekerle Sándor Lakásépítési Program": `
+    "Lakástakarék": `
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;width:40%;">EU-s forrás:</td>
-          <td style="padding:8px 0;">550 M € (max. 2 Mrd €)</td>
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">🏦 Lakástakarék Program</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Projekt típusa:</td>
-          <td style="padding:8px 0;">Hallgatói kollégiumi épületek</td>
+          <td style="padding:8px 0;font-weight:600;width:40%;">Ki veheti fel:</td>
+          <td style="padding:8px 0;">Bármely természetes személy</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Előkészítési határidő:</td>
-          <td style="padding:8px 0;">2026. szeptember 30.</td>
+          <td style="padding:8px 0;font-weight:600;">Betét összeg:</td>
+          <td style="padding:8px 0;">50 ezer - 10 millió Ft</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Indítás:</td>
-          <td style="padding:8px 0;">2026. szeptember 1.</td>
+          <td style="padding:8px 0;font-weight:600;">Kamatmérték (betét):</td>
+          <td style="padding:8px 0;">Aktuális piaci ráta (~3-4%)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Hitelkamat:</td>
+          <td style="padding:8px 0;">Kedvezményes (1-2% alatt)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Futamidő:</td>
+          <td style="padding:8px 0;">4-10 év (takarékoskodási + hitel fázis)</td>
         </tr>
         <tr>
-          <td style="padding:8px 0;font-weight:600;">Célcsoportja:</td>
-          <td style="padding:8px 0;">Fiatal tanulók, hallgatók</td>
+          <td style="padding:8px 0;font-weight:600;">Felhasználás:</td>
+          <td style="padding:8px 0;">Lakásvásárlás, építés, bővítés, felújítás</td>
         </tr>
       </table>
     `,
-    "KATA kiterjesztése (B2B, 300 Mrd Ft kompenzáció)": `
+    "Diákhitel / Tanulmányi hitel": `
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;width:40%;">Költségvetési kompenzáció:</td>
-          <td style="padding:8px 0;">300 Mrd Ft</td>
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">🎓 Tanulmányi Hitel</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">B2B engedélyezés:</td>
-          <td style="padding:8px 0;">Igen - cégeknek és szervezeteknek</td>
+          <td style="padding:8px 0;font-weight:600;width:40%;">Ki veheti fel:</td>
+          <td style="padding:8px 0;">Felsőoktatásban részt vevő hallgatók</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Hatálybalépés:</td>
-          <td style="padding:8px 0;">2027. január 1.</td>
+          <td style="padding:8px 0;font-weight:600;">Hitelösszeg:</td>
+          <td style="padding:8px 0;">1 Mft - 10 Mft / félév</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Kedvezmény:</td>
-          <td style="padding:8px 0;">Csökkentett adminisztráció, kedvezményes adó</td>
+          <td style="padding:8px 0;font-weight:600;">Kamatmérték:</td>
+          <td style="padding:8px 0;">Kamatmentes tanulmányok alatt</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Törlesztés megkezdése:</td>
+          <td style="padding:8px 0;">Tanulmányok befejezésétől 6 hónap után</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Futamidő törlesztéshez:</td>
+          <td style="padding:8px 0;">Akár 20 év</td>
         </tr>
         <tr>
-          <td style="padding:8px 0;font-weight:600;">Célcsoportja:</td>
-          <td style="padding:8px 0;">Kisvállalkozások, mikrovállalkozások</td>
+          <td style="padding:8px 0;font-weight:600;">Felhasználás:</td>
+          <td style="padding:8px 0;">Oktatási költségek, megélhetés</td>
         </tr>
       </table>
     `,
-    "Vagyonadó – évi 1% az 1 milliárd Ft feletti vagyonokra": `
+    "Kkv / Vállalkozási hitel": `
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;width:40%;">Adóalanyok:</td>
-          <td style="padding:8px 0;">15-25 ezer</td>
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">📈 KKV Hitelprogram</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Adósávok:</td>
-          <td style="padding:8px 0;">1% - 2% (sávozott)</td>
+          <td style="padding:8px 0;font-weight:600;width:40%;">Ki veheti fel:</td>
+          <td style="padding:8px 0;">Kisvállalkozások, mikrovállalkozások, egyéni vállalkozók</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Alsó küszöb:</td>
-          <td style="padding:8px 0;">1 milliárd Ft</td>
+          <td style="padding:8px 0;font-weight:600;">Hitelösszeg:</td>
+          <td style="padding:8px 0;">500 ezer - 100 Mft</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border-subtle);">
-          <td style="padding:8px 0;font-weight:600;">Magasabb sáv küszöbe:</td>
-          <td style="padding:8px 0;">~500 Mrd Ft felett</td>
+          <td style="padding:8px 0;font-weight:600;">Kamatmérték:</td>
+          <td style="padding:8px 0;">Aktuális ráta - 2-5% jegybanki kedvezmény</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Futamidő:</td>
+          <td style="padding:8px 0;">1-10 év (a felhasználástól függ)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Mire használható:</td>
+          <td style="padding:8px 0;">Berendezés, gépek, készletfelhalmozás, munkahelyteremtés</td>
         </tr>
         <tr>
-          <td style="padding:8px 0;font-weight:600;">Bevétel (becsült):</td>
-          <td style="padding:8px 0;">~7 Mrd Ft éves</td>
+          <td style="padding:8px 0;font-weight:600;">Feltételek:</td>
+          <td style="padding:8px 0;">Üzleti terv, garancia vagy önrész szükséges</td>
         </tr>
       </table>
     `
