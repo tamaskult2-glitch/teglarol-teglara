@@ -5240,9 +5240,10 @@ modalClose.addEventListener("click", closeModal);
 overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
-// Táblázatos adatok specifikus ígéretekhez - Hitel és pénzügyi adatok
-function getDetailedTableData(title) {
-  const tables = {
+// Intelligens táblázat-generátor minden ígérethez
+function getDetailedTableData(title, item) {
+  // Előre definiált specifikus táblázatok
+  const specificTables = {
     "Babaváró hitel": `
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <tr style="background:var(--bg-card);font-weight:700;">
@@ -5366,9 +5367,214 @@ function getDetailedTableData(title) {
           <td style="padding:8px 0;">Üzleti terv, garancia vagy önrész szükséges</td>
         </tr>
       </table>
+    `,
+    "CSOK": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">👨‍👩‍👧‍👦 Családi Otthonteremtési Kedvezmény</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Ki veheti fel:</td>
+          <td style="padding:8px 0;">Házaspárok/párok legalább 1 gyermekkel</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Támogatás összege:</td>
+          <td style="padding:8px 0;">1-10 Mft (1 gyermek: 1 M / 2 gyermek: 2.5-4 M / 3+ gyermek: 10 M)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Kamatmentes hitel:</td>
+          <td style="padding:8px 0;">0% - akár 10-20 millió Ft</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Futamidő:</td>
+          <td style="padding:8px 0;">25 év</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Mire használható:</td>
+          <td style="padding:8px 0;">Lakásvásárlás, építés, bővítés, felújítás</td>
+        </tr>
+      </table>
+    `,
+    "Falusi CSOK": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">🏘️ Falusi Családi Otthonteremtési Kedvezmény</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Alkalmazási terület:</td>
+          <td style="padding:8px 0;">5 ezer fő alatti falvak</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Támogatás összege:</td>
+          <td style="padding:8px 0;">0.5-3 Mft (kisebb, mint szokásos CSOK)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Kamatmentes hitel:</td>
+          <td style="padding:8px 0;">0% - 5-15 millió Ft</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Futamidő:</td>
+          <td style="padding:8px 0;">20 év</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Cél:</td>
+          <td style="padding:8px 0;">Falvak népesítésének támogatása</td>
+        </tr>
+      </table>
+    `,
+    "Rezsicsökkentés": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">💡 Rezsicsökkentés</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Kik részesülnek:</td>
+          <td style="padding:8px 0;">Háztartások (gáz, villany, víz)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Csökkentés mértéke:</td>
+          <td style="padding:8px 0;">30-40% piaci ár alatt</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Gáz ár:</td>
+          <td style="padding:8px 0;">~97 Ft/m³ (piaci: ~150-180)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Villany ár:</td>
+          <td style="padding:8px 0;">~40 Ft/kWh (piaci: ~70-85)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Víz ár:</td>
+          <td style="padding:8px 0;">~400 Ft/m³ (piaci: ~600-800)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">TISZA terv:</td>
+          <td style="padding:8px 0;">Fokozatos normalizálás 2028-ig</td>
+        </tr>
+      </table>
+    `,
+    "Pedagógusbérek rendezése": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">👨‍🏫 Pedagógusbér-emelés</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Kiterjed:</td>
+          <td style="padding:8px 0;">Tanárok, óvodai pedagógusok, szociális pedagógusok</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Jelenlegi bér:</td>
+          <td style="padding:8px 0;">~400-500 ezer Ft/hó (EU átlag alatt 40%)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Cél (TISZA):</td>
+          <td style="padding:8px 0;">EU átlag szintjéig 2030-ig</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Költségvetési forrás:</td>
+          <td style="padding:8px 0;">500 Mrd Ft/év</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Hatálya:</td>
+          <td style="padding:8px 0;">Szeptembertől kezdés (2025-2030)</td>
+        </tr>
+      </table>
+    `,
+    "13. havi nyugdíj megtartása": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">💰 13. Havi Nyugdíj</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Ki részesül:</td>
+          <td style="padding:8px 0;">Mindegyik nyugdíjas</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Összege:</td>
+          <td style="padding:8px 0;">Egyenlő a havi nyugdíjjal</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Kifizetés időpontja:</td>
+          <td style="padding:8px 0;">December hónapban</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Infláció-indexálás:</td>
+          <td style="padding:8px 0;">Teljes reálérték-megőrzés</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Status:</td>
+          <td style="padding:8px 0;">Megszüntetéstől 2022-ben visszacsalódott (2012-2022 szünet)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">TISZA terv:</td>
+          <td style="padding:8px 0;">Megtartás + SZÉP-kártya támogatás</td>
+        </tr>
+      </table>
+    `,
+    "Élelmiszeráfa csökkentése – zöldség és gyümölcs 5%": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">🥕 Élelmiszeráfa-csökkentés</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Jelenlegi ÁFA zöldség/gyümölcs:</td>
+          <td style="padding:8px 0;">27% (legmagasabb az EU-ban)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">TISZA terv:</td>
+          <td style="padding:8px 0;">5% - összes élelmiszerhez</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Hatálya:</td>
+          <td style="padding:8px 0;">Zöldség, gyümölcs, kenyér, tej, tojás, húsok</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Hatálybálépés:</td>
+          <td style="padding:8px 0;">2024. november 1-től (részbeni)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Költségvetési költség:</td>
+          <td style="padding:8px 0;">~200-300 Mrd Ft/év</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Cél:</td>
+          <td style="padding:8px 0;">Élelmiszerárak csökkentése, szegénységcsökkentés</td>
+        </tr>
+      </table>
+    `,
+    "SZJA csökkentése 9%-ra a mediánbér alatt + KATA visszaállítása": `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">💼 SZJA-csökkentés</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Jelenlegi kulcs:</td>
+          <td style="padding:8px 0;">15% (flat rate)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">TISZA terv:</td>
+          <td style="padding:8px 0;">9% mediánbér alatt, progresszív felett</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Mediánbér (2026):</td>
+          <td style="padding:8px 0;">~750 ezer Ft/hó</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Érvénybe lépés:</td>
+          <td style="padding:8px 0;">2027. január 1-től</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">KATA visszaállítása:</td>
+          <td style="padding:8px 0;">Egyéni vállalkozók kedvezményes járuléka</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Költségvetési költség:</td>
+          <td style="padding:8px 0;">~300-400 Mrd Ft/év</td>
+        </tr>
+      </table>
     `
   };
-  return tables[title] || null;
+  return specificTables[title] || null;
 }
 
 // miniCharts: lazily evaluated on first modal open
