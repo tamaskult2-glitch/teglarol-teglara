@@ -5574,7 +5574,49 @@ function getDetailedTableData(title, item) {
       </table>
     `
   };
-  return specificTables[title] || null;
+
+  // Return specific table if exists
+  if (specificTables[title]) {
+    return specificTables[title];
+  }
+
+  // Fallback: Generate generic table for any promise
+  if (item) {
+    const categoria = item["Kategória"] || "Ígéret";
+    const status = item["FiDeSZ állapot"] || "—";
+    const prioritas = item["Prioritás"] || "—";
+    const tipus = item["Típus"] || "—";
+
+    return `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:var(--bg-card);font-weight:700;">
+          <td colspan="2" style="padding:8px;border-bottom:2px solid var(--border-subtle);">📋 Ígéret Adatai</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;width:40%;">Kategória:</td>
+          <td style="padding:8px 0;">${categoria}</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Típus:</td>
+          <td style="padding:8px 0;">${tipus}</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">TISZA Állapot:</td>
+          <td style="padding:8px 0;">${status}</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:8px 0;font-weight:600;">Prioritás:</td>
+          <td style="padding:8px 0;">${prioritas}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:600;">Frissítés:</td>
+          <td style="padding:8px 0;">${item["Frissítés"] || "—"}</td>
+        </tr>
+      </table>
+    `;
+  }
+
+  return null;
 }
 
 // miniCharts: lazily evaluated on first modal open
