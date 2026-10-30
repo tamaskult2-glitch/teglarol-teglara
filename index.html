@@ -84,13 +84,14 @@ window.addEventListener('unhandledrejection', function(e) {
 
 <style>
 :root {
-  --bg-main:#F4F1EC; --bg-card:#FFFFFF; --text-main:#1A1918; --text-secondary:#4A4947;
-  --shadow-soft:0 2px 8px rgba(30,25,20,0.06),0 8px 24px rgba(30,25,20,0.04);
-  --border-subtle:rgba(0,0,0,0.06);
-  --cat-jog:#F0DCDE; --cat-bizt:#DCE8C9; --cat-kul:#C5D6E3; --cat-eg:#F3D9DC;
-  --cat-csal:#F2E6BD; --cat-gazd:#D4E5D3; --cat-egyeb:#DCDAD5; --cat-okt:#E5D0E6;
-  --cat-korr:#EECFCE; --cat-kozig:#D2DCEB; --cat-energia:#CDE0C9;
-  --cat-kozlek:#CCDCE4; --cat-lakh:#EDD9C4; --sidebar-width:300px;
+  --bg-main:#1A1B26; --bg-card:#24283B; --text-main:#C0CAF5; --text-secondary:#9AA5CE;
+  --shadow-soft:0 2px 8px rgba(0,0,0,0.4),0 8px 28px rgba(0,0,0,0.3);
+  --border-subtle:rgba(192,202,245,0.08);
+  --cat-jog:#3D2A35; --cat-bizt:#2E3D2B; --cat-kul:#1F3148; --cat-eg:#3E2A36;
+  --cat-csal:#3D3520; --cat-gazd:#233A32; --cat-egyeb:#2D2E3F; --cat-okt:#362B42;
+  --cat-korr:#3E2A2A; --cat-kozig:#2A334A; --cat-energia:#253D2E;
+  --cat-kozlek:#253545; --cat-lakh:#3D2F24; --sidebar-width:300px;
+  color-scheme: dark;
 }
 body.dark {
   --bg-main:#1A1B26; --bg-card:#24283B; --text-main:#C0CAF5; --text-secondary:#9AA5CE;
@@ -1258,8 +1259,8 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  margin-top: 20px;
+  gap: 16px;
+  margin-top: 12px;
   flex-wrap: wrap;
 }
 .prl-item {
@@ -1324,18 +1325,14 @@ body.dark .prl-item:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 20px 0 16px;
-  padding: 24px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  margin: 16px 0 12px;
+  padding: 20px 24px 24px;
+  background: linear-gradient(135deg, rgba(192,202,245,0.08), rgba(192,202,245,0.04));
   border-radius: 16px;
-  border: 1.5px solid rgba(0,0,0,0.05);
+  border: 1.5px solid rgba(192,202,245,0.1);
   backdrop-filter: blur(10px);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-body.dark .progress-ring-wrap {
-  background: linear-gradient(135deg, rgba(192,202,245,0.08), rgba(192,202,245,0.04));
-  border-color: rgba(192,202,245,0.1);
 }
 .progress-ring-wrap:hover {
   box-shadow: 0 8px 24px rgba(206,41,57,0.12);
@@ -1805,7 +1802,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
-  <svg class="progress-ring-svg" width="90" height="90" viewBox="0 0 90 90">
+  <svg class="progress-ring-svg" width="130" height="130" viewBox="0 0 90 90">
    <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border-subtle)" stroke-width="10"/>
    <!-- Ígéret (piros) - alul -->
    <circle id="ringProm" cx="45" cy="45" r="38" fill="none" stroke="#e8405a" stroke-width="10"
