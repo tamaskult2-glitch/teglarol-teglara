@@ -8852,15 +8852,14 @@ Számold ki te is: ${url}`;
   
   // === MEGJELENÍTÉS ===
   function displayResults(resBefore, resAfter) {
-    // Valós különbség (jelenlegi törvény szerint)
-    const diff = resBefore.netto - resBefore.netto; // 0 – az áradás előtt/után azonos adójogi környezet
+    // Jelenlegi (ma érvényes) törvény szerinti különbség
+    const currentDiff = resAfter.items.filter(i => i.tipus !== 'tisza').reduce((s, i) => s + i.osszeg, 0) - resBefore.items.reduce((s, i) => s + i.osszeg, 0);
 
     // TISZA ígéret tételek (még nem teljesültek)
     const tiszaIgeretek = resAfter.items.filter(i => i.tipus === 'tisza');
     const tiszaOsszeg = tiszaIgeretek.reduce((s, i) => s + i.osszeg, 0);
 
-    // Valós nettó különbség (TISZA tételek nélkül) = jelenlegi törvény szerinti különbség
-    const valosDiff = resBefore.netto - resBefore.netto; // jelenleg 0
+    // Össz különbség (jelenlegi + TISZA ígéretek)
     const diffPercent = resBefore.netto > 0 ? ((tiszaOsszeg / resBefore.netto) * 100).toFixed(1) : 0;
 
     const hasTisza = tiszaIgeretek.length > 0;
@@ -8892,8 +8891,8 @@ Számold ki te is: ${url}`;
       <!-- UTÁN: jelenlegi + TISZA ígéretek külön szekciókban -->
       <div style="background:linear-gradient(135deg, rgba(232,64,90,0.06), rgba(192,24,58,0.04)); border-radius:16px; padding:24px; border:2px solid #e8405a;">
         <div style="font-size:13px; font-weight:700; color:#e8405a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">"Áradás" után</div>
-        <div style="font-size:11px; color:#856404; background:#fff3cd; border:1px solid #ffca2c; border-radius:5px; padding:3px 8px; margin-bottom:8px; font-weight:600;">⚠️ Jelenlegi + TISZA ígéretek (még nem törvény!)</div>
-        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">${fmt(resBefore.netto)}</div>
+        <div style="font-size:11px; color:#856404; background:#fff3cd; border:1px solid #ffca2c; border-radius:5px; padding:3px 8px; margin-bottom:8px; font-weight:600;">⚠️ Jelenlegi törvény + TISZA ígéretek</div>
+        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">${fmt(resAfter.netto)}</div>
         <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">nettó / hó – jelenlegi törvény szerint</div>
 
         <!-- Jelenlegi tételek -->
@@ -8902,7 +8901,7 @@ Számold ki te is: ${url}`;
           ${afterItemsJelenlegi.map(renderItem).join('')}
           <div style="margin-top:8px; padding-top:8px; border-top:1.5px solid rgba(232,64,90,0.3); display:flex; justify-content:space-between; align-items:center;">
             <div style="font-size:13px; font-weight:800; color:var(--text-main);">= Jelenlegi nettó</div>
-            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${fmt(resBefore.netto)}</div>
+            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${fmt(resAfter.netto)}</div>
           </div>
         </div>
 
