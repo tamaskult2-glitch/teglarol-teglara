@@ -1263,61 +1263,6 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
   margin-top: 12px;
   flex-wrap: wrap;
 }
-.prl-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.5);
-  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
-  border: 1.5px solid rgba(0,0,0,0.05);
-  backdrop-filter: blur(8px);
-}
-body.dark .prl-item {
-  background: rgba(192,202,245,0.08);
-  border-color: rgba(192,202,245,0.12);
-}
-.prl-item:hover {
-  transform: translateY(-3px);
-  background: rgba(255,255,255,0.75);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
-body.dark .prl-item:hover {
-  background: rgba(192,202,245,0.15);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-}
-.prl-dot {
-  width: 13px;
-  height: 13px;
-  min-width: 13px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
-  transition: transform 0.2s;
-}
-.prl-item:hover .prl-dot {
-  transform: scale(1.15);
-}
-.prl-count {
-  font-weight: 800;
-  font-size: 18px;
-  min-width: 24px;
-  text-align: center;
-}
-.prl-label {
-  font-size: 13px;
-  color: var(--text-main);
-  font-weight: 600;
-}
-.prl-total {
-  margin-top: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  opacity: 0.9;
-}
 
 /* Progress Ring */
 .progress-ring-wrap {
@@ -1340,13 +1285,6 @@ body.dark .prl-item:hover {
 }
 body.dark .progress-ring-wrap:hover {
   box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
-.progress-ring-svg {
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
-  transition: transform 0.3s;
-}
-.progress-ring-wrap:hover .progress-ring-svg {
-  transform: scale(1.05);
 }
 
 /* HomePage Headlines */
@@ -1800,41 +1738,42 @@ window.addEventListener('unhandledrejection', function(e) {
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
  <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-27</strong> · Ver. 4.72</p>
 
- <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
+ <!-- HALADÁSMÉRŐ VÍZSZINTES SÁVOK -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
-  <svg class="progress-ring-svg" width="130" height="130" viewBox="0 0 90 90">
-   <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border-subtle)" stroke-width="10"/>
-   <!-- Ígéret (piros) - alul -->
-   <circle id="ringProm" cx="45" cy="45" r="38" fill="none" stroke="#e8405a" stroke-width="10"
-    stroke-linecap="butt" stroke-dasharray="0 502"
-    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1)"/>
-   <!-- Bejelentve (narancs) - középen -->
-   <circle id="ringAnn" cx="45" cy="45" r="38" fill="none" stroke="#FF9933" stroke-width="10"
-    stroke-linecap="butt" stroke-dasharray="0 502"
-    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1) 0.15s"/>
-   <!-- Megvalósult (zöld) - felül, kicsit vastagabb hogy látszódjon -->
-   <circle id="ringDone" cx="45" cy="45" r="38" fill="none" stroke="#2ecc71" stroke-width="12"
-    stroke-linecap="round" stroke-dasharray="0 502"
-    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1) 0.3s"/>
-   <text x="45" y="49" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text-main)" id="ringTotal">–</text>
-  </svg>
-  <div class="progress-ring-legend">
-   <div class="prl-item" onclick="filterByStatus('done')" title="Megvalósult téglák">
-    <div class="prl-dot" style="background:#2ecc71"></div>
-    <span class="prl-count" id="ringCountDone" style="color:#2ecc71">–</span>
-    <span class="prl-label">megvalósult</span>
-   </div>
-   <div class="prl-item" onclick="filterByStatus('announced')" title="Bejelentett téglák">
-    <div class="prl-dot" style="background:#FF9933"></div>
-    <span class="prl-count" id="ringCountAnn" style="color:#FF9933">–</span>
-    <span class="prl-label">bejelentve</span>
-   </div>
-   <div class="prl-item" onclick="filterByStatus('promise')" title="Csak ígéret téglák">
-    <div class="prl-dot" style="background:#e8405a"></div>
-    <span class="prl-count" id="ringCountProm" style="color:#e8405a">–</span>
-    <span class="prl-label">csak ígéret</span>
-   </div>
-   <div class="prl-total" id="ringTotalLabel">103 ígéret összesen</div>
+  <div style="text-align:center;margin-bottom:20px;font-weight:700;font-size:16px;">
+    <span id="ringTotal">–</span> Ígéret
+  </div>
+
+  <div style="max-width:300px;margin:0 auto;width:100%;">
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;">
+        <span onclick="filterByStatus('done')" style="cursor:pointer;">✓ Megvalósult</span>
+        <span id="ringCountDone" style="color:#2ecc71;">–</span>
+      </div>
+      <div style="width:100%;height:24px;background:rgba(192,202,245,0.1);border-radius:8px;overflow:hidden;">
+        <div id="barDone" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#2ecc71,#1abc9c);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:white;font-size:11px;font-weight:700;width:0%;transition:width 0.8s cubic-bezier(.4,0,.2,1);">26%</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;">
+        <span onclick="filterByStatus('announced')" style="cursor:pointer;">📢 Bejelentve</span>
+        <span id="ringCountAnn" style="color:#FF9933;">–</span>
+      </div>
+      <div style="width:100%;height:24px;background:rgba(192,202,245,0.1);border-radius:8px;overflow:hidden;">
+        <div id="barAnn" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#FF9933,#f39c12);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:white;font-size:11px;font-weight:700;width:0%;transition:width 0.8s cubic-bezier(.4,0,.2,1);">61%</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;">
+        <span onclick="filterByStatus('promise')" style="cursor:pointer;">💭 Csak ígéret</span>
+        <span id="ringCountProm" style="color:#e8405a;">–</span>
+      </div>
+      <div style="width:100%;height:24px;background:rgba(192,202,245,0.1);border-radius:8px;overflow:hidden;">
+        <div id="barProm" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#e8405a,#c0183a);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:white;font-size:11px;font-weight:700;width:0%;transition:width 0.8s cubic-bezier(.4,0,.2,1);">12%</div>
+      </div>
+    </div>
   </div>
  </div>
 
@@ -7329,13 +7268,10 @@ function initProgressRing() {
   const annOffset   = doneArc;
   const promOffset  = doneArc + annArc;
 
-  const ringDone = document.getElementById('ringDone');
-  const ringAnn  = document.getElementById('ringAnn');
-  const ringProm = document.getElementById('ringProm');
   const ringTotal = document.getElementById('ringTotal');
   const ringTotalLabel = document.getElementById('ringTotalLabel');
 
-  if (!ringDone) return;
+  if (!ringTotal) return;
 
   // Szám animáció
   document.getElementById('ringCountDone').textContent = done;
@@ -7344,22 +7280,26 @@ function initProgressRing() {
   ringTotal.textContent = total;
   if (ringTotalLabel) ringTotalLabel.textContent = total + ' ígéret összesen';
 
-  // SVG rétegsor: piros (prom) alul, narancs (ann) középen, zöld (done) felül
-  // Sorrendben: prom -90-től indul, ann prom után, done ann után
+  // Vízszintes sávok szélességének frissítése
   setTimeout(() => {
-    // Piros: -90 foktól indul (legalsó réteg)
-    ringProm.style.strokeDasharray  = promArc + ' ' + (circ - promArc);
-    ringProm.setAttribute('transform', 'rotate(-90 45 45)');
+    const barDone = document.getElementById('barDone');
+    const barAnn = document.getElementById('barAnn');
+    const barProm = document.getElementById('barProm');
 
-    // Narancs: prom után folytatódik
-    ringAnn.style.strokeDasharray   = annArc + ' ' + (circ - annArc);
-    const annDeg = -90 + (promArc / circ * 360);
-    ringAnn.setAttribute('transform', 'rotate(' + annDeg + ' 45 45)');
+    if (barDone && barAnn && barProm) {
+      const donePct = total > 0 ? (done / total * 100) : 0;
+      const annPct = total > 0 ? (ann / total * 100) : 0;
+      const promPct = total > 0 ? (prom / total * 100) : 0;
 
-    // Zöld: ann után, legfelső réteg (SVG-ben utoljára van)
-    ringDone.style.strokeDasharray  = doneArc + ' ' + (circ - doneArc);
-    const doneDeg = -90 + ((promArc + annArc) / circ * 360);
-    ringDone.setAttribute('transform', 'rotate(' + doneDeg + ' 45 45)');
+      barDone.style.width = donePct + '%';
+      barDone.textContent = Math.round(donePct) + '%';
+
+      barAnn.style.width = annPct + '%';
+      barAnn.textContent = Math.round(annPct) + '%';
+
+      barProm.style.width = promPct + '%';
+      barProm.textContent = Math.round(promPct) + '%';
+    }
   }, 200);
 }
 
