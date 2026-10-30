@@ -8349,7 +8349,7 @@ Számold ki te is: ${url}`;
       const brutto = parseFloat(bruttoInput.value) || 0;
       if (brutto <= 0) { alert('Add meg a bruttó fizetésed!'); return; }
       
-      const params = { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, isEgyedulallo, anyaInfo };
+      const params = { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, isEgyedulallo, anyaInfo, isGyes, isNyugdijas };
       resultBefore = calcBer(brutto, params, false);
       resultAfter = calcBer(brutto, params, true);
     }
@@ -8593,7 +8593,7 @@ Számold ki te is: ${url}`;
   
   // === NORMÁL BÉR SZÁMÍTÁS ===
   function calcBer(brutto, params, isTisza) {
-    const { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, anyaInfo } = params;
+    const { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, anyaInfo, isEgyedulallo, isGyes, isNyugdijas } = params;
     
     // TB járulék (TISZA alatt 3+ gyereknél csökken)
     let tbRate = TB_RATE;
