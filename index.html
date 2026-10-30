@@ -26,7 +26,7 @@ window.addEventListener('unhandledrejection', function(e) {
  </script>
  
  <title>Tégláról-téglára | teglarol-teglara.hu</title>
-<meta name="version" content="4.72">
+<meta name="version" content="4.73">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="Független nyomonkövetés: Magyar Péter és a TISZA Párt ígéreteinek teljesülése tégláról-téglára.">
 <meta property="og:title" content="Tégláról-téglára | TISZA ígéretkövető">
@@ -1456,9 +1456,6 @@ window.addEventListener('unhandledrejection', function(e) {
  <div class="cat-item" id="sidebarSearch" style="border-left:3px solid #4CAF50; cursor:pointer;">
   🔍 Keresés
  </div>
- <div class="cat-item" id="sidebarDarkToggle" style="border-left:3px solid #7B93DB; cursor:pointer;">
-  <span id="sidebarDarkIcon">🌙</span> <span id="sidebarDarkText">Sötét mód</span>
- </div>
  <div class="cat-item" id="sidebarBugReport" style="border-left:3px solid #FFA500; cursor:pointer;">
   ⚠️ Hiba bejelentése
  </div>
@@ -1558,12 +1555,7 @@ window.addEventListener('unhandledrejection', function(e) {
    <span class="support-btn-label">Támogass!</span>
   </button>
 
-  <!-- Dark mode toggle -->
-  <button id="darkToggleHeader" class="story-btn header-action-btn" aria-label="Sötét/világos mód váltása" title="Téma váltás">
-   <span id="darkToggleIconHeader" style="font-size:20px;line-height:1;">🌙</span>
-   <span>Téma</span>
-  </button>
- </div><!-- /Névjegy + Szavazó + Dark toggle -->
+ </div><!-- /Névjegy + Szavazó -->
 
  <!-- TÁMOGATÓ MODAL -->
  <div id="supportModal" style="visibility:hidden;pointer-events:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.2s;">
@@ -1736,7 +1728,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-27</strong> · Ver. 4.72</p>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-30</strong> · Ver. 4.73</p>
 
  <!-- HALADÁSMÉRŐ VÍZSZINTES SÁVOK -->
  <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
@@ -3174,6 +3166,13 @@ var safeStorage = (function() {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
      <div class="story-tl-content">
+      <div class="story-tl-ver">Ver. 4.73 <span class="story-tl-date">2026-10-30</span></div>
+      <div class="story-tl-desc">🔄 Pénztárcaindex lap frissítése (október 30.): Árszintek aktualizálása. 💰 Üzemanyagárak: benzin 645 Ft/l, dízel 715 Ft/l – októberi ár stabilizációja. 🛒 Élelmiszerárak: október 25-30-i bolti árakon frissítve (hús, pékáru, zöldség, tejtermékek). 📊 Nagy Bevásárlás Kalkulátor: család havi költsége 288,000 → 304,000 Ft, éves megtakarítás 948,000 → 936,000 Ft.</div>
+     </div>
+    </div>
+    <div class="story-tl-item">
+     <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
+     <div class="story-tl-content">
       <div class="story-tl-ver">Ver. 4.68 <span class="story-tl-date">2026-10-19</span></div>
       <div class="story-tl-desc">🔄 Teljes oldal frissítés (október 19.): **2027-es költségvetés bejelentés** – Magyar Péter az Országgyűlésben bemutatta a jövő évi költségvetést. 📊 Fő elemek: Hiány 4,9% GDP-hez; 100 Mrd Ft kátyúmentesítés; 928 Mrd Ft EU-s fejlesztési forrás; Nyugdíjasok (13. havi megtartva, minimum 120k Ft + plusz); Egészségügy, oktatás, vállalkozások prioritás; Babaváró, CSOK, falusi CSOK, rezsicsökkentés változatlan; Nagy vagyonok magasabb adóztatása. 📈 2 tégla frissítve (egészségügy, nyugdíj).</div>
      </div>
@@ -3613,8 +3612,8 @@ window.addEventListener("scroll", () => {
  
  // DIREKT DOM manipuláció - gombok + TELJES CSS reset
  const bugBtn = document.getElementById("bugBtn");
- const searchBtn = document.getElementById("searchBtn");const darkToggleHeader = document.getElementById("darkToggleHeader");
- 
+ const searchBtn = document.getElementById("searchBtn");
+
  // Jobb oldali fix gombok
  if (bugBtn) {
    bugBtn.style.display = scrolled ? "none" : "flex";
@@ -3624,13 +3623,6 @@ window.addEventListener("scroll", () => {
    searchBtn.style.display = scrolled ? "none" : "flex";
    searchBtn.style.opacity = scrolled ? "0" : "1";
    searchBtn.style.visibility = scrolled ? "hidden" : "visible";
- }
- 
- // Header dark toggle (fő csempén) - TELJES CSS reset
- if (darkToggleHeader) {
-   darkToggleHeader.style.display = scrolled ? "none" : "flex";
-   darkToggleHeader.style.opacity = scrolled ? "0" : "1";
-   darkToggleHeader.style.visibility = scrolled ? "hidden" : "visible";
  }
  
  scrollBtn.classList.toggle("visible", scrolled);
@@ -3713,65 +3705,12 @@ if (prevCatBtn) {
 
 // Dark mode toggle (jobb oldali gomb TÖRÖLVE - csak header marad!)
 
-// Dark mode toggle (header gomb - fő csempén)
-// ── Automatikus dark mode: 20:00-06:00 magyar nyári idő (UTC+2) ──
+// Dark mode - mindig be van kapcsolva
 (function() {
-  const h = (new Date().getUTCHours() + 2) % 24;
-  const autoDark = h >= 20 || h < 6;
-  const hasManual = safeStorage.getItem('ttm_dark_manual');
-  const savedDark = safeStorage.getItem('ttm_dark');
-
-  if (hasManual) {
-    // Manuálisan beállított → megtartjuk
-    if (savedDark === '1') document.body.classList.add('dark');
-  } else {
-    // Automatikus időalapú
-    document.body.classList.toggle('dark', autoDark);
-    safeStorage.setItem('ttm_dark', autoDark ? '1' : '0');
-  }
-  // Ikon frissítése
-  const iconEl = document.getElementById('darkToggleIconHeader');
-  if (iconEl) iconEl.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+  // Mindig sötét mód
+  document.body.classList.add('dark');
+  safeStorage.setItem('ttm_dark', '1');
 })();
-
-const darkToggleHeader = document.getElementById("darkToggleHeader");
-
-if (darkToggleHeader) {
- darkToggleHeader.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  const isDark = document.body.classList.contains("dark");
-  document.getElementById("darkToggleIconHeader").textContent = isDark ? "☀️" : "🌙";
-  // Manuális váltás jelzése – ne írja felül az auto
-  safeStorage.setItem('ttm_dark_manual', '1');
-  safeStorage.setItem('ttm_dark', isDark ? '1' : '0');
-  if (typeof excelData !== 'undefined' && excelData.length) drawChart(excelData);
- });
-}
-
-// Sidebar dark mode toggle
-const sidebarDarkToggle = document.getElementById("sidebarDarkToggle");
-if (sidebarDarkToggle) {
-  sidebarDarkToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    
-    // Frissítjük az összes dark toggle ikont
-    const sidebarIcon = document.getElementById("sidebarDarkIcon");
-    const sidebarText = document.getElementById("sidebarDarkText");
-    if (sidebarIcon) sidebarIcon.textContent = isDark ? "☀️" : "🌙";
-    if (sidebarText) sidebarText.textContent = isDark ? "Világos mód" : "Sötét mód";
-    
-    const headerIcon = document.getElementById("darkToggleIconHeader");
-    if (headerIcon) headerIcon.textContent = isDark ? "☀️" : "🌙";
-    
-    // Jobb oldali icon már NINCS!
-    
-    if (typeof excelData !== 'undefined' && excelData.length) drawChart(excelData);
-    
-    // Sidebar bezárása mobilon
-    if (window.innerWidth < 900) closeSidebar();
-  });
-}
 
 // Sidebar search
 const sidebarSearch = document.getElementById("sidebarSearch");
