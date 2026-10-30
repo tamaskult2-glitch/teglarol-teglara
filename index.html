@@ -597,6 +597,8 @@ body.dark .story-modal-box { background:var(--bg-card); }
 .story-tl-ver { font-size:14px; font-weight:700; color:var(--text-main); }
 .story-tl-date { font-size:11px; font-weight:400; color:var(--text-secondary); margin-left:8px; }
 .story-tl-desc { font-size:12.5px; line-height:1.6; color:var(--text-secondary); margin-top:4px; }
+.story-tl-item.expanded .story-tl-desc { max-height: 1000px !important; }
+.story-tl-item.expanded .story-tl-ver span:last-child { transform: rotate(90deg); }
 
 .story-struct-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .story-struct-item { background:var(--bg-main); border:1px solid var(--border-subtle); border-radius:12px; padding:12px 14px; }
@@ -3165,8 +3167,11 @@ var safeStorage = (function() {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 4.73 <span class="story-tl-date">2026-10-30</span></div>
-      <div class="story-tl-desc">🔄 Pénztárcaindex lap frissítése (október 30.): Árszintek aktualizálása. 💰 Üzemanyagárak: benzin 645 Ft/l, dízel 715 Ft/l – októberi ár stabilizációja. 🛒 Élelmiszerárak: október 25-30-i bolti árakon frissítve (hús, pékáru, zöldség, tejtermékek). 📊 Nagy Bevásárlás Kalkulátor: család havi költsége 288,000 → 304,000 Ft, éves megtakarítás 948,000 → 936,000 Ft.</div>
+      <div class="story-tl-ver" onclick="this.parentElement.parentElement.classList.toggle('expanded')" style="cursor:pointer;">
+       Ver. 4.73 <span class="story-tl-date">2026-10-30</span>
+       <span style="display:inline-block; margin-left:8px; transition:transform 0.3s;">▶</span>
+      </div>
+      <div class="story-tl-desc" style="max-height:0; overflow:hidden; transition:max-height 0.3s ease;">🔄 Pénztárcaindex lap frissítése (október 30.): Árszintek aktualizálása. 💰 Üzemanyagárak: benzin 645 Ft/l, dízel 715 Ft/l – októberi ár stabilizációja. 🛒 Élelmiszerárak: október 25-30-i bolti árakon frissítve (hús, pékáru, zöldség, tejtermékek). 📊 Nagy Bevásárlás Kalkulátor: család havi költsége 288,000 → 304,000 Ft, éves megtakarítás 948,000 → 936,000 Ft.</div>
      </div>
     </div>
     <div class="story-tl-item">
