@@ -289,9 +289,7 @@ body.dark .price-card::before {
 #darkToggle:hover { background: #a0102a; }
 </style>
 </head>
-<body>
-
-<button id="darkToggle" onclick="toggleDark()" title="Sötét/Világos mód">🌙</button>
+<body class="dark">
 
 <div class="header">
   <h1>💰 Pénztárcaindex</h1>
@@ -1199,48 +1197,4 @@ body.dark .price-card::before {
 
 </body>
 
-<script>
-// ===== AUTO DARK MODE =====
-// Este 20:00 - Reggel 06:00 között automatikusan sötét mód
-function checkAutoDark() {
-  const now = new Date(new Date().toLocaleString('en-US', {timeZone: 'Europe/Budapest'}));
-  const h = now.getHours();
-  const isNight = (h >= 20 || h < 6);
-  
-  // Ha nincs manuális override, alkalmazzuk az automata módot
-  const manual = localStorage.getItem('penz_dark_manual');
-  if (manual === null) {
-    if (isNight) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
-  }
-  updateToggleIcon();
-}
-
-function updateToggleIcon() {
-  const isDark = document.body.classList.contains('dark');
-  const btn = document.getElementById('darkToggle');
-  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
-}
-
-function toggleDark() {
-  const isDark = document.body.classList.contains('dark');
-  if (isDark) {
-    document.body.classList.remove('dark');
-    localStorage.setItem('penz_dark_manual', 'light');
-  } else {
-    document.body.classList.add('dark');
-    localStorage.setItem('penz_dark_manual', 'dark');
-  }
-  updateToggleIcon();
-}
-
-// Futtatás betöltéskor
-checkAutoDark();
-
-// Percenként ellenőrzi (pl. ha pont 20:00 lesz)
-setInterval(checkAutoDark, 60000);
-</script>
 </html>
