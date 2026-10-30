@@ -84,13 +84,14 @@ window.addEventListener('unhandledrejection', function(e) {
 
 <style>
 :root {
-  --bg-main:#F4F1EC; --bg-card:#FFFFFF; --text-main:#1A1918; --text-secondary:#4A4947;
-  --shadow-soft:0 2px 8px rgba(30,25,20,0.06),0 8px 24px rgba(30,25,20,0.04);
-  --border-subtle:rgba(0,0,0,0.06);
-  --cat-jog:#F0DCDE; --cat-bizt:#DCE8C9; --cat-kul:#C5D6E3; --cat-eg:#F3D9DC;
-  --cat-csal:#F2E6BD; --cat-gazd:#D4E5D3; --cat-egyeb:#DCDAD5; --cat-okt:#E5D0E6;
-  --cat-korr:#EECFCE; --cat-kozig:#D2DCEB; --cat-energia:#CDE0C9;
-  --cat-kozlek:#CCDCE4; --cat-lakh:#EDD9C4; --sidebar-width:300px;
+  --bg-main:#1A1B26; --bg-card:#24283B; --text-main:#C0CAF5; --text-secondary:#9AA5CE;
+  --shadow-soft:0 2px 8px rgba(0,0,0,0.4),0 8px 28px rgba(0,0,0,0.3);
+  --border-subtle:rgba(192,202,245,0.08);
+  --cat-jog:#3D2A35; --cat-bizt:#2E3D2B; --cat-kul:#1F3148; --cat-eg:#3E2A36;
+  --cat-csal:#3D3520; --cat-gazd:#233A32; --cat-egyeb:#2D2E3F; --cat-okt:#362B42;
+  --cat-korr:#3E2A2A; --cat-kozig:#2A334A; --cat-energia:#253D2E;
+  --cat-kozlek:#253545; --cat-lakh:#3D2F24; --sidebar-width:300px;
+  color-scheme: dark;
 }
 body.dark {
   --bg-main:#1A1B26; --bg-card:#24283B; --text-main:#C0CAF5; --text-secondary:#9AA5CE;
@@ -136,8 +137,8 @@ body.dark .sidebar .cat-item:hover { filter:brightness(1.15); }
 .content { margin-left:var(--sidebar-width); padding:40px; }
 
 /* ---- HEADER ---- */
-.modern-header { background:linear-gradient(135deg,#E8DDD2 0%,#C9B8A8 60%,#B5A498 100%); padding:60px 20px 28px; border-radius:24px; box-shadow:var(--shadow-soft); margin-bottom:40px; position:relative; overflow:visible; min-height:120px; }
-body.dark .modern-header { background:linear-gradient(135deg,#24283B 0%,#2A2E42 60%,#1F2235 100%); }
+.modern-header { background:linear-gradient(135deg,#FAFAF8 0%,#F5EEE8 50%,#EDE4DD 100%); padding:60px 20px 32px; border-radius:28px; box-shadow:0 8px 32px rgba(206,41,57,0.08), 0 2px 8px rgba(0,0,0,0.04); margin-bottom:48px; position:relative; overflow:visible; min-height:120px; backdrop-filter:blur(8px); }
+body.dark .modern-header { background:linear-gradient(135deg,#1E1F28 0%,#252B3B 50%,#1A1F30 100%); box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(192,202,245,0.04); }
 .header-inner { display:flex; align-items:center; gap:40px; flex-wrap:wrap; justify-content:center; }
 .logo-future { width:200px; height:200px; border-radius:40px; overflow:visible; position:relative; box-shadow:0 8px 24px rgba(30,25,20,0.18),inset 0 1px 0 rgba(255,255,255,0.2); flex-shrink:0; }
 body.dark .logo-future { box-shadow:0 8px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(192,202,245,0.1); }
@@ -521,19 +522,21 @@ body.dark .cat-all { border-color:rgba(192,202,245,0.2); }
 
 /* ---- STORYBOARD GOMB ---- */
 .story-btn {
-  display:flex; flex-direction:column; align-items:center; gap:5px;
-  margin-top:10px; padding:8px 14px;
-  background:rgba(255,255,255,0.22); backdrop-filter:blur(6px);
-  border:1px solid rgba(255,255,255,0.35); border-radius:12px;
-  color:rgba(255,255,255,0.85); font-size:11px; font-weight:600;
-  cursor:pointer; letter-spacing:0.3px;
-  transition:background 0.18s, transform 0.15s;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  margin-top:10px; padding:10px 16px;
+  background:rgba(255,255,255,0.55); backdrop-filter:blur(10px);
+  border:1.5px solid rgba(255,255,255,0.5); border-radius:14px;
+  color:rgba(26,25,24,0.9); font-size:11px; font-weight:700;
+  cursor:pointer; letter-spacing:0.4px;
+  transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
 .support-btn-label { display:inline; }
 @media (max-width:380px) { .support-btn-label { display:none; } }
-.story-btn:hover { background:rgba(255,255,255,0.32); transform:translateY(-2px); }
-.story-btn svg { width:22px; height:22px; }
-body.dark .story-btn { background:rgba(192,202,245,0.12); border-color:rgba(192,202,245,0.2); color:#C0CAF5; }
+.story-btn:hover { background:rgba(255,255,255,0.8); transform:translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,0.12); border-color:rgba(255,255,255,0.7); }
+.story-btn svg { width:24px; height:24px; }
+body.dark .story-btn { background:rgba(192,202,245,0.12); border-color:rgba(192,202,245,0.25); color:#E0E8FF; }
+body.dark .story-btn:hover { background:rgba(192,202,245,0.2); box-shadow:0 8px 20px rgba(0,0,0,0.3); border-color:rgba(192,202,245,0.4); }
 
 /* SZAVAZÓ GOMB - Vibráló pulzáló animáció */
 @keyframes voting-pulse {
@@ -594,6 +597,8 @@ body.dark .story-modal-box { background:var(--bg-card); }
 .story-tl-ver { font-size:14px; font-weight:700; color:var(--text-main); }
 .story-tl-date { font-size:11px; font-weight:400; color:var(--text-secondary); margin-left:8px; }
 .story-tl-desc { font-size:12.5px; line-height:1.6; color:var(--text-secondary); margin-top:4px; }
+.story-tl-item.expanded .story-tl-desc { max-height: 1000px !important; }
+.story-tl-item.expanded .story-tl-ver span:last-child { transform: rotate(90deg); }
 
 .story-struct-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .story-struct-item { background:var(--bg-main); border:1px solid var(--border-subtle); border-radius:12px; padding:12px 14px; }
@@ -1253,48 +1258,62 @@ body.dark .modal-box::before { background-image: url("data:image/svg+xml,%3Csvg 
 }
 .progress-ring-legend {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin-top: 14px;
-}
-.prl-item {
-  display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* Progress Ring */
+.progress-ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0 12px;
+  padding: 20px 24px 24px;
+  background: linear-gradient(135deg, rgba(192,202,245,0.08), rgba(192,202,245,0.04));
+  border-radius: 16px;
+  border: 1.5px solid rgba(192,202,245,0.1);
+  backdrop-filter: blur(10px);
   cursor: pointer;
-  padding: 4px 10px;
-  border-radius: 999px;
-  transition: transform 0.15s, background 0.15s;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
 }
-.prl-item:hover {
-  transform: translateY(-1px);
-  background: rgba(255,255,255,0.06);
+.progress-ring-wrap:hover {
+  box-shadow: 0 8px 24px rgba(206,41,57,0.12);
+  border-color: rgba(206,41,57,0.2);
 }
-.prl-dot {
-  width: 11px;
-  height: 11px;
-  min-width: 11px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
+body.dark .progress-ring-wrap:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
-.prl-count {
+
+/* HomePage Headlines */
+.content h1 {
+  font-size: 36px;
   font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.8px;
+  margin: 0 0 12px;
+  text-align: center;
+  line-height: 1.1;
+}
+.content > p:first-of-type {
   font-size: 17px;
-}
-.prl-label {
-  font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-.prl-total {
-  margin-top: 6px;
-  font-size: 13px;
+  color: var(--text-main);
+  text-align: center;
   font-weight: 600;
-  color: var(--text-secondary);
-  opacity: 0.85;
+  margin: 0 0 8px;
 }
+.content > p:nth-of-type(2) {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 20px;
+  letter-spacing: 0.3px;
+}
+
 .header-action-btn {
   flex: 1 1 0;
   min-width: 64px;
@@ -1710,46 +1729,7 @@ window.addEventListener('unhandledrejection', function(e) {
  </div>
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
- <p id="daysSince" style="text-align:center;font-size:16px;">Az "áradás" óta eltelt napok: …</p>
- <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:-4px;">Utolsó frissítés: <strong>2026-10-30</strong> · Ver. 4.73</p>
-
- <!-- HALADÁSMÉRŐ KÖRDIAGRAM -->
- <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
-  <svg class="progress-ring-svg" width="90" height="90" viewBox="0 0 90 90">
-   <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border-subtle)" stroke-width="10"/>
-   <!-- Ígéret (piros) - alul -->
-   <circle id="ringProm" cx="45" cy="45" r="38" fill="none" stroke="#e8405a" stroke-width="10"
-    stroke-linecap="butt" stroke-dasharray="0 502"
-    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1)"/>
-   <!-- Bejelentve (narancs) - középen -->
-   <circle id="ringAnn" cx="45" cy="45" r="38" fill="none" stroke="#FF9933" stroke-width="10"
-    stroke-linecap="butt" stroke-dasharray="0 502"
-    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1) 0.15s"/>
-   <!-- Megvalósult (zöld) - felül, kicsit vastagabb hogy látszódjon -->
-   <circle id="ringDone" cx="45" cy="45" r="38" fill="none" stroke="#2ecc71" stroke-width="12"
-    stroke-linecap="round" stroke-dasharray="0 502"
-    transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s cubic-bezier(.4,0,.2,1) 0.3s"/>
-   <text x="45" y="49" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text-main)" id="ringTotal">–</text>
-  </svg>
-  <div class="progress-ring-legend">
-   <div class="prl-item" onclick="filterByStatus('done')" title="Megvalósult téglák">
-    <div class="prl-dot" style="background:#2ecc71"></div>
-    <span class="prl-count" id="ringCountDone" style="color:#2ecc71">–</span>
-    <span class="prl-label">megvalósult</span>
-   </div>
-   <div class="prl-item" onclick="filterByStatus('announced')" title="Bejelentett téglák">
-    <div class="prl-dot" style="background:#FF9933"></div>
-    <span class="prl-count" id="ringCountAnn" style="color:#FF9933">–</span>
-    <span class="prl-label">bejelentve</span>
-   </div>
-   <div class="prl-item" onclick="filterByStatus('promise')" title="Csak ígéret téglák">
-    <div class="prl-dot" style="background:#e8405a"></div>
-    <span class="prl-count" id="ringCountProm" style="color:#e8405a">–</span>
-    <span class="prl-label">csak ígéret</span>
-   </div>
-   <div class="prl-total" id="ringTotalLabel">103 ígéret összesen</div>
-  </div>
- </div>
+ <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:0px;">Utolsó frissítés: <strong>2026-10-30</strong> · Ver. 4.73</p>
 
  <p id="tesztBadgeWrap" style="text-align:center;margin-top:12px;">
   <span style="display:inline-block;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1.5px solid rgba(192,24,58,0.3);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:600;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
@@ -3148,8 +3128,11 @@ var safeStorage = (function() {
     <div class="story-tl-item">
      <div class="story-tl-dot" style="background:#CE2939;border:2px solid #a01020;"></div>
      <div class="story-tl-content">
-      <div class="story-tl-ver">Ver. 4.73 <span class="story-tl-date">2026-10-30</span></div>
-      <div class="story-tl-desc">🔄 Pénztárcaindex lap frissítése (október 30.): Árszintek aktualizálása. 💰 Üzemanyagárak: benzin 645 Ft/l, dízel 715 Ft/l – októberi ár stabilizációja. 🛒 Élelmiszerárak: október 25-30-i bolti árakon frissítve (hús, pékáru, zöldség, tejtermékek). 📊 Nagy Bevásárlás Kalkulátor: család havi költsége 288,000 → 304,000 Ft, éves megtakarítás 948,000 → 936,000 Ft.</div>
+      <div class="story-tl-ver" onclick="this.parentElement.parentElement.classList.toggle('expanded')" style="cursor:pointer;">
+       Ver. 4.73 <span class="story-tl-date">2026-10-30</span>
+       <span style="display:inline-block; margin-left:8px; transition:transform 0.3s;">▶</span>
+      </div>
+      <div class="story-tl-desc" style="max-height:0; overflow:hidden; transition:max-height 0.3s ease;">🔄 Pénztárcaindex lap frissítése (október 30.): Árszintek aktualizálása. 💰 Üzemanyagárak: benzin 645 Ft/l, dízel 715 Ft/l – októberi ár stabilizációja. 🛒 Élelmiszerárak: október 25-30-i bolti árakon frissítve (hús, pékáru, zöldség, tejtermékek). 📊 Nagy Bevásárlás Kalkulátor: család havi költsége 288,000 → 304,000 Ft, éves megtakarítás 948,000 → 936,000 Ft.</div>
      </div>
     </div>
     <div class="story-tl-item">
@@ -5127,7 +5110,7 @@ function openModal(item) {
  `;
 
  // Specifikus adatok az egyes \u00edg\u00e9retekhez
- const specificTable = getDetailedTableData(title);
+ const specificTable = getDetailedTableData(title, item);
  const tableContent = specificTable || basicTable;
 
  const detailsTable = `
@@ -7189,13 +7172,10 @@ function initProgressRing() {
   const annOffset   = doneArc;
   const promOffset  = doneArc + annArc;
 
-  const ringDone = document.getElementById('ringDone');
-  const ringAnn  = document.getElementById('ringAnn');
-  const ringProm = document.getElementById('ringProm');
   const ringTotal = document.getElementById('ringTotal');
   const ringTotalLabel = document.getElementById('ringTotalLabel');
 
-  if (!ringDone) return;
+  if (!ringTotal) return;
 
   // Szám animáció
   document.getElementById('ringCountDone').textContent = done;
@@ -7204,22 +7184,26 @@ function initProgressRing() {
   ringTotal.textContent = total;
   if (ringTotalLabel) ringTotalLabel.textContent = total + ' ígéret összesen';
 
-  // SVG rétegsor: piros (prom) alul, narancs (ann) középen, zöld (done) felül
-  // Sorrendben: prom -90-től indul, ann prom után, done ann után
+  // Vízszintes sávok szélességének frissítése
   setTimeout(() => {
-    // Piros: -90 foktól indul (legalsó réteg)
-    ringProm.style.strokeDasharray  = promArc + ' ' + (circ - promArc);
-    ringProm.setAttribute('transform', 'rotate(-90 45 45)');
+    const barDone = document.getElementById('barDone');
+    const barAnn = document.getElementById('barAnn');
+    const barProm = document.getElementById('barProm');
 
-    // Narancs: prom után folytatódik
-    ringAnn.style.strokeDasharray   = annArc + ' ' + (circ - annArc);
-    const annDeg = -90 + (promArc / circ * 360);
-    ringAnn.setAttribute('transform', 'rotate(' + annDeg + ' 45 45)');
+    if (barDone && barAnn && barProm) {
+      const donePct = total > 0 ? (done / total * 100) : 0;
+      const annPct = total > 0 ? (ann / total * 100) : 0;
+      const promPct = total > 0 ? (prom / total * 100) : 0;
 
-    // Zöld: ann után, legfelső réteg (SVG-ben utoljára van)
-    ringDone.style.strokeDasharray  = doneArc + ' ' + (circ - doneArc);
-    const doneDeg = -90 + ((promArc + annArc) / circ * 360);
-    ringDone.setAttribute('transform', 'rotate(' + doneDeg + ' 45 45)');
+      barDone.style.width = donePct + '%';
+      barDone.textContent = Math.round(donePct) + '%';
+
+      barAnn.style.width = annPct + '%';
+      barAnn.textContent = Math.round(annPct) + '%';
+
+      barProm.style.width = promPct + '%';
+      barProm.textContent = Math.round(promPct) + '%';
+    }
   }, 200);
 }
 
@@ -8269,7 +8253,7 @@ Számold ki te is: ${url}`;
       const brutto = parseFloat(bruttoInput.value) || 0;
       if (brutto <= 0) { alert('Add meg a bruttó fizetésed!'); return; }
       
-      const params = { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, isEgyedulallo, anyaInfo };
+      const params = { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, isEgyedulallo, anyaInfo, isGyes, isNyugdijas };
       resultBefore = calcBer(brutto, params, false);
       resultAfter = calcBer(brutto, params, true);
     }
@@ -8513,7 +8497,7 @@ Számold ki te is: ${url}`;
   
   // === NORMÁL BÉR SZÁMÍTÁS ===
   function calcBer(brutto, params, isTisza) {
-    const { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, anyaInfo } = params;
+    const { gyerekSzam, is25Alatt, isElsoHazas, isFogyatekos, anyaInfo, isEgyedulallo, isGyes, isNyugdijas } = params;
     
     // TB járulék (TISZA alatt 3+ gyereknél csökken)
     let tbRate = TB_RATE;
@@ -8772,15 +8756,14 @@ Számold ki te is: ${url}`;
   
   // === MEGJELENÍTÉS ===
   function displayResults(resBefore, resAfter) {
-    // Valós különbség (jelenlegi törvény szerint)
-    const diff = resBefore.netto - resBefore.netto; // 0 – az áradás előtt/után azonos adójogi környezet
+    // Jelenlegi (ma érvényes) törvény szerinti különbség
+    const currentDiff = resAfter.items.filter(i => i.tipus !== 'tisza').reduce((s, i) => s + i.osszeg, 0) - resBefore.items.reduce((s, i) => s + i.osszeg, 0);
 
     // TISZA ígéret tételek (még nem teljesültek)
     const tiszaIgeretek = resAfter.items.filter(i => i.tipus === 'tisza');
     const tiszaOsszeg = tiszaIgeretek.reduce((s, i) => s + i.osszeg, 0);
 
-    // Valós nettó különbség (TISZA tételek nélkül) = jelenlegi törvény szerinti különbség
-    const valosDiff = resBefore.netto - resBefore.netto; // jelenleg 0
+    // Össz különbség (jelenlegi + TISZA ígéretek)
     const diffPercent = resBefore.netto > 0 ? ((tiszaOsszeg / resBefore.netto) * 100).toFixed(1) : 0;
 
     const hasTisza = tiszaIgeretek.length > 0;
@@ -8812,8 +8795,8 @@ Számold ki te is: ${url}`;
       <!-- UTÁN: jelenlegi + TISZA ígéretek külön szekciókban -->
       <div style="background:linear-gradient(135deg, rgba(232,64,90,0.06), rgba(192,24,58,0.04)); border-radius:16px; padding:24px; border:2px solid #e8405a;">
         <div style="font-size:13px; font-weight:700; color:#e8405a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">"Áradás" után</div>
-        <div style="font-size:11px; color:#856404; background:#fff3cd; border:1px solid #ffca2c; border-radius:5px; padding:3px 8px; margin-bottom:8px; font-weight:600;">⚠️ Jelenlegi + TISZA ígéretek (még nem törvény!)</div>
-        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">${fmt(resBefore.netto)}</div>
+        <div style="font-size:11px; color:#856404; background:#fff3cd; border:1px solid #ffca2c; border-radius:5px; padding:3px 8px; margin-bottom:8px; font-weight:600;">⚠️ Jelenlegi törvény + TISZA ígéretek</div>
+        <div style="font-size:32px; font-weight:900; color:var(--text-main); margin-bottom:4px;">${fmt(resAfter.netto)}</div>
         <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">nettó / hó – jelenlegi törvény szerint</div>
 
         <!-- Jelenlegi tételek -->
@@ -8822,7 +8805,7 @@ Számold ki te is: ${url}`;
           ${afterItemsJelenlegi.map(renderItem).join('')}
           <div style="margin-top:8px; padding-top:8px; border-top:1.5px solid rgba(232,64,90,0.3); display:flex; justify-content:space-between; align-items:center;">
             <div style="font-size:13px; font-weight:800; color:var(--text-main);">= Jelenlegi nettó</div>
-            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${fmt(resBefore.netto)}</div>
+            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${fmt(resAfter.netto)}</div>
           </div>
         </div>
 
