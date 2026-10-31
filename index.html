@@ -4353,12 +4353,9 @@ function setSortMode(cardId, mode) {
 
 function renderDashboard(data) {
  const container = document.getElementById("categorySections");
- console.log('🔧 renderDashboard called with', data?.length, 'items');
  if (!container) {
-   console.error('❌ ERROR: categorySections container not found!');
    return;
  }
- console.log('✅ Container found, clearing innerHTML');
  container.innerHTML = "";
 
  // Top 10 legfontosabb módban: flat lista
@@ -7215,11 +7212,7 @@ function initProgressRing() {
 let currentSort = 'default';
 let currentPriority = null; // 'azonnali' | 'rovid' | 'hosszu' | null
 
-console.log('🚀 DEBUG: excelData length:', excelData?.length);
-console.log('🚀 DEBUG: #categorySections exists:', !!document.getElementById("categorySections"));
-console.log('🚀 DEBUG: About to call renderDashboard');
 renderDashboard(excelData);
-console.log('🚀 DEBUG: renderDashboard finished');
 // Kördiagram és fontossági adatok inicializálása
 setTimeout(() => {
   initProgressRing();
