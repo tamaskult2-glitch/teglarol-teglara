@@ -1358,7 +1358,7 @@ window.addEventListener('unhandledrejection', function(e) {
 }, true);
 </script>
 </head>
-<body>
+<body class="dark">
 <div id="stickyCatHeader"></div>
 <a href="#categorySections" class="skip-link" style="position:absolute;top:-40px;left:0;background:#e8405a;color:#fff;padding:8px 16px;border-radius:0 0 8px 0;font-weight:700;font-size:14px;z-index:9999;transition:top 0.2s;text-decoration:none;">Ugrás a tartalomhoz</a>
 <style>.skip-link:focus{top:0!important}</style>
@@ -1730,45 +1730,6 @@ window.addEventListener('unhandledrejection', function(e) {
 
  <h1 style="text-align:center;line-height:1.15;">„Tégláról-téglára"</h1>
  <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-top:0px;">Utolsó frissítés: <strong>2026-10-30</strong> · Ver. 4.73</p>
-
- <!-- HALADÁSMÉRŐ VÍZSZINTES SÁVOK -->
- <div class="progress-ring-wrap" id="progressRingWrap" title="Kattints a szűréshez">
-  <div style="text-align:center;margin-bottom:20px;font-weight:700;font-size:16px;">
-    <span id="ringTotal">114</span> 🧱 Ígéret
-  </div>
-
-  <div style="max-width:300px;margin:0 auto;width:100%;">
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;">
-        <span onclick="filterByStatus('done')" style="cursor:pointer;">✓ Megvalósult</span>
-        <span id="ringCountDone" style="color:#2ecc71;">30</span>
-      </div>
-      <div style="width:100%;height:24px;background:rgba(192,202,245,0.1);border-radius:8px;overflow:hidden;">
-        <div id="barDone" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#2ecc71,#1abc9c);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:white;font-size:11px;font-weight:700;width:26%;transition:width 0.8s cubic-bezier(.4,0,.2,1);">26%</div>
-      </div>
-    </div>
-
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;">
-        <span onclick="filterByStatus('announced')" style="cursor:pointer;">📢 Bejelentve</span>
-        <span id="ringCountAnn" style="color:#FF9933;">70</span>
-      </div>
-      <div style="width:100%;height:24px;background:rgba(192,202,245,0.1);border-radius:8px;overflow:hidden;">
-        <div id="barAnn" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#FF9933,#f39c12);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:white;font-size:11px;font-weight:700;width:61%;transition:width 0.8s cubic-bezier(.4,0,.2,1);">61%</div>
-      </div>
-    </div>
-
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;">
-        <span onclick="filterByStatus('promise')" style="cursor:pointer;">💭 Csak ígéret</span>
-        <span id="ringCountProm" style="color:#e8405a;">14</span>
-      </div>
-      <div style="width:100%;height:24px;background:rgba(192,202,245,0.1);border-radius:8px;overflow:hidden;">
-        <div id="barProm" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#e8405a,#c0183a);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:white;font-size:11px;font-weight:700;width:12%;transition:width 0.8s cubic-bezier(.4,0,.2,1);">12%</div>
-      </div>
-    </div>
-  </div>
- </div>
 
  <p id="tesztBadgeWrap" style="text-align:center;margin-top:12px;">
   <span style="display:inline-block;background:rgba(255,255,255,0.75);backdrop-filter:blur(8px);border:1.5px solid rgba(192,24,58,0.3);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:600;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
