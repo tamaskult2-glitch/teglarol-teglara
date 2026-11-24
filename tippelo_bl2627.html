@@ -305,6 +305,13 @@
   }
   #navFabUp{bottom:78px;right:16px;border:2px solid rgba(0,200,255,.4);background:rgba(0,200,255,.12);color:var(--bl-cyan);}
   #navFabNext{bottom:20px;right:16px;border:2px solid var(--bl-gold);background:rgba(201,160,56,.18);color:var(--bl-gold);animation:navPulse 2s infinite;}
+  #navFabRank{bottom:136px;right:16px;border:2px solid rgba(168,85,247,.45);background:rgba(168,85,247,.14);color:#c4a3fb;}
+  #navFabRank.rank-pulse{animation:rankFabPulse 1.6s infinite;}
+  @keyframes rankFabPulse{
+    0%,100%{box-shadow:0 3px 14px rgba(0,0,0,.4),0 0 0 0 rgba(168,85,247,.45);}
+    50%{box-shadow:0 3px 14px rgba(0,0,0,.4),0 0 0 9px rgba(168,85,247,0);}
+  }
+  #rankFabDot{position:absolute;top:-2px;right:-2px;width:13px;height:13px;border-radius:50%;background:var(--bl-red);border:2px solid var(--bl-navy);display:none;}
   @keyframes navPulse{
     0%,100%{box-shadow:0 3px 14px rgba(0,0,0,.4),0 0 0 0 rgba(201,160,56,.35);}
     50%{box-shadow:0 3px 14px rgba(0,0,0,.4),0 0 0 8px rgba(201,160,56,0);}
@@ -786,6 +793,19 @@
 
 <button id="navFabUp" class="nav-fab" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Fel">▲</button>
 <button id="navFabNext" class="nav-fab" onclick="jumpToNextUntipped()" title="Következő tippeletlen meccs">🎯</button>
+<button id="navFabRank" class="nav-fab" onclick="openRankWatchModal()" title="Ranglista-figyelő">📊<span id="rankFabDot"></span></button>
+
+<!-- RANGLISTA-FIGYELŐ MODAL — élő meccsek alapján összegzi, hogyan állna
+     most a ranglista, és kiemeli a CURRENT_USER helyezés-változását. -->
+<div id="rankWatchModal" style="display:none;position:fixed;inset:0;z-index:261;background:rgba(0,0,0,.7);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="width:100%;max-width:460px;max-height:82vh;background:linear-gradient(180deg,var(--bl-navy2),#0c0e26);border:2px solid rgba(168,85,247,.4);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+    <div style="padding:16px 18px 8px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:16px;color:#c4a3fb;font-weight:800;">📊 Ranglista-figyelő</span>
+      <button onclick="document.getElementById('rankWatchModal').style.display='none'" style="background:none;border:none;color:var(--bl-grey);font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div id="rankWatchContent" style="flex:1;overflow-y:auto;padding:0 16px 16px;"></div>
+  </div>
+</div>
 
 <script>
 /* =====================================================================
@@ -2684,7 +2704,14 @@ async function cleanupLegacyTips(){
   }
 }
 
-function computeLeaderboard(){
+// useLive=true: a még le nem zárt (nincs FT), de ÉPPEN ÉLŐ (LIVE_SCORES-ban
+// szereplő) meccseket a jelenlegi állással "ideiglenes eredményként" veszi
+// figyelembe — ugyanazzal a pseudoMatch-mintával, mint a kártyán látható
+// élő pontszám-jelvény (lásd fentebb). Ez egy VETÍTETT, nem végleges
+// ranglista — a tényleges (useLive=false, alapértelmezett) ranglistát sosem
+// módosítja, csak a Ranglista-figyelő popup "mi lenne, ha most érne véget"
+// nézetéhez használjuk.
+function computeLeaderboard(useLive){
   // Poka-yoke védelem: csak olyan ALL_TIPS-kulcsot dolgozunk fel, ami egy
   // VALÓS meccs-ID (LEAGUE_MATCHES-ben szereplő). A korábbi (már javított)
   // tips/{user}/{matchId} útvonal-sorrendből maradt Firebase-ben pár régi
@@ -2703,18 +2730,25 @@ function computeLeaderboard(){
 
   const rows = [];
   users.forEach(safe=>{
-    let pts=0, tipped=0, pending=0, exact=0;
+    let pts=0, tipped=0, pending=0, exact=0, live=0;
     scoringMatches.forEach(m=>{
       const tip = ALL_TIPS[m.id] ? ALL_TIPS[m.id][safe] : null;
       if(!tip) return;
       const hasFt = m.ftHome!=null && m.ftAway!=null;
-      if(!hasFt){ pending++; return; }
+      if(!hasFt){
+        const liveScore = useLive ? LIVE_SCORES[m.id] : null;
+        if(!liveScore){ pending++; return; }
+        const pseudoMatch = { ...m, ftHome: liveScore.home, ftAway: liveScore.away };
+        tipped++; live++;
+        pts += calcTipPoints(pseudoMatch, tip);
+        return;
+      }
       tipped++;
       pts += calcTipPoints(m, tip);
       if(tip.scoreHome === m.ftHome && tip.scoreAway === m.ftAway) exact++;
     });
     const displayName = (ALL_USERS[safe] && ALL_USERS[safe].name) || safe;
-    rows.push({ safe, name:displayName, pts, tipped, pending, exact });
+    rows.push({ safe, name:displayName, pts, tipped, pending, exact, live });
   });
 
   rows.sort((a,b)=> b.pts-a.pts || b.exact-a.exact || b.tipped-a.tipped);
@@ -2908,6 +2942,145 @@ function renderLeaderboardTab(){
       ${i<3 ? `<div style="margin-left:auto;flex-shrink:0;font-size:14px;font-weight:800;color:var(--bl-gold);">${prizes[i]}</div>` : ''}
     </div>`;
   }).join("");
+
+  checkRankChanges(rows);
+}
+
+/* =====================================================================
+   RANGLISTA-FIGYELŐ — minden renderLeaderboardTab()-hívás (azaz minden
+   renderAll(), azaz minden élő-frissítés/admin-mentés/tippmentés) után
+   lefut. Két, EGYMÁSTÓL FÜGGETLEN pillanatképet hasonlít a megelőzőhöz:
+     1) "real" — a TÉNYLEGES (rögzített FT-eredményeken alapuló) ranglista,
+        csak akkor változik, ha admin rögzít egy eredményt.
+     2) "live" — a computeLeaderboard(true) VETÍTETT ranglistája, ami a
+        jelenleg élő meccsek pillanatnyi állásával számol, és percenként
+        (refreshLiveScores) mindenkinél frissül — ez adja a "hogyan alakul"
+        érzést anélkül, hogy bármit is Firebase-be írnánk.
+   Csak a BEJELENTKEZETT felhasználó (CURRENT_USER) saját előrelépésekor
+   szólalunk meg (poka-yoke: nem zaklatjuk mindenki mással, csak azzal,
+   akit érint), és csak akkor, ha már volt korábbi pillanatkép (első
+   betöltéskor nincs "előző" állapot, amihez képest előre lehetne lépni).
+   ===================================================================== */
+let _prevRealRanks = null;   // {safe: 0-based rank} — utolsó TÉNYLEGES pillanatkép
+let _prevLiveRanks = null;   // {safe: 0-based rank} — utolsó ÉLŐ-vetített pillanatkép
+let _rankEventLog = [];      // legutóbbi néhány rangsor-esemény szövege (a popuphoz)
+
+function _rankMapOf(rows){
+  const map = {};
+  rows.forEach((r,i)=> map[r.safe] = i);
+  return map;
+}
+
+function checkRankChanges(realRows){
+  // --- 1) TÉNYLEGES ranglista-elmozdulás ---
+  const realMap = _rankMapOf(realRows);
+  if(CURRENT_USER && _prevRealRanks && Object.prototype.hasOwnProperty.call(_prevRealRanks, CURRENT_USER)){
+    const prevRank = _prevRealRanks[CURRENT_USER];
+    const newRank = realMap[CURRENT_USER];
+    if(newRank != null && newRank < prevRank){
+      showToastBL(`⬆️ Előreléptél a ranglistán! Most: ${newRank+1}. hely (előző: ${prevRank+1}.)`);
+      _rankEventLog.unshift(`✅ Rögzített eredmény alapján ${prevRank+1}. → ${newRank+1}. hely`);
+      _rankEventLog = _rankEventLog.slice(0,8);
+      _flagRankNotification();
+    }
+  }
+  _prevRealRanks = realMap;
+
+  // --- 2) ÉLŐ-vetített ranglista-elmozdulás (csak ha van éppen élő meccs) ---
+  const hasLiveMatch = Object.keys(LIVE_SCORES).length > 0;
+  if(hasLiveMatch){
+    const liveRows = computeLeaderboard(true);
+    const liveMap = _rankMapOf(liveRows);
+    if(CURRENT_USER && _prevLiveRanks && Object.prototype.hasOwnProperty.call(_prevLiveRanks, CURRENT_USER)){
+      const prevRank = _prevLiveRanks[CURRENT_USER];
+      const newRank = liveMap[CURRENT_USER];
+      if(newRank != null && newRank < prevRank){
+        showToastBL(`⏱️ Élő állás szerint feljebb lépnél: ${newRank+1}. hely (előző: ${prevRank+1}.)`);
+        _rankEventLog.unshift(`⏱️ Élő állás alapján ${prevRank+1}. → ${newRank+1}. hely`);
+        _rankEventLog = _rankEventLog.slice(0,8);
+        _flagRankNotification();
+      }
+    }
+    _prevLiveRanks = liveMap;
+  } else {
+    _prevLiveRanks = null; // nincs élő meccs — a következő élő meccskor friss bázisról induljon
+  }
+
+  // Ha a popup épp nyitva van, azonnal frissítjük a tartalmát is.
+  const modal = document.getElementById("rankWatchModal");
+  if(modal && modal.style.display === "flex") renderRankWatchModal();
+}
+
+function _flagRankNotification(){
+  const dot = document.getElementById("rankFabDot");
+  const fab = document.getElementById("navFabRank");
+  if(dot) dot.style.display = "block";
+  if(fab) fab.classList.add("rank-pulse");
+}
+
+function openRankWatchModal(){
+  renderRankWatchModal();
+  document.getElementById("rankWatchModal").style.display = "flex";
+  const dot = document.getElementById("rankFabDot");
+  const fab = document.getElementById("navFabRank");
+  if(dot) dot.style.display = "none";
+  if(fab) fab.classList.remove("rank-pulse");
+}
+
+function renderRankWatchModal(){
+  const el = document.getElementById("rankWatchContent");
+  if(!el) return;
+
+  const liveMatchIds = Object.keys(LIVE_SCORES);
+  const realRows = computeLeaderboard();
+  const realMap = _rankMapOf(realRows);
+
+  let html = "";
+
+  // --- Élő meccsek összegzése ---
+  if(liveMatchIds.length){
+    html += `<div style="font-size:11px;color:var(--bl-grey);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 6px;">🔴 Élő meccsek</div>`;
+    liveMatchIds.forEach(id=>{
+      const m = LEAGUE_MATCHES.find(x=>x.id===id);
+      const live = LIVE_SCORES[id];
+      if(!m || !live) return;
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px;">
+        <span style="flex:1;">${escapeHtml(m.teamHome)} – ${escapeHtml(m.teamAway)}</span>
+        <span style="font-weight:800;color:var(--bl-red);">${live.home}:${live.away}</span>
+        <span style="font-size:10px;color:var(--bl-grey);min-width:48px;text-align:right;">${escapeHtml(live.clock||"")}</span>
+      </div>`;
+    });
+
+    const liveRows = computeLeaderboard(true);
+    html += `<div style="font-size:11px;color:var(--bl-grey);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 6px;">📊 Várható ranglista — ha most érnének véget</div>`;
+    html += liveRows.slice(0, Math.max(10, realMap[CURRENT_USER]!=null ? realMap[CURRENT_USER]+3 : 10)).map((r,i)=>{
+      const me = r.safe === CURRENT_USER;
+      const realRank = realMap[r.safe];
+      let arrow = `<span style="color:var(--bl-grey);">–</span>`;
+      if(realRank != null){
+        if(i < realRank) arrow = `<span style="color:var(--bl-green);font-weight:800;">▲ ${realRank-i}</span>`;
+        else if(i > realRank) arrow = `<span style="color:var(--bl-red);font-weight:800;">▼ ${i-realRank}</span>`;
+      }
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.05);${me?'background:rgba(168,85,247,.1);border-radius:6px;':''}">
+        <span style="width:22px;font-weight:700;color:${i<3?'var(--bl-gold)':'var(--bl-grey)'};">${i+1}.</span>
+        <span style="flex:1;font-size:12.5px;font-weight:600;">${escapeHtml(r.name)}${me?' <span style="color:#c4a3fb;font-size:10.5px;">(te)</span>':''}</span>
+        <span style="font-size:13px;font-weight:800;">${r.pts} <span style="font-size:10px;font-weight:400;color:var(--bl-grey);">pt</span></span>
+        <span style="min-width:30px;text-align:right;font-size:11px;">${arrow}</span>
+      </div>`;
+    }).join("");
+  } else {
+    html += `<div class="placeholder-note">Jelenleg nincs élő BL-mérkőzés. Amint elkezdődik egy meccs, itt látod majd, hogyan alakulna a ranglista a pillanatnyi állás alapján — és szólunk, ha előrébb lépnél.</div>`;
+  }
+
+  // --- Legutóbbi rangsor-események ---
+  html += `<div style="font-size:11px;color:var(--bl-grey);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 6px;">🕘 Legutóbbi változások nálad</div>`;
+  if(_rankEventLog.length){
+    html += _rankEventLog.map(line=>`<div style="font-size:12px;color:rgba(240,244,240,.8);padding:3px 0;">${escapeHtml(line)}</div>`).join("");
+  } else {
+    html += `<div class="placeholder-note">Még nincs rögzített elmozdulás ebben a böngészőben.</div>`;
+  }
+
+  el.innerHTML = html;
 }
 
 function escapeHtml(s){
