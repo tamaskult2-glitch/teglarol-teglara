@@ -305,6 +305,17 @@
   }
   #navFabUp{bottom:78px;right:16px;border:2px solid rgba(0,200,255,.4);background:rgba(0,200,255,.12);color:var(--bl-cyan);}
   #navFabNext{bottom:20px;right:16px;border:2px solid var(--bl-gold);background:rgba(201,160,56,.18);color:var(--bl-gold);animation:navPulse 2s infinite;}
+  /* ===== ÉLŐ EREDMÉNY-SZALAG (hírszalag) ===== */
+  #liveTicker{display:none;position:sticky;top:0;z-index:140;overflow:hidden;background:linear-gradient(90deg,#3a0a12,#1a0b2e);border-bottom:2px solid var(--bl-red);box-shadow:0 2px 10px rgba(0,0,0,.4);}
+  #liveTicker .tk-badge{position:absolute;left:0;top:0;bottom:0;z-index:2;display:flex;align-items:center;padding:0 10px;background:var(--bl-red);color:#fff;font-weight:800;font-size:11px;letter-spacing:.06em;}
+  #liveTicker .tk-track{display:inline-flex;white-space:nowrap;padding-left:70px;animation:tkScroll var(--tk-dur,30s) linear infinite;}
+  #liveTicker:hover .tk-track{animation-play-state:paused;}
+  #liveTicker .tk-item{display:inline-flex;align-items:center;gap:7px;padding:7px 22px;font-size:12.5px;cursor:pointer;color:var(--bl-white);}
+  #liveTicker .tk-score{font-weight:800;color:#fff;background:rgba(224,51,63,.35);border-radius:5px;padding:1px 7px;}
+  #liveTicker .tk-score.fin{background:rgba(255,255,255,.14);}
+  #liveTicker .tk-clock{font-size:10.5px;color:#fca5a5;}
+  #liveTicker .tk-sep{color:var(--bl-grey);}
+  @keyframes tkScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   #navFabRank{bottom:136px;right:16px;border:2px solid rgba(168,85,247,.45);background:rgba(168,85,247,.14);color:#c4a3fb;}
   #navFabRank.rank-pulse{animation:rankFabPulse 1.6s infinite;}
   @keyframes rankFabPulse{
@@ -345,6 +356,7 @@
   </div>
   <button onclick="openSupportModal()" style="margin-top:8px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:12px;font-weight:700;cursor:pointer;">☕ Támogass</button>
 </header>
+<div id="liveTicker" aria-live="polite"></div>
 
 <!-- TÁMOGATÁS MODAL — a VB Gólszaglóból átemelve (Revolut link, QR, IBAN, havi gyűjtőméter) -->
 <div id="supportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);z-index:250;align-items:center;justify-content:center;padding:20px;">
@@ -3408,6 +3420,34 @@ document.querySelectorAll("nav.bl-tabs button").forEach(btn=>{
   });
 });
 
+
+/* =====================================================================
+   ÉLŐ EREDMÉNY-SZALAG — hírszalag-szerű futó sáv az oldal tetején.
+   Forrás: LIVE_SCORES (élő) + a MAI napon már lezárt meccsek (m.ftHome).
+   Csak olvas, minden renderAll()-nál újraépül; ha nincs mit mutatni, rejtett.
+   Kattintásra a meccskártyához ugrik.
+   ===================================================================== */
+function renderLiveTicker(){
+  const el = document.getElementById("liveTicker");
+  if(!el) return;
+  const today = getBudapestToday();
+  const items = [];
+  LEAGUE_MATCHES.forEach(m=>{
+    const live = LIVE_SCORES[m.id];
+    if(live && m.ftHome == null){
+      items.push(`<span class="tk-item" onclick="scrollToMatch('${m.id}')">🔴 ${escapeHtml(m.teamHome)} <span class="tk-score">${live.home}:${live.away}</span> ${escapeHtml(m.teamAway)}${live.clock?` <span class="tk-clock">${escapeHtml(live.clock)}</span>`:""}</span>`);
+    } else if(m.ftHome != null && m.ftAway != null && m.huDate === today){
+      items.push(`<span class="tk-item" onclick="scrollToMatch('${m.id}')">✅ ${escapeHtml(m.teamHome)} <span class="tk-score fin">${m.ftHome}:${m.ftAway}</span> ${escapeHtml(m.teamAway)} <span class="tk-clock" style="color:var(--bl-grey);">VÉGE</span></span>`);
+    }
+  });
+  if(!items.length){ el.style.display="none"; el.innerHTML=""; return; }
+  const hasLive = Object.keys(LIVE_SCORES).length > 0;
+  const one = items.join('<span class="tk-sep">•</span>');
+  // kétszer egymás után => folytonos, hézagmentes végtelen görgetés (-50%-ig mozog)
+  el.innerHTML = `<span class="tk-badge">${hasLive?"🔴 ÉLŐ":"MA"}</span><div class="tk-track" style="--tk-dur:${Math.max(18, items.length*9)}s;">${one}<span class="tk-sep">•</span>${one}<span class="tk-sep">•</span></div>`;
+  el.style.display = "block";
+}
+
 function renderAll(){
   renderLeagueMatches();
   const standings = renderStandings();
@@ -3416,6 +3456,7 @@ function renderAll(){
   renderAdminPanel();
   renderTippekTab();
   renderLeaderboardTab();
+  renderLiveTicker();
 }
 
 bindTipHandlers("ligaMatchesContainer");
