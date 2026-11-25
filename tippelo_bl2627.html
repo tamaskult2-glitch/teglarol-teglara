@@ -69,10 +69,10 @@
     position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;
     border-radius:50%;background:radial-gradient(circle,rgba(0,200,255,.35),transparent 70%);
   }
+  #topFixed{position:sticky;top:0;z-index:200;background:var(--bl-navy);box-shadow:0 4px 14px rgba(0,0,0,.5);}
   nav.bl-tabs{
     display:flex;
-    position:sticky;
-    top:0;
+    position:relative;
     z-index:50;
     background:var(--bl-navy2);
     border-bottom:1px solid rgba(255,255,255,.08);
@@ -307,7 +307,7 @@
   #navFabUp{border:2px solid rgba(0,200,255,.4);background:rgba(0,200,255,.12);color:var(--bl-cyan);}
   #navFabNext{border:2px solid var(--bl-gold);background:rgba(201,160,56,.18);color:var(--bl-gold);animation:navPulse 2s infinite;}
   /* ===== ÉLŐ EREDMÉNY-SZALAG (hírszalag) ===== */
-  #liveTicker{display:none;position:sticky;top:0;z-index:140;overflow:hidden;background:linear-gradient(90deg,#3a0a12,#1a0b2e);border-bottom:2px solid var(--bl-red);box-shadow:0 2px 10px rgba(0,0,0,.4);}
+  #liveTicker{display:none;position:relative;overflow:hidden;background:linear-gradient(90deg,#3a0a12,#1a0b2e);border-bottom:2px solid var(--bl-red);box-shadow:0 2px 10px rgba(0,0,0,.4);}
   #liveTicker .tk-badge{position:absolute;left:0;top:0;bottom:0;z-index:2;display:flex;align-items:center;padding:0 10px;background:var(--bl-red);color:#fff;font-weight:800;font-size:11px;letter-spacing:.06em;}
   #liveTicker .tk-track{display:inline-flex;white-space:nowrap;padding-left:70px;animation:tkScroll var(--tk-dur,30s) linear infinite;}
   #liveTicker:hover .tk-track{animation-play-state:paused;}
@@ -340,6 +340,7 @@
 </head>
 <body>
 
+<div id="topFixed">
 <header class="bl-header">
   <div class="starball" aria-hidden="true">
     <div class="starball-center"></div>
@@ -498,6 +499,7 @@
   <button data-tab="tab-szabalyok">ℹ️ Szabályok</button>
   <button data-tab="tab-admin" class="admin-only">🔧 Admin</button>
 </nav>
+</div>
 
 <main>
 
@@ -2559,7 +2561,7 @@ function jumpToNextUntipped(){
 function scrollToMatch(matchId){
   const card = document.querySelector(`.match-card[data-match-id="${matchId}"]`);
   if(!card) return;
-  const navH = document.querySelector("nav.bl-tabs") ? document.querySelector("nav.bl-tabs").offsetHeight + 8 : 0;
+  const navH = document.getElementById("topFixed") ? document.getElementById("topFixed").offsetHeight + 8 : 0;
   window.scrollTo({ top: card.getBoundingClientRect().top + window.scrollY - navH, behavior: "smooth" });
   card.classList.remove("md-highlight");
   void card.offsetWidth; // reflow, hogy az animáció újra elinduljon ismételt ugrásnál is
