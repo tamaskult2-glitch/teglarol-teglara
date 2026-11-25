@@ -316,6 +316,9 @@
   #liveTicker .tk-clock{font-size:10.5px;color:#fca5a5;}
   #liveTicker .tk-sep{color:var(--bl-grey);}
   @keyframes tkScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  #navFabRefresh{bottom:194px;right:16px;border:2px solid rgba(31,174,94,.5);background:rgba(31,174,94,.14);color:var(--bl-green);}
+  #navFabRefresh.spin span{display:inline-block;animation:rfSpin .8s linear infinite;}
+  @keyframes rfSpin{to{transform:rotate(360deg);}}
   #navFabRank{bottom:136px;right:16px;border:2px solid rgba(168,85,247,.45);background:rgba(168,85,247,.14);color:#c4a3fb;}
   #navFabRank.rank-pulse{animation:rankFabPulse 1.6s infinite;}
   @keyframes rankFabPulse{
@@ -805,6 +808,7 @@
 
 <button id="navFabUp" class="nav-fab" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Fel">▲</button>
 <button id="navFabNext" class="nav-fab" onclick="jumpToNextUntipped()" title="Következő tippeletlen meccs">🎯</button>
+<button id="navFabRefresh" class="nav-fab" onclick="manualRefresh()" title="Frissítés (élő állás)"><span>🔄</span></button>
 <button id="navFabRank" class="nav-fab" onclick="openRankWatchModal()" title="Ranglista-figyelő">📊<span id="rankFabDot"></span></button>
 
 <!-- RANGLISTA-FIGYELŐ MODAL — élő meccsek alapján összegzi, hogyan állna
@@ -3446,6 +3450,22 @@ function renderLiveTicker(){
   // kétszer egymás után => folytonos, hézagmentes végtelen görgetés (-50%-ig mozog)
   el.innerHTML = `<span class="tk-badge">${hasLive?"🔴 ÉLŐ":"MA"}</span><div class="tk-track" style="--tk-dur:${Math.max(18, items.length*9)}s;">${one}<span class="tk-sep">•</span>${one}<span class="tk-sep">•</span></div>`;
   el.style.display = "block";
+}
+
+
+// Kézi frissítés gomb — mindenkinek az élő állást kérdezi le (csak olvas).
+// Adminnál ezen felül a mai lezárt eredményeket is rögzíti (autoFetchTodayResults).
+async function manualRefresh(){
+  const btn = document.getElementById("navFabRefresh");
+  if(!btn || btn.classList.contains("spin")) return;
+  btn.classList.add("spin");
+  try{
+    if(IS_ADMIN) await autoFetchTodayResults();
+    await refreshLiveScores();
+    renderAll();
+    showToastBL("🔄 Frissítve");
+  }catch(e){ showToastBL("❌ Frissítés sikertelen"); }
+  finally{ btn.classList.remove("spin"); }
 }
 
 function renderAll(){
