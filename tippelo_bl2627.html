@@ -1571,10 +1571,21 @@ async function refreshLiveScores(){
   if(changed) renderAll();
 }
 
-// Induláskor egyszer, majd percenként — mindenkinél fut, nem csak adminnál,
+// Induláskor egyszer, majd 30 másodpercenként — mindenkinél fut, nem csak adminnál,
 // mivel csak olvas (ESPN), nem ír Firebase-be.
-refreshLiveScores();
-setInterval(refreshLiveScores, 60*1000);
+// Automatikus frissítés 30 mp-enként: a 🔄 ikon ugyanúgy forog, mint kézi nyomásnál.
+async function autoRefreshTick(){
+  const btn = document.getElementById("navFabRefresh");
+  if(btn) btn.classList.add("spin");
+  const t0 = Date.now();
+  try{ await refreshLiveScores(); }
+  finally{
+    // legalább ~0,8 mp-ig látszódjon a forgás, hogy a gyors válasz se tűnjön el
+    setTimeout(()=>{ if(btn) btn.classList.remove("spin"); }, Math.max(0, 800-(Date.now()-t0)));
+  }
+}
+autoRefreshTick();
+setInterval(autoRefreshTick, 30*1000);
 
 
 /* =====================================================================
