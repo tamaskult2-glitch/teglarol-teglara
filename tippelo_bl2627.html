@@ -298,13 +298,14 @@
   }
 
   /* ===== LEBEGŐ FEL/LE UGRÁTÓ NYILAK — a VB Gólszagló mintája ===== */
+  #hdrActions{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;}
   .nav-fab{
-    position:fixed;z-index:150;width:44px;height:44px;border-radius:50%;
+    position:relative;flex-shrink:0;width:40px;height:40px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;font-size:19px;
     cursor:pointer;box-shadow:0 3px 14px rgba(0,0,0,.4);
   }
-  #navFabUp{bottom:78px;right:16px;border:2px solid rgba(0,200,255,.4);background:rgba(0,200,255,.12);color:var(--bl-cyan);}
-  #navFabNext{bottom:20px;right:16px;border:2px solid var(--bl-gold);background:rgba(201,160,56,.18);color:var(--bl-gold);animation:navPulse 2s infinite;}
+  #navFabUp{border:2px solid rgba(0,200,255,.4);background:rgba(0,200,255,.12);color:var(--bl-cyan);}
+  #navFabNext{border:2px solid var(--bl-gold);background:rgba(201,160,56,.18);color:var(--bl-gold);animation:navPulse 2s infinite;}
   /* ===== ÉLŐ EREDMÉNY-SZALAG (hírszalag) ===== */
   #liveTicker{display:none;position:sticky;top:0;z-index:140;overflow:hidden;background:linear-gradient(90deg,#3a0a12,#1a0b2e);border-bottom:2px solid var(--bl-red);box-shadow:0 2px 10px rgba(0,0,0,.4);}
   #liveTicker .tk-badge{position:absolute;left:0;top:0;bottom:0;z-index:2;display:flex;align-items:center;padding:0 10px;background:var(--bl-red);color:#fff;font-weight:800;font-size:11px;letter-spacing:.06em;}
@@ -316,10 +317,10 @@
   #liveTicker .tk-clock{font-size:10.5px;color:#fca5a5;}
   #liveTicker .tk-sep{color:var(--bl-grey);}
   @keyframes tkScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-  #navFabRefresh{bottom:194px;right:16px;border:2px solid rgba(31,174,94,.5);background:rgba(31,174,94,.14);color:var(--bl-green);}
+  #navFabRefresh{border:2px solid rgba(31,174,94,.5);background:rgba(31,174,94,.14);color:var(--bl-green);}
   #navFabRefresh.spin span{display:inline-block;animation:rfSpin .8s linear infinite;}
   @keyframes rfSpin{to{transform:rotate(360deg);}}
-  #navFabRank{bottom:136px;right:16px;border:2px solid rgba(168,85,247,.45);background:rgba(168,85,247,.14);color:#c4a3fb;}
+  #navFabRank{border:2px solid rgba(168,85,247,.45);background:rgba(168,85,247,.14);color:#c4a3fb;}
   #navFabRank.rank-pulse{animation:rankFabPulse 1.6s infinite;}
   @keyframes rankFabPulse{
     0%,100%{box-shadow:0 3px 14px rgba(0,0,0,.4),0 0 0 0 rgba(168,85,247,.45);}
@@ -357,7 +358,13 @@
   <div id="loggedInBar" style="display:none;margin-top:6px;font-size:11px;color:var(--bl-grey);">
     <span id="loggedInAs"></span> · <span id="logoutLink" style="color:var(--bl-cyan);cursor:pointer;text-decoration:underline;">kijelentkezés</span>
   </div>
-  <button onclick="openSupportModal()" style="margin-top:8px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:12px;font-weight:700;cursor:pointer;">☕ Támogass</button>
+  <div id="hdrActions">
+  <button id="navFabRefresh" class="nav-fab" onclick="manualRefresh()" title="Frissítés (élő állás)"><span>🔄</span></button>
+  <button id="navFabRank" class="nav-fab" onclick="openRankWatchModal()" title="Ranglista-figyelő">📊<span id="rankFabDot"></span></button>
+  <button onclick="openSupportModal()" style="padding:6px 14px;border-radius:20px;border:1.5px solid var(--bl-gold);background:rgba(201,160,56,.1);color:var(--bl-gold);font-size:12px;font-weight:700;cursor:pointer;">☕ Támogass</button>
+  <button id="navFabUp" class="nav-fab" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Fel">▲</button>
+  <button id="navFabNext" class="nav-fab" onclick="jumpToNextUntipped()" title="Következő tippeletlen meccs">🎯</button>
+  </div>
 </header>
 <div id="liveTicker" aria-live="polite"></div>
 
@@ -806,10 +813,6 @@
 
 </main>
 
-<button id="navFabUp" class="nav-fab" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Fel">▲</button>
-<button id="navFabNext" class="nav-fab" onclick="jumpToNextUntipped()" title="Következő tippeletlen meccs">🎯</button>
-<button id="navFabRefresh" class="nav-fab" onclick="manualRefresh()" title="Frissítés (élő állás)"><span>🔄</span></button>
-<button id="navFabRank" class="nav-fab" onclick="openRankWatchModal()" title="Ranglista-figyelő">📊<span id="rankFabDot"></span></button>
 
 <!-- RANGLISTA-FIGYELŐ MODAL — élő meccsek alapján összegzi, hogyan állna
      most a ranglista, és kiemeli a CURRENT_USER helyezés-változását. -->
